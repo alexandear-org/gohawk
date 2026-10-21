@@ -1,9 +1,9 @@
 package goroutineownership
 
 import (
-	"go/token"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/completionsteps"
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -182,21 +182,13 @@ func opaqueCallEndsWorkerWork(call *ssa.Call, budget *proofs.SearchBudget) bool 
 		if !budget.Spend() || cfg.BlockInCycle(instruction.Block()) {
 			return false
 		}
-		switch typed := instruction.(type) {
-		case *ssa.Return, *ssa.Jump, *ssa.DebugRef:
-		case *ssa.UnOp:
-			if typed.Op != token.MUL {
-				return false
-			}
-		case *ssa.Call:
-			if !ssacall.CallMatchesSymbol(typed.Common(), syntax.Builtin("close")) {
-				return false
-			}
-		case *ssa.RunDefers:
+		switch completionsteps.Tail(instruction) {
+		case completionsteps.Passive:
+		case completionsteps.Deferred:
 			if !completionOnlyDefersWithin(call.Parent(), budget) {
 				return false
 			}
-		default:
+		case completionsteps.Work:
 			return false
 		}
 	}

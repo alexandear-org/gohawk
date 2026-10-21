@@ -1,0 +1,16 @@
+signature total fallback outputs Reject;
+const Reject, Returned, RunDefers, Follow;
+
+rule Return:
+  inputs (Return)
+  => outputs Returned;
+
+rule Deferred:
+  inputs (Defers)
+  => outputs RunDefers;
+
+// Conditional terminal sends may jump to a shared return block. A jump performs
+// no work; the host must still find a successor and prove its remaining suffix.
+rule Successor:
+  inputs (Jump)
+  => outputs Follow;

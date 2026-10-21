@@ -167,3 +167,55 @@ func TestSummaryJoinChildCutoffAndFreshCache(t *testing.T) {
 		t.Fatalf("fresh cached summary unavailable: %+v", got)
 	}
 }
+
+func TestWorkerCompletionSuffixesAndAllowance(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "completiontails", `package completiontails
+ import "sync"
+ func opaque(){}
+ func terminal(done chan int){close(done)}
+ func early(done chan int){close(done);println("work")}
+ func groupFinal(group *sync.WaitGroup,other chan int){defer close(other);group.Done()}
+ func channelFinal(done,other chan int){defer close(other);close(done)}
+ func tail(done chan int,value *int)int{opaque();close(done);return *value}
+ func send(done chan int){opaque();done<-1}
+ func deferred(done chan int){defer close(done);opaque()}
+ func badDeferred(clean func()){defer clean();opaque()}
+ func cycle(){opaque();for{}}
+ `)
+	for _, test := range []struct {
+		name     string
+		terminal bool
+		want     bool
+	}{
+		{"terminal", true, true},
+		{"early", true, false},
+		{"groupFinal", true, true},
+		{"channelFinal", true, false},
+		{"tail", false, true},
+		{"send", false, false},
+		{"deferred", false, true},
+		{"badDeferred", false, false},
+		{"cycle", false, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			function := pkg.Func(test.name)
+			calls := ssaflow.InstructionsOf[*ssa.Call](function)
+			if len(calls) == 0 {
+				t.Fatal("missing call under test")
+			}
+			for _, limit := range []int{0, proofs.QueryBudget} {
+				budget := proofs.NewSearchBudget(limit)
+				var got bool
+				if test.terminal {
+					got = terminalCompletion(calls[0], budget)
+				} else {
+					got = opaqueCallEndsWorkerWork(calls[0], budget)
+				}
+				want := test.want && limit != 0
+				if got != want || budget.Exhausted() != (limit == 0) {
+					t.Fatalf("limit=%d result=%v exhausted=%v, want %v", limit, got, budget.Exhausted(), want)
+				}
+			}
+		})
+	}
+}

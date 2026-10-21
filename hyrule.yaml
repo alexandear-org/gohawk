@@ -875,3 +875,17 @@ targets:
     function: ReadWrite
     rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write_gen.go
+  - name: worker_completion_terminal
+    package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
+    signature: terminalSignature
+    function: Terminal
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal_gen.go
+  - name: worker_completion_tail
+    package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
+    signature: tailSignature
+    function: Tail
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail_gen.go

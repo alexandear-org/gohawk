@@ -1,6 +1,7 @@
 package goroutineownership
 
 import (
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/completionsteps"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -37,20 +38,21 @@ func terminalCompletion(done ssa.Instruction, budget *proofs.SearchBudget) bool 
 			return false
 		}
 		seen[current] = true
+		// A terminal signal promises that all remaining paths only return.
+		// Deferred completion is safe only after Done and a complete census;
+		// arbitrary defers could still perform work after the signal.
 		if current.index < len(current.block.Instrs) {
-			switch current.block.Instrs[current.index].(type) {
-			case *ssa.Return:
+			switch completionsteps.Terminal(current.block.Instrs[current.index]) {
+			case completionsteps.Returned:
 				continue
-			case *ssa.RunDefers:
+			case completionsteps.RunDefers:
 				if !ssacall.CallMatchesSymbol(ssaflow.InstructionCall(done), waitGroupDone) || !completionOnlyDefersWithin(done.Parent(), budget) {
 					return false
 				}
 				queue = append(queue, cursor{block: current.block, index: current.index + 1})
 				continue
-			case *ssa.Jump:
-				// Conditional terminal sends can jump to a shared return block.
-				// A jump performs no work and preserves this completion proof.
-			default:
+			case completionsteps.Follow:
+			case completionsteps.Reject:
 				return false
 			}
 		}

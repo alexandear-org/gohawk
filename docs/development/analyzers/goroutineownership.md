@@ -29,6 +29,15 @@ opaque flow, and signal-census interruption stops before process-entry evidence.
 A decided unknown proof is an answer, never permission to try another strategy.
 The existing caller-lifetime query table and flow traversal remain in Go.
 
+`completionsteps` owns the structural plans used by the terminal-completion and
+opaque-call suffix walks. Terminal completion admits only return, jump and
+RunDefers forms; the opaque suffix additionally admits DebugRef, a dereference
+load, and an exact builtin close. A same-named project function is still work.
+The root keeps the CFG work list, cycle checks, original allowance charges and
+the deferred-operation census. RunDefers is a request to check that census, not
+proof of completion: terminal completion still requires the originating Done
+contract. The real-SSA suffix tests pin those mode and cutoff boundaries.
+
 The policy's public tests pin lazy query order, positive/unknown answers, and
 independent relay/census allowances. The root proof regression pins considered
 reason order and identical verdicts with tracing disabled. Existing analyzer

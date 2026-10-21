@@ -1,0 +1,13 @@
+view Return = *ssa.Return {
+};
+view Defers = *ssa.RunDefers {
+};
+view Jump = *ssa.Jump {
+};
+view Debug = *ssa.DebugRef {
+};
+view Unary = *ssa.UnOp {
+  op: Op;
+};
+view Call = *ssa.Call {
+};

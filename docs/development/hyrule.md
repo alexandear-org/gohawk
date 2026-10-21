@@ -69,7 +69,7 @@ path is removed; generator support and examples alone do not qualify.
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation/agreement, local completion strategy and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
-| Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
+| Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment, worker-completion instruction plans and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated instruction and opaque-consumption/storage/call policies, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
@@ -780,3 +780,17 @@ and reportable evidence end the search at the current identity. When no candidat
 reports, the last matching candidate's proof and identity survive. The root's
 reason aliases retain all original numeric values and trace strings; reporting,
 held-state flow and diagnostic evidence buffering remain unchanged.
+
+## Worker completion instruction plans
+
+`goroutineownership/completionsteps` recognizes the distinct structural plans
+for terminal completion and the remaining suffix of an opaque call. Return,
+jump and RunDefers forms belong to terminal completion. An opaque-call suffix
+also permits DebugRef, dereference loads and exact builtin close calls. Receives,
+other unary operations, named close functions and new launches remain work.
+
+The plans leave CFG scheduling, cycle rejection, allowance charges and the
+completion-only defer census in Go. Terminal RunDefers still requires the
+original WaitGroup Done origin. A plan never proves a deferred callback safe;
+only the reached existing census can do so. The pure recognition adds no query
+charges and does not broaden either mode's accepted instruction set.

@@ -1,0 +1,19 @@
+signature total fallback outputs Work;
+const Work, Passive, Deferred, loadToken;
+guard closes;
+
+// This policy is deliberately broader than terminal completion: an opaque
+// call's nonblocking tail may load a captured cell or close a completion signal.
+// Other unary operations, named calls, sends, receives and launches remain work.
+rule Passive:
+  inputs (or (Return) (Jump) (Debug) (Unary op:loadToken))
+  => outputs Passive;
+
+rule Close:
+  inputs $call:(Call)
+  && closes $call
+  => outputs Passive;
+
+rule Deferred:
+  inputs (Defers)
+  => outputs Deferred;
