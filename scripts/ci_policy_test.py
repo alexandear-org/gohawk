@@ -25,7 +25,7 @@ class CIPolicyTest(unittest.TestCase):
             '#!/bin/sh\nprintf "%s\\n" "$*" >> generation-invoked\n'
         )
         self.environment = os.environ.copy()
-        for name in ("CI", "GITHUB_ACTIONS", "MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES", "GOFLAGS"):
+        for name in ("CI", "GITHUB_ACTIONS", "MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES", "GOFLAGS", "HYRULE_READY"):
             self.environment.pop(name, None)
 
     def run_make(self, *arguments, markers=None):
