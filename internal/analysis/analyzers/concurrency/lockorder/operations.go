@@ -5,12 +5,12 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockforms"
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockvariant"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
-	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -200,72 +200,7 @@ func appendLockValue(values []ssa.Value, candidate ssa.Value, budget *proofs.Sea
 	return append(values, candidate)
 }
 
-// loopVariantValue reports whether the acquisition's receiver is selected by a
-// loop iteration: it is defined inside a cycle and derives from a phi or map
-// iterator or channel receive in that cycle, as a range element does. This
-// is uncertainty, not freshness: a sender could send the same pointer again.
-// A field of a receiver or
-// a package variable locked inside a loop is the same mutex every time and
-// stays reportable.
+// loopVariantValue shares the caller's reaching walk with loop-origin queries.
 func loopVariantValue(walk ssaflow.ReachingWalk, value ssa.Value) bool {
-	if value == nil || !walk.Mark(value) {
-		return false
-	}
-	switch typed := value.(type) {
-	case *ssa.Alloc:
-		// An allocation executed again by a loop creates a different lock,
-		// even though the allocation has one SSA name.
-		return cfg.BlockInCycle(typed.Block())
-	case *ssa.Phi:
-		return cfg.BlockInCycle(typed.Block())
-	case *ssa.Extract:
-		return loopVariantExtract(walk, typed)
-	case *ssa.UnOp:
-		// Queue consumers can receive a different object each iteration.
-		// https://github.com/encodeous/nylon/blob/c4a96c804f7aa08512721dec7994907eab100bc8/polyamide/device/channels.go#L83-L99
-		if typed.Op == token.ARROW {
-			return cfg.BlockInCycle(typed.Block())
-		}
-		return loopVariantValue(walk, typed.X)
-	case *ssa.IndexAddr:
-		return loopVariantValue(walk, typed.Index) || loopVariantValue(walk, typed.X)
-	case *ssa.Index:
-		return loopVariantValue(walk, typed.Index) || loopVariantValue(walk, typed.X)
-	case *ssa.FieldAddr:
-		return loopVariantValue(walk, typed.X)
-	case *ssa.Field:
-		return loopVariantValue(walk, typed.X)
-	case *ssa.BinOp:
-		// A range index is the loop phi plus one.
-		return loopVariantValue(walk, typed.X) || loopVariantValue(walk, typed.Y)
-	case *ssa.Call:
-		// A lookup keyed by the iteration, such as the per-session state a
-		// cleanup loop fetches before locking it, selects a different mutex
-		// each time; a call with no loop-variant argument returns the same one.
-		// CodeKanban locks every session's state this way:
-		// https://github.com/fy0/CodeKanban/blob/745699cb67d3d34cec4793168f148eb61e43e766/service/websession/history_cleanup.go#L262-L276
-		return slices.ContainsFunc(typed.Common().Args, func(argument ssa.Value) bool {
-			return loopVariantValue(walk, argument)
-		})
-	case *ssa.ChangeType, *ssa.ChangeInterface, *ssa.Convert, *ssa.MakeInterface:
-		inner, ok := ssaflow.UnwrapTransparentValue(
-			value,
-			ssaflow.TransparentChangeInterface|ssaflow.TransparentChangeType|ssaflow.TransparentConvert|ssaflow.TransparentMakeInterface,
-		)
-		return ok && loopVariantValue(walk, inner)
-	}
-	return false
-}
-
-func loopVariantExtract(walk ssaflow.ReachingWalk, value *ssa.Extract) bool {
-	switch tuple := value.Tuple.(type) {
-	case *ssa.Next:
-		return cfg.BlockInCycle(tuple.Block())
-	case *ssa.Select:
-		// The first two results are the selected case index and receive-ok;
-		// only the remaining results are received payloads.
-		return value.Index >= 2 && cfg.BlockInCycle(tuple.Block())
-	default:
-		return loopVariantValue(walk, value.Tuple)
-	}
+	return lockvariant.Value(walk, value)
 }

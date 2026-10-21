@@ -1,0 +1,37 @@
+view Allocation = *ssa.Alloc {
+};
+view Phi = *ssa.Phi {
+};
+view Extract = *ssa.Extract {
+  tuple: Tuple;
+  index: Index;
+};
+view Unary = *ssa.UnOp {
+  op: Op;
+  source: X;
+};
+view IndexAddress = *ssa.IndexAddr {
+  owner: X;
+  index: Index;
+};
+view Index = *ssa.Index {
+  owner: X;
+  index: Index;
+};
+view FieldAddress = *ssa.FieldAddr {
+  owner: X;
+};
+view Field = *ssa.Field {
+  owner: X;
+};
+view Binary = *ssa.BinOp {
+  first: X;
+  second: Y;
+};
+view Call = *ssa.Call {
+};
+view Next = *ssa.Next {
+};
+view Select = *ssa.Select {
+};
+const receiveToken;

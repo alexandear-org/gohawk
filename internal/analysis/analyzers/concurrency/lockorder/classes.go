@@ -4,6 +4,7 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockidentity"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -185,7 +186,7 @@ func lockClass(walk ssaflow.ReachingWalk, value ssa.Value) string {
 	}
 	switch typed := value.(type) {
 	case *ssa.Call:
-		owner, field := mutexGetter(typed)
+		owner, field := lockidentity.Getter(typed)
 		if field != nil {
 			return types.TypeString(owner.Type(), nil) + "." + field.Name()
 		}
@@ -193,7 +194,7 @@ func lockClass(walk ssaflow.ReachingWalk, value ssa.Value) string {
 		// One package variable is one lock, so its class is its instance.
 		return typed.Name()
 	case *ssa.FieldAddr:
-		field := structField(typed.X.Type(), typed.Field)
+		field := lockidentity.Field(typed.X.Type(), typed.Field)
 		if field == nil {
 			return ""
 		}
@@ -220,7 +221,7 @@ func globalRooted(walk ssaflow.ReachingWalk, value ssa.Value) bool {
 	}
 	switch typed := value.(type) {
 	case *ssa.Call:
-		owner, field := mutexGetter(typed)
+		owner, field := lockidentity.Getter(typed)
 		return field != nil && globalRooted(walk, owner)
 	case *ssa.Global:
 		return true

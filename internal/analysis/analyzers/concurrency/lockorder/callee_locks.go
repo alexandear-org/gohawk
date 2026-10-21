@@ -6,6 +6,7 @@ import (
 	"go/types"
 	"strings"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockidentity"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -331,7 +332,7 @@ func embeddedValueFields(path ssaflow.EmbeddedFieldPath) bool {
 	}
 	valueType := path.Root.Type()
 	for _, index := range path.Fields[:path.Depth] {
-		field := structField(valueType, index)
+		field := lockidentity.Field(valueType, index)
 		if field == nil {
 			return false
 		}
@@ -422,7 +423,7 @@ func mutexPathInstanceIdentity(path ssaflow.EmbeddedFieldPath) string {
 	identity.WriteString(name)
 	valueType := root.Value.Type()
 	for _, index := range path.Fields[:path.Depth] {
-		field := structField(valueType, index)
+		field := lockidentity.Field(valueType, index)
 		if field == nil {
 			return ""
 		}

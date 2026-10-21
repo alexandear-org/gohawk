@@ -1,0 +1,41 @@
+view Closure = *ssa.MakeClosure {
+};
+view Unary = *ssa.UnOp {
+  op: Op;
+  source: X;
+};
+view Allocation = *ssa.Alloc {
+};
+view FieldAddress = *ssa.FieldAddr {
+};
+view IndexAddress = *ssa.IndexAddr {
+};
+view Assertion = *ssa.TypeAssert {
+};
+view Slice = *ssa.Slice {
+  source: X;
+};
+view Extract = *ssa.Extract {
+  source: Tuple;
+};
+view Call = *ssa.Call {
+};
+view Store = *ssa.Store {
+  address: Addr;
+  value: Val;
+};
+view Send = *ssa.Send {
+  value: X;
+};
+view Select = *ssa.Select {
+};
+view Update = *ssa.MapUpdate {
+  value: Value;
+};
+view Return = *ssa.Return {
+};
+view Defer = *ssa.Defer {
+};
+view Go = *ssa.Go {
+};
+const loadToken;

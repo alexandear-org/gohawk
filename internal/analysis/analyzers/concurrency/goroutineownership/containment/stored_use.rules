@@ -1,0 +1,21 @@
+signature total fallback outputs false;
+guard sameValue;
+query stored = storedCarries;
+query source = Matches;
+
+rule Store:
+  inputs $walk (Store address:$address value:$value) $owner $target
+  && sameValue $address $owner
+  => query source $walk $value $target {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// Each selected address has its own referrers. The surrounding walk retains
+// sibling selection and marking before these recursive use queries.
+rule Selected:
+  inputs $walk $value:(or (FieldAddress) (IndexAddress)) _ $target
+  => query stored $walk $value $target {
+       true => outputs true;
+       false => outputs false;
+     };

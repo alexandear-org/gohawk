@@ -707,3 +707,21 @@ indices stop, and only slice loads may expose an owner's backing array. Alias
 queries, field-contract uncertainty, writer witnesses, budgets and held-state
 updates remain in the existing proof and flow. Existing read-lock, private-owner,
 constant/dynamic-index and allowance regressions retain the behavioral boundary.
+
+## Generated identity and loop-origin cases
+
+The analyzer-owned `lockidentity` package centralizes exact getter, field and
+observation-time storage contracts. Its generated leaves preserve terminal
+unknown call/field results, copied-parameter/capture identity and distinct SSA
+names for local owners. Owner and index resolution retain their previous order;
+interrupted walks publish no identity. Class and callee-path queries use the
+same getter and direct-field helpers.
+
+`lockvariant` generates iteration-dependent value and extraction cases around
+the caller's existing reaching walk. Cycle-dependent allocation/phi/receive
+origins supply uncertainty only. Selected-case index and receive-ok results do
+not borrow payload dependence; a receive outside a cycle does not fall through
+to its channel. Operand and argument traversal retains its original ordering,
+short circuiting and shared visited state. Existing identity, copied-receiver,
+loop and allowance regressions exercise the complete consuming lock flow.
+Held-state mutations and budgeted acquisition/return searches remain in Go.

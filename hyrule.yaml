@@ -434,3 +434,59 @@ targets:
     function: decideDefaultUse
     rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use_gen.go
+  - name: worker_containment
+    package: internal/analysis/analyzers/concurrency/goroutineownership/containment
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
+    signature: containmentSignature
+    function: decideContainment
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf_gen.go
+  - name: worker_stored_containment
+    package: internal/analysis/analyzers/concurrency/goroutineownership/containment
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
+    signature: storedUseSignature
+    function: decideStoredUse
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use_gen.go
+  - name: worker_helper_escape
+    package: internal/analysis/analyzers/concurrency/goroutineownership/containment
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
+    signature: escapeSignature
+    function: Escapes
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/escape.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/containment/escape_gen.go
+  - name: lock_identity
+    package: internal/analysis/analyzers/concurrency/lockorder/lockidentity
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockidentity/identity.go
+    signature: leafSignature
+    function: decideIdentityLeaf
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf_gen.go
+  - name: lock_loop_origin
+    package: internal/analysis/analyzers/concurrency/lockorder/lockvariant
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockvariant/iteration.go
+    signature: valueSignature
+    function: decideValue
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/value.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/schema.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockvariant/value_gen.go
+  - name: lock_loop_extraction
+    package: internal/analysis/analyzers/concurrency/lockorder/lockvariant
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockvariant/iteration.go
+    signature: extractSignature
+    function: decideExtract
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/schema.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract_gen.go
+  - name: worker_receive
+    package: internal/analysis/analyzers/concurrency/goroutineownership/receives
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/receives/receives.go
+    signature: fromSignature
+    function: decideFrom
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/from.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/receives/from_gen.go
+  - name: worker_guaranteed_receive
+    package: internal/analysis/analyzers/concurrency/goroutineownership/receives
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/receives/receives.go
+    signature: guaranteedSignature
+    function: decideGuaranteed
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed_gen.go

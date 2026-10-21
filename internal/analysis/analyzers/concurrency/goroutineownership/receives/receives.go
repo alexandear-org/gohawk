@@ -21,23 +21,7 @@ func From(instruction ssa.Instruction, matches func(ssa.Value) bool) bool {
 
 // FromWithin bounds select-case enumeration with the supplied allowance.
 func FromWithin(instruction ssa.Instruction, matches func(ssa.Value) bool, budget *proofs.SearchBudget) bool {
-	switch typed := instruction.(type) {
-	case *ssa.UnOp:
-		return typed.Op == token.ARROW && matches(typed.X)
-	case *ssa.Select:
-		for _, state := range typed.States {
-			if !budget.Spend() {
-				return false
-			}
-			if state.Dir == types.RecvOnly && matches(state.Chan) {
-				return true
-			}
-		}
-	case *ssa.Range:
-		_, channel := typed.X.Type().Underlying().(*types.Chan)
-		return channel && matches(typed.X)
-	}
-	return false
+	return decideFrom(instruction, matches, budget)
 }
 
 // Guaranteed requires a receive on every selected path.
@@ -45,15 +29,7 @@ func FromWithin(instruction ssa.Instruction, matches func(ssa.Value) bool, budge
 // on the edge, or at an unambiguous arm entry, keeping other cases open.
 // https://github.com/containerd/stargz-snapshotter/blob/624678b4e421947534cbf0618f9609853cccee0f/store/manager.go#L193-L221
 func Guaranteed(instruction ssa.Instruction, matches func(ssa.Value) bool) bool {
-	if SelectedAtEntry(instruction, matches) {
-		return true
-	}
-	if choice, ok := instruction.(*ssa.Select); ok {
-		return choice.Blocking && len(choice.States) > 0 && !slices.ContainsFunc(choice.States, func(state *ssa.SelectState) bool {
-			return state.Dir != types.RecvOnly || !matches(state.Chan)
-		})
-	}
-	return From(instruction, matches)
+	return decideGuaranteed(instruction, matches)
 }
 
 // SelectedAtEntry recognizes an unambiguous selected receive at an arm entry.
@@ -64,4 +40,43 @@ func SelectedAtEntry(instruction ssa.Instruction, matches func(ssa.Value) bool) 
 	}
 	channel, selected := ssapath.SelectedReceiveChannel(block)
 	return selected && matches(channel)
+}
+
+// Native predicate parameters retain the caller's exact or possible channel
+// policy. Invocations are queries because those predicates may spend budgets.
+type (
+	fromSignature       func(ssa.Instruction, func(ssa.Value) bool, *proofs.SearchBudget) bool
+	guaranteedSignature func(ssa.Instruction, func(ssa.Value) bool) bool
+)
+
+var (
+	_ fromSignature       = decideFrom
+	_ guaranteedSignature = decideGuaranteed
+)
+
+const receiveToken = token.ARROW
+
+func matchChannel(matches func(ssa.Value) bool, channel ssa.Value) bool { return matches(channel) }
+
+func channelRange(value ssa.Value) bool {
+	_, channel := value.Type().Underlying().(*types.Chan)
+	return channel
+}
+
+func selectReceives(choice *ssa.Select, matches func(ssa.Value) bool, budget *proofs.SearchBudget) bool {
+	for _, state := range choice.States {
+		if !budget.Spend() {
+			return false
+		}
+		if state.Dir == types.RecvOnly && matches(state.Chan) {
+			return true
+		}
+	}
+	return false
+}
+
+func selectGuaranteed(choice *ssa.Select, matches func(ssa.Value) bool) bool {
+	return choice.Blocking && len(choice.States) > 0 && !slices.ContainsFunc(choice.States, func(state *ssa.SelectState) bool {
+		return state.Dir != types.RecvOnly || !matches(state.Chan)
+	})
 }

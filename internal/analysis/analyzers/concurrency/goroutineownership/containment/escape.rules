@@ -1,0 +1,44 @@
+signature total fallback outputs false;
+query derived, captured, called;
+query selected = selectHandoff;
+query returned = returnedHandoff;
+
+rule Consumed:
+  inputs (or (Store value:$value) (Send value:$value) (Update value:$value)) _ $derives _
+  => query derived $derives $value {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// Offering a send on the supplied owner's field may participate in shutdown.
+// It is uncertainty, never a join borrowed from another selected receive arm.
+rule Selected:
+  inputs $choice:(Select) $local _ _
+  => query selected $choice $local {
+       true => outputs true;
+       false => outputs false;
+     };
+
+rule Captured:
+  inputs $closure:(Closure) _ $derives _
+  => query captured $closure $derives {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// Returning the owner's join handle exposes it to callers; it is not a join
+// performed by the accessor itself.
+// https://github.com/raviqqe/muffet/blob/ea33f85e5644c609a114b00e1f4dfc757b15c8ee/page_checker_test.go#L39-L46
+rule Returned:
+  inputs $returned:(Return) $local $derives _
+  => query returned $returned $local $derives {
+       true => outputs true;
+       false => outputs false;
+     };
+
+rule Called:
+  inputs $instruction:(or (Call) (Defer) (Go)) _ _ $calls
+  => query called $calls $instruction {
+       true => outputs true;
+       false => outputs false;
+     };

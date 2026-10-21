@@ -67,12 +67,12 @@ path is removed; generator support and examples alone do not qualify.
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Generated launch/callback recognition and unproven-completion outcomes; recursive coverage, path mapping and the existing transfer table stay in Go |
-| Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
+| Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
-| Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps and dynamic-index leaves; main held-state transition policy remains; identity and cycle search stay in Go |
+| Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves and identity/loop-origin cases; storage/reaching searches, held-state updates and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves, response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
@@ -519,3 +519,52 @@ The operation metadata, condition contexts, worker condition arms and pre-proven
 path summaries remain borrowed exactly as before. Nil and non-nil empty lists
 remain distinct. Collection, cutoff tracking, source folding and branch joins
 remain Go responsibilities; derived copying does not define summary equality.
+
+## Worker containment, helper escapes and receive sites
+
+`goroutineownership/containment` generates the SSA cases selected by the existing
+possible-possession walk. Alias checks still precede leaf recognition; closure
+bindings, old stores and sibling selections retain their original traversal and
+visited state. An asserted owner can carry a stored target, but its assertion is
+not a transparent transfer. Generated stored-use cases retain exact store-address
+comparison before following a value.
+
+Helper escape rules pass native predicate parameters to explicit queries. The
+caller retains the tracked-kind policy, recursive helper memo and allowance;
+there is no query-host adapter or second helper cache. A returned owner handle
+or offered select send remains unknown participation, not positive completion.
+
+`receives` generates direct, selected and channel-range cases, together with
+ordered guaranteed-receive decisions. Selected arm-entry evidence precedes local
+instruction evidence. A select that is mixed, empty or nonblocking remains a
+terminal negative for guaranteed completion, even if some offered receive uses
+the tracked channel. Select enumeration retains its original per-arm spending,
+and channel predicates retain the caller's exact/possible identity policy.
+Existing receive identity, select-edge, helper-use and worker-flow regressions
+exercise these paths through the analyzer.
+
+## Lock instance identity and iteration dependence
+
+`lockorder/lockidentity` owns one instance-identity walk and its exact getter and
+field contracts. Generated leaves choose getter, field, indexed and named SSA
+cases. An unresolved call or field is terminal: it cannot fall back to an SSA
+name and invent a stable lock across executions. Indexed identity still resolves
+the owner before the index, including when the owner is unknown. Storage queries,
+walk marking and the final child/pool fence remain in Go. The parent class and
+callee-path code use the same getter and field helpers.
+
+`lockvariant` generates iteration-dependent origin and extraction cases while
+sharing the caller's existing reaching walk. Receives outside a cycle are
+terminal false; select index/receive-ok metadata never borrows payload dependence
+or incurs another tuple visit. Index-before-owner and left-before-right queries
+retain their short circuiting and common visited set. Calls follow their arguments
+in order, and transparent wrappers use the shared caller-selected form mask.
+No iteration-dependent source proves distinct runtime locks: it supplies only
+uncertainty. Existing lock identity, copied-receiver, loop and all-allowance
+controls remain the behavioral contract.
+
+The main held-state transfer remains Go orchestration. It interleaves trace and
+map updates, deferred-release registration, caller-ownership checks, and exclusive
+acquisition queries. Moving the whole transfer into a pure builder would violate
+that order; a separate rule dispatcher would leave the same state machine in Go.
+The substantial finite source decisions it consumes are generated instead.

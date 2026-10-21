@@ -4,7 +4,6 @@
 package containment
 
 import (
-	"go/token"
 	"slices"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -24,33 +23,7 @@ func Matches(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
 		if heapmodel.MayAlias(value, target) {
 			return true
 		}
-		switch typed := value.(type) {
-		case *ssa.MakeClosure:
-			// A closure carries whatever it captured, including an addressable
-			// local that held the target at any point.
-			return slices.ContainsFunc(typed.Bindings, func(binding ssa.Value) bool {
-				return heapmodel.CapturedBindingMatches(binding, target) || Matches(walk, binding, target)
-			})
-		case *ssa.UnOp:
-			// A struct passed or returned by value is loaded from the local that
-			// assembled it, so the load carries what the local's fields hold.
-			return typed.Op == token.MUL && Matches(walk, typed.X, target)
-		case *ssa.Alloc, *ssa.FieldAddr, *ssa.IndexAddr:
-			return storedCarries(walk, value, target)
-		case *ssa.TypeAssert:
-			// Stores through an asserted owner remain positive containment
-			// evidence when that same owner later reaches a helper. Do not
-			// unwrap the assertion or call the store itself a transfer.
-			// https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
-			return storedCarries(walk, value, target)
-		case *ssa.Slice:
-			return Matches(walk, typed.X, target)
-		case *ssa.Extract:
-			return Matches(walk, typed.Tuple, target)
-		case *ssa.Call:
-			return callResultCarries(walk, typed, target)
-		}
-		return false
+		return decideContainment(walk, value, target)
 	})
 }
 
@@ -80,19 +53,8 @@ func storedCarries(walk ssaflow.ReachingWalk, address, target ssa.Value) bool {
 		return false
 	}
 	for _, reference := range *address.Referrers() {
-		switch typed := reference.(type) {
-		case *ssa.Store:
-			if typed.Addr == address && Matches(walk, typed.Val, target) {
-				return true
-			}
-		case *ssa.FieldAddr:
-			if storedCarries(walk, typed, target) {
-				return true
-			}
-		case *ssa.IndexAddr:
-			if storedCarries(walk, typed, target) {
-				return true
-			}
+		if decideStoredUse(walk, reference, address, target) {
+			return true
 		}
 	}
 	return false

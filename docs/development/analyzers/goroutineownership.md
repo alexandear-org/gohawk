@@ -797,3 +797,19 @@ from the same candidate allowance and feeds the same cached instruction label.
 bookkeeping and testing cleanup, alongside existing summary, owner and callback
 fixtures. The containment and factory-origin searches moved without changing
 what wrappers or storage facts they follow or how their budgets are charged.
+
+## Generated containment and receive cases
+
+The analyzer-owned `containment` rules now select possible-possession leaves,
+address uses and helper escape instruction families. Alias, sibling-selection
+and recursive storage walks retain their former order and visited state. Native
+predicate arguments carry exact/possible derivation and recursive helper policy
+without a new memo or query-host wrapper. Return and select-send evidence remains
+unknown worker participation, never a positive join.
+
+The `receives` rules keep channel predicates explicit and preserve arm-entry
+precedence. A mixed, empty or nonblocking select cannot become a guaranteed
+receive just because an offered arm matches. Per-arm allowance spending remains
+in the Go enumerator. Existing receive identity, selected-edge, nested helper,
+retained-owner and full worker-flow fixtures continue to pin these boundaries;
+this migration does not broaden completion or handoff semantics.

@@ -3,11 +3,11 @@ package goroutineownership
 import (
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
-	"github.com/kojah/gohawk/internal/engine/lifecycle"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -208,36 +208,9 @@ func (search *helperSearch) instructionEscapes(
 	kind trackedKind,
 	derives func(ssa.Value) bool,
 ) bool {
-	switch typed := instruction.(type) {
-	case *ssa.Store:
-		return derives(typed.Val)
-	case *ssa.Send:
-		return derives(typed.X)
-	case *ssa.Select:
-		// A helper offering a send on a field of the supplied owner may
-		// participate in its shutdown protocol. It is not a channel join;
-		// preserve the aggregate handoff as unknown without borrowing another
-		// select arm's receive. A bare completion-channel select does not qualify.
-		return slices.ContainsFunc(typed.States, func(state *ssa.SelectState) bool {
-			return state.Send != nil && ssaflow.ValueIsAccessPathFrom(state.Chan, local)
-		})
-	case *ssa.MapUpdate:
-		return derives(typed.Value)
-	case *ssa.MakeClosure:
-		return slices.ContainsFunc(typed.Bindings, derives)
-	case *ssa.Return:
-		// Returning a channel selected from the tracked owner exposes its join
-		// handle. The accessor itself is not a join, but its caller may drain
-		// the stream; losing that relationship cannot prove an unjoined worker.
-		// https://github.com/raviqqe/muffet/blob/ea33f85e5644c609a114b00e1f4dfc757b15c8ee/page_checker_test.go#L39-L46
-		return lifecycle.ReturnedValueOwnsValue(typed, local) || slices.ContainsFunc(typed.Results, func(value ssa.Value) bool {
-			return ssaflow.ChannelType(value) && derives(value)
-		})
-	case *ssa.Call, *ssa.Defer, *ssa.Go:
+	return containment.Escapes(instruction, local, derives, func(instruction ssa.Instruction) bool {
 		return search.callEscapes(instruction, kind, derives)
-	default:
-		return false
-	}
+	})
 }
 
 func (search *helperSearch) callEscapes(instruction ssa.Instruction, kind trackedKind, derives func(ssa.Value) bool) bool {

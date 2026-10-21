@@ -1,0 +1,45 @@
+signature total fallback outputs false;
+query closure = closureCarries;
+query source = Matches;
+query stored = storedCarries;
+query returned = callResultCarries;
+
+// Captured addressable locals may have held the target at any point.
+rule Closure:
+  inputs $walk $closure:(Closure) $target
+  => query closure $walk $closure $target {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// Loading an aggregate carries the values its fields held. Arithmetic does not.
+rule Load:
+  inputs $walk (Unary op:loadToken source:$source) $target
+  => query source $walk $source $target {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// An assertion may carry a stored owner, but is not transparently unwrapped and
+// does not itself transfer ownership.
+// https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
+rule Stored:
+  inputs $walk $value:(or (Allocation) (FieldAddress) (IndexAddress) (Assertion)) $target
+  => query stored $walk $value $target {
+       true => outputs true;
+       false => outputs false;
+     };
+
+rule Projected:
+  inputs $walk (or (Slice source:$source) (Extract source:$source)) $target
+  => query source $walk $source $target {
+       true => outputs true;
+       false => outputs false;
+     };
+
+rule Call:
+  inputs $walk $call:(Call) $target
+  => query returned $walk $call $target {
+       true => outputs true;
+       false => outputs false;
+     };

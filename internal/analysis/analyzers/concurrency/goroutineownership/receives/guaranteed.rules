@@ -1,0 +1,27 @@
+signature total fallback outputs false;
+query entry = SelectedAtEntry;
+query selected = selectGuaranteed;
+query received = From;
+
+// Arm-entry evidence precedes instruction-local evidence. A mixed or defaulted
+// select is terminal false, even when some offered arm receives from the target.
+// https://github.com/containerd/stargz-snapshotter/blob/624678b4e421947534cbf0618f9609853cccee0f/store/manager.go#L193-L221
+rule Select:
+  inputs $instruction:(Select) $matches
+  => query entry $instruction $matches {
+       true => outputs true;
+       false => query selected $instruction $matches {
+         true => outputs true;
+         false => outputs false;
+       };
+     };
+
+rule Other:
+  inputs $instruction $matches
+  => query entry $instruction $matches {
+       true => outputs true;
+       false => query received $instruction $matches {
+         true => outputs true;
+         false => outputs false;
+       };
+     };

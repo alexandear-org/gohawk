@@ -1,0 +1,10 @@
+view Unary = *ssa.UnOp {
+  op: Op;
+  channel: X;
+};
+view Select = *ssa.Select {
+};
+view Range = *ssa.Range {
+  channel: X;
+};
+const receiveToken;
