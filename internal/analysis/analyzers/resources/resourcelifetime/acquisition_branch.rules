@@ -32,9 +32,7 @@ rule OtherBranch:
                NoGuard => decline;
              };
            true <- query available $budget
-             else {
-               false => decline;
-             };
+             else decline;
            pure outputs (testifyResult $success $budget) $success;
          }
      <|> query flow $branch $successor $error $budget

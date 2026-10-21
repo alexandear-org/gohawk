@@ -31,7 +31,9 @@ The success-branch policy combines `do` with ordered alternatives: explicit
 `decline` tries ordinary flow after an unavailable assertion strategy, without
 repeating its queries or refunding its allowance.
 Each step selects a complete outcome and explicitly returns on every other
-outcome. Reached queries retain their original order and budget charges; the
+outcome. Boolean steps may write `false <- query ... else result;` (or `true`)
+to handle the complementary literal without a one-arm block. Tagged outcomes
+retain explicit named arms. Reached queries retain their original order and budget charges; the
 public Go entry points still discard evidence if the child or shared allowance
 is exhausted. CI pins the compiler revision supporting this syntax.
 

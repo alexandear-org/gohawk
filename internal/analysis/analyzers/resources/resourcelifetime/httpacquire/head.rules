@@ -10,13 +10,9 @@ rule Head:
   inputs $call:(headDo $client $request) $budget
   => do {
        true <- query constructed $request $budget
-         else {
-           false => outputs (Unknown reason:None);
-         };
+         else outputs (Unknown reason:None);
        true <- query unchanged $request $budget
-         else {
-           false => outputs (Disproven reason:HeadRequestModified);
-         };
+         else outputs (Disproven reason:HeadRequestModified);
        Proven <- query client $client $call $budget
          else {
            Unknown reason:$reason => outputs (Unknown reason:$reason);
