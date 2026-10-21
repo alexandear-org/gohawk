@@ -42,3 +42,52 @@ targets:
     function: classifyValueUse
     rules: [internal/analysis/analyzers/resources/deferinloop/classify.rules]
     out: internal/analysis/analyzers/resources/deferinloop/classify_gen.go
+  - name: cancellation_instruction_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: classifySignature
+    function: classifyCancellation
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/classify.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/classify_gen.go
+  - name: cancellation_call_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: callLabelSignature
+    function: recognizeCancellationCall
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/call_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/call_label_gen.go
+  - name: cancellation_argument_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: argumentLabelSignature
+    function: recognizeCancellationArgument
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/argument_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/argument_label_gen.go
+  - name: cancellation_recognized_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: callLabelSignature
+    function: recognizeCancellation
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/recognized_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/recognized_label_gen.go
+  - name: cancellation_direct_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: callLabelSignature
+    function: recognizeCancellationDirect
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/direct_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/direct_label_gen.go
+  - name: cancellation_deferred_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: argumentLabelSignature
+    function: recognizeCancellationDeferredUse
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/deferred_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/deferred_label_gen.go
+  - name: cancellation_return_label
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
+    signature: returnLabelSignature
+    function: classifyCancellationReturn
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/return_label.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go

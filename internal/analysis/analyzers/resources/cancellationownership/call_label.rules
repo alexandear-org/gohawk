@@ -1,0 +1,25 @@
+signature total fallback outputs (Opaque reasonLabelHelperUndecided) true;
+query returnedCallback = cancellationClassifier.returnedCallbackCancels;
+query testingCleanup($common) = testingCleanupCall $common $classifier.cancel;
+query registered($instruction, $common) = registeredCleanupCall $instruction $common $classifier.cancel;
+query exactArgument = cancellationClassifier.exactCallArgument;
+query captured($common) = capturedCancellationArgument $common $classifier.cancel;
+
+rule Call:
+  inputs $instruction $classifier $common
+  => query returnedCallback $classifier $instruction $common {
+       true => outputs (Release reasonLabelReturnedCallback) true;
+       false => query testingCleanup $common {
+         true => outputs (Transfer reasonLabelTestingCleanup) true;
+         false => query registered $instruction $common {
+           true => outputs (Opaque reasonLabelRegisteredCallback) true;
+           false => query exactArgument $classifier $instruction $common {
+             Decided label:$label => outputs $label true;
+             Unrecognized => query captured $common {
+               true => outputs (Opaque reasonLabelCapturedByCallback) true;
+               false => outputs (NoAction reasonCancellationNone) false;
+             };
+           };
+         };
+       };
+     };

@@ -1,0 +1,24 @@
+signature total fallback outputs (Opaque reasonLabelDeferredClosure) true;
+query callsValue($instruction) = lifecycle.DeferredClosureCallsValue $instruction $classifier.cancel;
+query invokes($instruction) = lifecycle.DeferredClosureInvokesArgumentOnEveryReturn $instruction $classifier.cancel;
+query captures($instruction) = deferredClosureCaptures $instruction $classifier.cancel;
+query resolved($instruction) = deferredClosureUseIsLocallyResolved $instruction $classifier.cancel $classifier.observer;
+
+// Captured callbacks and helper chains are deliberately ambiguous. These broad
+// traversals establish possible participation, not which callback runs on every
+// path. Each search runs only after the preceding question fails to establish it.
+rule DeferredUse:
+  inputs $instruction $classifier
+  => query callsValue $instruction {
+       true => outputs (Opaque reasonLabelDeferredClosure) true;
+       false => query invokes $instruction {
+         true => outputs (Opaque reasonLabelDeferredClosure) true;
+         false => query captures $instruction {
+           true => outputs (Opaque reasonLabelDeferredClosure) true;
+           false => query resolved $instruction {
+             true => outputs (NoAction reasonCancellationNone) true;
+             false => outputs (NoAction reasonCancellationNone) false;
+           };
+         };
+       };
+     };

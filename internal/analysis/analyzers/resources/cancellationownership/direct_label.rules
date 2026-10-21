@@ -1,0 +1,40 @@
+signature total fallback outputs (Opaque reasonLabelDeferredClosure) true;
+guard ownDone = cancellationClassifier.ownDoneChannel;
+guard exactCancel($common) = exactCancelCall $common $classifier.cancel;
+query literal = cancellationClassifier.deferredLiteralLabel;
+query remaining = recognizeCancellationDeferredUse;
+
+// A selected Done observation is cancellation evidence, not synchronous unlinking.
+rule Done:
+  inputs (Receive op:receiveToken value:$channel) $classifier _
+  && ownDone $classifier $channel
+  => outputs (Opaque reasonLabelOwnDoneReceive) true;
+
+rule StartedCancel:
+  inputs (Started) $classifier $common
+  && exactCancel $common
+  => outputs (Transfer reasonLabelLaunchedCancel) true;
+
+rule DirectCancel:
+  inputs _ $classifier $common
+  && exactCancel $common
+  => outputs (Release reasonLabelRelease) true;
+
+rule DeferredLiteral:
+  inputs $instruction:(Deferred) $classifier _
+  => query literal $classifier $instruction {
+       Decided label:$label => outputs $label true;
+       Unrecognized => query $result = remaining $instruction $classifier
+       decide $result {
+         Decided => $result;
+         Unrecognized => $result;
+       };
+     };
+
+rule Remaining:
+  inputs $instruction $classifier _
+  => query $result = remaining $instruction $classifier
+     decide $result {
+       Decided => $result;
+       Unrecognized => $result;
+     };

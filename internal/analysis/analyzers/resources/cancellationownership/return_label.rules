@@ -1,0 +1,27 @@
+signature total fallback outputs (Opaque reasonLabelOwnerUnavailable);
+query guarded = cancellationClassifier.resultGuardedReturn;
+query returned($instruction) = returnsCancel $instruction $classifier.cancel;
+query owner = cancellationClassifier.ownerReturnLabel;
+query possibleOwner($instruction) = lifecycle.ReturnedValueOwnsValue $instruction $classifier.cancel;
+
+rule Return:
+  inputs $instruction $classifier
+  => query guarded $classifier $instruction {
+       Decided label:$label => query returned $instruction {
+         false => outputs $label;
+         true => outputs (Transfer reasonLabelReturned);
+       };
+       Unrecognized => query returned $instruction {
+         true => outputs (Transfer reasonLabelReturned);
+         false => query $label = owner $classifier $instruction
+         decide $label {
+           Release => outputs $label;
+           Transfer => outputs $label;
+           Opaque => outputs $label;
+           NoAction => query possibleOwner $instruction {
+             true => outputs (Opaque reasonLabelReturned);
+             false => outputs (NoAction reasonCancellationNone);
+           };
+         };
+       };
+     };

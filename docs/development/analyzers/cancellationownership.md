@@ -230,3 +230,26 @@ classifier and allowance. Actual SSA contract, child/parent/fresh, padded captur
 ordering and sibling-field controls, and flow cut/cleanup precedence are in
 [owner_budget_test.go](../../../internal/analysis/analyzers/resources/cancellationownership/owner_budget_test.go).
 No package or callee guarantee is inferred from this caller-local owner proof.
+
+## Declarative label decisions
+
+The Hyrule targets in `classify.rules`, `recognized_label.rules`,
+`direct_label.rules`, `deferred_label.rules`, `call_label.rules`,
+`argument_label.rules`, and `return_label.rules` own the ordered label decisions.
+`label_schema.rules` declares the closed action domain and the separate Boolean
+recognition status. Recognized `none` is a decided result, not fallthrough.
+
+Creating a closure skips owner discovery and completion. Other instructions
+first ask deferred-store evidence and the cached owner, then exact/direct and
+call contracts. Exact invocation remains authoritative when owner discovery was
+cut off. Only unrecognized uses ask owner availability, process-lifetime
+retention, references and local observation. Returned-owner decisions retain
+result-guard and exact-return precedence before possible containment.
+
+Completion and summary fallback use one request and its original child budget;
+the fallback does not acquire a fresh allowance. Launched exact-argument helpers
+stay unknown before asking completion. The existing searches, candidate pool,
+owner cache, instruction cache, tracing and feasible-path flow retain their Go
+implementations. `classify_rules_test.go` checks closure admission and exact,
+launched and exhausted-helper labels on actual SSA. Existing owner, deferred
+capture, callback, summary and result-guard fixtures remain the boundary tests.

@@ -1,0 +1,35 @@
+union Label = cancellationLabel tag action {
+  NoAction = cancellationActionNone {
+    reason;
+  };
+  Release = cancellationActionRelease {
+    reason;
+  };
+  Transfer = cancellationActionTransfer {
+    reason;
+  };
+  Opaque = cancellationActionUnknown {
+    reason;
+  };
+};
+union Recognized = (cancellationLabel, bool) tag 1 {
+  Decided = true {
+    label: 0;
+  };
+  Unrecognized = false;
+};
+const cancellationActionNone, cancellationActionRelease, cancellationActionTransfer, cancellationActionUnknown;
+const reasonCancellationNone, reasonLabelOwnerUnavailable, reasonLabelProcessLifetimeContext;
+const reasonLabelReturnedCallback, reasonLabelTestingCleanup, reasonLabelRegisteredCallback, reasonLabelCapturedByCallback;
+const reasonLabelLaunchedHelper, reasonLabelHelperRelease, reasonLabelSummaryRelease, reasonLabelHelperUndecided;
+const reasonLabelHelperMayInvoke, reasonLabelReturnsDeferredCleanup;
+view Receive = *ssa.UnOp {
+  op: Op;
+  value: X;
+};
+view Deferred = *ssa.Defer {
+};
+view Started = *ssa.Go {
+};
+const receiveToken;
+const reasonLabelOwnDoneReceive, reasonLabelLaunchedCancel, reasonLabelRelease, reasonLabelDeferredClosure, reasonLabelReturned;

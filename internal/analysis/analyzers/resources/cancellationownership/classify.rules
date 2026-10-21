@@ -1,0 +1,51 @@
+signature total fallback outputs (Opaque reasonLabelOwnerUnavailable);
+view Closure = *ssa.MakeClosure {
+};
+query deferredStore = cancellationClassifier.deferredCaptureStoreLabel;
+query ownerHolds = cancellationClassifier.ownerHoldsInstruction;
+query recognized = cancellationClassifier.recognizedInstruction;
+query ownerAvailable = cancellationClassifier.ownerAvailable;
+// A standard context acquired once by the true program entry may span the
+// process lifetime. Exit ends that interval without invoking cancel or joining
+// workers; signal registrations and repeatable acquisitions remain outside it.
+// Exact cleanup or transfer still covers this unknown.
+// https://github.com/k8ssandra/k8ssandra-operator/blob/2028d352ecb495de4b6e053d99d7a77b21eb5107/main.go#L176-L205
+query processReturn = cancellationClassifier.processLifetimeReturn;
+query references($instruction) = instructionReferencesCancellation $instruction $classifier.cancel;
+query localStorageOnly;
+query localObserves($instruction) = localCallOnlyObserves $instruction $classifier.cancel $classifier.observer;
+build opaqueReference;
+
+// Creating a callback does not release or transfer cancellation. Classify the
+// defer, return, store, launch or opaque call that establishes its lifecycle.
+rule ClosureCreation:
+  inputs (Closure) _
+  => outputs (NoAction reasonCancellationNone);
+
+rule Instruction:
+  inputs $instruction $classifier
+  => query deferredStore $classifier $instruction {
+       Decided label:$label => outputs $label;
+       Unrecognized => query ownerHolds $classifier $instruction {
+         true => outputs (NoAction reasonCancellationNone);
+         false => query recognized $classifier $instruction {
+           Decided label:$label => outputs $label;
+           Unrecognized => query ownerAvailable $classifier {
+             false => outputs (Opaque reasonLabelOwnerUnavailable);
+             true => query processReturn $classifier $instruction {
+               true => outputs (Opaque reasonLabelProcessLifetimeContext);
+               false => query references $instruction {
+                 false => outputs (NoAction reasonCancellationNone);
+                 true => query localStorageOnly $instruction {
+                   true => outputs (NoAction reasonCancellationNone);
+                   false => query localObserves $instruction {
+                     true => outputs (NoAction reasonCancellationNone);
+                     false => outputs (Opaque (opaqueReference $instruction));
+                   };
+                 };
+               };
+             };
+           };
+         };
+       };
+     };

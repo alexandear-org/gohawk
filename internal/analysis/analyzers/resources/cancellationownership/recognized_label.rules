@@ -1,0 +1,14 @@
+signature total fallback outputs (Opaque reasonLabelHelperUndecided) true;
+query direct = cancellationClassifier.recognizedDirectAction;
+query call = cancellationClassifier.recognizedCallAction;
+
+rule Recognized:
+  inputs $instruction $classifier $common
+  => query direct $classifier $instruction $common {
+       Decided label:$label => outputs $label true;
+       Unrecognized => query $result = call $classifier $instruction $common
+       decide $result {
+         Decided => $result;
+         Unrecognized => $result;
+       };
+     };

@@ -46,7 +46,7 @@ path is removed; generator support and examples alone do not qualify.
 | Call-use and heap-operation classification | Handwritten; migration remains; state application stays in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
 | Goroutine ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
-| Cancellation ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
+| Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated ordered per-value classifier; acquisition discovery and loop traversal remain in Go |
@@ -91,3 +91,19 @@ Transparent SSA wrapper extraction uses read-only views of the original SSA
 nodes. The views generate checked assertions and field reads; the rules retain
 form masks and the distinction between an asserted value and its success flag.
 The existing reaching walks and ownership proofs remain authoritative.
+
+## Cancellation labels
+
+The cancellation classifier uses generated decisions for instruction admission,
+direct and deferred use, call contracts, exact callback completion, and returns.
+All seven targets share a closed label domain and a recognized/unrecognized
+outcome. A recognized `none` label still stops recognition: it cannot fall
+through to a later opaque-use rule. Exact cleanup remains available after owner
+discovery stops, while unavailable owner evidence still suppresses default loss.
+
+Receiver methods bind directly to explicit classifier arguments. Whole view
+captures retain the concrete asserted SSA type, so deferred-literal queries use
+the original `*ssa.Defer` without a conversion adapter. Completion's request and
+spent child allowance travel together into summary fallback. The existing action
+cache remains the sole cache and trace boundary, and parent/return combination
+continues to feed the same obligation-flow query.
