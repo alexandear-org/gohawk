@@ -1,0 +1,67 @@
+union Decision = Proof tag Outcome {
+  Unknown {
+    reason: Reason;
+  };
+  Honored {
+    reason: Reason;
+  };
+  Violated {
+    reason: Reason;
+    witness: Witness;
+  };
+  Transferred {
+    reason: Reason;
+  };
+};
+union Optional = (Proof, bool) tag 1 {
+  Decided = true {
+    proof: 0;
+  };
+  Undecided = false;
+};
+view Discovery = Discovery {
+  exhausted: Exhausted;
+  obligation: Obligation;
+  early: EarlyDone;
+};
+union RelayEvidence = Relay tag Kind {
+  RelayMissing = RelayAbsent;
+  RelayFound = RelayRelated;
+  RelayCutoff = RelayInterrupted {
+    budget: Budget;
+  };
+};
+union SignalEvidence = Census tag Kind {
+  Observed = CensusObserved;
+  Unobserved = CensusUnobserved;
+  Unavailable = CensusUnavailable;
+  CensusCutoff = CensusInterrupted {
+    budget: Budget;
+  };
+};
+build emptyProof;
+query lifecycle = ProofQueries.Lifecycle;
+query fallback = ProofQueries.Fallback;
+query relay = LifecycleQueries.Relay;
+query relayCutoff = LifecycleQueries.RelayCutoff;
+query handle = LifecycleQueries.CompletionHandle;
+query caller = LifecycleQueries.CallerLifetime;
+query synctest = LifecycleQueries.Synctest;
+query dominating = ProofQueries.Dominating;
+query workers = ProofQueries.Workers;
+query flow = ProofQueries.Flow;
+query honored = ProofQueries.Honored;
+query guarded = ProofQueries.Guarded;
+query uncertain = ProofQueries.Uncertain;
+query flagGuarded = FallbackQueries.FlagGuarded;
+query counted = FallbackQueries.Counted;
+query shared = FallbackQueries.SharedStorage;
+query buffered = FallbackQueries.Buffered;
+query census = FallbackQueries.Census;
+query censusCutoff = FallbackQueries.CensusCutoff;
+query entry = FallbackQueries.ProgramEntry;
+const DiscoveryBudgetExhausted, DoneBeforeCompletion, NoObligation;
+const WorkerConsumesSignal, JoinProven, GuardedLocalJoin, OpaqueTransfer;
+const FlagGuardedJoin, LoopJoinUnproven, SharedStorageSignal, BufferedSignal;
+const UnobservedSignal, SignalCensusUnavailable, ProcessExitStopsWorker, UnownedReturn;
+const RelayDependency, SynctestBubbleOwner;

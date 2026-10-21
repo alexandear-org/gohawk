@@ -285,6 +285,8 @@ func TestTypedStringEnumMatcher(t *testing.T) {
 		{"tuple assignment", `func text()(string,int){return "",0}; func f(){kind,n:=text();_,_=kind,n}`, true},
 		{"range declaration", `func f(){for _,kind:=range []string{"a"}{_=kind}}`, true},
 		{"numeric import", `type CheckKind = wire.Number; func f(kind CheckKind){}`, false},
+		{"textual reason alias", `type QueryReason = wire.Text`, true},
+		{"numeric reason alias", `type QueryReason = wire.Number`, false},
 		{"numeric inferred", `func number()wire.Number{return 0}; func f(){kind:=number();_=kind}`, false},
 		{"text identity", `type AnalyzerID wire.Text; func f(prefix wire.Text){}`, false},
 		{"fixture text", `const fixture="type Outcome string"`, false},
@@ -337,6 +339,12 @@ func reasonEnumViolation(node ast.Node) bool {
 		if !strings.HasSuffix(node.Name.Name, "Reason") {
 			return false
 		}
+		// An alias can retain a reason domain owned by another package. Its
+		// declaration is checked here; TestNoTypedStringEnums also resolves
+		// imported aliases so a textual domain cannot hide behind this form.
+		if target, ok := node.Type.(*ast.SelectorExpr); ok && node.Assign.IsValid() {
+			return !strings.HasSuffix(target.Sel.Name, "Reason")
+		}
 		underlying, ok := node.Type.(*ast.Ident)
 		if !ok || node.Assign.IsValid() {
 			return true
@@ -370,6 +378,9 @@ func TestReasonEnumBoundaryMatcher(t *testing.T) {
 		{"type QueryReason uint8", false},
 		{"type QueryReason string", true},
 		{"type QueryReason = uint8", true},
+		{"type QueryReason = domain.Reason", false},
+		{"type QueryReason = domain.QueryReason", false},
+		{"type QueryReason = domain.Number", true},
 		{"type Proof struct { Reason string }", true},
 		{"type Proof struct { reason string }", true},
 		{"type Proof struct { Reason QueryReason }", false},

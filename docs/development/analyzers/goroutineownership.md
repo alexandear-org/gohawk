@@ -17,7 +17,22 @@ predicates. It distinguishes selected arms from every-case receives and feeds
 the same cached labels and final proof. Spawn query-phase names live beside
 the candidate budgets in `spawn.go`. Possible possession and factory provenance
 live in the analyzer-owned `containment` and `origins` packages; candidate
-transfer and lifetime decisions consume those queries in Go.
+transfer and lifetime decisions consume those queries through the ordered proof
+policy described below.
+
+`proofpolicy` owns the final proof and reason vocabulary, along with the
+ordered discovery, lifecycle-prefix and post-flow decisions. The root package
+retains its public proof aliases. It supplies bounded searches and records each
+failed considered reason immediately, before the next query. Discovery cutoff
+and absent obligations stop before lifetime queries; guarded exact flow precedes
+opaque flow, and signal-census interruption stops before process-entry evidence.
+A decided unknown proof is an answer, never permission to try another strategy.
+The existing caller-lifetime query table and flow traversal remain in Go.
+
+The policy's public tests pin lazy query order, positive/unknown answers, and
+independent relay/census allowances. The root proof regression pins considered
+reason order and identical verdicts with tracing disabled. Existing analyzer
+fixtures retain the actual SSA, acceptance, diagnostic and cutoff controls.
 
 `obligation.go` owns completion-handle discovery and parent binding;
 `completion_coverage.go` owns terminal-work and return-coverage requirements.

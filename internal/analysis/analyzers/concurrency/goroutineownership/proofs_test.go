@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
+	"github.com/kojah/gohawk/internal/engine/ssaflow/ssaflowtest"
 	"github.com/kojah/gohawk/internal/testsupport/analyzertest"
+	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/analysistest"
 	"golang.org/x/tools/go/ssa"
 )
@@ -332,4 +335,36 @@ func TestTransferProofStrength(t *testing.T) {
 		"configuredMockResult":      GoroutineUnknown,
 	}
 	assertSpawnProofs(t, want, "transferlabels")
+}
+
+// The adapter must record failed conclusions at the same point and keep the
+// disabled path free of considered-step storage. The proof itself is identical.
+func TestProofConsideredOrderAndDisabledTracing(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "prooforder", `package prooforder
+ func worker(done chan int){done<-1}
+ func subject(){done:=make(chan int);go worker(done)}
+ `)
+	function := pkg.Func("subject")
+	pass := &analysis.Pass{Fset: pkg.Prog.Fset, Pkg: pkg.Pkg}
+	spawn := ssaflow.InstructionsOf[*ssa.Go](function)[0]
+	want := []goroutineOwnershipReason{
+		reasonWorkerConsumesSignal, reasonJoinProven, reasonGuardedLocalJoin, reasonOpaqueTransfer,
+		reasonFlagGuardedJoin, reasonLoopJoinUnproven, reasonSharedStorageSignal, reasonBufferedSignal,
+		reasonUnobservedSignal, reasonProcessExitStopsWorker,
+	}
+	for _, enabled := range []bool{false, true} {
+		candidate := newSpawnAnalysis(pass, function, spawn)
+		candidate.tracing = enabled
+		got := candidate.prove()
+		if got.Outcome != GoroutineLifecycleViolated || got.Reason != reasonUnownedReturn || got.Witness == nil {
+			t.Fatalf("tracing=%v: proof=%+v", enabled, got)
+		}
+		expected := want
+		if !enabled {
+			expected = nil
+		}
+		if !reflect.DeepEqual(candidate.considered, expected) {
+			t.Fatalf("tracing=%v: considered=%v", enabled, candidate.considered)
+		}
+	}
 }

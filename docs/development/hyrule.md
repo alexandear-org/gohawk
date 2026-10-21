@@ -685,3 +685,19 @@ the original call and result slot; recursive exact-local coverage stays in Go.
 An absent result remains uncovered even when earlier completion was recorded.
 The mapping and return tests pin these ordering, payload and cutoff boundaries;
 existing consumer fixtures retain the end-to-end checks.
+
+## Goroutine ownership proof policy
+
+`goroutineownership/proofpolicy` owns the stable proof/reason domain and final
+ordered decisions. Discovery availability precedes all queries. Lifecycle and
+pre-spawn evidence precede the single obligation walk, while guarded exact flow
+precedes opaque flow. Flag, loop-count, shared-storage, buffering, signal-census
+and process-entry evidence retain their original order and conservative outcomes.
+A decided unknown result stops later strategies just as a proven result does.
+
+The consuming analyzer executes each reached search and records a negative
+considered reason before the next query. Flow evidence is evaluated once and
+reused; cutoff packets retain their exact child allowance for the original
+observation phase. No trace-only result list is constructed when tracing is off.
+Caller-lifetime enumeration remains its existing declarative Go table, and all
+instruction classification, cache, traversal and reporting boundaries remain.

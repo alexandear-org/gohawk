@@ -1,0 +1,47 @@
+signature total fallback outputs (Unknown reason:None);
+const None;
+
+// Partial discovery cannot rule out an alternative completion handle.
+rule DiscoveryCutoff:
+  inputs (Discovery exhausted:true) _
+  => outputs (Unknown reason:DiscoveryBudgetExhausted);
+
+// Early Done may announce readiness. Without a separate completion promise,
+// later work cannot establish a defect, including when join mode is selected.
+// https://github.com/nadoo/glider/blob/38b34030bc0664b958f9226a51d9400258e5d852/dns/server.go#L39-L62
+rule EarlyDone:
+  inputs (Discovery obligation:false early:true) _
+  => outputs (Unknown reason:DoneBeforeCompletion);
+
+rule NoObligation:
+  inputs (Discovery obligation:false) _
+  => outputs (Unknown reason:NoObligation);
+
+// Other workers may own the producer's completion even when the parent has no
+// receive obligation. Worker pools need not dominate their producer launch.
+// https://github.com/grafana/alerting/blob/46847d9b586c46b06f8c666a93250ed062e4efb9/testing/alerting-gen/pkg/execute/run.go#L95-L160
+// One walk carries all labels to feasible returns; opacity on one path cannot
+// excuse an unrelated early return. Guarded exact flow precedes opaque outcome.
+rule Prove:
+  inputs _ $queries
+  => do {
+       Undecided <- query lifecycle $queries
+         else {
+           Decided proof:$proof => outputs $proof;
+         };
+       Undecided <- query dominating $queries
+         else {
+           Decided proof:$proof => outputs $proof;
+         };
+       false <- query workers $queries
+         else outputs (Unknown reason:WorkerConsumesSignal);
+       $flow <- query flow $queries;
+       false <- query honored $queries $flow
+         else outputs (Honored reason:JoinProven);
+       false <- query guarded $queries
+         else outputs (Honored reason:GuardedLocalJoin);
+       false <- query uncertain $queries $flow
+         else outputs (Unknown reason:OpaqueTransfer);
+       $proof <- query fallback $queries $flow.Witness;
+       pure outputs $proof;
+     };

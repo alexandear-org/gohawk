@@ -1,0 +1,38 @@
+signature total fallback outputs (Unknown reason:None);
+const None;
+
+// A Boolean guard around spawn/join can express correlation this flow does
+// not prove. Keep uncertainty rather than claiming either joined or violated.
+// https://github.com/nebius/soperator/blob/3f5635c08fab3578db574a55b293b5aa32042bd3/internal/exporter/exporter.go#L157-L193
+// Spawn/receive loop symmetry is also unknown: neither loop's runtime count
+// may be guessed. A conditional receive after a single spawn is distinct.
+// Buffered completion sends do not themselves establish a joining protocol.
+// https://github.com/buildkite/agent/blob/e206ddf806af50a1ba8c9a6dd501dfda0b730818/internal/artifact/downloader.go#L96-L177
+// A signal closed but never observed supplies no obligation to skip.
+// https://github.com/canyonroad/agentsh/blob/0ce9939b6ccead8b21b9ce16783b287d18012777/internal/db/proxy/postgres/upstreamread_test.go#L229-L237
+// Process exit explains lifetime but never completion before another instruction.
+// This conclusion remains unknown for cross-analyzer callers.
+rule Remaining:
+  inputs $queries $witness
+  => do {
+       false <- query flagGuarded $queries
+         else outputs (Unknown reason:FlagGuardedJoin);
+       false <- query counted $queries
+         else outputs (Unknown reason:LoopJoinUnproven);
+       false <- query shared $queries
+         else outputs (Unknown reason:SharedStorageSignal);
+       false <- query buffered $queries
+         else outputs (Unknown reason:BufferedSignal);
+       Observed <- query census $queries
+         else {
+           Unobserved => outputs (Unknown reason:UnobservedSignal);
+           Unavailable => outputs (Unknown reason:SignalCensusUnavailable);
+           CensusCutoff budget:$budget => do {
+             $proof <- query censusCutoff $queries $budget;
+             pure outputs $proof;
+           };
+         };
+       false <- query entry $queries
+         else outputs (Unknown reason:ProcessExitStopsWorker);
+       pure outputs (Violated reason:UnownedReturn witness:$witness);
+     };

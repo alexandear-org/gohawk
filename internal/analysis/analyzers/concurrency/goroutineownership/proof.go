@@ -3,6 +3,8 @@ package goroutineownership
 import (
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy"
+
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/origins"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -21,33 +23,27 @@ import (
 // consumes it.
 // Every instruction after the spawn is classified once; the shared obligation
 // walk then reports whether exact actions, only opaque ones, or nothing at all
-// covers every return.
+// covers every return. proofpolicy owns the ordered decisions; this file owns
+// search execution, shared allowances and the timing of trace observations.
 
-// GoroutineOutcome distinguishes proven lifecycle behavior from an opaque
-// handoff. Unknown evidence suppresses correctness diagnostics.
-type GoroutineOutcome uint8
+// GoroutineOutcome retains the public ownership vocabulary used by reporting.
+type GoroutineOutcome = proofpolicy.Outcome
 
 const (
-	GoroutineUnknown GoroutineOutcome = iota
-	GoroutineLifecycleHonored
-	GoroutineLifecycleViolated
-	GoroutineTransferred
+	GoroutineUnknown           = proofpolicy.Unknown
+	GoroutineLifecycleHonored  = proofpolicy.Honored
+	GoroutineLifecycleViolated = proofpolicy.Violated
+	GoroutineTransferred       = proofpolicy.Transferred
 )
 
-// GoroutineProof is the single result consumed by reporting, tracing, and
-// cross-analyzer ownership queries.
-type GoroutineProof struct {
-	Outcome GoroutineOutcome
-	Reason  goroutineOwnershipReason
-	// Witness is the return a violated proof reached without a join.
-	Witness *ssa.Return
-}
+// GoroutineProof is the authoritative decision shared with other analyzers.
+type GoroutineProof = proofpolicy.Proof
 
 // ruledOut records a proof step that was evaluated and did not hold. The
 // reason names the conclusion that failed, so a trace reader can see which
-// suppressions were tried before the reported one won. The two grouped
-// helpers above record only the outcomes they prove, because each covers
-// several conclusions and a single failure code would not say which.
+// suppressions were tried before the reported one won. Composite lifetime
+// and dominance queries retain their own multi-conclusion evidence; only the
+// proposition adapters below record these individual negative conclusions.
 func (analysis *spawnAnalysis) ruledOut(reason goroutineOwnershipReason) {
 	if analysis.tracing {
 		analysis.considered = append(analysis.considered, reason)
@@ -55,117 +51,12 @@ func (analysis *spawnAnalysis) ruledOut(reason goroutineOwnershipReason) {
 }
 
 func (analysis *spawnAnalysis) prove() GoroutineProof {
-	// A cutoff may hide an alternative completion handle. Partial discovery
-	// cannot justify a defect, even when it already found one obligation.
-	if analysis.discoveryBudget.Exhausted() {
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonDiscoveryBudgetExhausted}
+	discovery := proofpolicy.Discovery{
+		Exhausted:  analysis.discoveryBudget.Exhausted(),
+		Obligation: len(analysis.signals) != 0 || len(analysis.groups) != 0,
+		EarlyDone:  analysis.unsettledDone != nil,
 	}
-	// Absence of a recognizable owner is not evidence of a defect. This also
-	// applies in join mode: a policy setting cannot create a completion promise.
-	if len(analysis.signals) == 0 && len(analysis.groups) == 0 {
-		// Early Done may announce readiness rather than completion. Without a
-		// separate completion promise, later work does not establish a defect.
-		// https://github.com/nadoo/glider/blob/38b34030bc0664b958f9226a51d9400258e5d852/dns/server.go#L39-L62
-		if analysis.unsettledDone != nil {
-			return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonDoneBeforeCompletion}
-		}
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonNoObligation}
-	}
-	if proof, decided := analysis.lifecycleProof(); decided {
-		return proof
-	}
-	if proof, decided := analysis.dominatingProof(); decided {
-		return proof
-	}
-	if analysis.otherWorkerConsumesSignal() {
-		// A producer whose channel is drained by worker goroutines launched in
-		// the same function hands its completion to those workers: the parent
-		// never established a receive of its own to skip. Worker pools launch
-		// the consumers in a loop, so dominance cannot credit them. Grafana's
-		// alert generator and NetBox's SNMP probe runner use this shape:
-		// https://github.com/grafana/alerting/blob/46847d9b586c46b06f8c666a93250ed062e4efb9/testing/alerting-gen/pkg/execute/run.go#L95-L160
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonWorkerConsumesSignal}
-	}
-	analysis.ruledOut(reasonWorkerConsumesSignal)
-	// One walk carries every label to every feasible return: honored when
-	// exact joins and transfers cover them all, uncertain when some return is
-	// reached only through an opaque handoff, violated when a return is
-	// reached with no action at all. Opacity on one path never excuses an
-	// unrelated early return.
-	outcome, witness := ssapath.EvaluateObligationWitness(ssapath.ObligationFlow{
-		Start: analysis.spawn, Instruction: analysis.obligation, Edge: analysis.edgeObligation,
-		Successors: summaryKnowledge.Provider(analysis.pass).Successors(), Terminates: summaryKnowledge.Provider(analysis.pass).Terminates(),
-	})
-	if outcome == ssapath.ObligationHonored {
-		return GoroutineProof{Outcome: GoroutineLifecycleHonored, Reason: reasonJoinProven}
-	}
-	analysis.ruledOut(reasonJoinProven)
-	if analysis.guardedLocalJoin() {
-		return GoroutineProof{Outcome: GoroutineLifecycleHonored, Reason: reasonGuardedLocalJoin}
-	}
-	analysis.ruledOut(reasonGuardedLocalJoin)
-	if outcome == ssapath.ObligationUncertain {
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonOpaqueTransfer}
-	}
-	analysis.ruledOut(reasonOpaqueTransfer)
-	if analysis.flagGuardedJoin() {
-		// A join guarded by a local Boolean that the function assigns around
-		// the spawn, such as `started = true` before launching and `if started
-		// { wg.Wait() }` after, correlates the guard with the launch in a way
-		// this proof does not model. Soperator and gocoin both use the shape:
-		// https://github.com/nebius/soperator/blob/3f5635c08fab3578db574a55b293b5aa32042bd3/internal/exporter/exporter.go#L157-L193
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonFlagGuardedJoin}
-	}
-	analysis.ruledOut(reasonFlagGuardedJoin)
-	if analysis.countedJoin() {
-		// When the spawn itself runs in a loop, a later receive loop that may
-		// run zero times is not a proven skip: the spawn loop may have run zero
-		// times too. Matching those counts is not modeled, so counted joins stay
-		// unknown. A single spawn joined only inside a conditional loop body has
-		// no such symmetry and remains reportable.
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonLoopJoinUnproven}
-	}
-	analysis.ruledOut(reasonLoopJoinUnproven)
-	if analysis.sharedStorageSignals() {
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonSharedStorageSignal}
-	}
-	analysis.ruledOut(reasonSharedStorageSignal)
-	if analysis.bufferedSignals() {
-		// A buffered completion send lets the worker finish after the caller
-		// stops receiving, so it does not by itself establish a join protocol.
-		// Buildkite uses a one-slot result channel to let its collector finish:
-		// https://github.com/buildkite/agent/blob/e206ddf806af50a1ba8c9a6dd501dfda0b730818/internal/artifact/downloader.go#L96-L177
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonBufferedSignal}
-	}
-	analysis.ruledOut(reasonBufferedSignal)
-	censusBudget := analysis.budget()
-	unobserved := analysis.proveUnobservedSignalsWithin(censusBudget)
-	if !unobserved.Known() {
-		if unobserved.Reason == proofs.EvidenceBudgetExhausted {
-			return analysis.lifetimeCutoff(censusBudget, querySignalCensus, reasonSignalCensusUnavailable)
-		}
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonSignalCensusUnavailable}
-	}
-	if unobserved.Proven() {
-		// A channel the worker only closes, and that nothing in the function
-		// or its callees ever receives from, selects on, or hands away, is
-		// not a completion protocol: no code waits for it, and close never
-		// blocks the worker. Its presence proves no obligation the parent
-		// could skip. agentsh's test drain loops close such a channel:
-		// https://github.com/canyonroad/agentsh/blob/0ce9939b6ccead8b21b9ce16783b287d18012777/internal/db/proxy/postgres/upstreamread_test.go#L229-L237
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonUnobservedSignal}
-	}
-	analysis.ruledOut(reasonUnobservedSignal)
-	if ssacall.RunsOnceInProgramEntry(analysis.spawn) {
-		// A worker launched at most once by main.main cannot accumulate, and
-		// every way out of main ends the process and stops the worker. This
-		// settles the join obligation only; it is unknown rather than
-		// honored, so no other analyzer may read it as proof that the worker
-		// finished before a later instruction.
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonProcessExitStopsWorker}
-	}
-	analysis.ruledOut(reasonProcessExitStopsWorker)
-	return GoroutineProof{Outcome: GoroutineLifecycleViolated, Reason: reasonUnownedReturn, Witness: witness}
+	return proofpolicy.Prove(discovery, proofQueries{analysis})
 }
 
 // otherWorkerConsumesSignal reports whether a worker other than the spawn
@@ -203,27 +94,7 @@ func (analysis *spawnAnalysis) otherWorkerConsumesSignal() bool {
 // possible caller lifetime bound before local flow. A received stop signal or
 // context can explain ownership, but cannot prove the worker has been joined.
 func (analysis *spawnAnalysis) lifecycleProof() (GoroutineProof, bool) {
-	relayBudget := analysis.budget()
-	relay := analysis.relayDependencyUncertain(relayBudget)
-	if relayBudget.Exhausted() {
-		return analysis.lifetimeCutoff(relayBudget, queryRelayDependency, reasonRelayDependencyBudgetExhausted), true
-	}
-	if relay {
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonRelayDependency}, true
-	}
-	// Completion-handle ownership is independent of stop/context inputs. Keep
-	// the existing factory-opacity boundary before an external transfer claim;
-	// a possible lifetime bound must not replace either contract with a join.
-	if proof, decided := analysis.completionHandleProof(); decided {
-		return proof, true
-	}
-	if proof, decided := analysis.callerLifetimeProof(); decided {
-		return proof, true
-	}
-	if synctestOwnsGoroutine(analysis.function) {
-		return GoroutineProof{Outcome: GoroutineLifecycleHonored, Reason: reasonSynctestBubbleOwner}, true
-	}
-	return GoroutineProof{}, false
+	return proofpolicy.Lifecycle(proofQueries{analysis})
 }
 
 // Every lifetime query shares one allowance. Check availability before naming
@@ -378,4 +249,119 @@ func (analysis *spawnAnalysis) factoryOriginDecision(origin proofs.Proof, budget
 		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonOpaqueTransfer}, true
 	}
 	return GoroutineProof{}, false
+}
+
+// proofQueries owns evidence execution and trace timing, not the order of
+// policy choices. Negative considered events commit before the next query.
+type proofQueries struct{ analysis *spawnAnalysis }
+
+func (queries proofQueries) Relay() proofpolicy.Relay {
+	budget := queries.analysis.budget()
+	found := queries.analysis.relayDependencyUncertain(budget)
+	if budget.Exhausted() {
+		return proofpolicy.Relay{Kind: proofpolicy.RelayInterrupted, Budget: budget}
+	}
+	if found {
+		return proofpolicy.Relay{Kind: proofpolicy.RelayRelated}
+	}
+	return proofpolicy.Relay{Kind: proofpolicy.RelayAbsent}
+}
+
+func (queries proofQueries) RelayCutoff(budget *proofs.SearchBudget) GoroutineProof {
+	return queries.analysis.lifetimeCutoff(budget, queryRelayDependency, reasonRelayDependencyBudgetExhausted)
+}
+
+func (queries proofQueries) CompletionHandle() (GoroutineProof, bool) {
+	return queries.analysis.completionHandleProof()
+}
+
+func (queries proofQueries) CallerLifetime() (GoroutineProof, bool) {
+	return queries.analysis.callerLifetimeProof()
+}
+
+func (queries proofQueries) Synctest() bool { return synctestOwnsGoroutine(queries.analysis.function) }
+
+func (queries proofQueries) Dominating() (GoroutineProof, bool) {
+	return queries.analysis.dominatingProof()
+}
+
+func (queries proofQueries) observed(reason goroutineOwnershipReason, found bool) bool {
+	if !found {
+		queries.analysis.ruledOut(reason)
+	}
+	return found
+}
+
+func (queries proofQueries) Workers() bool {
+	return queries.observed(reasonWorkerConsumesSignal, queries.analysis.otherWorkerConsumesSignal())
+}
+
+func (queries proofQueries) Flow() proofpolicy.Flow {
+	analysis := queries.analysis
+	outcome, witness := ssapath.EvaluateObligationWitness(ssapath.ObligationFlow{
+		Start: analysis.spawn, Instruction: analysis.obligation, Edge: analysis.edgeObligation,
+		Successors: summaryKnowledge.Provider(analysis.pass).Successors(), Terminates: summaryKnowledge.Provider(analysis.pass).Terminates(),
+	})
+	return proofpolicy.Flow{Outcome: outcome, Witness: witness}
+}
+
+func (queries proofQueries) Honored(flow proofpolicy.Flow) bool {
+	return queries.observed(reasonJoinProven, flow.Outcome == ssapath.ObligationHonored)
+}
+
+func (queries proofQueries) Guarded() bool {
+	return queries.observed(reasonGuardedLocalJoin, queries.analysis.guardedLocalJoin())
+}
+
+func (queries proofQueries) Uncertain(flow proofpolicy.Flow) bool {
+	return queries.observed(reasonOpaqueTransfer, flow.Outcome == ssapath.ObligationUncertain)
+}
+
+func (queries proofQueries) FlagGuarded() bool {
+	return queries.observed(reasonFlagGuardedJoin, queries.analysis.flagGuardedJoin())
+}
+
+func (queries proofQueries) Counted() bool {
+	return queries.observed(reasonLoopJoinUnproven, queries.analysis.countedJoin())
+}
+
+func (queries proofQueries) SharedStorage() bool {
+	return queries.observed(reasonSharedStorageSignal, queries.analysis.sharedStorageSignals())
+}
+
+func (queries proofQueries) Buffered() bool {
+	return queries.observed(reasonBufferedSignal, queries.analysis.bufferedSignals())
+}
+
+func (queries proofQueries) Census() proofpolicy.Census {
+	analysis := queries.analysis
+	budget := analysis.budget()
+	proof := analysis.proveUnobservedSignalsWithin(budget)
+	if !proof.Known() {
+		if proof.Reason == proofs.EvidenceBudgetExhausted {
+			return proofpolicy.Census{Kind: proofpolicy.CensusInterrupted, Budget: budget}
+		}
+		return proofpolicy.Census{Kind: proofpolicy.CensusUnavailable}
+	}
+	if proof.Proven() {
+		return proofpolicy.Census{Kind: proofpolicy.CensusUnobserved}
+	}
+	analysis.ruledOut(reasonUnobservedSignal)
+	return proofpolicy.Census{Kind: proofpolicy.CensusObserved}
+}
+
+func (queries proofQueries) CensusCutoff(budget *proofs.SearchBudget) GoroutineProof {
+	return queries.analysis.lifetimeCutoff(budget, querySignalCensus, reasonSignalCensusUnavailable)
+}
+
+func (queries proofQueries) ProgramEntry() bool {
+	return queries.observed(reasonProcessExitStopsWorker, ssacall.RunsOnceInProgramEntry(queries.analysis.spawn))
+}
+
+func (queries proofQueries) Lifecycle() (GoroutineProof, bool) {
+	return queries.analysis.lifecycleProof()
+}
+
+func (queries proofQueries) Fallback(witness *ssa.Return) GoroutineProof {
+	return proofpolicy.Fallback(queries, witness)
 }
