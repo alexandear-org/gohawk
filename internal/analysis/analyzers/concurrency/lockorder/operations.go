@@ -4,6 +4,8 @@ import (
 	"go/token"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockidentity"
+
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockforms"
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockvariant"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -203,4 +205,13 @@ func appendLockValue(values []ssa.Value, candidate ssa.Value, budget *proofs.Sea
 // loopVariantValue shares the caller's reaching walk with loop-origin queries.
 func loopVariantValue(walk ssaflow.ReachingWalk, value ssa.Value) bool {
 	return lockvariant.Value(walk, value)
+}
+
+// lockIdentityOf names the lock a receiver value denotes, or returns the
+// empty string when its origin cannot be told apart from another lock's.
+func lockIdentityOf(value ssa.Value) string { return lockIdentityWithin(value, nil) }
+
+// lockIdentityWithin keeps storage, reaching and cutoff policy at one boundary.
+func lockIdentityWithin(value ssa.Value, budget *proofs.SearchBudget) string {
+	return lockidentity.Within(value, budget)
 }

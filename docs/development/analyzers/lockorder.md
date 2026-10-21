@@ -4,6 +4,30 @@ The public page is [lockorder](../../analyzers/). This note keeps every precisio
 boundary: what the analyzer accepts or reports at the edge of its proof, and
 why. Update it with the fixtures when a boundary changes.
 
+## Lock-state transfer rules
+
+`copy.rules` and `transfer.rules` own the lock-state copy barrier and ordered
+mutex transfer. Copying charges held, reader-held and deferred identities before
+cloning those slices, then charges and copies guards and origins. A cutoff
+returns a zero state, never a partial successor. Guard and origin maps are
+writable even when the incoming maps are nil; immutable branch constraints and
+literal bindings retain their existing sharing contract.
+
+Transfer rules distinguish direct release, deferred release, deferred
+acquisition and acquisition. Acquisition registration precedes dynamic-receiver
+and caller-ownership checks. Preparation records guards, source positions and
+possible deferred cleanup before the ordering proof. An ordering cutoff leaves
+that prepared state intact without adding the new held lock or origin. Reader
+acquisitions retain reader mode; a new writer acquisition clears any stale
+reader mode. Alias queries, tracing, collection mutation and fixed-point
+scheduling remain typed Go operations in their original order.
+
+Hyrule's unconditional `$value <- query operation ...;` binding sequences
+updates without inventing a success tag. Conditional bindings still state their
+Boolean or tagged outcome and early result. `flow_test.go` pins interruption,
+independent successors, empty storage, deferred timing and admission behavior.
+The existing lock/read-mode fixtures retain acquisition and release coverage.
+
 ## Rationale in detail
 
 ### Deferred cleanup through a captured owner

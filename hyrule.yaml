@@ -595,3 +595,17 @@ targets:
     function: RecognizeCondition
     rules: [internal/engine/lifecycle/completionpolicy/condition.rules]
     out: internal/engine/lifecycle/completionpolicy/condition_gen.go
+  - name: lock_state_copy
+    package: internal/analysis/analyzers/concurrency/lockorder
+    bindings: internal/analysis/analyzers/concurrency/lockorder/state.go
+    signature: lockStateCopySignature
+    function: cloneLockStateWithin
+    rules: [internal/analysis/analyzers/concurrency/lockorder/copy.rules, internal/analysis/analyzers/concurrency/lockorder/state_schema.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/copy_gen.go
+  - name: lock_state_transfer
+    package: internal/analysis/analyzers/concurrency/lockorder
+    bindings: internal/analysis/analyzers/concurrency/lockorder/flow.go
+    signature: mutexTransferSignature
+    function: decideMutexTransfer
+    rules: [internal/analysis/analyzers/concurrency/lockorder/state_schema.rules, internal/analysis/analyzers/concurrency/lockorder/transfer.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/transfer_gen.go

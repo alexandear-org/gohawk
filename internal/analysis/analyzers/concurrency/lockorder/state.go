@@ -294,37 +294,51 @@ func traceFreshMutexIdentity(pass *analysis.Pass, instruction ssa.Instruction, r
 	}
 }
 
-// A successor may share its predecessor's state until expansion. Mutable lock
-// collections are detached under the traversal allowance before any transfer;
-// cutoff exposes no partly copied state to another path.
-func cloneLockStateWithin(state lockFlowState, budget *proofs.SearchBudget) (lockFlowState, bool) {
-	if budget.Exhausted() {
-		return lockFlowState{}, false
-	}
+// Copy hooks own charged collection iteration, while copy.rules owns the
+// availability barrier, copy order and complete state assembly.
+type (
+	lockStringList = []string
+	lockGuardMap   = map[string]lockGuard
+	lockOriginMap  = map[string]lockAcquisition
+)
+
+type lockStateCopySignature func(lockFlowState, *proofs.SearchBudget) (lockFlowState, bool)
+
+var _ lockStateCopySignature = cloneLockStateWithin
+
+func lockCopyAvailable(budget *proofs.SearchBudget) bool { return !budget.Exhausted() }
+
+func copyLockLists(state lockFlowState, budget *proofs.SearchBudget) ([]string, []string, []string, bool) {
 	for _, values := range [][]string{state.held, state.readHeld, state.deferred} {
 		for range values {
 			if !budget.Spend() {
-				return lockFlowState{}, false
+				return nil, nil, nil, false
 			}
 		}
 	}
-	state.held = slices.Clone(state.held)
-	state.readHeld = slices.Clone(state.readHeld)
-	state.deferred = slices.Clone(state.deferred)
+	return slices.Clone(state.held), slices.Clone(state.readHeld), slices.Clone(state.deferred), true
+}
+
+func copyLockGuards(state lockFlowState, budget *proofs.SearchBudget) (map[string]lockGuard, bool) {
 	guards := map[string]lockGuard{}
 	for identity, guard := range state.guards {
 		if !budget.Spend() {
-			return lockFlowState{}, false
+			return nil, false
 		}
 		guards[identity] = guard
 	}
+	return guards, true
+}
+
+func copyLockOrigins(state lockFlowState, budget *proofs.SearchBudget) (map[string]lockAcquisition, bool) {
 	origins := map[string]lockAcquisition{}
 	for identity, origin := range state.origins {
 		if !budget.Spend() {
-			return lockFlowState{}, false
+			return nil, false
 		}
 		origins[identity] = origin
 	}
-	state.guards, state.origins = guards, origins
-	return state, true
+	return origins, true
 }
+
+func emptyLockState() lockFlowState { return lockFlowState{} }

@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         git init ../lockdoc
-        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git 5a0c4283df47b55d8d4d524cd1d6b272e3515dc1
+        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git 0df82e3383285bcf8412ae10835cb1f3ef682d13
         git -C ../lockdoc checkout --detach FETCH_HEAD
         GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         GOTOOLCHAIN=go1.27.0 make generated-markdown

@@ -349,3 +349,60 @@ func lockBudgetState(t *testing.T) lockFlowState {
 		constants: []lockScalarConstant{{value: phi, literal: ssa.NewConst(constant.MakeBool(true), types.Typ[types.Bool])}},
 	}
 }
+
+func TestLockStateCopyEmptyStorage(t *testing.T) {
+	// Writable maps and nil versus nonnil empty slices are part of the successor
+	// contract even when there are no entries to charge.
+	state := lockFlowState{readHeld: []string{}}
+	copied, ok := cloneLockStateWithin(state, proofs.NewSearchBudget(0))
+	if !ok || copied.held != nil || copied.readHeld == nil || copied.deferred != nil || copied.guards == nil || copied.origins == nil {
+		t.Fatalf("empty successor: %+v, available=%v", copied, ok)
+	}
+	copied.guards["new"] = lockGuard{condition: "branch"}
+	copied.origins["new"] = lockAcquisition{}
+	if state.guards != nil || state.origins != nil {
+		t.Fatal("successor changed predecessor maps")
+	}
+	exhausted := proofs.NewSearchBudget(0)
+	exhausted.Spend()
+	if copied, ok := cloneLockStateWithin(state, exhausted); ok || !reflect.DeepEqual(copied, lockFlowState{}) {
+		t.Fatalf("already exhausted copy: %+v, available=%v", copied, ok)
+	}
+}
+
+func TestMutexTransferAdmissionAndDeferredTiming(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "transfer", `package transfer
+ import "sync"
+ func deferred(mu *sync.Mutex){defer mu.Lock();defer mu.Unlock()}
+ func borrowed(mu *sync.Mutex){mu.Lock()}
+ func dynamic(mutexes []sync.Mutex,index int){mutexes[index].Lock()}
+ `)
+	for _, tt := range []struct {
+		name                           string
+		index                          int
+		operation                      mutexOperation
+		released, deferred, registered bool
+	}{
+		{"deferred", 0, mutexAcquire, false, false, false},
+		{"deferred", 1, mutexRelease, true, true, false},
+		{"borrowed", 0, mutexAcquire, false, false, true},
+		{"dynamic", 0, mutexAcquire, false, false, true},
+	} {
+		t.Run(tt.name+string(rune('0'+tt.index)), func(t *testing.T) {
+			instruction := ssaflow.InstructionsOf[ssa.CallInstruction](pkg.Func(tt.name))[tt.index]
+			receiver := instruction.Common().Args[0]
+			flow := lockFlowContext{
+				budget: nil, acquisitions: map[string][]ssa.Instruction{}, uncertainGuards: map[string]bool{},
+				lockValues: map[string][]ssa.Value{}, released: map[string]bool{}, callerOwned: map[string]bool{"lock": tt.name == "borrowed"},
+			}
+			state := lockFlowState{held: []string{"earlier"}, readHeld: []string{"earlier"}}
+			effect := mutexEffect{operation: tt.operation, identity: "lock", receiver: receiver}
+			got := flow.applyMutexAction(instruction, effect, state)
+			if !reflect.DeepEqual(got.held, state.held) || !reflect.DeepEqual(got.readHeld, state.readHeld) ||
+				(len(got.deferred) != 0) != tt.deferred || flow.released["lock"] != tt.released ||
+				(len(flow.acquisitions["lock"]) != 0) != tt.registered || (len(flow.lockValues["lock"]) != 0) != tt.registered {
+				t.Fatalf("state=%+v released=%v acquisitions=%v values=%v", got, flow.released, flow.acquisitions, flow.lockValues)
+			}
+		})
+	}
+}

@@ -76,80 +76,88 @@ func (flow lockFlowContext) applyMutexAction(
 	state lockFlowState,
 ) lockFlowState {
 	flow.releaseAttempts.recordAction(instruction, effect)
-	operation, identity, receiver := effect.operation, effect.identity, effect.receiver
-	if operation == mutexRelease {
-		flow.released[identity] = true
-		if _, deferredRelease := instruction.(*ssa.Defer); deferredRelease {
-			// A deferred unlock remains effective on every later trip around a
-			// control-flow loop. Unique identities let the dataflow reach a fixed
-			// point instead of growing without bound.
-			state.deferred = appendUniqueString(state.deferred, identity)
-			return state
-		}
-		delete(state.guards, identity)
-		state.held = releaseLock(state.held, identity)
-		state.readHeld = releaseLock(state.readHeld, identity)
-		return flow.transferPossiblyAliasedUnlock(instruction, effect, state)
-	}
-	// Registering a deferred acquisition does not acquire the lock now. In
-	// particular, a temporary upgrade can defer restoring the reader state
-	// after its writer unlock. This walk does not execute pending acquisitions
-	// at return, so it must not invent their held state in the function body.
-	// https://github.com/refraction-networking/utls/blob/23b1dac19c06c51e278468e29ac329eec605a31f/common.go#L1100-L1119
-	if _, deferredAcquisition := instruction.(*ssa.Defer); deferredAcquisition {
-		return state
-	}
-	// Acquisitions, whether direct or summarized, participate in the same
-	// acquire-for-caller contract and loaded-condition uncertainty boundary.
+	return decideMutexTransfer(flow, instruction, effect, state)
+}
+
+type mutexTransferSignature func(lockFlowContext, ssa.Instruction, mutexEffect, lockFlowState) lockFlowState
+
+var _ mutexTransferSignature = decideMutexTransfer
+
+func (flow lockFlowContext) deferMutexRelease(effect mutexEffect, state lockFlowState) lockFlowState {
+	flow.released[effect.identity] = true
+	state.deferred = appendUniqueString(state.deferred, effect.identity)
+	return state
+}
+
+func (flow lockFlowContext) releaseMutex(instruction ssa.Instruction, effect mutexEffect, state lockFlowState) lockFlowState {
+	identity := effect.identity
+	flow.released[identity] = true
+	delete(state.guards, identity)
+	state.held = releaseLock(state.held, identity)
+	state.readHeld = releaseLock(state.readHeld, identity)
+	return flow.transferPossiblyAliasedUnlock(instruction, effect, state)
+}
+
+// Registration precedes admission: even a dynamic or caller-owned acquisition
+// contributes its original tracing, call-contract and uncertainty observations.
+func (flow lockFlowContext) registerMutexAcquisition(instruction ssa.Instruction, effect mutexEffect) []ssa.Value {
+	identity, receiver := effect.identity, effect.receiver
 	traceFreshMutexIdentity(flow.pass, instruction, receiver)
 	flow.acquisitions[identity] = appendUniqueInstruction(flow.acquisitions[identity], instruction)
 	flow.uncertainGuards[identity] = flow.uncertainGuards[identity] || optionalLoadedGuard(instruction, identity, flow.budget)
 	flow.lockValues[identity] = appendLockValue(flow.lockValues[identity], receiver, flow.budget)
-	// A mutex selected from a map, slice, or loop-carried value may represent a
-	// different runtime lock on every iteration. Collapsing those values into one
-	// SSA identity creates missing-release and ordering false positives:
-	// https://github.com/caidaoli/ccLoad/blob/9ed11fe1b1dd2bfed12a32c9290354ff3cdc9b77/internal/cursorauth/sdk_runner.go#L410-L470
-	// https://github.com/kubernetes/kubernetes/blob/e72c2715ade37738aa5c029e8de5285cbe1c9441/pkg/kubelet/images/pullmanager/locks.go#L56-L65
-	if dynamicIndexedMutex(receiver) {
-		return state
-	}
-	// A release before the first acquisition means this helper borrowed a
-	// caller-held lock. Reacquiring restores the caller's state; it does not make
-	// the helper responsible for a subsequent unlock:
-	// https://github.com/kubernetes/kubernetes/blob/e72c2715ade37738aa5c029e8de5285cbe1c9441/pkg/kubelet/cm/devicemanager/manager.go#L1065-L1075
-	if flow.callerOwned[identity] {
-		return state
-	}
+	return flow.lockValues[identity]
+}
+
+func (flow lockFlowContext) callerOwnsMutex(effect mutexEffect) bool {
+	return flow.callerOwned[effect.identity]
+}
+
+func (flow lockFlowContext) prepareMutexAcquisition(
+	instruction ssa.Instruction, effect mutexEffect, state lockFlowState, values []ssa.Value,
+) lockFlowState {
+	identity := effect.identity
 	if state.condition != "" {
 		state.guards[identity] = lockGuard{condition: state.condition, value: state.conditionValue}
 	}
 	if flow.acquiredAt[identity] == token.NoPos {
 		flow.acquiredAt[identity] = instruction.Pos()
 	}
-	if flow.possiblyDeferredUnlock(instruction, flow.lockValues[identity]) {
+	if flow.possiblyDeferredUnlock(instruction, values) {
 		flow.released[identity] = true
 		state.deferred = appendUniqueString(state.deferred, identity)
 	}
-	acquired := effect.acquired
-	newAcquisition := !slices.Contains(state.held, identity)
-	if newAcquisition && len(state.held) != 0 {
-		guards := flow.exclusiveGlobalGuards(state.held, state.readHeld)
-		// An object nobody else can reach yet is locked without ordering
-		// anything; the lock is still held from here on.
-		proof := flow.exclusive.acquisitionExclusive(flow.function, instruction, receiver, flow.budget)
-		if proof.reason == lockReasonLockStateBudgetExhausted {
-			return state
-		}
-		if proof.state != proofs.EvidenceProven {
-			flow.recordInitialAcquisition(instruction, receiver, acquired, state, guards)
-		}
+	return state
+}
+
+// Ordering can stop on a cutoff after preparation has already committed its
+// observations. It must not publish a held lock or its acquisition origin then.
+func (flow lockFlowContext) orderMutexAcquisition(instruction ssa.Instruction, effect mutexEffect, state lockFlowState) bool {
+	if slices.Contains(state.held, effect.identity) || len(state.held) == 0 {
+		return true
 	}
+	guards := flow.exclusiveGlobalGuards(state.held, state.readHeld)
+	// An object nobody else can reach yet is locked without ordering anything;
+	// the lock is still held from here on.
+	proof := flow.exclusive.acquisitionExclusive(flow.function, instruction, effect.receiver, flow.budget)
+	if proof.reason == lockReasonLockStateBudgetExhausted {
+		return false
+	}
+	if proof.state != proofs.EvidenceProven {
+		flow.recordInitialAcquisition(instruction, effect.receiver, effect.acquired, state, guards)
+	}
+	return true
+}
+
+func holdMutex(effect mutexEffect, state lockFlowState) lockFlowState {
+	identity, acquired := effect.identity, effect.acquired
+	newAcquisition := !slices.Contains(state.held, identity)
 	if newAcquisition {
 		state.origins[identity] = acquired
 	}
 	if acquired.read {
 		state.readHeld = appendUniqueString(state.readHeld, identity)
-	} else if !slices.Contains(state.held, identity) {
+	} else if newAcquisition {
 		// A helper or an opaque release can remove held without carrying its
 		// mode forward. A fresh writer acquisition establishes the new mode.
 		state.readHeld = releaseLock(state.readHeld, identity)
