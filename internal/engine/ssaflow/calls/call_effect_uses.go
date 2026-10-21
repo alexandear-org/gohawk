@@ -29,52 +29,42 @@ func (query *CallEffects) uses(value ssa.Value, seen map[ssa.Value]bool) CallEff
 	return effects
 }
 
+// callUseSignature returns direct effects or one transparent alias to visit.
+// The caller retains recursive dispatch and the shared use-walk state.
+type callUseSignature func(value ssa.Value, use ssa.Instruction) (CallEffect, ssa.Value)
+
+var _ callUseSignature = classifyCallUse
+
+const (
+	useLoadToken        = token.MUL
+	useEqualToken       = token.EQL
+	useNotEqualToken    = token.NEQ
+	useStored           = EffectRetain | effectUnknown
+	useStoredAndMutated = EffectMutate | useStored
+	useSent             = EffectRetain | EffectAsync | effectUnknown
+)
+
+// SSA values use exact node identity here, without alias resolution.
+func sameEffectValue(left, right ssa.Value) bool { return left == right }
+
+// The rules call this only after identifying a value-producing alias form.
+func effectAlias(instruction ssa.Instruction) ssa.Value {
+	value, _ := instruction.(ssa.Value)
+	return value
+}
+
 func (query *CallEffects) use(value ssa.Value, use ssa.Instruction, seen map[ssa.Value]bool) CallEffect {
 	switch use := use.(type) {
-	case *ssa.DebugRef:
-		return 0
-	case *ssa.FieldAddr, *ssa.IndexAddr, *ssa.Slice, *ssa.ChangeType, *ssa.MakeInterface, *ssa.ChangeInterface, *ssa.Phi:
-		return query.uses(use.(ssa.Value), seen)
-	case *ssa.UnOp:
-		if use.Op == token.MUL {
-			return EffectRead
-		}
-		return effectUnknown
-	case *ssa.BinOp:
-		if use.Op == token.EQL || use.Op == token.NEQ {
-			return EffectRead
-		}
-		return effectUnknown
-	case *ssa.Store:
-		var effects CallEffect
-		if use.Addr == value {
-			effects |= EffectMutate
-		}
-		if use.Val == value {
-			// The new alias may later be loaded and mutated. Retention is
-			// observed, but absence of other effects cannot be established.
-			effects |= EffectRetain | effectUnknown
-		}
-		return effects
-	case *ssa.Return:
-		return EffectRetain
-	case *ssa.Send:
-		if use.X == value {
-			return EffectRetain | EffectAsync | effectUnknown
-		}
-		return EffectMutate
-	case *ssa.MapUpdate:
-		if use.Value == value || use.Key == value {
-			return EffectRetain | effectUnknown
-		}
-		return EffectMutate
 	case *ssa.Call, *ssa.Defer, *ssa.Go:
 		return query.call(use, value)
 	case *ssa.MakeClosure:
 		return query.closure(use, value)
-	default:
-		return effectUnknown
 	}
+	effects, alias := classifyCallUse(value, use)
+	if alias != nil {
+		return query.uses(alias, seen)
+	}
+	return effects
 }
 
 func (query *CallEffects) closure(closure *ssa.MakeClosure, value ssa.Value) CallEffect {

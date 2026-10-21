@@ -1,5 +1,19 @@
 version: 1
 targets:
+  - name: call_effect_use
+    package: internal/engine/ssaflow/calls
+    bindings: internal/engine/ssaflow/calls/call_effect_uses.go
+    signature: callUseSignature
+    function: classifyCallUse
+    rules: [internal/engine/ssaflow/calls/call_effect_uses.rules]
+    out: internal/engine/ssaflow/calls/call_effect_uses_gen.go
+  - name: call_effect_field_use
+    package: internal/engine/ssaflow/calls
+    bindings: internal/engine/ssaflow/calls/call_field_effects.go
+    signature: fieldUseSignature
+    function: classifyFieldUse
+    rules: [internal/engine/ssaflow/calls/call_field_effects.rules]
+    out: internal/engine/ssaflow/calls/call_field_effects_gen.go
   - name: concurrency_context_call
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/context.go

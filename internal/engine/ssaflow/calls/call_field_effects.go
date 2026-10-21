@@ -1,8 +1,6 @@
 package calls
 
 import (
-	"go/token"
-
 	ssaflow "github.com/kojah/gohawk/internal/engine/ssaflow"
 	"golang.org/x/tools/go/ssa"
 )
@@ -81,34 +79,30 @@ func (query *CallEffects) fieldUses(path ssaflow.EmbeddedFieldPath) CallEffect {
 	return effects
 }
 
+type fieldUseSignature func(path ssaflow.EmbeddedFieldPath, use ssa.Instruction) (CallEffect, *ssa.FieldAddr)
+
+var _ fieldUseSignature = classifyFieldUse
+
+func selectedEffectField(path ssaflow.EmbeddedFieldPath, field *ssa.FieldAddr) bool {
+	return path.Depth <= 0 || field.Field == path.Fields[0]
+}
+
 // The projection walk narrows the path only at real embedded field addresses.
 // It never follows a loaded pointer as if its pointee were the original slot,
 // nor treats a whole-owner store or publication as unrelated to a child field.
 func (query *CallEffects) fieldUse(path ssaflow.EmbeddedFieldPath, use ssa.Instruction) CallEffect {
-	switch use := use.(type) {
-	case *ssa.DebugRef:
-		return 0
-	case *ssa.FieldAddr:
-		if path.Depth > 0 && use.Field != path.Fields[0] {
-			return 0
-		}
-		child := ssaflow.EmbeddedFieldPath{Root: use}
-		if path.Depth > 0 {
-			child.Depth = path.Depth - 1
-			copy(child.Fields[:], path.Fields[1:path.Depth])
-		}
-		return query.fieldUses(child)
-	case *ssa.UnOp:
-		if use.Op == token.MUL {
-			return EffectRead
-		}
-	case *ssa.Store:
-		if use.Addr == path.Root {
-			return EffectMutate
-		}
-		return EffectRetain
+	switch use.(type) {
 	case *ssa.Call, *ssa.Go, *ssa.Defer:
 		return query.fieldCall(use, path)
 	}
-	return effectUnknown
+	effects, field := classifyFieldUse(path, use)
+	if field == nil {
+		return effects
+	}
+	child := ssaflow.EmbeddedFieldPath{Root: field}
+	if path.Depth > 0 {
+		child.Depth = path.Depth - 1
+		copy(child.Fields[:], path.Fields[1:path.Depth])
+	}
+	return query.fieldUses(child)
 }

@@ -43,7 +43,7 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
 | Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
-| Call-use and heap-operation classification | Handwritten; migration remains; state application stays in Go |
+| Call-use and heap-operation classification | Generated direct call-use effects, transparent aliases and field-use admission; heap-operation classification remains; recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
 | Goroutine ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
@@ -160,3 +160,27 @@ alternative. Invalid tags or active payloads stop with the declared conservative
 fallback. Cancellation instruction, call and deferred-use chains preserve their
 previous short-circuit order; completion retains an exhaustive decision where
 its outcomes require different follow-up evidence.
+
+## Call-use effects
+
+`calls/call_effect_uses.rules` classifies direct effects and the exact transparent
+alias forms. Its native result contains effect bits and an optional alias;
+`CallEffects` retains call/closure dispatch, every-use traversal, visited state,
+budgets and memoization. The alias result is one step, not a recursive proof.
+
+Stores distinguish mutation of the supplied address from retention of the
+supplied value, including their combination. Publication through a channel is
+asynchronous and incomplete; map keys and values retain the original uncertainty.
+Loads read the slot without following its pointee. Unsupported operations remain
+unknown rather than being inferred harmless.
+
+`calls/call_field_effects.rules` selects the matching embedded field projection
+and classifies loads, whole-owner writes and publication. The Go caller rebases
+the selected child path and resumes the same bounded walk. Other fields cannot
+replace the selected slot. A whole-owner write still includes that slot.
+
+`call_effect_uses_test.go` exercises these policies through the public value and
+field-call proofs on compiled SSA, including wrappers, merged aliases, local
+spills, synchronous/deferred/launched calls, capture loads, nested field paths,
+and recovery with a fresh allowance after exhaustion. The existing metadata
+allowance tests continue to cover late matching arguments and captures.

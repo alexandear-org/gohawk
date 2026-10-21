@@ -1,0 +1,114 @@
+signature total fallback outputs effectUnknown nil;
+view Debug = *ssa.DebugRef {
+};
+view FieldAddress = *ssa.FieldAddr {
+};
+view IndexAddress = *ssa.IndexAddr {
+};
+view Slice = *ssa.Slice {
+};
+view ChangedType = *ssa.ChangeType {
+};
+view Boxed = *ssa.MakeInterface {
+};
+view ChangedInterface = *ssa.ChangeInterface {
+};
+view Phi = *ssa.Phi {
+};
+view Unary = *ssa.UnOp {
+  op: Op;
+};
+view Binary = *ssa.BinOp {
+  op: Op;
+};
+view Store = *ssa.Store {
+  address: Addr;
+  value: Val;
+};
+view Return = *ssa.Return {
+};
+view Send = *ssa.Send {
+  value: X;
+};
+view MapUpdate = *ssa.MapUpdate {
+  key: Key;
+  value: Value;
+};
+build alias = effectAlias;
+guard same = sameEffectValue;
+const EffectRead, EffectMutate, EffectRetain, effectUnknown;
+const useLoadToken, useEqualToken, useNotEqualToken;
+const useStored, useStoredAndMutated, useSent;
+
+rule Debug:
+  inputs use:(Debug)
+  => outputs 0 nil;
+
+// These forms preserve the supplied address. The Go walk checks every use of
+// the resulting alias with the same visited set and counted allowance.
+rule Alias:
+  inputs
+    use:$alias:(or
+          (FieldAddress)
+          (IndexAddress)
+          (Slice)
+          (ChangedType)
+          (Boxed)
+          (ChangedInterface)
+          (Phi)
+        )
+  => outputs 0 (alias $alias);
+
+// Loading reads the slot; subsequent uses of its pointee are a separate query.
+rule Read:
+  inputs use:(or (Unary op:useLoadToken) (Binary op:(or useEqualToken useNotEqualToken)))
+  => outputs EffectRead nil;
+
+// The new alias may later be loaded and mutated. Retention is observed, but
+// absence of other effects cannot be established, even for a local spill.
+rule StoreBoth:
+  inputs value:$value use:(Store address:$address value:$stored)
+  && same $address $value
+  && same $stored $value
+  => outputs useStoredAndMutated nil;
+
+rule StoreAddress:
+  inputs value:$value use:(Store address:$address)
+  && same $address $value
+  => outputs EffectMutate nil;
+
+rule StoreValue:
+  inputs value:$value use:(Store value:$stored)
+  && same $stored $value
+  => outputs useStored nil;
+
+rule OtherStore:
+  inputs use:(Store)
+  => outputs 0 nil;
+
+rule Returned:
+  inputs use:(Return)
+  => outputs EffectRetain nil;
+
+rule SentValue:
+  inputs value:$value use:(Send value:$sent)
+  && same $sent $value
+  => outputs useSent nil;
+
+rule SentChannel:
+  inputs use:(Send)
+  => outputs EffectMutate nil;
+
+rule MapKey:
+  inputs value:$value use:(MapUpdate key:$key)
+  && same $key $value
+  => outputs useStored nil;
+
+rule MapValue:
+  inputs value:$value use:(MapUpdate value:$stored)
+  && same $stored $value
+  => outputs useStored nil;
+
+rule MapMutation:
+  inputs use:(MapUpdate)
+  => outputs EffectMutate nil;
