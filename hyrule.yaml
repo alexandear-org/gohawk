@@ -525,3 +525,31 @@ targets:
     function: decideResultComparison
     rules: [internal/analysis/summaries/comparison.rules]
     out: internal/analysis/summaries/comparison_gen.go
+  - name: path_stable_guard
+    package: internal/engine/ssaflow/path
+    bindings: internal/engine/ssaflow/path/flow_guards.go
+    signature: stableGuardSignature
+    function: decideStableGuard
+    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_stable.rules]
+    out: internal/engine/ssaflow/path/guard_stable_gen.go
+  - name: path_loaded_guard
+    package: internal/engine/ssaflow/path
+    bindings: internal/engine/ssaflow/path/flow_guards.go
+    signature: loadedGuardSignature
+    function: loadedGuard
+    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_loaded.rules]
+    out: internal/engine/ssaflow/path/guard_loaded_gen.go
+  - name: path_guard_address
+    package: internal/engine/ssaflow/path
+    bindings: internal/engine/ssaflow/path/flow_guards.go
+    signature: addressGuardSignature
+    function: recognizeGuardAddress
+    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_address.rules]
+    out: internal/engine/ssaflow/path/guard_address_gen.go
+  - name: path_literal_comparison
+    package: internal/engine/ssaflow/path
+    bindings: internal/engine/ssaflow/path/flow_branch_literals.go
+    signature: literalComparisonSignature
+    function: decideLiteralComparison
+    rules: [internal/engine/ssaflow/path/branch_compare.rules]
+    out: internal/engine/ssaflow/path/branch_compare_gen.go

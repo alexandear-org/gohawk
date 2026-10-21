@@ -76,6 +76,7 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves, fixed argument outcomes, assumed leaves, conditional return decisions and branch comparisons, plus response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
+| Path guards and literal comparison | Generated stable-guard, loaded-condition, address-step and literal-operator decisions; traversal, cycle queries, rendering memos, invalidation and flow application stay in Go |
 
 ## Preserved boundaries
 
@@ -586,3 +587,26 @@ when unknown; only a known answer can prune flow. The fixed-argument recognizer
 retains caller bindings before construction evidence, including a bound
 `OutcomeAny`, and preserves typed-nil interface boxing. These policies share no
 new cache or allowance and do not broaden the proof model.
+
+## Path-guard evidence
+
+The guard rules keep loaded identity distinct from stable Boolean identity.
+Loaded recognition runs first. Stable equality then queries its left operand
+before its right operand, and an unavailable operand continues with the
+existing computed-Boolean cycle query. That continuation shares the consumed
+allowance; no failed strategy refunds work or tries the right operand early.
+
+Address rules return a root or projection step. Go spends before each step,
+recurses over the selected source and applies the rendering memo afterward.
+A returned pointer remains one address only until the call reruns; the existing
+invalidation walk still owns that boundary. Loaded rules call the same address
+and rendering query, including when the address is unavailable. They preserve
+its string and polarity payload while returning availability false; unresolved
+addresses never populate either memo. A warm memo still pays for resolution.
+
+Literal comparison keeps ordered operand decoding and both cutoff fences in
+Go. Rules select nil equality or a supported constant operator only afterward.
+A nil pair never reaches `constant.Compare`; missing literal payloads and
+unsupported operators remain undecided. Existing path, execution-oracle and
+local/shared budget tests cover the consuming flow, and the loaded-format test
+pins the nonempty unavailable payload.

@@ -1,0 +1,46 @@
+view Parameter = *ssa.Parameter {
+};
+view Allocation = *ssa.Alloc {
+};
+view Free = *ssa.FreeVar {
+};
+view Global = *ssa.Global {
+};
+view Call = *ssa.Call {
+};
+view Extract = *ssa.Extract {
+};
+view FieldAddress = *ssa.FieldAddr {
+  source: X;
+};
+view Unary = *ssa.UnOp {
+  source: X;
+  op: Op;
+};
+view Comparison = *ssa.BinOp {
+  left: X;
+  right: Y;
+  op: Op;
+};
+view Constant = *ssa.Const {
+};
+const guardLoadToken, guardEqualToken, guardNotEqualToken;
+union Loaded = (string, bool, bool) tag 2 {
+  KnownLoaded = true {
+    identity: 0;
+    negated: 1;
+  };
+  UnknownLoaded = false {
+    identity: 0;
+    negated: 1;
+  };
+};
+union Computed = (string, bool) tag 1 {
+  KnownGuard = true {
+    identity: 0;
+  };
+  UnknownGuard = false {
+    identity: 0;
+  };
+};
+build negated = guardNegated;

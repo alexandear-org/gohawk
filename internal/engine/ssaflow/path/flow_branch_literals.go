@@ -95,19 +95,31 @@ func compareBranchLiteralsWithin(comparison *ssa.BinOp, block, predecessor *ssa.
 	if budget.Exhausted() || left == nil || right == nil {
 		return false, false
 	}
-	if left.IsNil() && right.IsNil() {
-		return comparison.Op == token.EQL, comparison.Op == token.EQL || comparison.Op == token.NEQ
-	}
-	if left.Value == nil || right.Value == nil {
-		return false, false
-	}
-	switch comparison.Op {
-	case token.EQL, token.NEQ, token.LSS, token.LEQ, token.GTR, token.GEQ:
-		return constant.Compare(left.Value, comparison.Op, right.Value), true
-	default:
-		return false, false
-	}
+	return decideLiteralComparison(comparison.Op, left, right)
 }
+
+type literalComparisonSignature func(token.Token, *ssa.Const, *ssa.Const) (bool, bool)
+
+var _ literalComparisonSignature = decideLiteralComparison
+
+const (
+	guardLessToken         = token.LSS
+	guardLessEqualToken    = token.LEQ
+	guardGreaterToken      = token.GTR
+	guardGreaterEqualToken = token.GEQ
+)
+
+func guardBothNil(left, right *ssa.Const) bool { return left.IsNil() && right.IsNil() }
+
+func guardConstantPresent(value constant.Value) bool { return value != nil }
+
+func guardEqualityToken(op token.Token) bool { return op == token.EQL || op == token.NEQ }
+
+func guardLiteralCompare(left constant.Value, op token.Token, right constant.Value) bool {
+	return constant.Compare(left, op, right)
+}
+
+func guardIsEqualToken(op token.Token) bool { return op == token.EQL }
 
 func branchLiteralWithin(value ssa.Value, block, predecessor *ssa.BasicBlock, budget *proofs.SearchBudget) *ssa.Const {
 	value = BranchValueWithin(value, block, predecessor, budget)

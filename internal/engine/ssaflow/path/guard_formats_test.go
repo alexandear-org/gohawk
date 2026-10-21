@@ -17,6 +17,7 @@ func probe(r *record) bool { if r.Payload==nil { return true }; return false }
 func unequal(r *record) bool { if r.Payload!=nil { return true }; return false }
 func flag(p *bool) bool { if !*p { return true }; return false }
 func unknown(p []*bool,i int) bool { if *p[i] { return true }; return false }
+func unknownCompare(p []int,i int) bool { if p[i]!=0 { return true }; return false }
 `
 
 func loadedGuardCondition(tb testing.TB, name string) ssa.Value {
@@ -71,6 +72,20 @@ func TestGuardFormatsDoNotMemoizeUnresolvedAddresses(t *testing.T) {
 	_, _, _, _ = guardConditionWithFormats(condition, nil, &formats)
 	if len(formats.loaded) != 0 || len(formats.addresses) != 0 {
 		t.Fatal("an opaque address populated the loaded identity memo")
+	}
+}
+
+func TestLoadedGuardRetainsUnavailablePayload(t *testing.T) {
+	condition := loadedGuardCondition(t, "unknownCompare")
+	var formats guardFormats
+	for range 2 {
+		identity, negated, ok := loadedGuard(condition, nil, &formats)
+		if identity != "eq(load(),0)" || !negated || ok {
+			t.Fatalf("unavailable loaded guard = (%q, %v, %v)", identity, negated, ok)
+		}
+		if len(formats.loaded) != 0 || len(formats.addresses) != 0 {
+			t.Fatal("unavailable identity populated the formatting memo")
+		}
 	}
 }
 

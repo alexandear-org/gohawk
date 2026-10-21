@@ -1,0 +1,12 @@
+signature total fallback outputs guardAddressAbsent nil;
+const guardAddressAbsent, guardAddressRoot, guardAddressProjection;
+
+// A pointer returned by a call names one object until that call reruns. Guard
+// invalidation retains that temporal boundary; recognition does not unwrap it.
+rule Root:
+  inputs (or (Allocation) (Parameter) (Free) (Global) (Call) (Extract))
+  => outputs guardAddressRoot nil;
+
+rule Projection:
+  inputs (or (FieldAddress source:$source) (Unary source:$source op:guardLoadToken))
+  => outputs guardAddressProjection $source;

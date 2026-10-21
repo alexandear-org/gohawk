@@ -2,6 +2,9 @@ package path
 
 import (
 	"fmt"
+	"go/token"
+
+	proofs "github.com/kojah/gohawk/internal/engine/proof"
 
 	"golang.org/x/tools/go/ssa"
 )
@@ -72,4 +75,13 @@ func guardAddressString(address ssa.Value, inner string) string {
 		return guardOperandIdentity(typed)
 	}
 	return ""
+}
+
+// Loaded-guard rules request rendering through a query because successful
+// rendering populates the memo. A warm entry still follows the address proof.
+func guardLoadedAddress(
+	condition, source ssa.Value, literal *ssa.Const, op token.Token, budget *proofs.SearchBudget, formats *guardFormats,
+) (string, bool, bool) {
+	address, ok := guardAddressIdentityWithFormats(source, budget, formats)
+	return formats.loadedIdentity(condition, address, literal, ok), guardNegated(op), ok
 }

@@ -85,13 +85,12 @@ func guardConditionSource(condition ssa.Value, budget *proofs.SearchBudget, form
 	if identity, negated, ok := loadedGuard(condition, budget, formats); ok {
 		return identity, negated, false, true
 	}
-	if _, parameter := condition.(*ssa.Parameter); parameter && booleanValue(condition) {
-		return fmt.Sprintf("value:%p", condition), false, true, true
-	}
-	if comparison, ok := condition.(*ssa.BinOp); ok && (comparison.Op == token.EQL || comparison.Op == token.NEQ) &&
-		stableOperandWithin(comparison.X, budget) && stableOperandWithin(comparison.Y, budget) {
-		return stableEquality(comparison.X, comparison.Y), comparison.Op == token.NEQ, true, true
-	}
+	return decideStableGuard(condition, budget)
+}
+
+// Computed stability is one bounded cycle query. Keep it separate from the
+// ordered operand proof: failed left evidence must not query the right operand.
+func computedGuard(condition ssa.Value, budget *proofs.SearchBudget) (string, bool) {
 	// A computed Boolean outside a cycle is evaluated once, so repeating that
 	// exact SSA value cannot change its truth, including a short-circuit phi.
 	// A loop instruction is not correlated across iterations: its next
@@ -100,10 +99,10 @@ func guardConditionSource(condition ssa.Value, budget *proofs.SearchBudget, form
 	if instruction, ok := condition.(ssa.Instruction); ok && booleanValue(condition) {
 		cyclic := cfg.BlockInCycleWithin(instruction.Block(), budget)
 		if !cyclic && !budget.Exhausted() {
-			return fmt.Sprintf("value:%p", condition), false, true, true
+			return guardValueIdentity(condition), true
 		}
 	}
-	return "", false, false, false
+	return "", false
 }
 
 func stableEquality(left, right ssa.Value) string {
@@ -114,32 +113,37 @@ func stableEquality(left, right ssa.Value) string {
 	return "eq(" + first + "," + second + ")"
 }
 
-func loadedGuard(condition ssa.Value, budget *proofs.SearchBudget, formats *guardFormats) (string, bool, bool) {
-	switch typed := condition.(type) {
-	case *ssa.UnOp:
-		if typed.Op != token.MUL {
-			return "", false, false
-		}
-		address, ok := guardAddressIdentityWithFormats(typed.X, budget, formats)
-		return formats.loadedIdentity(condition, address, nil, ok), false, ok
-	case *ssa.BinOp:
-		if typed.Op != token.EQL && typed.Op != token.NEQ {
-			return "", false, false
-		}
-		left, right := typed.X, typed.Y
-		if _, ok := left.(*ssa.Const); ok {
-			left, right = right, left
-		}
-		literal, ok := right.(*ssa.Const)
-		load, loaded := left.(*ssa.UnOp)
-		if !ok || !loaded || load.Op != token.MUL {
-			return "", false, false
-		}
-		address, ok := guardAddressIdentityWithFormats(load.X, budget, formats)
-		return formats.loadedIdentity(condition, address, literal, ok), typed.Op == token.NEQ, ok
-	}
-	return "", false, false
-}
+type (
+	stableGuardSignature  func(ssa.Value, *proofs.SearchBudget) (string, bool, bool, bool)
+	loadedGuardSignature  func(ssa.Value, *proofs.SearchBudget, *guardFormats) (string, bool, bool)
+	addressGuardSignature func(ssa.Value) (guardAddressKind, ssa.Value)
+)
+
+var (
+	_ stableGuardSignature  = decideStableGuard
+	_ loadedGuardSignature  = loadedGuard
+	_ addressGuardSignature = recognizeGuardAddress
+)
+
+// guardAddressKind selects the structural step; traversal and memo writes are
+// applied afterward so recognition never spends or mutates formatting state.
+type guardAddressKind uint8
+
+const (
+	guardAddressAbsent guardAddressKind = iota
+	guardAddressRoot
+	guardAddressProjection
+)
+
+const (
+	guardLoadToken     = token.MUL
+	guardEqualToken    = token.EQL
+	guardNotEqualToken = token.NEQ
+)
+
+func guardValueIdentity(value ssa.Value) string { return fmt.Sprintf("value:%p", value) }
+
+func guardNegated(op token.Token) bool { return op == token.NEQ }
 
 // guardAddressIdentityWithin names a cell by its selected address/load path.
 func guardAddressIdentityWithin(address ssa.Value, budget *proofs.SearchBudget) (string, bool) {
@@ -150,23 +154,14 @@ func guardAddressIdentityWithFormats(address ssa.Value, budget *proofs.SearchBud
 	if !budget.Spend() {
 		return "", false
 	}
-	switch typed := address.(type) {
-	case *ssa.Alloc, *ssa.Parameter, *ssa.FreeVar, *ssa.Global:
+	kind, source := recognizeGuardAddress(address)
+	switch kind {
+	case guardAddressRoot:
 		return formats.addressIdentity(address, "", true), true
-	case *ssa.FieldAddr:
-		inner, ok := guardAddressIdentityWithFormats(typed.X, budget, formats)
+	case guardAddressProjection:
+		inner, ok := guardAddressIdentityWithFormats(source, budget, formats)
 		return formats.addressIdentity(address, inner, ok), ok
-	case *ssa.UnOp:
-		if typed.Op == token.MUL {
-			inner, ok := guardAddressIdentityWithFormats(typed.X, budget, formats)
-			return formats.addressIdentity(address, inner, ok), ok
-		}
-	case *ssa.Call, *ssa.Extract:
-		// A pointer a call returned is one object until the call runs again,
-		// so two reads of the same field of it read the same slot, as two
-		// reads of a parameter's field do: a response's status checked
-		// twice. A walker forgets the guard when the call reruns; see After.
-		return formats.addressIdentity(address, "", true), true
+	case guardAddressAbsent:
 	}
 	return "", false
 }
