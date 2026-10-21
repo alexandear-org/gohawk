@@ -4,6 +4,7 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy"
 	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/sqlparents"
 	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts"
 	"github.com/kojah/gohawk/internal/analysis/summaries"
@@ -184,144 +185,17 @@ func (analysis *resourceAnalysis) compressionOutputAbandoned(instruction ssa.Ins
 // opaqueConsumption reports whether the instruction hands the resource to
 // something the analysis cannot see through.
 func (analysis *resourceAnalysis) opaqueConsumption(instruction ssa.Instruction) (resourceLifetimeReason, bool) {
-	switch typed := instruction.(type) {
-	case *ssa.Return:
-		proof := analysis.returnedWrapperWithin(typed, analysis.budget(proofs.SummaryBudget))
-		return proof.Reason, proof.State != proofs.EvidenceDisproven
-	case *ssa.Store:
-		proof := analysis.resourceStorage(typed)
-		if proof.State == proofs.EvidenceUnknown {
-			return proof.Reason, true
-		}
-		// An owner selected from a collection may already be retained elsewhere.
-		// The local collection is not evidence that its elements are local owners.
-		// https://github.com/cloudflare/artifact-fs/blob/2b87a48691ef4ae82d391b7bbe4976c06c7fadf7/internal/fusefs/fuse_unix.go#L256-L287
-		owner := proof.Owner
-		_, field := typed.Addr.(*ssa.FieldAddr)
-		if field && owner != nil && ssaflow.ElementOfAggregate(owner) {
-			return resourceReasonStoredOnCollectionOwner, true
-		}
-		wrapper := analysis.proveWrapperStoredOnForeignOwnerWithin(typed, analysis.budget(proofs.SummaryBudget))
-		return wrapper.Reason, wrapper.State != proofs.EvidenceDisproven
-	case *ssa.Send:
-		if proof := analysis.responseBodyAggregateHandoff(typed.X, typed); proof.State == proofs.EvidenceUnknown {
-			return proof.Reason, true
-		}
-		return analysis.carriedPayload(typed.X, resourceReasonSentToChannel)
-	case *ssa.MapUpdate:
-		return analysis.carriedPayload(typed.Value, resourceReasonStoredInMap)
-	case *ssa.Select:
-		for _, state := range typed.States {
-			if state.Send != nil {
-				if proof := analysis.responseBodyAggregateHandoff(state.Send, typed); proof.State == proofs.EvidenceUnknown {
-					return proof.Reason, true
-				}
-			}
-			if state.Send != nil {
-				if reason, opaque := analysis.carriedPayload(state.Send, resourceReasonSentToChannel); opaque {
-					return reason, true
-				}
-			}
-		}
-		return resourceReasonNone, false
-	case *ssa.Call, *ssa.Defer, *ssa.Go:
-		return analysis.opaqueCall(instruction, ssaflow.InstructionCall(instruction))
-	}
-	return resourceReasonNone, false
+	return resourcepolicy.Consume(opacityQueries{analysis}, instruction)
 }
 
 func (analysis *resourceAnalysis) opaqueCall(instruction ssa.Instruction, common *ssa.CallCommon) (resourceLifetimeReason, bool) {
-	if common == nil {
-		return resourceReasonNone, false
-	}
-	carriedProof := analysis.proveCarriedArgumentsWithin(common, analysis.budget(proofs.SummaryBudget))
-	if carriedProof.State == proofs.EvidenceUnknown {
-		return carriedProof.Reason, true
-	}
-	carried := carriedProof.Proven()
-	callback := analysis.provePossiblyRetainedCallbackWithin(instruction, common, analysis.budget(proofs.SummaryBudget))
-	if callback.State != proofs.EvidenceDisproven {
-		return callback.Reason, true
-	}
-	// A helper may expose the exact resource asynchronously without itself
-	// being launched. That is opaque ownership, not proven cleanup. Conversely,
-	// preserving an address does not prove that a resource loaded through it
-	// stays owned here: the lifecycle-specific rules below still decide that.
-	if carried {
-		exposure := analysis.proveAsynchronousExposureWithin(instruction, common, analysis.budget(proofs.SummaryBudget))
-		if exposure.State != proofs.EvidenceDisproven {
-			return exposure.Reason, true
-		}
-	}
-	if common.IsInvoke() {
-		// The receiver of an interface method is not consumed by being the
-		// receiver; only the resource handed to the method is. The body behind
-		// an interface method is chosen at run time, so no summary describes it.
-		return resourceReasonInterfaceMethod, carried
-	}
-	if builtin, ok := common.Value.(*ssa.Builtin); ok {
-		return resourceReasonAppended, builtin.Name() == "append" && carried
-	}
-	if closure, ok := common.Value.(*ssa.MakeClosure); ok {
-		return analysis.opaqueClosureCall(instruction, closure, carried)
-	}
-	return analysis.opaqueFunctionCall(instruction, common, carried)
+	return resourcepolicy.Call(opacityQueries{analysis}, instruction, common)
 }
 
 // Named and dynamically selected functions share the argument-level boundary;
 // literal captures and interface receivers are classified by opaqueCall first.
 func (analysis *resourceAnalysis) opaqueFunctionCall(instruction ssa.Instruction, common *ssa.CallCommon, carried bool) (resourceLifetimeReason, bool) {
-	callee := common.StaticCallee()
-	if callee == nil {
-		// A function value: the callee is decided at run time.
-		return resourceReasonDynamicCallee, carried
-	}
-	// A callee proven to store a constructor chain over the resource takes it,
-	// whether the chain derives from the resource directly or holds it inside
-	// an aggregate; see proveChainKeptWithin.
-	chain := analysis.proveChainKeptWithin(instruction, common, analysis.budget(proofs.SummaryBudget))
-	if chain.State != proofs.EvidenceDisproven {
-		return chain.Reason, true
-	}
-	if !carried {
-		return resourceReasonNone, false
-	}
-	// An aggregate owner passed to an incompletely modeled retaining helper
-	// can outlive this call even when the helper returns nothing. A read-only
-	// helper is not an ownership handoff and must keep the obligation live.
-	// https://github.com/goshs-labs/goshs/blob/c65ca19696e87cd5ec2206b2a488c5f5f5b621db/smbserver/session.go#L135-L137
-	escape := analysis.proveAggregateOwnerEscapeWithin(instruction, common, analysis.budget(proofs.SummaryBudget))
-	if escape.State != proofs.EvidenceDisproven {
-		return escape.Reason, true
-	}
-	// A resource that reaches the callee only inside an aggregate argument is
-	// beyond a parameter-level completion proof: that proof follows the
-	// parameter value, not a resource nested in one of its fields. Treat such a
-	// call as a boundary only when its own result reaches a return or global, because
-	// only then can the resource have been transferred to the value the caller
-	// receives; a call whose result is discarded transfers nothing, so a
-	// resource left behind in its argument is still leaked. oss-rebuild wraps a
-	// zip reader in an fs.FS wrapper and returns the loader's result:
-	// https://github.com/google/oss-rebuild/blob/9ce0528dd68bf209b52cc9fdc90bd63742cbb3a0/pkg/sysgraph/sgstorage/loader.go#L173-L179
-	aggregate := analysis.proveCarriedAggregateArgumentsWithin(common, analysis.budget(proofs.SummaryBudget))
-	if aggregate.State == proofs.EvidenceUnknown {
-		return aggregate.Reason, true
-	}
-	if aggregate.Proven() {
-		publication := proveCallResultMayTransferWithin(instruction, analysis.budget(proofs.SummaryBudget))
-		if publication.State == proofs.EvidenceUnknown {
-			return publication.Reason, true
-		}
-		if publication.Proven() {
-			return resourceReasonNestedInTransferredArgument, true
-		}
-	}
-	// A summarized callee proven to release, store, or own the resource was
-	// classified as settled above; one summarized as doing none of those is
-	// transparent. A callee with a body but no summary is judged by its body
-	// through the completion proof already consulted; without either, the
-	// callee is a boundary.
-	return resourceReasonUnsummarizedCallee, !analysis.evidence.CalleeSummarized(instruction) && len(callee.Blocks) == 0
+	return resourcepolicy.Function(opacityQueries{analysis}, instruction, common, carried)
 }
 
 // SQL parent cleanup supplies uncertainty rather than synchronous release. Both
@@ -341,4 +215,87 @@ func proveSQLParentCleanupWithin(acquisition *ssa.Call, instruction ssa.Instruct
 		reason = resourceReasonRowsTransactionFinished
 	}
 	return resourceProof{State: parent.State, Reason: reason}
+}
+
+// opacityQueries supplies reached evidence without changing its allowance,
+// observation point or cache ownership. The rules own the decision ordering.
+type opacityQueries struct{ analysis *resourceAnalysis }
+
+func (q opacityQueries) Returned(value *ssa.Return) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.returnedWrapperWithin(value, q.analysis.budget(proofs.SummaryBudget)).resourceProof)
+}
+
+func (q opacityQueries) Storage(value *ssa.Store) resourcepolicy.Storage {
+	p := q.analysis.resourceStorage(value)
+	return resourcepolicy.Storage{State: p.State, Reason: p.Reason, Owner: p.Owner}
+}
+
+func (q opacityQueries) Wrapper(value *ssa.Store) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveWrapperStoredOnForeignOwnerWithin(value, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Handoff(value ssa.Value, instruction ssa.Instruction) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.responseBodyAggregateHandoff(value, instruction))
+}
+
+func (q opacityQueries) Payload(value ssa.Value, reason resourcepolicy.Reason) (resourcepolicy.Reason, bool) {
+	return q.analysis.carriedPayload(value, reason)
+}
+
+func (q opacityQueries) Select(value *ssa.Select) (resourcepolicy.Reason, bool) {
+	for _, state := range value.States {
+		if state.Send != nil {
+			if reason, opaque := resourcepolicy.Send(q, state.Send, value); opaque {
+				return reason, true
+			}
+		}
+	}
+	return resourceReasonNone, false
+}
+
+func (q opacityQueries) Call(instruction ssa.Instruction, common *ssa.CallCommon) (resourcepolicy.Reason, bool) {
+	return q.analysis.opaqueCall(instruction, common)
+}
+
+func (q opacityQueries) Carried(common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveCarriedArgumentsWithin(common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Callback(instruction ssa.Instruction, common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.provePossiblyRetainedCallbackWithin(instruction, common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Exposure(instruction ssa.Instruction, common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveAsynchronousExposureWithin(instruction, common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Closure(instruction ssa.Instruction, closure *ssa.MakeClosure, carried bool) (resourcepolicy.Reason, bool) {
+	return q.analysis.opaqueClosureCall(instruction, closure, carried)
+}
+
+func (q opacityQueries) Function(instruction ssa.Instruction, common *ssa.CallCommon, carried bool) (resourcepolicy.Reason, bool) {
+	return q.analysis.opaqueFunctionCall(instruction, common, carried)
+}
+
+func (q opacityQueries) Chain(instruction ssa.Instruction, common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveChainKeptWithin(instruction, common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Escape(instruction ssa.Instruction, common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveAggregateOwnerEscapeWithin(instruction, common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Aggregate(common *ssa.CallCommon) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveCarriedAggregateArgumentsWithin(common, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Publication(instruction ssa.Instruction) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(proveCallResultMayTransferWithin(instruction, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+// Unmodeled asks only about unavailable body/summary evidence. A readable
+// body was already judged by completion, and a summarized no-effect callee is
+// transparent. Neither case becomes opaque merely for lacking a release here.
+func (q opacityQueries) Unmodeled(instruction ssa.Instruction, common *ssa.CallCommon) bool {
+	return !q.analysis.evidence.CalleeSummarized(instruction) && len(common.StaticCallee().Blocks) == 0
 }

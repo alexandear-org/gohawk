@@ -13,6 +13,23 @@ These consume the same contract and flow model; no reporting rule or API
 coverage changes with the separation. Callback registration rationale stays
 with that function, independently of the recursive-completion budget rationale.
 
+`resourcepolicy` owns ordered opaque-consumption decisions and the shared reason
+vocabulary. The root retains private reason aliases and its proof methods;
+query adapters execute the same searches with the same limits and observation
+points. Carried-argument cutoff precedes callbacks; callback retention is queried
+even without carried arguments, while asynchronous exposure requires them.
+Constructor-chain retention precedes rejecting an uncarried static call. Aggregate
+retention and result publication remain distinct, and an interrupted proof ends
+classification before another query can reinterpret it as absence.
+
+The send policy is shared by sends and select arms. Select iteration and early
+exit remain in Go. Storage resolves its owner once, preserves uncertainty before
+collection-owner inspection, then asks about foreign wrappers. Closure evidence
+retains its existing Go proof. False answers keep their inspected reason payloads;
+trace codes and reason ordinals remain unchanged. Query-order tests cover cold
+cutoffs, callback/exposure order and conditional publication; the existing SSA
+fixtures and label tests cover actual ownership and cleanup behavior.
+
 ## Final decision and tracing
 
 `evaluateResourceFlow` owns the final diagnostic evidence and reason, including

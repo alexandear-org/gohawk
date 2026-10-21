@@ -1,0 +1,24 @@
+signature total fallback outputs None false;
+guard dynamic;
+query chain = FunctionQueries.Chain;
+query tail = FunctionTail;
+const DynamicCallee;
+
+rule Dynamic:
+  inputs _ _ $common $carried
+  && dynamic $common
+  => outputs DynamicCallee $carried;
+
+// A retained constructor chain may carry the resource directly or through an
+// aggregate. Query it before rejecting a call without directly carried args.
+rule Named:
+  inputs $queries $instruction $common $carried
+  => do {
+       Disproven <- query chain $queries $instruction $common
+         else {
+           Proven reason:$reason => outputs $reason true;
+           Unknown reason:$reason => outputs $reason true;
+         };
+       $answer <- query tail $queries $instruction $common $carried;
+       pure $answer;
+     };

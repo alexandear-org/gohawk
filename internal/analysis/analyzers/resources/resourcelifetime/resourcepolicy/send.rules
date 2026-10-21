@@ -1,0 +1,15 @@
+signature total fallback outputs None false;
+query handoff = InstructionQueries.Handoff;
+query unknown = Evidence.Unknown;
+query payload = InstructionQueries.Payload;
+const SentToChannel;
+
+rule Sent:
+  inputs $queries $value $instruction
+  => do {
+       $proof <- query handoff $queries $value $instruction;
+       false <- query unknown $proof
+         else outputs $proof.Reason true;
+       $answer <- query payload $queries $value SentToChannel;
+       pure $answer;
+     };

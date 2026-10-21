@@ -749,3 +749,59 @@ targets:
     function: FoldPath
     rules: [internal/engine/lifecycle/completionmapping/accumulation.rules]
     out: internal/engine/lifecycle/completionmapping/accumulation_gen.go
+  - name: resource_opacity_consume
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: consumeSignature
+    function: Consume
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume_gen.go
+  - name: resource_opacity_send
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: sendSignature
+    function: Send
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send_gen.go
+  - name: resource_opacity_call
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: callSignature
+    function: Call
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call_gen.go
+  - name: resource_opacity_after_callback
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: afterCallbackSignature
+    function: AfterCallback
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback_gen.go
+  - name: resource_opacity_dispatch
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: dispatchSignature
+    function: Dispatch
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch_gen.go
+  - name: resource_opacity_function
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: functionSignature
+    function: Function
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_gen.go
+  - name: resource_opacity_function_tail
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: functionTailSignature
+    function: FunctionTail
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail_gen.go
+  - name: resource_opacity_store
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
+    signature: storeSignature
+    function: StoreConsumption
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store_gen.go

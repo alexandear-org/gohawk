@@ -41,3 +41,18 @@ func TestResourceClassifierEvidenceOrder(t *testing.T) {
 		})
 	}
 }
+
+func TestOpacityRetainsColdCutoffAndTransparentCallPayload(t *testing.T) {
+	query, call := helperBudgetAnalysis(t, "println(value)")
+	query.pool = proofs.NewSearchBudget(0)
+	if reason, opaque := query.opaqueCall(call, nil); reason != resourceReasonNone || opaque || query.pool.Exhausted() {
+		t.Fatalf("nil call reason=%v opaque=%v exhausted=%v", reason, opaque, query.pool.Exhausted())
+	}
+	if reason, opaque := query.opaqueCall(call, call.Common()); reason != resourceReasonBudgetExhausted || !opaque || !query.pool.Exhausted() {
+		t.Fatalf("cutoff reason=%v opaque=%v exhausted=%v", reason, opaque, query.pool.Exhausted())
+	}
+	query.pool = proofs.NewSearchBudget(resourcePoolBudget)
+	if reason, opaque := query.opaqueCall(call, call.Common()); reason != resourceReasonUnsummarizedCallee || opaque || query.pool.Exhausted() {
+		t.Fatalf("fresh reason=%v opaque=%v exhausted=%v", reason, opaque, query.pool.Exhausted())
+	}
+}

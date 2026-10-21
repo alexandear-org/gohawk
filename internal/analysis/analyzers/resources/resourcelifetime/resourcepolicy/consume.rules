@@ -1,0 +1,53 @@
+signature total fallback outputs None false;
+build possible;
+query returned = InstructionQueries.Returned;
+query stored = StoreConsumption;
+query send = Send;
+query payload = InstructionQueries.Payload;
+query select = InstructionQueries.Select;
+query call = InstructionQueries.Call;
+build common = ssaflow.InstructionCall;
+const StoredOnCollectionOwner, StoredInMap;
+
+rule Returned:
+  inputs $queries $return:(Return)
+  => do {
+       $proof <- query returned $queries $return;
+       pure outputs $proof.Reason (possible $proof);
+     };
+
+rule Stored:
+  inputs $queries $store:(Store)
+  => do {
+       $answer <- query stored $queries $store;
+       pure $answer;
+     };
+
+rule Sent:
+  inputs $queries $instruction:(Send value:$value)
+  => do {
+       $answer <- query send $queries $value $instruction;
+       pure $answer;
+     };
+
+rule Mapped:
+  inputs $queries (Map value:$value)
+  => do {
+       $answer <- query payload $queries $value StoredInMap;
+       pure $answer;
+     };
+
+rule Selected:
+  inputs $queries $select:(Select)
+  => do {
+       $answer <- query select $queries $select;
+       pure $answer;
+     };
+
+rule Called:
+  inputs $queries $instruction:(or (Call) (Defer) (Go))
+  let $common = common $instruction
+  => do {
+       $answer <- query call $queries $instruction $common;
+       pure $answer;
+     };

@@ -72,7 +72,7 @@ path is removed; generator support and examples alone do not qualify.
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
-| Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
+| Resource lifetime classification and acquisition-boundary patterns | Generated instruction and opaque-consumption/storage/call policies, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves, identity/loop-origin cases, budgeted copy sequencing and mutex-transfer sequencing; storage/reaching searches, collection mutation and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
@@ -717,3 +717,20 @@ callees. Its generated fold preserves the first path payload and marks conflicti
 or unnamed evidence inexact. Later matching observations cannot restore lost
 exactness. An unseen callee adds no observation; a nil collector records none.
 The existing translation rules map nested paths before they reach this fold.
+
+## Resource opaque consumption
+
+`resourcelifetime/resourcepolicy` owns the shared resource reason/evidence domain
+and ordered instruction, storage, send, call-dispatch and named-function decisions.
+Queries retain the analyzer's allowance limits, caches and source observations.
+The callback boundary precedes asynchronous exposure, which runs only for carried
+arguments. Constructor-chain evidence still precedes the uncarried-call exit;
+aggregate containment reaches result-publication evidence only when proven.
+
+Unknown evidence stops the selected decision, while false answers retain their
+original reason payload. In particular, a non-consuming builtin remains
+`Appended/false`, a dynamically chosen non-carrying function remains
+`DynamicCallee/false`, and a readable or summarized static callee can remain
+`UnsummarizedCallee/false`. Those values describe an inspected alternative, not
+numeric action codes. Sends and select arms share one handoff/payload policy;
+arm iteration, closure evidence, storage caches and recursive searches stay in Go.
