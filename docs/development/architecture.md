@@ -76,7 +76,11 @@ measurement output. Their shared lock and disabled fast paths are unchanged.
 Synchronization evidence contracts and completeness live in
 `internal/analysis/passes/concurrencyfacts/summary.go`. `engine.go` owns serialized
 queries, cache policy and collection retries; `effects.go` accounts for ordered
-instruction effects and the passive whitelist. Linear fact publication and
+instruction effects. `passive.rules` owns passive admission, while the
+`concurrencyfacts/admission` implementation package owns inert data and resource
+type contracts. Prerequisite analyzers remain registered at `passes/<name>`;
+nested implementation packages require that registered owner and cannot declare
+an `Analyzer` entry point. Linear fact publication and
 rich local queries retain their separate caches and shared evidence contract.
 
 The CLI's delegated process boundary lives in `internal/cli/delegated_run.go`.
@@ -286,6 +290,7 @@ the code cannot drift apart silently.
 | `TestInternalPackagesRespectDependencyDirection` | analyzers may use shared tools; shared tools never depend on analyzers or the catalog |
 | `TestSSADependencyBoundaries` | CFG and value mechanics sit below calls, and calls below path proofs; reverse dependencies are forbidden |
 | `TestAnalyzerPackageLayout` | one package per analyzer under `internal/analysis/analyzers/<group>/<name>` |
+| `TestInfrastructureAnalyzerPlacementPolicy` | prerequisite analyzers remain top-level passes; nested helpers require a registered owning pass and cannot declare another analyzer |
 | `TestAnalyzersUseSharedReporting` | diagnostics only through `check.Report` or `check.Reportf`, never `analysis.Pass.Report` directly |
 | `TestAnalyzerCodeUsesStructuredTracing` | production analyzer and analysis-pass code uses `internal/reporting/trace` rather than `fmt.Print`, `fmt.Printf`, or `fmt.Println` probes |
 | `TestNoPublicCheckIsAConvention` | no listed check is kind `policy`: a diagnostic a reader must first agree with is withdrawn from the catalog rather than published |

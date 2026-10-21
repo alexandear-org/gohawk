@@ -1,5 +1,19 @@
 version: 1
 targets:
+  - name: concurrency_inert_data
+    package: internal/analysis/passes/concurrencyfacts/admission
+    bindings: internal/analysis/passes/concurrencyfacts/admission/data.go
+    signature: DataSignature
+    function: DataInstruction
+    rules: [internal/analysis/passes/concurrencyfacts/admission/data.rules]
+    out: internal/analysis/passes/concurrencyfacts/admission/data_gen.go
+  - name: concurrency_passive_instruction
+    package: internal/analysis/passes/concurrencyfacts
+    bindings: internal/analysis/passes/concurrencyfacts/effects.go
+    signature: passiveSignature
+    function: passiveInstruction
+    rules: [internal/analysis/passes/concurrencyfacts/passive.rules]
+    out: internal/analysis/passes/concurrencyfacts/passive_gen.go
   - name: select_comparison
     package: internal/engine/ssaflow/selection
     bindings: internal/engine/ssaflow/selection/comparison.go

@@ -2,7 +2,6 @@ package concurrencyfacts
 
 import (
 	"go/token"
-	"go/types"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -197,23 +196,4 @@ func (engine *Engine) importedField(call ssa.CallInstruction, value ssa.Value, f
 		return nil, false
 	}
 	return engine.fieldAddress(call.Parent(), path)
-}
-
-// Whole-owner stores can reset embedded synchronization state just as a store
-// directly to a Mutex or WaitGroup can. Pointer fields do not embed that state.
-func containsSynchronization(value types.Type) bool {
-	if synchronizationPointer(types.NewPointer(value)) {
-		return true
-	}
-	switch value := value.Underlying().(type) {
-	case *types.Struct:
-		for field := range value.Fields() {
-			if containsSynchronization(field.Type()) {
-				return true
-			}
-		}
-	case *types.Array:
-		return containsSynchronization(value.Elem())
-	}
-	return false
 }

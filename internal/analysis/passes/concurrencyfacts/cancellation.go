@@ -5,9 +5,9 @@ package concurrencyfacts
 // CancelFunc types alone do not rule out custom implementations or callbacks.
 
 import (
-	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"github.com/kojah/gohawk/internal/engine/syntax"
@@ -24,14 +24,6 @@ var (
 
 func isCancelConstructor(common *ssa.CallCommon) bool {
 	return ssacall.CallMatchesAnySymbol(common, withCancel, withCancelCause)
-}
-
-func cancellationType(value types.Type) bool {
-	return syntax.NamedType(value, "context", "Context") || cancelFunctionType(value)
-}
-
-func cancelFunctionType(value types.Type) bool {
-	return syntax.NamedType(value, "context", "CancelFunc") || syntax.NamedType(value, "context", "CancelCauseFunc")
 }
 
 func (engine *Engine) cancellationCall(call ssa.CallInstruction) (Summary, bool) {
@@ -51,7 +43,7 @@ func (engine *Engine) cancellationCall(call ssa.CallInstruction) (Summary, bool)
 		return Summary{}, true
 	case ssacall.CallMatchesSymbol(common, contextDone):
 		return engine.cancellationOperation(call, ssaflow.CallReceiver(common), false), true
-	case !common.IsInvoke() && common.Value != nil && cancelFunctionType(common.Value.Type()):
+	case !common.IsInvoke() && common.Value != nil && admission.CancelFunctionType(common.Value.Type()):
 		return engine.cancellationOperation(call, common.Value, true), true
 	default:
 		return Summary{}, false

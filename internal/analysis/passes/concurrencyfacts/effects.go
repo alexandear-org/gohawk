@@ -5,6 +5,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"golang.org/x/tools/go/ssa"
@@ -106,7 +107,7 @@ func (engine *Engine) instructionEffects(result *Summary, instruction ssa.Instru
 		return passiveInstruction(instruction, root, engine.budget)
 	case *ssa.FieldAddr:
 		// A mutex reached through a write-once field is named by its path.
-		if MutexPointer(instruction.Type()) && !synchronizationPointer(instruction.X.Type()) {
+		if MutexPointer(instruction.Type()) && !admission.SynchronizationPointer(instruction.X.Type()) {
 			if _, exact := engine.identityPath(instruction); exact {
 				return ReasonNone
 			}
@@ -146,7 +147,7 @@ func loadEffect(load *ssa.UnOp, budget *proofs.SearchBudget) Reason {
 		// on it must resolve one through reference, which declines globals.
 		return ReasonNone
 	}
-	if readableAddress(load.X) || inertValue(load.Type()) {
+	if readableAddress(load.X) || admission.Value(load.Type()) {
 		return ReasonNone
 	}
 	return ReasonLoadUnknown
@@ -172,62 +173,10 @@ func (engine *Engine) appendOperation(result *Summary, kind Kind, value ssa.Valu
 	return ReasonNone
 }
 
-func passiveInstruction(instruction ssa.Instruction, root bool, budget *proofs.SearchBudget) Reason {
-	if effectFree(instruction, root) {
-		return ReasonNone
-	}
-	switch instruction := instruction.(type) {
-	case *ssa.If, *ssa.Jump:
-		// The acyclic collector checks every successor and requires identical
-		// ordered effects at joins and returns.
-		return ReasonNone
-	case *ssa.Phi:
-		// Inert values cannot change resource identity. Every incoming
-		// computation is still checked by the instruction whitelist.
-		if inertValue(instruction.Type()) {
-			return ReasonNone
-		}
-	case *ssa.DebugRef, *ssa.Alloc, *ssa.MakeClosure:
-		return ReasonNone
-	case *ssa.FieldAddr:
-		if _, exact := embeddedPathWithin(instruction, budget); exact && !synchronizationPointer(instruction.X.Type()) {
-			return ReasonNone
-		}
-	case *ssa.Store:
-		// A fresh group's zero state is part of the counter proof. Resetting
-		// or copying it invalidates that proof, even through a local address.
-		// Spilling a *pointer* to a primitive into a local closure cell does
-		// not copy the primitive; binding later proves the cell is stable.
-		if localSynchronizationPointerStore(instruction) ||
-			localAddress(instruction.Addr) && !containsSynchronization(instruction.Val.Type()) &&
-				!synchronizationPointer(instruction.Addr.Type()) {
-			return ReasonNone
-		}
-	case *ssa.ChangeType:
-		if ssaflow.ChannelType(instruction) {
-			return ReasonNone
-		}
-	case *ssa.MakeInterface, *ssa.ChangeInterface:
-		// Boxing or converting an interface does not itself publish the
-		// value. Every subsequent use must still resolve to a complete callee;
-		// opaque dispatch is unknown.
-		return ReasonNone
-	case *ssa.MakeChan:
-		// Callee allocation sites cannot identify runtime instances across
-		// separate calls. Only channels created by the root are admitted.
-		if root {
-			return ReasonNone
-		}
-	}
-	// This whitelist is also the scope-completeness proof: no unmodelled
-	// call, publication, launch, panic, or blocking action is skipped.
-	return ReasonEffectUnknown
-}
-
 // effectFree groups the instruction families that need no ordered effect:
 // scalar arithmetic, an admitted return, and inert caller-owned data.
 func effectFree(instruction ssa.Instruction, root bool) bool {
-	return scalarInstruction(instruction) || admittedReturn(instruction, root) || inertDataInstruction(instruction)
+	return scalarInstruction(instruction) || admittedReturn(instruction, root) || admission.DataInstruction(instruction)
 }
 
 // A root's results reach its caller only after the root returns, and root
@@ -244,7 +193,7 @@ func admittedReturn(instruction ssa.Instruction, root bool) bool {
 		return true
 	}
 	for _, result := range returned.Results {
-		if !inertValue(result.Type()) {
+		if !admission.Value(result.Type()) {
 			return false
 		}
 	}
@@ -256,7 +205,7 @@ func localSynchronizationPointerStore(store *ssa.Store) bool {
 		return false
 	}
 	pointer, ok := store.Addr.Type().Underlying().(*types.Pointer)
-	return ok && synchronizationPointer(pointer.Elem())
+	return ok && admission.SynchronizationPointer(pointer.Elem())
 }
 
 // Empty protocol effects require positive evidence for every instruction, not
@@ -281,4 +230,17 @@ func scalarType(value types.Type) bool {
 func isGlobal(address ssa.Value) bool {
 	_, ok := address.(*ssa.Global)
 	return ok
+}
+
+// Passive decisions retain the original instruction/root/allowance boundary.
+type (
+	passiveSignature func(instruction ssa.Instruction, root bool, budget *proofs.SearchBudget) Reason
+	passiveValue     = ssa.Value
+)
+
+var _ passiveSignature = passiveInstruction
+
+func passiveFieldWithin(field *ssa.FieldAddr, budget *proofs.SearchBudget) bool {
+	_, exact := embeddedPathWithin(field, budget)
+	return exact && !admission.SynchronizationPointer(field.X.Type())
 }

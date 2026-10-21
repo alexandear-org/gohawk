@@ -4,6 +4,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
@@ -48,7 +49,7 @@ func callbackHole(instruction ssa.CallInstruction) (Summary, bool) {
 		return Summary{}, false
 	}
 	for _, argument := range common.Args {
-		if !inertValue(argument.Type()) {
+		if !admission.Value(argument.Type()) {
 			return Summary{}, false
 		}
 	}
@@ -66,7 +67,7 @@ func holeInput(value ssa.Value, method *types.Func) bool {
 		return false
 	}
 	if method != nil {
-		return types.IsInterface(value.Type()) && !cancellationType(value.Type())
+		return types.IsInterface(value.Type()) && !admission.CancellationType(value.Type())
 	}
 	_, function := value.Type().Underlying().(*types.Signature)
 	return function

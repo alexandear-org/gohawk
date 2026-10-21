@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
+	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/ssaflow/ssaflowtest"
+	"golang.org/x/tools/go/ssa"
 )
 
 // Builtins, helper results, assertions, and panicking branches are passive
@@ -287,6 +289,41 @@ func Rebinds(s, o *server) { s.conn.mu.Lock(); go func() { s = o }(); s.conn.mu.
 	for _, name := range []string{"Loose", "Mapped"} {
 		if got := engine.Root(pkg.Func(name), budget()); got.Complete() {
 			t.Errorf("%s = %+v, want incomplete", name, got)
+		}
+	}
+}
+
+func TestPassiveAdmissionKeepsRootAndFieldAllowance(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "admission", `package admission
+ type owner struct{ C chan int }
+ func field(o *owner)chan int{return o.C}
+ func fresh()chan int{return make(chan int)}
+ `)
+	field := ssaflow.InstructionsOf[*ssa.FieldAddr](pkg.Func("field"))[0]
+	for _, test := range []struct {
+		name  string
+		limit int
+		want  Reason
+	}{
+		{"complete", proofs.QueryBudget, ReasonNone},
+		{"cut", 0, ReasonEffectUnknown},
+		{"fresh", proofs.QueryBudget, ReasonNone},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			budget := proofs.NewSearchBudget(test.limit)
+			if got := passiveInstruction(field, false, budget); got != test.want {
+				t.Fatalf("field allowance %d: %v, want %v", test.limit, got, test.want)
+			}
+		})
+	}
+	channel := ssaflow.InstructionsOf[*ssa.MakeChan](pkg.Func("fresh"))[0]
+	for _, test := range []struct {
+		root bool
+		want Reason
+	}{{true, ReasonNone}, {false, ReasonEffectUnknown}} {
+		budget := proofs.NewSearchBudget(0)
+		if got := passiveInstruction(channel, test.root, budget); got != test.want || budget.Exhausted() {
+			t.Fatalf("root %v: %v, want %v; exhausted=%v", test.root, got, test.want, budget.Exhausted())
 		}
 	}
 }

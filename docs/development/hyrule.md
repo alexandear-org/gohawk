@@ -40,7 +40,7 @@ path is removed; generator support and examples alone do not qualify.
 | --- | --- |
 | Select-index comparison recognition | Generated shared recognition used by summary dispatch and selected-receive edge evidence |
 | Standard synchronization primitives | Generated shared recognition used by concurrency call summaries and heap mutex effects; count acceptance remains summary policy |
-| Concurrency inert-data and passive-instruction admission | Handwritten; migration remains |
+| Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
 | Concurrency context/callback operation recognition | Handwritten; migration remains |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Handwritten; migration remains; state application stays in Go |
@@ -98,6 +98,23 @@ keeps its exact SSA identity. Arithmetic/logical unary operations retain a false
 recognition result, and traversal stops there. `ExternallyOwnedValue` and
 `ElementOfAggregate` consume this same generated recognition through their
 existing reaching walks; the rules neither traverse nor establish ownership.
+
+## Concurrency admission
+
+`concurrencyfacts/admission/data.rules` owns inert-data instruction admission.
+The child package also owns the existing inert value/container, builtin/atomic
+and standard resource-type contracts. It cannot call back into the enclosing
+pass. `passive.rules` owns the remaining instruction/root decision; its field
+query invokes the existing bounded path proof exactly once when reached.
+Collector traversal, scalar arithmetic, return-value scans and resource identity
+remain in Go. The enclosing pass keeps its existing exported mutex predicate as
+a delegate to the same type contract.
+
+The rules preserve empty-container admission, select-projection exclusion,
+resource-bearing writes, pointer spills and root-only channel allocations.
+Unknown forms retain `ReasonEffectUnknown`. `effects_test.go` keeps adjacent
+accepted/rejected summaries and checks complete, exhausted and fresh field-path
+allowances, plus root/callee allocation with no search charge.
 
 ## Cancellation labels
 

@@ -5,6 +5,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
@@ -151,7 +152,7 @@ func (engine *Engine) bind(
 }
 
 func (engine *Engine) reference(value ssa.Value) (Reference, bool) {
-	if value == nil || !ssaflow.ChannelType(value) && !synchronizationPointer(value.Type()) && !cancellationType(value.Type()) {
+	if value == nil || !ssaflow.ChannelType(value) && !admission.SynchronizationPointer(value.Type()) && !admission.CancellationType(value.Type()) {
 		return Reference{}, false
 	}
 	return ssaflow.ResolveReachingValue(ssaflow.NewReachingWalk(ssaflow.TransparentChangeType), value,
@@ -175,7 +176,7 @@ func (engine *Engine) referenceLeaf(_ ssaflow.ReachingWalk, value ssa.Value) (Re
 			}
 		}
 		if capture, ok := load.X.(*ssa.FreeVar); ok && readableAddress(capture) {
-			return Reference{Value: capture, Indirect: true, Cancellation: cancellationType(value.Type())}, true
+			return Reference{Value: capture, Indirect: true, Cancellation: admission.CancellationType(value.Type())}, true
 		}
 	}
 	return Reference{}, false
@@ -189,9 +190,9 @@ func (engine *Engine) resolvedReference(value ssa.Value) (Reference, bool) {
 	case *ssa.Call:
 		return Reference{Value: value}, ssacall.CallMatchesSymbol(value.Common(), newCond)
 	case *ssa.Parameter, *ssa.FreeVar, *ssa.MakeChan:
-		return Reference{Value: value, Cancellation: cancellationType(value.Type())}, true
+		return Reference{Value: value, Cancellation: admission.CancellationType(value.Type())}, true
 	case *ssa.Alloc:
-		if synchronizationPointer(value.Type()) {
+		if admission.SynchronizationPointer(value.Type()) {
 			return Reference{Value: value}, true
 		}
 	case *ssa.Global, *ssa.FieldAddr:
@@ -220,7 +221,7 @@ func readableAddress(value ssa.Value) bool {
 		return false
 	}
 	_, channel := pointer.Elem().Underlying().(*types.Chan)
-	return channel || synchronizationPointer(pointer.Elem()) || cancellationType(pointer.Elem())
+	return channel || admission.SynchronizationPointer(pointer.Elem()) || admission.CancellationType(pointer.Elem())
 }
 
 func localAddress(value ssa.Value) bool {

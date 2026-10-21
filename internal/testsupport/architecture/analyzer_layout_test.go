@@ -118,23 +118,80 @@ func assertAnalyzerSourceDepth(t *testing.T, inventory repositorySourceInventory
 
 func assertInfrastructureAnalyzerPlacement(t *testing.T, loaded []*packages.Package, modulePath string) {
 	t.Helper()
+	for _, message := range infrastructureAnalyzerPlacementErrors(loaded, modulePath) {
+		t.Error(message)
+	}
+}
+
+// Only registered passes occupy the first level. Their implementation helpers
+// may be nested, but cannot register another analyzer or exist without an owner.
+func infrastructureAnalyzerPlacementErrors(loaded []*packages.Package, modulePath string) []string {
 	passesPrefix := modulePath + "/internal/analysis/passes/"
+	registered := map[string]bool{}
+	for _, pkg := range loaded {
+		variable, ok := pkg.Types.Scope().Lookup("Analyzer").(*types.Var)
+		registered[pkg.PkgPath] = ok && analysisAnalyzerPointer(variable.Type())
+	}
+	var failures []string
 	for _, pkg := range loaded {
 		object := pkg.Types.Scope().Lookup("Analyzer")
-		variable, analyzerVariable := object.(*types.Var)
-		if analyzerVariable && analysisAnalyzerPointer(variable.Type()) && !strings.HasPrefix(pkg.PkgPath, passesPrefix) {
-			t.Errorf("%s exports an Analyzer variable outside internal/analysis/passes/<name>", pkg.PkgPath)
+		if registered[pkg.PkgPath] && !strings.HasPrefix(pkg.PkgPath, passesPrefix) {
+			failures = append(failures, pkg.PkgPath+" exports an Analyzer variable outside internal/analysis/passes/<name>")
 		}
 		relative, passPackage := strings.CutPrefix(pkg.PkgPath, passesPrefix)
 		if !passPackage {
 			continue
 		}
-		if relative == "" || strings.Contains(relative, "/") {
-			t.Errorf("%s prerequisite pass must be exactly internal/analysis/passes/<name>", pkg.PkgPath)
+		owner, _, nested := strings.Cut(relative, "/")
+		if nested {
+			if !registered[passesPrefix+owner] {
+				failures = append(failures, pkg.PkgPath+" helper must belong to a registered prerequisite pass")
+			}
+			if object != nil {
+				failures = append(failures, pkg.PkgPath+" helper must not declare Analyzer; prerequisite analyzers belong at internal/analysis/passes/<name>")
+			}
+			continue
 		}
-		if !analyzerVariable || !analysisAnalyzerPointer(variable.Type()) {
-			t.Errorf("%s must export an Analyzer variable of type *analysis.Analyzer", pkg.PkgPath)
+		if relative == "" || !registered[pkg.PkgPath] {
+			failures = append(failures, pkg.PkgPath+" must export an Analyzer variable of type *analysis.Analyzer")
 		}
+	}
+	return failures
+}
+
+func TestInfrastructureAnalyzerPlacementPolicy(t *testing.T) {
+	const module = "example.test/project"
+	analysisPackage := types.NewPackage("golang.org/x/tools/go/analysis", "analysis")
+	analyzer := types.NewNamed(types.NewTypeName(0, analysisPackage, "Analyzer", nil), types.NewStruct(nil, nil), nil)
+	makePackage := func(path string, registered bool) *packages.Package {
+		pkg := types.NewPackage(module+path, "fixture")
+		if registered {
+			pkg.Scope().Insert(types.NewVar(0, pkg, "Analyzer", types.NewPointer(analyzer)))
+		}
+		return &packages.Package{PkgPath: pkg.Path(), Types: pkg}
+	}
+	for _, test := range []struct {
+		name, path        string
+		registered, owner bool
+		want              int
+	}{
+		{"root pass", "/internal/analysis/passes/owner", true, false, 0},
+		{"owned helper", "/internal/analysis/passes/owner/admission", false, true, 0},
+		{"deep helper", "/internal/analysis/passes/owner/model/detail", false, true, 0},
+		{"orphan helper", "/internal/analysis/passes/missing/admission", false, true, 1},
+		{"nested analyzer", "/internal/analysis/passes/owner/admission", true, true, 1},
+		{"plain root", "/internal/analysis/passes/plain", false, false, 1},
+		{"misplaced analyzer", "/internal/engine/helper", true, false, 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			loaded := []*packages.Package{makePackage(test.path, test.registered)}
+			if test.owner {
+				loaded = append(loaded, makePackage("/internal/analysis/passes/owner", true))
+			}
+			if failures := infrastructureAnalyzerPlacementErrors(loaded, module); len(failures) != test.want {
+				t.Fatalf("placement failures=%v, want %d", failures, test.want)
+			}
+		})
 	}
 }
 

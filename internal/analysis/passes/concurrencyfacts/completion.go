@@ -4,6 +4,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	"github.com/kojah/gohawk/internal/engine/ssaflow/calls/synchronization"
 
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -34,18 +35,10 @@ func (engine *Engine) callSummary(instruction ssa.CallInstruction) Summary {
 		result.Reason = engine.appendOperation(&result, operation.Kind, operation.Resource, instruction.Pos())
 		return result
 	}
-	if inertBuiltin(common) || inertAtomic(common) {
+	if admission.Builtin(common) || admission.Atomic(common) {
 		return Summary{}
 	}
 	return engine.instantiate(instruction)
-}
-
-func waitGroupPointer(value types.Type) bool {
-	pointer, ok := value.Underlying().(*types.Pointer)
-	if !ok {
-		return false
-	}
-	return syntax.PointerStruct(pointer) != nil && syntax.NamedType(pointer.Elem(), "sync", "WaitGroup")
 }
 
 func (engine *Engine) deferCompletion(result *Summary, instruction *ssa.Defer) Reason {
@@ -77,15 +70,8 @@ func (engine *Engine) deferCompletion(result *Summary, instruction *ssa.Defer) R
 	return ReasonNone
 }
 
-func synchronizationPointer(value types.Type) bool {
-	return waitGroupPointer(value) || MutexPointer(value) || condPointer(value)
-}
-
 // MutexPointer identifies sync.Mutex and sync.RWMutex pointers, not lookalikes.
-func MutexPointer(value types.Type) bool {
-	pointer, ok := value.Underlying().(*types.Pointer)
-	return ok && (syntax.NamedType(pointer.Elem(), "sync", "Mutex") || syntax.NamedType(pointer.Elem(), "sync", "RWMutex"))
-}
+func MutexPointer(value types.Type) bool { return admission.MutexPointer(value) }
 
 func straightLineBody(function *ssa.Function) bool {
 	if len(function.Blocks) == 1 {
@@ -101,11 +87,6 @@ func straightLineBody(function *ssa.Function) bool {
 // can only be recovered from an exact NewCond call, never a mutable L field.
 
 var newCond = syntax.PackageFunction("sync", "NewCond")
-
-func condPointer(value types.Type) bool {
-	pointer, ok := value.Underlying().(*types.Pointer)
-	return ok && syntax.NamedType(pointer.Elem(), "sync", "Cond")
-}
 
 func condLocker(call ssa.CallInstruction) (ssa.Value, bool) {
 	if !ssacall.CallMatchesSymbol(call.Common(), newCond) || len(call.Common().Args) != 1 {

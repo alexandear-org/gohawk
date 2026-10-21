@@ -1,0 +1,115 @@
+signature total fallback outputs false;
+view FieldAddress = *ssa.FieldAddr {
+  owner: X;
+};
+view Store = *ssa.Store {
+  value: Val;
+  address: Addr;
+};
+view Map = *ssa.MakeMap {
+};
+view SliceAllocation = *ssa.MakeSlice {
+};
+view IndexAddress = *ssa.IndexAddr {
+};
+view Slice = *ssa.Slice {
+};
+view Lookup = *ssa.Lookup {
+};
+view Assertion = *ssa.TypeAssert {
+};
+view Extraction = *ssa.Extract {
+  tuple: Tuple;
+};
+view Selection = *ssa.Select {
+};
+view MapUpdate = *ssa.MapUpdate {
+  key: Key;
+  value: Value;
+};
+view Binary = *ssa.BinOp {
+  op: Op;
+  left: X;
+  right: Y;
+};
+build typeOf = node.Type;
+build primitive = SynchronizationPointer;
+build elementType = lookupElement;
+guard inert = Value;
+guard address = Address;
+guard elements = Elements;
+guard nilConstant;
+const equalToken, notEqualToken;
+
+// A primitive's fields are its internal state, never ordinary data.
+rule Field:
+  inputs $field:(FieldAddress owner:$owner)
+  let $type = typeOf $owner
+  let $primitive = primitive $type
+  && $primitive == false
+  && address $field
+  => outputs true;
+
+// Flag/counter writes cannot satisfy a modeled wait. Reads only choose among
+// branches the summary already keeps.
+rule Write:
+  inputs (Store value:$value address:$location)
+  let $type = typeOf $value
+  && inert $type
+  && address $location
+  => outputs true;
+
+// Empty containers hold no resource. A size panic ends the path before a wait.
+rule EmptyContainer:
+  inputs (or (Map) (SliceAllocation))
+  => outputs true;
+
+rule Indexed:
+  inputs $index:(IndexAddress)
+  && address $index
+  => outputs true;
+
+// Reslicing shares elements and creates no new identity.
+rule Resliced:
+  inputs $slice:(Slice)
+  let $type = typeOf $slice
+  && elements $type
+  => outputs true;
+
+// Comma-ok results carry an element plus a Boolean; failed assertions panic.
+rule Element:
+  inputs $value:(or (Lookup) (Assertion))
+  let $type = elementType $value
+  && inert $type
+  => outputs true;
+
+// Select projections belong to the separate dispatch proof.
+rule SelectProjection:
+  inputs (Extraction tuple:(Selection))
+  => outputs false;
+
+rule Projected:
+  inputs $value:(Extraction)
+  let $type = typeOf $value
+  && inert $type
+  => outputs true;
+
+// Storing resource keys or values would publish them.
+rule MapWrite:
+  inputs (MapUpdate key:$key value:$value)
+  let $keyType = typeOf $key
+  && inert $keyType
+  let $valueType = typeOf $value
+  && inert $valueType
+  => outputs true;
+
+// Comparing against nil cannot panic, including interface comparisons.
+rule LeftNil:
+  inputs (Binary op:(or equalToken notEqualToken) left:$left)
+  && nilConstant $left
+  => outputs true;
+
+rule RightNil:
+  inputs (Binary op:(or equalToken notEqualToken) right:$right)
+  && nilConstant $right
+  => outputs true;
