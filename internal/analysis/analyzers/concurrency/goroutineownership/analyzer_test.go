@@ -19,6 +19,7 @@ func TestAnalyzer(t *testing.T) {
 
 func TestGoroutineOwnershipReasonCodes(t *testing.T) {
 	want := map[goroutineOwnershipReason]string{
+		reasonLabelCallUnavailable:           "call-classification-unavailable",
 		reasonSummaryJoinBudgetExhausted:     "summary-join-budget-exhausted",
 		reasonFactoryOriginBudgetExhausted:   "factory-origin-budget-exhausted",
 		reasonHelperCallBudgetExhausted:      "helper-call-budget-exhausted",

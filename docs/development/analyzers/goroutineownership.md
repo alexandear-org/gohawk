@@ -9,11 +9,15 @@ why. Update it with the fixtures when a boundary changes.
 `classify.go` owns the action lattice, cached labels, exact versus possible
 signal identity, and terminal proof dispatch. `entry.rules` and `classify.rules`
 own ordered arm-entry, receive and publication decisions.
-`call_actions.go` owns synchronous, launched and opaque call contracts;
+`call_prefix.rules` and `call_contracts.rules` order synchronous, launched and
+opaque call contracts. `call_actions.go` retains their bounded queries and
+concrete helper dispatch;
 `receives` owns standalone receive-site recognition with caller-supplied channel
 predicates. It distinguishes selected arms from every-case receives and feeds
 the same cached labels and final proof. Spawn query-phase names live beside
-the candidate budgets in `spawn.go`.
+the candidate budgets in `spawn.go`. Possible possession and factory provenance
+live in the analyzer-owned `containment` and `origins` packages; candidate
+transfer and lifetime decisions consume those queries in Go.
 
 `obligation.go` owns completion-handle discovery and parent binding;
 `completion_coverage.go` owns terminal-work and return-coverage requirements.
@@ -757,9 +761,10 @@ therefore retains the join label before its publication could make it opaque.
 
 `classify.rules` orders exact receive, possible receive, aggregate receive and
 tracked select-send evidence, and labels direct sends and map publication.
-Closure construction itself remains `none`. The Go dispatcher sends returns,
-stores and calls to the existing terminal proof functions; their exact identity,
-containment and helper policies remain authoritative. The action cache surrounds
+Closure construction itself remains `none`. The Go dispatcher sends returns
+and stores to their existing proof functions and calls through the ordered
+contract stages. Exact identity, containment and helper queries remain
+authoritative. The action cache surrounds
 both generated stages and terminal proofs, so repeated walks do not repeat a
 query or trace label.
 
@@ -769,3 +774,26 @@ stored handles, publication, closure construction, selected-arm precedence and
 synchronous/deferred/launched WaitGroup calls. It also checks that looking up a
 cached action leaves the candidate pool unchanged. Existing receive-search and
 analyzer fixtures cover mixed select arms, helper bindings and exhausted budgets.
+
+## Generated call contracts
+
+Call recognition preserves missing-call, launched-observer, builtin and direct
+join precedence. Even a builtin with no tracked consumption returns a recognized
+`none`, so it cannot accidentally enter retained-owner or summary inference.
+Launching a builtin is classified before ordinary builtin admission.
+
+The remaining contracts ask retained-owner, pipe-peer and summary queries in
+order, then recognize WaitGroup bookkeeping and testing cleanup before gomock
+publication. A known bookkeeping or cleanup contract stops even when its label
+is `none`. The gomock argument query remains conditional on the registered API
+identity. An unanswered contract proceeds to the existing concrete-callee or
+opaque-call proof. Invalid active label domains produce opaque uncertainty.
+
+The shared rules schema uses the existing `helperCallProof` and a recognition
+boolean; no new request or result structs are introduced. Partial summary and
+retained-owner results preserve their cutoff reasons. Every query still draws
+from the same candidate allowance and feeds the same cached instruction label.
+`classify_test.go` pins builtin/launch/direct-wait order and terminal `none` for
+bookkeeping and testing cleanup, alongside existing summary, owner and callback
+fixtures. The containment and factory-origin searches moved without changing
+what wrappers or storage facts they follow or how their budgets are charged.

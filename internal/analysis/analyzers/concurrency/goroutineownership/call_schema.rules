@@ -1,0 +1,22 @@
+union Label = helperCallProof tag action {
+  NoAction = actionNone {
+    reason;
+  };
+  Join = actionJoin {
+    reason;
+  };
+  Transfer = actionTransfer {
+    reason;
+  };
+  Opaque = actionUnknown {
+    reason;
+  };
+};
+union Recognized = (helperCallProof, bool) tag 1 {
+  Decided = true {
+    label: 0;
+  };
+  Unrecognized = false;
+};
+const actionNone, actionJoin, actionTransfer, actionUnknown;
+const reasonNone, reasonLabelCallUnavailable;

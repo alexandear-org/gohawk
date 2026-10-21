@@ -45,7 +45,7 @@ path is removed; generator support and examples alone do not qualify.
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, transparent aliases and field-use admission; heap-operation classification remains; recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
-| Goroutine ownership instruction/call labels | Generated arm-entry, receive and publication decisions; terminal return/store/call policies and searches remain in Go |
+| Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
@@ -194,12 +194,44 @@ channel/map publication. All identity, containment and selected-case questions
 are explicit queries; no counted search is a speculative guard.
 
 The enclosing instruction cache and trace boundary are unchanged. Go dispatches
-returns, stores and calls to their existing proof functions. Standalone receive
+returns and stores to their existing proof functions and calls through the
+contract stages below. Standalone receive
 recognizers live under the analyzer's `receives` package, while spawn-specific
 identity remains with its classifier. Query phases live beside spawn budgets.
 No traversal, budget accounting, callback binding or flow query moves into rules.
 
 The classifier's compiled-SSA tests preserve action/reason pairs and cache reuse,
 including a send at a selected receive's arm entry. Full analyzer fixtures retain
-mixed select, alias, ownership-transfer and budget controls. Call, return and
-store proof policies remain migration candidates independently of this dispatcher.
+mixed select, alias, ownership-transfer and budget controls. Return/store proofs
+and callee traversal retain their existing Go implementations.
+
+## Goroutine call contracts
+
+`call_prefix.rules` handles missing calls, launched observers, builtins and direct
+joins before any summary or retained-owner query. A launched builtin keeps the
+opaque-launch policy. Builtins other than append return a recognized `none`;
+append asks whether its arguments consume tracked values.
+
+`call_contracts.rules` orders retained-owner participation, pipe peers, concurrency
+summaries, WaitGroup bookkeeping, testing cleanup and gomock return contracts.
+Each query executes once when reached. A recognized `none` from bookkeeping or
+cleanup stops the chain; an unrecognized answer proceeds. The gomock argument
+query runs only after its registered library contract matches. Unavailable or
+invalid query-domain outcomes terminate with an opaque call label.
+
+The targets share the existing `helperCallProof` label and native recognition
+boolean. Direct joins, pipe peers and summaries produce recognized labels at the
+same proof boundary rather than needing request or response wrapper structs.
+Callee resolution, recursive helper binding and opaque-call consumption remain
+Go queries. The instruction cache still surrounds the complete call decision.
+
+The analyzer-local `containment` package owns possible possession, including old
+stores and mixed choices; it never claims exact handoff. `origins` owns bounded
+factory/registry provenance. Candidate transfer and lifetime decisions consume
+those same queries in Go. Their moved searches and rationale comments retain the
+same transparency, storage and cutoff rules.
+
+Compiled-SSA label tests cover launched builtins, append, other builtins, possible
+group receivers and direct waits. Contract tests pin terminal `none` for group
+bookkeeping and testing cleanup. Existing summary and retained-owner tests keep
+candidate attribution, cutoff precedence and fresh-cache recovery controls.

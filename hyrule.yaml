@@ -1,5 +1,19 @@
 version: 1
 targets:
+  - name: goroutine_call_recognition
+    package: internal/analysis/analyzers/concurrency/goroutineownership
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go
+    signature: callLabelSignature
+    function: recognizeSpawnCall
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/call_prefix.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/call_prefix_gen.go
+  - name: goroutine_call_contract
+    package: internal/analysis/analyzers/concurrency/goroutineownership
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go
+    signature: callLabelSignature
+    function: recognizeSpawnCallContract
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/call_contracts.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/call_contracts_gen.go
   - name: goroutine_instruction_label
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/classify.go

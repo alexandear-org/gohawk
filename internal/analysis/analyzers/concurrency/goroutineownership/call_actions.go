@@ -4,6 +4,8 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -16,62 +18,39 @@ import (
 // consumption. Exact group/library contracts stay separate from broad receiver
 // or capture identity, which can explain uncertainty but cannot prove a join.
 
+type callLabelSignature func(analysis *spawnAnalysis, instruction ssa.Instruction, common *ssa.CallCommon) (helperCallProof, bool)
+
+type callBuiltin = ssa.Builtin
+
+const goMockReturn = ssacall.ContractGoMockReturn
+
+var (
+	_ callLabelSignature = recognizeSpawnCall
+	_ callLabelSignature = recognizeSpawnCallContract
+)
+
 func (analysis *spawnAnalysis) callAction(instruction ssa.Instruction, common *ssa.CallCommon) (ownershipAction, goroutineOwnershipReason) {
-	if common == nil {
-		return actionNone, reasonNone
+	label, decided := recognizeSpawnCall(analysis, instruction, common)
+	if decided {
+		return label.action, label.reason
 	}
-	// A launched observer runs independently of the caller. Handle it before
-	// receiver, summary and library contracts that describe synchronous calls.
-	if _, launched := instruction.(*ssa.Go); launched {
-		return analysis.opaqueCallAction(common, reasonLabelLaunchedHelper)
+	label, decided = recognizeSpawnCallContract(analysis, instruction, common)
+	if decided {
+		return label.action, label.reason
 	}
-	if builtin, ok := common.Value.(*ssa.Builtin); ok {
-		// append retains its arguments in a slice the caller keeps; the other
-		// builtins only observe a channel or its capacity.
-		if builtin.Name() == "append" && analysis.anyArgumentConsumes(common) {
-			return actionUnknown, reasonLabelAppended
-		}
-		return actionNone, reasonNone
-	}
-	if action, reason := analysis.directJoinAction(common); action != actionNone {
-		return action, reason
-	}
-	owner := analysis.closesRetainedWorkerOwner(instruction, common)
-	if owner.Reason == proofs.EvidenceBudgetExhausted {
-		return actionUnknown, reasonRetainedOwnerBudgetExhausted
-	}
-	if owner.Proven() {
-		return actionUnknown, reasonLabelClosesRetainedOwner
-	}
-	if action := analysis.pipePeerAction(instruction, common); action != actionNone {
-		return action, reasonLabelPipePeer
-	}
-	if proof := analysis.summarizedJoin(instruction); proof.action != actionNone {
-		return proof.action, proof.reason
-	}
-	if analysis.waitGroupBookkeeping(common) {
-		return actionNone, reasonNone
-	}
-	if ssacall.HasLibraryContract(common, ssacall.ContractTestingCleanup) {
-		proof := analysis.testingCleanupAction(common)
-		return proof.action, proof.reason
-	}
-	if ssacall.HasLibraryContract(common, ssacall.ContractGoMockReturn) && analysis.anyArgumentConsumes(common) {
-		// gomock.Return publishes its configured results, but broad argument
-		// containment does not prove the exact stream is among those results.
-		// https://github.com/uber-go/mock/blob/539d81c0f42174d17e8f91abcb869bed37605a15/gomock/call.go#L185-L205
-		return actionUnknown, reasonLabelGoMockReturn
-	}
+	// Visible callee traversal and binding remain in Go. An opaque callee may
+	// retain the value; source visibility alone does not establish completion.
 	callee, closure := ssacall.DirectCallee(common)
 	if callee == nil || len(callee.Blocks) == 0 {
-		// An opaque callee may retain the value.
+		reason := reasonLabelCalleeWithoutBody
 		if callee == nil {
-			return analysis.opaqueCallAction(common, reasonLabelDynamicCallee)
+			reason = reasonLabelDynamicCallee
 		}
-		return analysis.opaqueCallAction(common, reasonLabelCalleeWithoutBody)
+		label = analysis.opaqueCallAction(common, reason)
+		return label.action, label.reason
 	}
-	proof := analysis.helperAction(common, callee, closure, analysis.tracked)
-	return proof.action, proof.reason
+	label = analysis.helperAction(common, callee, closure, analysis.tracked)
+	return label.action, label.reason
 }
 
 // Opaque and launched calls share the same handoff boundary. Positive argument
@@ -79,37 +58,37 @@ func (analysis *spawnAnalysis) callAction(instruction ssa.Instruction, common *s
 // uncertain without establishing a join.
 func (analysis *spawnAnalysis) opaqueCallAction(
 	common *ssa.CallCommon, reason goroutineOwnershipReason,
-) (ownershipAction, goroutineOwnershipReason) {
+) helperCallProof {
 	if analysis.anyArgumentConsumes(common) || analysis.closureConsumes(common.Value) {
-		return actionUnknown, reason
+		return helperCallProof{action: actionUnknown, reason: reason}
 	}
-	return actionNone, reasonNone
+	return helperCallProof{}
 }
 
 // Wait observes completion only on the exact settling group. A lifecycle
 // method on a captured owner supplies possible shutdown participation; neither
 // its name nor receiver identity proves observation of this worker's completion.
-func (analysis *spawnAnalysis) directJoinAction(common *ssa.CallCommon) (ownershipAction, goroutineOwnershipReason) {
+func (analysis *spawnAnalysis) directJoinAction(common *ssa.CallCommon) (helperCallProof, bool) {
 	receiver := ssaflow.CallReceiver(common)
 	if receiver == nil {
-		return actionNone, reasonNone
+		return helperCallProof{}, false
 	}
 	if !ssacall.CallMatchesSymbol(common, waitGroupWait) {
 		if lifecycleMethod(ssaflow.CallName(common)) && ownerReceiver(receiver, analysis.owners) {
-			return actionUnknown, reasonLabelOwnerLifecycle
+			return helperCallProof{action: actionUnknown, reason: reasonLabelOwnerLifecycle}, true
 		}
-		return actionNone, reasonNone
+		return helperCallProof{}, false
 	}
 	storage := heapmodel.NewStorage(analysis.budget())
 	for _, target := range analysis.groups {
 		if storage.Same(receiver, target).Proven() {
-			return actionJoin, reasonLabelDirectJoin
+			return helperCallProof{action: actionJoin, reason: reasonLabelDirectJoin}, true
 		}
 	}
 	if heapmodel.MayAliasAny(receiver, analysis.groups) || storage.Budget().Exhausted() {
-		return actionUnknown, reasonLabelPossibleJoin
+		return helperCallProof{action: actionUnknown, reason: reasonLabelPossibleJoin}, true
 	}
-	return actionNone, reasonNone
+	return helperCallProof{}, false
 }
 
 var waitGroupAdd = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "WaitGroup", Name: "Add"})
@@ -146,7 +125,10 @@ func (analysis *spawnAnalysis) unsettledGroup(receiver ssa.Value) bool {
 // helper: testing guarantees that it runs after the test completes, so a join
 // on every path through the callback settles the worker.
 // https://github.com/charmbracelet/crush/blob/6fa9e6905041c32ffceb1c9b1a3189b3db1eec07/internal/server/socket_test.go#L162-L177
-func (analysis *spawnAnalysis) testingCleanupAction(common *ssa.CallCommon) helperCallProof {
+func (analysis *spawnAnalysis) testingCleanupAction(common *ssa.CallCommon) (helperCallProof, bool) {
+	if !ssacall.HasLibraryContract(common, ssacall.ContractTestingCleanup) {
+		return helperCallProof{}, false
+	}
 	result := actionNone
 	for _, argument := range common.Args {
 		closure, ok := argument.(*ssa.MakeClosure)
@@ -156,12 +138,12 @@ func (analysis *spawnAnalysis) testingCleanupAction(common *ssa.CallCommon) help
 		if callee, _ := closure.Fn.(*ssa.Function); callee != nil {
 			proof := analysis.helperAction(nil, callee, closure, analysis.tracked)
 			if proof.reason == reasonHelperCallBudgetExhausted {
-				return proof
+				return proof, true
 			}
 			result = strongerAction(result, proof.action)
 		}
 	}
-	return helperCallProof{action: result, reason: reasonLabelTestingCleanup}
+	return helperCallProof{action: result, reason: reasonLabelTestingCleanup}, true
 }
 
 func (analysis *spawnAnalysis) anyArgumentConsumes(common *ssa.CallCommon) bool {
@@ -185,7 +167,7 @@ func (analysis *spawnAnalysis) closureConsumes(value ssa.Value) bool {
 				if !budget.Spend() {
 					return false
 				}
-				if bindingCarries(binding, tracked.value) {
+				if containment.Binding(binding, tracked.value) {
 					return true
 				}
 			}
@@ -228,7 +210,7 @@ func (analysis *spawnAnalysis) helperAction(
 			if !budget.Spend() {
 				return analysis.helperCallResult(actionUnknown, budget)
 			}
-			carried := bindingCarries(pair.Supplied, tracked.value)
+			carried := containment.Binding(pair.Supplied, tracked.value)
 			projected := ssaflow.ValueIsAccessPathFrom(tracked.value, pair.Supplied)
 			if !carried && !projected {
 				continue

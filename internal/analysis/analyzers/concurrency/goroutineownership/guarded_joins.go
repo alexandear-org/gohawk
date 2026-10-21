@@ -4,6 +4,8 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -108,7 +110,7 @@ func capturedFlagVariable(condition ssa.Value, pairs []ssacall.CallBinding) ssa.
 func (analysis *spawnAnalysis) closureBlockJoins(block *ssa.BasicBlock, pairs []ssacall.CallBinding) bool {
 	for _, pair := range pairs {
 		for _, tracked := range analysis.tracked {
-			if !bindingCarries(pair.Supplied, tracked.value) {
+			if !containment.Binding(pair.Supplied, tracked.value) {
 				continue
 			}
 			derives := func(value ssa.Value) bool {

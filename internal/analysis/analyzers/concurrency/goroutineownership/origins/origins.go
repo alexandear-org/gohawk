@@ -1,4 +1,7 @@
-package goroutineownership
+// Package origins distinguishes possible factory or registry ownership from
+// a caller's fresh completion handle. Each query shares its allowance across
+// reaching values and storage; incomplete evidence remains unknown.
+package origins
 
 import (
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -8,39 +11,9 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
-// Factory-origin evidence distinguishes uncertain completion handles from an
-// external owner's exact transfer. Value folds and storage leaves share an
-// allowance; incomplete origin evidence stops the lifecycle decision as unknown.
-
-func (analysis *spawnAnalysis) completionHandleProof() (GoroutineProof, bool) {
-	for _, tracked := range analysis.tracked {
-		budget := analysis.budget()
-		if tracked.kind == trackedSignal {
-			if proof, decided := analysis.factoryOriginDecision(helperSignalOrigin(tracked.value, analysis.spawn, budget), budget); decided {
-				return proof, true
-			}
-		}
-		if tracked.kind != trackedOwner && ssaflow.ExternallyOwnedValue(tracked.value) {
-			return GoroutineProof{Outcome: GoroutineTransferred, Reason: reasonCallerOrExternalOwner}, true
-		}
-		if tracked.kind == trackedGroup {
-			if proof, decided := analysis.factoryOriginDecision(opaqueGroupOrigin(tracked.value, budget), budget); decided {
-				return proof, true
-			}
-		}
-	}
-	return GoroutineProof{}, false
-}
-
-func (analysis *spawnAnalysis) factoryOriginDecision(origin proofs.Proof, budget *proofs.SearchBudget) (GoroutineProof, bool) {
-	if !origin.Known() {
-		return analysis.lifetimeCutoff(budget, queryFactoryOrigin, reasonFactoryOriginBudgetExhausted), true
-	}
-	if origin.Proven() {
-		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonOpaqueTransfer}, true
-	}
-	return GoroutineProof{}, false
-}
+// Origin queries name their own transparent forms so containment changes
+// cannot silently widen factory provenance.
+const originForms = ssaflow.TransparentChangeInterface | ssaflow.TransparentChangeType | ssaflow.TransparentConvert | ssaflow.TransparentMakeInterface
 
 func factoryOriginProof(found bool, budget *proofs.SearchBudget) proofs.Proof {
 	if budget.Exhausted() {
@@ -52,12 +25,13 @@ func factoryOriginProof(found bool, budget *proofs.SearchBudget) proofs.Proof {
 	return proofs.Proof{State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound}
 }
 
+// Signal finds possible factory ownership of a completion channel.
 // A channel supplied by a factory or registry may already have another owner.
 // Until its allocation and ownership are established, a local launch cannot
 // manufacture an exclusive receive obligation for this caller. This is not a
 // claim that an arbitrary factory channel is drained.
 // https://github.com/deckarep/golang-set/blob/711c30df0fdf98710a4ca0211e12ef7210967ad3/threadsafe.go#L268-L287
-func helperSignalOrigin(value ssa.Value, spawn *ssa.Go, budget *proofs.SearchBudget) proofs.Proof {
+func Signal(value ssa.Value, spawn *ssa.Go, budget *proofs.SearchBudget) proofs.Proof {
 	storage := heapmodel.NewStorage(budget)
 	var leaf func(ssaflow.ReachingWalk, ssa.Value) bool
 	leaf = func(walk ssaflow.ReachingWalk, current ssa.Value) bool {
@@ -79,14 +53,15 @@ func helperSignalOrigin(value ssa.Value, spawn *ssa.Go, budget *proofs.SearchBud
 		_, call := current.(*ssa.Call)
 		return call
 	}
-	return factoryOriginProof(ssaflow.NewReachingWalk(carryForms).Within(budget).Any(value, leaf), budget)
+	return factoryOriginProof(ssaflow.NewReachingWalk(originForms).Within(budget).Any(value, leaf), budget)
 }
 
+// Group finds possible registry ownership of a settling group.
 // An opaque producer can lend a registry-owned group, not allocate a new one.
 // Without its body we cannot assign the join obligation to this invocation.
 // This is uncertainty, not proof that the caller or registry actually waits.
 // https://github.com/i-love-flamingo/flamingo/blob/79a55d62bb7a1bffe11a4dea1444490b14785879/core/requesttask/filter.go#L28-L60
-func opaqueGroupOrigin(value ssa.Value, budget *proofs.SearchBudget) proofs.Proof {
+func Group(value ssa.Value, budget *proofs.SearchBudget) proofs.Proof {
 	storage := heapmodel.NewStorage(budget)
 	var leaf func(ssaflow.ReachingWalk, ssa.Value) bool
 	leaf = func(walk ssaflow.ReachingWalk, current ssa.Value) bool {
@@ -108,5 +83,5 @@ func opaqueGroupOrigin(value ssa.Value, budget *proofs.SearchBudget) proofs.Proo
 		}
 		return false
 	}
-	return factoryOriginProof(ssaflow.NewReachingWalk(carryForms|ssaflow.TransparentTypeAssert).Within(budget).Any(value, leaf), budget)
+	return factoryOriginProof(ssaflow.NewReachingWalk(originForms|ssaflow.TransparentTypeAssert).Within(budget).Any(value, leaf), budget)
 }

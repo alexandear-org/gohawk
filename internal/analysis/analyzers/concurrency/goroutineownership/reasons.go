@@ -66,10 +66,12 @@ const (
 	reasonFactoryOriginBudgetExhausted
 	reasonHelperCallBudgetExhausted
 	reasonSummaryJoinBudgetExhausted
+	reasonLabelCallUnavailable
 	goroutineOwnershipReasonCount
 )
 
 var ownershipReasonCodes = [...]string{
+	reasonLabelCallUnavailable:           "call-classification-unavailable",
 	reasonSummaryJoinBudgetExhausted:     "summary-join-budget-exhausted",
 	reasonFactoryOriginBudgetExhausted:   "factory-origin-budget-exhausted",
 	reasonHelperCallBudgetExhausted:      "helper-call-budget-exhausted",

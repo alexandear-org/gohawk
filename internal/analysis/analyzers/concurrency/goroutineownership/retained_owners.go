@@ -4,6 +4,8 @@ import (
 	"go/token"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -289,21 +291,21 @@ func pipeConstructor(common *ssa.CallCommon) bool {
 		ssacall.CallMatchesSymbol(common, syntax.PackageFunction("net", "Pipe"))
 }
 
-func (analysis *spawnAnalysis) pipePeerAction(instruction ssa.Instruction, common *ssa.CallCommon) ownershipAction {
+func (analysis *spawnAnalysis) pipePeerAction(instruction ssa.Instruction, common *ssa.CallCommon) (helperCallProof, bool) {
 	if len(analysis.pipePeers) == 0 {
-		return actionNone
+		return helperCallProof{}, false
 	}
 	if _, deferred := instruction.(*ssa.Defer); !deferred &&
 		!slices.Contains(cfg.InstructionsReachableAfter(analysis.spawn), instruction) {
-		return actionNone
+		return helperCallProof{}, false
 	}
 	callee, closure := ssacall.DirectCallee(common)
 	_, launched := instruction.(*ssa.Go)
 	if callee != nil && len(callee.Blocks) != 0 && !launched {
 		if analysis.helperAction(common, callee, closure, analysis.pipePeers).action != actionNone {
-			return actionUnknown
+			return helperCallProof{action: actionUnknown, reason: reasonLabelPipePeer}, true
 		}
-		return actionNone
+		return helperCallProof{}, false
 	}
 	values := common.Args
 	if closure != nil {
@@ -311,10 +313,23 @@ func (analysis *spawnAnalysis) pipePeerAction(instruction ssa.Instruction, commo
 	}
 	for _, peer := range analysis.pipePeers {
 		if slices.ContainsFunc(values, func(value ssa.Value) bool {
-			return carries(ssaflow.NewReachingWalk(carryForms), value, peer.value)
+			return containment.Matches(ssaflow.NewReachingWalk(carryForms), value, peer.value)
 		}) {
-			return actionUnknown
+			return helperCallProof{action: actionUnknown, reason: reasonLabelPipePeer}, true
 		}
 	}
-	return actionNone
+	return helperCallProof{}, false
+}
+
+// Retained-owner participation can explain uncertainty without proving a join.
+// Preserve cutoff precedence even when a partial search found a matching owner.
+func (analysis *spawnAnalysis) retainedOwnerLabel(instruction ssa.Instruction, common *ssa.CallCommon) (helperCallProof, bool) {
+	proof := analysis.closesRetainedWorkerOwner(instruction, common)
+	if proof.Reason == proofs.EvidenceBudgetExhausted {
+		return helperCallProof{action: actionUnknown, reason: reasonRetainedOwnerBudgetExhausted}, true
+	}
+	if proof.Proven() {
+		return helperCallProof{action: actionUnknown, reason: reasonLabelClosesRetainedOwner}, true
+	}
+	return helperCallProof{}, false
 }

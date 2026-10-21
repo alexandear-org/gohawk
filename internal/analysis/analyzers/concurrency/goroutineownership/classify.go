@@ -4,6 +4,8 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 
@@ -335,6 +337,42 @@ func (analysis *spawnAnalysis) possibleSignal(value ssa.Value) bool {
 // https://github.com/lotusirous/go-concurrency-patterns/blob/791337ff11e69cd9d1a8587e53474a8469b3510f/17-ring-buffer-channel/main.go#L49-L62
 func (analysis *spawnAnalysis) signalAggregateCarries(value ssa.Value) bool {
 	return slices.ContainsFunc(analysis.signals, func(signal ssa.Value) bool {
-		return !ssaflow.ChannelType(signal) && carries(ssaflow.NewReachingWalk(carryForms), signal, value)
+		return !ssaflow.ChannelType(signal) && containment.Matches(ssaflow.NewReachingWalk(carryForms), signal, value)
+	})
+}
+
+// carryForms are the wrappers transparent to this classifier's containment evidence.
+const carryForms = ssaflow.TransparentChangeInterface | ssaflow.TransparentChangeType | ssaflow.TransparentConvert | ssaflow.TransparentMakeInterface
+
+// transferAction reserves exact ownership for one tracked value on every
+// reaching path. Containment includes old stores, mixed phis and wrapping call
+// arguments, so it establishes only a possible handoff. Budget exhaustion must
+// also stay unknown rather than turn an unfinished identity query into absence.
+func (analysis *spawnAnalysis) transferAction(value ssa.Value) ownershipAction {
+	storage := heapmodel.NewStorage(analysis.budget())
+	for _, tracked := range analysis.tracked {
+		if storage.Same(value, tracked.value).Proven() {
+			return actionTransfer
+		}
+	}
+	if storage.Budget().Exhausted() || analysis.consumes(value) {
+		return actionUnknown
+	}
+	return actionNone
+}
+
+// consumes reports whether value is a tracked value or something that carries
+// one: a closure capturing it, an aggregate holding it, a loaded composite, or
+// the result of a call that received it.
+func (analysis *spawnAnalysis) consumes(value ssa.Value) bool {
+	return slices.ContainsFunc(analysis.tracked, func(tracked trackedValue) bool {
+		target := tracked.value
+		// A worker may receive a loaded field while its caller returns the
+		// aggregate initialized with that field. Resolve the read at its own
+		// instruction, rather than expecting the return to contain the load.
+		if resolved := heapmodel.NewStorage(analysis.budget()).Resolve(target); resolved.Proven() {
+			target = resolved.Value
+		}
+		return containment.Matches(ssaflow.NewReachingWalk(carryForms), value, target)
 	})
 }

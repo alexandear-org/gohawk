@@ -4,6 +4,8 @@ import (
 	"go/constant"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+
 	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
@@ -428,7 +430,7 @@ func localChannelWithin(function *ssa.Function, signal ssa.Value, budget *proofs
 		if !ok {
 			continue
 		}
-		if carries(ssaflow.NewReachingWalk(carryForms).Within(budget), signal, created) {
+		if containment.Matches(ssaflow.NewReachingWalk(carryForms).Within(budget), signal, created) {
 			return created
 		}
 	}

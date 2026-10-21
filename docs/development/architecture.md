@@ -50,10 +50,13 @@ the per-function guarantees. These boundaries preserve one fact schema and
 one inference path rather than adding adapters between parallel models.
 
 Goroutine ownership instruction orchestration remains in `classify.go`;
-`call_actions.go` owns synchronous and opaque call contracts.
+`call_prefix.rules` and `call_contracts.rules` order call contracts;
+`call_actions.go` retains bounded call queries and concrete helper dispatch.
 `entry.rules` and `classify.rules` select instruction labels; `classify.go` keeps
 identity, cache and terminal proof dispatch. The analyzer-local `receives` package
-recognizes receive sites using caller-supplied channel predicates. Nested
+recognizes receive sites using caller-supplied channel predicates. Its sibling
+`containment` and `origins` packages own possible possession and factory provenance
+without selecting candidate outcomes. Nested
 implementation packages belong to one `analyzers/<group>/<name>` owner: they
 may import helpers under that owner, but cannot import the analyzer entry package
 or any other analyzer's implementation. Helpers require an active analyzer owner

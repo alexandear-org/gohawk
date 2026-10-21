@@ -22,7 +22,7 @@ type summaryJoinProof struct {
 	summaryCause concurrencyfacts.Reason
 }
 
-func (analysis *spawnAnalysis) summarizedJoin(instruction ssa.Instruction) helperCallProof {
+func (analysis *spawnAnalysis) summarizedJoin(instruction ssa.Instruction) (helperCallProof, bool) {
 	engine, _ := summaryKnowledge.Provider(analysis.pass).Concurrency()
 	budget := analysis.queryBudget(helperUseBudget)
 	for _, tracked := range analysis.tracked {
@@ -30,7 +30,7 @@ func (analysis *spawnAnalysis) summarizedJoin(instruction ssa.Instruction) helpe
 			break
 		}
 		if tracked.kind == trackedGroup && analysis.returnedGroupJoin(instruction, tracked.value, budget) && !budget.Exhausted() {
-			return helperCallProof{action: actionJoin, reason: reasonLabelSummaryJoin}
+			return helperCallProof{action: actionJoin, reason: reasonLabelSummaryJoin}, true
 		}
 		proof := proveSummaryJoin(engine, instruction, tracked.value, tracked.kind, budget)
 		if budget.Exhausted() {
@@ -44,7 +44,7 @@ func (analysis *spawnAnalysis) summarizedJoin(instruction ssa.Instruction) helpe
 					Function: analysis.function.String(),
 				})
 			}
-			return helperCallProof{action: actionJoin, reason: reasonLabelSummaryJoin}
+			return helperCallProof{action: actionJoin, reason: reasonLabelSummaryJoin}, true
 		}
 	}
 	// An interrupted summary cannot establish absent completion. Keep the
@@ -53,9 +53,9 @@ func (analysis *spawnAnalysis) summarizedJoin(instruction ssa.Instruction) helpe
 		budget.Observe(proofs.EvidenceBudgetExhausted, analysis.spawn.Pos(), func() map[string]string {
 			return map[string]string{"phase": "summary-join"}
 		})
-		return helperCallProof{action: actionUnknown, reason: reasonSummaryJoinBudgetExhausted}
+		return helperCallProof{action: actionUnknown, reason: reasonSummaryJoinBudgetExhausted}, true
 	}
-	return helperCallProof{action: actionNone, reason: reasonNone}
+	return helperCallProof{action: actionNone, reason: reasonNone}, false
 }
 
 // A returned waiter can honor an already-established group obligation. A

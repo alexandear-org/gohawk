@@ -1,0 +1,38 @@
+signature total fallback outputs (Opaque reasonLabelCallUnavailable) true;
+query retained = spawnAnalysis.retainedOwnerLabel;
+query pipe = spawnAnalysis.pipePeerAction;
+query summary = spawnAnalysis.summarizedJoin;
+query bookkeeping = spawnAnalysis.waitGroupBookkeeping;
+query cleanup = spawnAnalysis.testingCleanupAction;
+// gomock.Return publishes its configured results, but broad argument
+// containment does not prove the exact stream is among those results.
+// https://github.com/uber-go/mock/blob/539d81c0f42174d17e8f91abcb869bed37605a15/gomock/call.go#L185-L205
+query mockContract = ssacall.HasLibraryContract;
+query arguments = spawnAnalysis.anyArgumentConsumes;
+const goMockReturn;
+const reasonLabelGoMockReturn;
+
+rule Missing:
+  inputs common:nil
+  => outputs (NoAction reasonNone) true;
+
+// Each answer commits, including a recognized none label. Partial evidence
+// retains its original precedence before summary, bookkeeping and callbacks.
+rule Contract:
+  inputs $analysis $instruction $common
+  => query retained $analysis $instruction $common
+           select Decided label:$label => outputs $label true
+     <|> query pipe $analysis $instruction $common
+           select Decided label:$label => outputs $label true
+     <|> query summary $analysis $instruction
+           select Decided label:$label => outputs $label true
+     <|> query bookkeeping $analysis $common
+           select true => outputs (NoAction reasonNone) true
+     <|> query cleanup $analysis $common
+           select Decided label:$label => outputs $label true
+     <|> query mockContract $common goMockReturn
+           select true => query arguments $analysis $common {
+             true => outputs (Opaque reasonLabelGoMockReturn) true;
+             false => outputs (NoAction reasonNone) false;
+           }
+     <|> pure outputs (NoAction reasonNone) false;

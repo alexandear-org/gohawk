@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/origins"
+
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -276,9 +278,9 @@ func assertFactoryOriginQuery(t *testing.T, function *ssa.Function, signal, want
 	spawn := ssaflow.InstructionsOf[*ssa.Go](function)[0]
 	query := func(budget *proofs.SearchBudget) proofs.Proof {
 		if signal {
-			return helperSignalOrigin(value, spawn, budget)
+			return origins.Signal(value, spawn, budget)
 		}
-		return opaqueGroupOrigin(value, budget)
+		return origins.Group(value, budget)
 	}
 	fresh := query(proofs.NewSearchBudget(proofs.QueryBudget))
 	if !fresh.Known() || fresh.Proven() != want {

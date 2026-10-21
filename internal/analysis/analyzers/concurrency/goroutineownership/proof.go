@@ -3,6 +3,8 @@ package goroutineownership
 import (
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/origins"
+
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -346,4 +348,34 @@ func (analysis *spawnAnalysis) channelsCreatedOnceBeforeSpawn() []ssa.Value {
 		}
 	}
 	return created
+}
+
+func (analysis *spawnAnalysis) completionHandleProof() (GoroutineProof, bool) {
+	for _, tracked := range analysis.tracked {
+		budget := analysis.budget()
+		if tracked.kind == trackedSignal {
+			if proof, decided := analysis.factoryOriginDecision(origins.Signal(tracked.value, analysis.spawn, budget), budget); decided {
+				return proof, true
+			}
+		}
+		if tracked.kind != trackedOwner && ssaflow.ExternallyOwnedValue(tracked.value) {
+			return GoroutineProof{Outcome: GoroutineTransferred, Reason: reasonCallerOrExternalOwner}, true
+		}
+		if tracked.kind == trackedGroup {
+			if proof, decided := analysis.factoryOriginDecision(origins.Group(tracked.value, budget), budget); decided {
+				return proof, true
+			}
+		}
+	}
+	return GoroutineProof{}, false
+}
+
+func (analysis *spawnAnalysis) factoryOriginDecision(origin proofs.Proof, budget *proofs.SearchBudget) (GoroutineProof, bool) {
+	if !origin.Known() {
+		return analysis.lifetimeCutoff(budget, queryFactoryOrigin, reasonFactoryOriginBudgetExhausted), true
+	}
+	if origin.Proven() {
+		return GoroutineProof{Outcome: GoroutineUnknown, Reason: reasonOpaqueTransfer}, true
+	}
+	return GoroutineProof{}, false
 }

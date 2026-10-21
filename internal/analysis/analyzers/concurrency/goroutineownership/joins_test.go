@@ -118,7 +118,11 @@ func TestSummaryJoinSharesCandidateAllowance(t *testing.T) {
 			pass: pass, function: function, spawn: spawn, probe: probe,
 			pool: proofs.NewSearchBudget(limit).Observed(probe.Observer()), tracked: []trackedValue{{value: target, kind: trackedSignal}},
 		}
-		return candidate.summarizedJoin(call)
+		label, decided := candidate.summarizedJoin(call)
+		if !decided {
+			t.Fatal("summary did not recognize completion or cutoff")
+		}
+		return label
 	}
 	for _, limit := range []int{0, 1, 32} {
 		if got := query(limit); got.action != actionUnknown || got.reason != reasonSummaryJoinBudgetExhausted {
@@ -149,8 +153,9 @@ func TestSummaryJoinChildCutoffAndFreshCache(t *testing.T) {
 		pass: pass, function: fn, spawn: ssaflow.InstructionsOf[*ssa.Go](fn)[0],
 		pool: proofs.NewSearchBudget(spawnPoolBudget), tracked: []trackedValue{{value: ssaflow.InstructionsOf[*ssa.MakeChan](fn)[0], kind: trackedSignal}},
 	}
-	if got := candidate.summarizedJoin(call); got.action != actionUnknown || got.reason != reasonSummaryJoinBudgetExhausted || candidate.pool.Exhausted() {
-		t.Fatalf("child cutoff with live pool returned %+v, pool exhausted=%v", got, candidate.pool.Exhausted())
+	cutoff, decided := candidate.summarizedJoin(call)
+	if !decided || cutoff.action != actionUnknown || cutoff.reason != reasonSummaryJoinBudgetExhausted || candidate.pool.Exhausted() {
+		t.Fatalf("child cutoff with live pool returned %+v, pool exhausted=%v", cutoff, candidate.pool.Exhausted())
 	}
 	// A larger independent engine query may complete the same callee. A child
 	// cutoff must not have cached its interrupted prefix as a final answer.
@@ -158,7 +163,7 @@ func TestSummaryJoinChildCutoffAndFreshCache(t *testing.T) {
 	if !summary.Complete() {
 		t.Fatalf("fresh engine query unavailable: %+v", summary)
 	}
-	if got := candidate.summarizedJoin(call); got.action != actionJoin {
+	if got, decided := candidate.summarizedJoin(call); !decided || got.action != actionJoin {
 		t.Fatalf("fresh cached summary unavailable: %+v", got)
 	}
 }

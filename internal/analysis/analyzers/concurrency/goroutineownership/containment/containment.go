@@ -1,4 +1,7 @@
-package goroutineownership
+// Package containment identifies possible possession of tracked worker values.
+// Old stores, mixed choices and aggregate projections remain possible evidence;
+// they do not establish exact identity or an ownership transfer.
+package containment
 
 import (
 	"go/token"
@@ -9,51 +12,11 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
-// Containment evidence decides whether an SSA value is, or carries, one of the
-// worker's tracked values. It is what lets a return, store, send, or opaque
-// call consume a completion channel hidden inside a closure, a struct literal,
-// or a wrapping call result. This is possible-use evidence: past stores, mixed
-// choices and wrapping arguments can match. A transfer consumer keeps that
-// evidence opaque unless a separate identity proof establishes the handoff.
+// forms are the wrappers transparent to captured-binding containment.
+const forms = ssaflow.TransparentChangeInterface | ssaflow.TransparentChangeType | ssaflow.TransparentConvert | ssaflow.TransparentMakeInterface
 
-// carryForms are the wrappers through which a carried value keeps its
-// identity for containment evidence.
-const carryForms = ssaflow.TransparentChangeInterface | ssaflow.TransparentChangeType | ssaflow.TransparentConvert | ssaflow.TransparentMakeInterface
-
-// transferAction reserves exact ownership for one tracked value on every
-// reaching path. Containment includes old stores, mixed phis and wrapping call
-// arguments, so it establishes only a possible handoff. Budget exhaustion must
-// also stay unknown rather than turn an unfinished identity query into absence.
-func (analysis *spawnAnalysis) transferAction(value ssa.Value) ownershipAction {
-	storage := heapmodel.NewStorage(analysis.budget())
-	for _, tracked := range analysis.tracked {
-		if storage.Same(value, tracked.value).Proven() {
-			return actionTransfer
-		}
-	}
-	if storage.Budget().Exhausted() || analysis.consumes(value) {
-		return actionUnknown
-	}
-	return actionNone
-}
-
-// consumes reports whether value is a tracked value or something that carries
-// one: a closure capturing it, an aggregate holding it, a loaded composite, or
-// the result of a call that received it.
-func (analysis *spawnAnalysis) consumes(value ssa.Value) bool {
-	return slices.ContainsFunc(analysis.tracked, func(tracked trackedValue) bool {
-		target := tracked.value
-		// A worker may receive a loaded field while its caller returns the
-		// aggregate initialized with that field. Resolve the read at its own
-		// instruction, rather than expecting the return to contain the load.
-		if resolved := heapmodel.NewStorage(analysis.budget()).Resolve(target); resolved.Proven() {
-			target = resolved.Value
-		}
-		return carries(ssaflow.NewReachingWalk(carryForms), value, target)
-	})
-}
-
-func carries(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
+// Matches checks possible containment through the caller's reaching walk.
+func Matches(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
 	if value != nil && heapmodel.MayAlias(value, target) {
 		return true
 	}
@@ -66,12 +29,12 @@ func carries(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
 			// A closure carries whatever it captured, including an addressable
 			// local that held the target at any point.
 			return slices.ContainsFunc(typed.Bindings, func(binding ssa.Value) bool {
-				return heapmodel.CapturedBindingMatches(binding, target) || carries(walk, binding, target)
+				return heapmodel.CapturedBindingMatches(binding, target) || Matches(walk, binding, target)
 			})
 		case *ssa.UnOp:
 			// A struct passed or returned by value is loaded from the local that
 			// assembled it, so the load carries what the local's fields hold.
-			return typed.Op == token.MUL && carries(walk, typed.X, target)
+			return typed.Op == token.MUL && Matches(walk, typed.X, target)
 		case *ssa.Alloc, *ssa.FieldAddr, *ssa.IndexAddr:
 			return storedCarries(walk, value, target)
 		case *ssa.TypeAssert:
@@ -81,9 +44,9 @@ func carries(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
 			// https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
 			return storedCarries(walk, value, target)
 		case *ssa.Slice:
-			return carries(walk, typed.X, target)
+			return Matches(walk, typed.X, target)
 		case *ssa.Extract:
-			return carries(walk, typed.Tuple, target)
+			return Matches(walk, typed.Tuple, target)
 		case *ssa.Call:
 			return callResultCarries(walk, typed, target)
 		}
@@ -99,7 +62,7 @@ func callResultCarries(walk ssaflow.ReachingWalk, call *ssa.Call, target ssa.Val
 		return false
 	}
 	return slices.ContainsFunc(call.Common().Args, func(argument ssa.Value) bool {
-		return carries(walk, argument, target)
+		return Matches(walk, argument, target)
 	})
 }
 
@@ -119,7 +82,7 @@ func storedCarries(walk ssaflow.ReachingWalk, address, target ssa.Value) bool {
 	for _, reference := range *address.Referrers() {
 		switch typed := reference.(type) {
 		case *ssa.Store:
-			if typed.Addr == address && carries(walk, typed.Val, target) {
+			if typed.Addr == address && Matches(walk, typed.Val, target) {
 				return true
 			}
 		case *ssa.FieldAddr:
@@ -175,8 +138,8 @@ func siblingSelection(address ssa.Value) (ssa.Value, func(ssa.Instruction) bool)
 	return nil, nil
 }
 
-// bindingCarries matches a closure binding or call argument against a tracked
+// Binding matches a closure binding or call argument against a tracked
 // value, including an addressable local that has contained it.
-func bindingCarries(binding, target ssa.Value) bool {
-	return heapmodel.CapturedBindingMatches(binding, target) || carries(ssaflow.NewReachingWalk(carryForms), binding, target)
+func Binding(binding, target ssa.Value) bool {
+	return heapmodel.CapturedBindingMatches(binding, target) || Matches(ssaflow.NewReachingWalk(forms), binding, target)
 }
