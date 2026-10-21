@@ -1,5 +1,12 @@
 version: 1
 targets:
+  - name: result_leaf
+    package: internal/analysis/passes/resultfacts
+    bindings: internal/analysis/passes/resultfacts/results.go
+    signature: resultLeafSignature
+    function: classifyResultLeaf
+    rules: [internal/analysis/passes/resultfacts/leaf.rules]
+    out: internal/analysis/passes/resultfacts/leaf_gen.go
   - name: resource_classification
     package: internal/analysis/analyzers/resources/resourcelifetime
     bindings: internal/analysis/analyzers/resources/resourcelifetime/classify.go

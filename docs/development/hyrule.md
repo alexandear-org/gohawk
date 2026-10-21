@@ -53,7 +53,7 @@ path is removed; generator support and examples alone do not qualify.
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Handwritten; migration remains for substantial pattern/decision families |
 | Producer lifecycle use classification | Handwritten; migration remains for instruction classifications |
-| Result and lifecycle summary leaf recognition | Handwritten; migration remains; summary inference stays in Go |
+| Result and lifecycle summary leaf recognition | Generated static result leaves; lifecycle leaf recognition remains; summary inference stays in Go |
 
 ## Preserved boundaries
 
@@ -288,3 +288,26 @@ becomes a synchronous child-release guarantee.
 cleanup and early collection precedence against the handwritten classifier's
 baseline. Existing budget-observer, SQL identity, result-guard, ownership and
 wrapper regressions continue to guard the underlying proof boundaries.
+
+## Static result guarantees
+
+`resultfacts/leaf.rules` classifies the original SSA value after the existing
+leaf allowance and call-result summary path. Nil and Boolean literals retain
+priority; concrete interface boxing is nonnil even for a typed nil payload.
+Interface/type-parameter payloads remain unknown. Allocations, channel/map/slice
+creation, functions and closures retain their original nonnil guarantee.
+Numeric constants, parameters, unresolved projections and other forms retain
+unknown. The recognizer does not infer guarantees through memory.
+
+The existing reaching/storage fold, point-in-time content queries, imported
+facts, recursion, summary cache, publication cutoffs and normal-return policy
+remain in Go. No wrapper record or query adapter is introduced: the generated
+native function returns the existing `Guarantee` enum. Its three pure hooks
+only inspect literal and type structure.
+
+[Result guarantee tests](../../internal/analysis/passes/resultfacts/results_test.go)
+cover the recognized forms alongside typed-nil boxing,
+abstract generic boxing, Boolean parameters, scalar constants and slice
+projections. The added cases pass against the handwritten baseline. Existing
+allowance, storage, relation, cross-package and publication regressions remain
+authoritative for the surrounding summary engine.

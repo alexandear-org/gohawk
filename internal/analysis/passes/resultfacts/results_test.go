@@ -15,6 +15,15 @@ var sentinel error = &failure{}
 func Nil() error { return nil }
 func TypedNil() error { return (*failure)(nil) }
 func Fresh() *int { return new(int) }
+func FreshMap() map[string]int { return make(map[string]int) }
+func FreshChannel() chan int { return make(chan int) }
+func FreshSlice(n int) []int { return make([]int,n) }
+func FunctionValue() func() { return Returns }
+func ClosureValue(value *int) func() { return func(){ *value++ } }
+func NilFunction() func() { return nil }
+func Numeric() int { return 1 }
+func BooleanParameter(value bool) bool { return value }
+func SliceProjection(value []int) []int { return value[:] }
 func Yes() bool { return true }
 func No() bool { return false }
 func Forward() error { return Nil() }
@@ -55,7 +64,10 @@ func TestResultGuarantees(t *testing.T) {
 		"Tuple": {AlwaysTrue, AlwaysNonNil, AlwaysNil}, "ForwardTuple": {AlwaysTrue, AlwaysNonNil, AlwaysNil},
 		"Mixed": {Unknown}, "Global": {Unknown}, "Parameter": {Unknown}, "Unresolved": {Unknown},
 		"Recursive": {Unknown}, "Deferred": {Unknown}, "Recovered": {Unknown}, "PanicOnly": {Unknown}, "Forever": {Unknown},
-		"Boxed":      {AlwaysNonNil},
+		"Boxed":    {AlwaysNonNil},
+		"FreshMap": {AlwaysNonNil}, "FreshChannel": {AlwaysNonNil}, "FreshSlice": {AlwaysNonNil},
+		"FunctionValue": {AlwaysNonNil}, "ClosureValue": {AlwaysNonNil}, "NilFunction": {AlwaysNil},
+		"Numeric": {Unknown}, "BooleanParameter": {Unknown}, "SliceProjection": {Unknown},
 		"GenericNil": {Unknown},
 	} {
 		t.Run(name, func(t *testing.T) {

@@ -180,29 +180,29 @@ func (engine *Engine) leaf(value ssa.Value, budget *proofs.SearchBudget) Guarant
 	if call, index, ok := ssacall.CallResultSource(value); ok {
 		return engine.function(ssacall.ResolvedCallee(call.Common()), budget).Result(index)
 	}
-	switch value := value.(type) {
-	case *ssa.Const:
-		if value.IsNil() {
-			return AlwaysNil
-		}
-		if value.Value != nil && value.Value.Kind() == constant.Bool {
-			if constant.BoolVal(value.Value) {
-				return AlwaysTrue
-			}
-			return AlwaysFalse
-		}
-	case *ssa.MakeInterface:
-		// Boxing a typed nil pointer still produces a nonnil interface.
-		// A type parameter can itself instantiate to an interface, however;
-		// its unknown dynamic type must not become a concrete boxing proof.
-		if _, abstract := value.X.Type().Underlying().(*types.Interface); abstract {
-			return Unknown
-		}
-		return AlwaysNonNil
-	case *ssa.Alloc, *ssa.MakeChan, *ssa.MakeMap, *ssa.MakeSlice, *ssa.Function, *ssa.MakeClosure:
-		return AlwaysNonNil
-	}
 	// The value fold handles loads through point-in-time storage evidence.
 	// Unresolved values never inherit a guarantee from a possible initializer.
-	return Unknown
+	return classifyResultLeaf(value)
+}
+
+// The generated recognizer classifies one original SSA leaf. It does not spend
+// allowance or infer summaries; those operations remain in the surrounding fold.
+type resultLeafSignature func(ssa.Value) Guarantee
+
+var _ resultLeafSignature = classifyResultLeaf
+
+func resultNilConstant(value *ssa.Const) bool { return value.IsNil() }
+
+func resultBooleanLiteral(value constant.Value) (bool, bool) {
+	if value == nil || value.Kind() != constant.Bool {
+		return false, false
+	}
+	return constant.BoolVal(value), true
+}
+
+// Boxing a typed nil pointer still produces a nonnil interface. A type
+// parameter may instantiate to an interface, so its dynamic type stays unknown.
+func resultConcreteBox(value ssa.Value) bool {
+	_, abstract := value.Type().Underlying().(*types.Interface)
+	return !abstract
 }
