@@ -1,11 +1,11 @@
 package heapmodel
 
 import (
-	"go/token"
 	"go/types"
 	"strconv"
 	"strings"
 
+	"github.com/kojah/gohawk/internal/engine/heapmodel/operations"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	"golang.org/x/tools/go/ssa"
@@ -53,46 +53,30 @@ func (graph *regionGraph) transfer(state *regionState, instruction ssa.Instructi
 // define records the pointees of a value-defining instruction that does not
 // change memory.
 func (graph *regionGraph) define(state *regionState, instruction ssa.Instruction) {
-	if operand, ok := wrapperOperand(instruction); ok {
-		graph.setValue(instruction.(ssa.Value), graph.pointees(operand)) //nolint:forcetypeassert // A wrapper is a value.
+	value, ok := instruction.(ssa.Value)
+	if !ok {
 		return
 	}
-	switch typed := instruction.(type) {
-	case *ssa.FieldAddr:
-		graph.setValue(typed, graph.selectStep(graph.pointees(typed.X), "field:"+strconv.Itoa(typed.Field)))
-	case *ssa.Field:
-		graph.setValue(typed, graph.load(state, graph.selectStep(graph.pointees(typed.X), "field:"+strconv.Itoa(typed.Field)), typed))
-	case *ssa.IndexAddr:
-		graph.setValue(typed, graph.index(typed.X, typed.Index))
-	case *ssa.Index:
-		graph.setValue(typed, graph.load(state, graph.index(typed.X, typed.Index), typed))
-	case *ssa.Slice:
-		graph.slice(typed)
-	case *ssa.UnOp:
-		if typed.Op == token.MUL {
-			graph.setValue(typed, graph.load(state, graph.pointees(typed.X), typed))
-		}
-	case *ssa.TypeAssert:
-		if !typed.CommaOk {
-			graph.setValue(typed, graph.pointees(typed.X))
-		}
-	case *ssa.MakeMap, *ssa.MakeChan, *ssa.MakeSlice, *ssa.Range, *ssa.Next, *ssa.BinOp, *ssa.MultiConvert:
-		if value, ok := typed.(ssa.Value); ok {
-			graph.setValue(value, pointees{{region: graph.opaque(value)}: false})
-		}
-	case *ssa.Return, *ssa.Jump, *ssa.If, *ssa.Panic, *ssa.DebugRef, *ssa.Select:
+	plan := operations.Define(value)
+	switch plan.Kind {
+	case operations.Alias:
+		graph.setValue(plan.Value, graph.pointees(plan.Source))
+	case operations.FieldAddress:
+		graph.setValue(plan.Value, graph.selectStep(graph.pointees(plan.Source), "field:"+strconv.Itoa(plan.Field)))
+	case operations.FieldLoad:
+		graph.setValue(plan.Value, graph.load(state, graph.selectStep(graph.pointees(plan.Source), "field:"+strconv.Itoa(plan.Field)), plan.Value))
+	case operations.IndexAddress:
+		graph.setValue(plan.Value, graph.index(plan.Source, plan.Index))
+	case operations.IndexLoad:
+		graph.setValue(plan.Value, graph.load(state, graph.index(plan.Source, plan.Index), plan.Value))
+	case operations.Sliced:
+		graph.slice(plan.Slice)
+	case operations.Load:
+		graph.setValue(plan.Value, graph.load(state, graph.pointees(plan.Source), plan.Value))
+	case operations.Opaque:
+		graph.setValue(plan.Value, pointees{{region: graph.opaque(plan.Value)}: false})
+	case operations.Ignored:
 	}
-}
-
-// wrapperOperand returns the operand of an instruction whose value refers
-// to exactly what its operand refers to.
-func wrapperOperand(instruction ssa.Instruction) (ssa.Value, bool) { //nolint:ireturn // Operands keep their concrete forms.
-	if typed, ok := instruction.(*ssa.SliceToArrayPointer); ok {
-		return typed.X, true
-	}
-	value, _ := instruction.(ssa.Value)
-	forms := ssaflow.TransparentChangeInterface | ssaflow.TransparentChangeType | ssaflow.TransparentConvert | ssaflow.TransparentMakeInterface
-	return ssaflow.UnwrapTransparentValue(value, forms)
 }
 
 // pointees returns the slots a value may refer to, deriving them for the
@@ -114,25 +98,16 @@ func (graph *regionGraph) pointees(value ssa.Value) pointees {
 		return pointees{{region: graph.unkR}: false}
 	}
 	var set pointees
-	switch typed := value.(type) {
-	case *ssa.Parameter, *ssa.FreeVar, *ssa.Global:
-		set = pointees{{region: graph.external(typed)}: false}
-	case *ssa.Const:
-		// A nil constant is nil; a non-nil constant of aggregate type is a
-		// zero value, which holds nil in every slot.
+	switch operations.Leaf(value, graph.function) {
+	case operations.LeafExternal:
+		set = pointees{{region: graph.external(value)}: false}
+	case operations.LeafNil:
 		set = pointees{{region: graph.nilR}: false}
-	case *ssa.Function, *ssa.Builtin:
-		set = pointees{{region: graph.opaque(typed)}: false}
-	case ssa.Instruction:
-		// An instruction of this function the fixpoint has not reached yet,
-		// which only a phi from a back edge can ask about, or an
-		// instruction of another function.
-		if typed.Parent() != graph.function {
-			set = pointees{{region: graph.unkR}: false}
-		} else {
-			return pointees{}
-		}
-	default:
+	case operations.LeafOpaque:
+		set = pointees{{region: graph.opaque(value)}: false}
+	case operations.LeafPending:
+		return pointees{}
+	case operations.LeafUnknown:
 		set = pointees{{region: graph.unkR}: false}
 	}
 	graph.values[value] = set

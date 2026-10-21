@@ -43,3 +43,13 @@ Final reportability evidence is presented through `trace.DiagnosticOutcome`.
 Proof rules and report gates remain local; shared presentation neither supplies
 missing evidence nor turns uncertainty into a diagnostic. Existing trace fixtures
 pin the supported outcomes and source attribution.
+
+## Generated syntax recognition
+
+`root.rules` supplies a single mutation-root step through parentheses or a map
+index, and `channel_statement.rules` recognizes direct sends and standalone
+receives. The existing Go paths retain root traversal, type/object identity,
+statement positions and pending-send state. Neither ruleset adds a guard proof
+or broadens the diagnostic. `mutation_roots.go` pairs parenthesized and nested
+map diagnostics with the existing array, slice and selector gaps. Channel guard
+fixtures retain same-channel, unrelated-channel and already-ended controls.

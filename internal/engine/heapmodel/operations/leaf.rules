@@ -1,0 +1,36 @@
+signature total fallback outputs LeafUnknown;
+view Parameter = *ssa.Parameter {
+};
+view Capture = *ssa.FreeVar {
+};
+view Global = *ssa.Global {
+};
+view Constant = *ssa.Const {
+};
+view Function = *ssa.Function {
+};
+view Builtin = *ssa.Builtin {
+};
+match instruction;
+guard localInstruction;
+const LeafUnknown, LeafExternal, LeafNil, LeafOpaque, LeafPending;
+
+rule External:
+  inputs (or (Parameter) (Capture) (Global)) _
+  => outputs LeafExternal;
+
+// A nonnil aggregate constant is a zero value with nil in every memory slot.
+rule Constant:
+  inputs (Constant) _
+  => outputs LeafNil;
+
+rule Callable:
+  inputs (or (Function) (Builtin)) _
+  => outputs LeafOpaque;
+
+// Only a local instruction not yet reached by the fixpoint may remain empty.
+// Instructions from another function retain unknown pointees.
+rule Pending:
+  inputs (instruction $instruction) $owner
+  && localInstruction $instruction $owner
+  => outputs LeafPending;

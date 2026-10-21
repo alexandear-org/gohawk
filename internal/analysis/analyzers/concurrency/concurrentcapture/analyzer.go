@@ -251,24 +251,22 @@ func mutationHasChannelGuard(pass *analysis.Pass, closure *ast.FuncLit, mutation
 		}
 		pending := map[types.Object]bool{}
 		for _, statement := range block.List {
-			if send, ok := statement.(*ast.SendStmt); ok && send.End() < mutation.Pos() {
-				if channel := channelObject(pass, send.Chan); channel != nil {
-					pending[channel] = true
+			kind, expression := channelStatement(statement)
+			switch kind {
+			case channelStatementSend:
+				if statement.End() < mutation.Pos() {
+					if channel := channelObject(pass, expression); channel != nil {
+						pending[channel] = true
+					}
 				}
+			case channelStatementReceive:
+				channel := channelObject(pass, expression)
+				if statement.Pos() > mutation.End() && pending[channel] {
+					guarded = true
+				}
+				delete(pending, channel)
+			case channelStatementNone:
 			}
-			expression, ok := statement.(*ast.ExprStmt)
-			if !ok {
-				continue
-			}
-			receive, ok := expression.X.(*ast.UnaryExpr)
-			if !ok || receive.Op != token.ARROW {
-				continue
-			}
-			channel := channelObject(pass, receive.X)
-			if receive.Pos() > mutation.End() && pending[channel] {
-				guarded = true
-			}
-			delete(pending, channel)
 		}
 		return !guarded
 	})
@@ -284,24 +282,14 @@ func channelObject(pass *analysis.Pass, expression ast.Expr) types.Object {
 }
 
 func mutatedRoot(pass *analysis.Pass, expression ast.Expr) *ast.Ident {
-	switch candidate := expression.(type) {
-	case *ast.Ident:
-		return candidate
-	case *ast.IndexExpr:
-		typeOf := pass.TypesInfo.TypeOf(candidate.X)
-		if typeOf != nil {
-			_, ok := typeOf.Underlying().(*types.Map)
-			if !ok {
-				return nil
-			}
-			return mutatedRoot(pass, candidate.X)
+	for expression != nil {
+		identifier, next := mutationRootStep(pass, expression)
+		if identifier != nil {
+			return identifier
 		}
-		return nil
-	case *ast.ParenExpr:
-		return mutatedRoot(pass, candidate.X)
-	default:
-		return nil
+		expression = next
 	}
+	return nil
 }
 
 func closureUsesLock(closure *ast.FuncLit) bool {

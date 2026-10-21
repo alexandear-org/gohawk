@@ -43,16 +43,16 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
 | Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
-| Call-use and heap-operation classification | Generated direct call-use effects, transparent aliases and field-use admission; heap-operation classification remains; recursive searches and state application stay in Go |
-| Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
+| Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
+| Lifecycle completion/transfer recognition and outcome selection | Generated unproven-completion outcomes; completion/transfer recognition remains; recursive searches stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated ordered instruction classification; acquisition-boundary patterns remain; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
-| Concurrent capture syntax and guard decisions | Handwritten; migration remains for substantial pattern/decision families |
-| Producer lifecycle use classification | Handwritten; migration remains for instruction classifications |
+| Concurrent capture syntax and guard decisions | Generated mutation-root steps and channel statement recognition; guard decisions and other substantial patterns remain |
+| Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves; lifecycle leaf recognition remains; summary inference stays in Go |
 
 ## Preserved boundaries
@@ -311,3 +311,44 @@ abstract generic boxing, Boolean parameters, scalar constants and slice
 projections. The added cases pass against the handwritten baseline. Existing
 allowance, storage, relation, cross-package and publication regressions remain
 authoritative for the surrounding summary engine.
+
+## Heap value definitions and leaves
+
+`heapmodel/operations` recognizes alias, field/index projection, slice, load and
+opaque definitions. Its plans retain exact SSA operands; the enclosing graph
+applies every load and projection against the current region state. Transparent
+wrappers use the existing form mask, and comma-ok assertions are left to their
+extractions. Unsupported definitions do not gain storage or identity evidence.
+
+The separate leaf target distinguishes external values, nil aggregate slots,
+opaque callable values and pending local instructions. A pending local value
+retains an empty pointee set until the fixpoint reaches it; a foreign instruction
+retains unknown. Type tracking, owner checks, caching, joins, escape effects and
+fixed-point scheduling remain in Go. Existing region storage parity, alias,
+projection and aggregate tests exercise the consuming graph rather than merely
+checking the generated plan shape.
+
+## Completion outcomes
+
+`lifecycle/completionpolicy/outcome.rules` selects the existing proof after a
+completion search fails to prove its target. Budget exhaustion precedes loop
+uncertainty, which precedes incomplete nested work, then a completed negative
+search. Body availability supplies local SSA provenance even at a cutoff. An
+unavailable body has no such provenance. The enclosing request still observes
+exactly the returned reason with the original launch position and details.
+Search, recursion, positive witnesses and allowance spending remain in Go.
+
+## Capture and producer recognition
+
+Capture root rules select one identifier or next expression through parentheses
+and map indexes. The caller owns the walk; arrays, slices and selectors retain
+their existing conservative boundary. Channel statement rules recognize direct
+sends and standalone receives. The caller retains statement ordering, exact
+channel-object identity and pending-send updates; recognition does not claim
+semaphore capacity or race freedom.
+
+Producer receiver rules dispatch helper calls before direct receives and select
+states. Helper outcomes retain their count, uncertainty and reason intact, and
+alias queries execute only for reached receive forms. Select counting retains
+the existing may-alias policy. Block traversal, partial-count accumulation,
+cycle uncertainty and shared helper allowances remain unchanged.

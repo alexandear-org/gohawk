@@ -134,3 +134,14 @@ returns unknown while its pool stays usable; a fresh child completes. The parent
 instead returned complete non-receiving evidence at that cutoff. Existing
 `receiver_budget_test.go` controls retain cold/warm summary admission and exact
 receive counts for ordinary helpers and incomplete sending workers.
+
+## Generated receiver instruction decisions
+
+`receive.rules` selects helper calls, direct channel receives and select states
+on the existing production count path. Each helper outcome retains all three
+fields: count, unknown and reason. Direct aliases and select-state aliases use
+the same existing may-alias queries, in the same order. The enclosing block walk
+still discards partial counts on unknown helper evidence and marks a cyclic
+receive region unknown. Existing helper, cutoff, selected-drain and source
+attribution regressions remain the behavioral contract; no count inference or
+ownership search moves into a pure matcher.

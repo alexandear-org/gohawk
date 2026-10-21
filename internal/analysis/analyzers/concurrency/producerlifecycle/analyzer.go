@@ -4,7 +4,6 @@ package producerlifecycle
 import (
 	"go/constant"
 	"go/token"
-	"go/types"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
 	"github.com/kojah/gohawk/internal/analysis/summaries"
@@ -239,23 +238,10 @@ func channelReceives(function *ssa.Function, channel ssa.Value, origin *ssa.Go, 
 	for _, block := range function.Blocks {
 		before := result.count
 		for _, instruction := range block.Instrs {
-			switch candidate := instruction.(type) {
-			case ssa.CallInstruction:
-				proof := helperReceives(candidate, channel, origin, engine, budget)
-				result.count += proof.count
-				if proof.unknown {
-					return proof
-				}
-			case *ssa.UnOp:
-				if candidate.Op == token.ARROW && heapmodel.MayAlias(candidate.X, channel) {
-					result.count++
-				}
-			case *ssa.Select:
-				for _, state := range candidate.States {
-					if state.Dir == types.RecvOnly && heapmodel.MayAlias(state.Chan, channel) {
-						result.count++
-					}
-				}
+			proof := instructionReceives(instruction, channel, origin, engine, budget)
+			result.count += proof.count
+			if proof.unknown {
+				return proof
 			}
 		}
 		if result.count > before && cfg.BlockInCycle(block) {

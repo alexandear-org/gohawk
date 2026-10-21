@@ -224,3 +224,45 @@ targets:
     function: classifyCancellationReturn
     rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/return_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go
+  - name: completion_unproven_outcome
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/outcome.go
+    signature: signature
+    function: decideUnproven
+    rules: [internal/engine/lifecycle/completionpolicy/outcome.rules]
+    out: internal/engine/lifecycle/completionpolicy/outcome_gen.go
+  - name: heap_value_definition
+    package: internal/engine/heapmodel/operations
+    bindings: internal/engine/heapmodel/operations/definition.go
+    signature: definitionSignature
+    function: Define
+    rules: [internal/engine/heapmodel/operations/definition.rules]
+    out: internal/engine/heapmodel/operations/definition_gen.go
+  - name: heap_static_leaf
+    package: internal/engine/heapmodel/operations
+    bindings: internal/engine/heapmodel/operations/leaf.go
+    signature: leafSignature
+    function: Leaf
+    rules: [internal/engine/heapmodel/operations/leaf.rules]
+    out: internal/engine/heapmodel/operations/leaf_gen.go
+  - name: capture_mutation_root
+    package: internal/analysis/analyzers/concurrency/concurrentcapture
+    bindings: internal/analysis/analyzers/concurrency/concurrentcapture/syntax_bindings.go
+    signature: rootStepSignature
+    function: mutationRootStep
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/root.rules]
+    out: internal/analysis/analyzers/concurrency/concurrentcapture/root_gen.go
+  - name: capture_channel_statement
+    package: internal/analysis/analyzers/concurrency/concurrentcapture
+    bindings: internal/analysis/analyzers/concurrency/concurrentcapture/syntax_bindings.go
+    signature: channelStatementSignature
+    function: channelStatement
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement.rules]
+    out: internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement_gen.go
+  - name: producer_instruction_receive
+    package: internal/analysis/analyzers/concurrency/producerlifecycle
+    bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
+    signature: receiveSignature
+    function: instructionReceives
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/receive.rules]
+    out: internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go

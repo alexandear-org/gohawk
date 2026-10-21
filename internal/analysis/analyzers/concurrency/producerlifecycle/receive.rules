@@ -1,0 +1,49 @@
+signature total fallback outputs (Known count:0 reason:reasonNone);
+union Receives = receiveProof tag unknown {
+  Known = false {
+    count;
+    reason;
+  };
+  Unknown = true {
+    count;
+    reason;
+  };
+};
+view Unary = *ssa.UnOp {
+  op: Op;
+  channel: X;
+};
+view Select = *ssa.Select {
+};
+match callInstruction;
+query helper = helperReceives;
+query alias = heapmodel.MayAlias;
+query selected = selectedReceives;
+const receiveToken, reasonNone;
+
+// Helper calls keep their count, uncertainty and reason intact. In particular,
+// an asynchronous or exhausted helper cannot become a missing receive.
+rule Helper:
+  inputs (callInstruction $call) $channel $origin $engine $budget
+  => query $proof = helper $call $channel $origin $engine $budget
+     decide $proof {
+       Known => outputs $proof;
+       Unknown => outputs $proof;
+     };
+
+rule Receive:
+  inputs (Unary op:receiveToken channel:$received) $channel _ _ _
+  => query alias $received $channel {
+       true => outputs (Known count:1 reason:reasonNone);
+       false => outputs (Known count:0 reason:reasonNone);
+     };
+
+// Select states retain the original may-count policy. The query only scans
+// this instruction's states; it does not infer an exact protocol or loop count.
+rule Select:
+  inputs $select:(Select) $channel _ _ _
+  => query $proof = selected $select $channel
+     decide $proof {
+       Known => outputs $proof;
+       Unknown => outputs $proof;
+     };
