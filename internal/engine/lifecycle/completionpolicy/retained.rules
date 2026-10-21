@@ -1,0 +1,32 @@
+signature total fallback outputs CapabilityAbsent nil nil;
+const CapabilityAbsent, CapabilityClosure, CapabilityStorage, CapabilityArguments;
+view Closure = *ssa.MakeClosure {
+};
+view Allocation = *ssa.Alloc {
+};
+view Unary = *ssa.UnOp {
+  source: X;
+};
+view Call = *ssa.Call {
+  common: Call;
+};
+
+rule Closure:
+  inputs $closure:(Closure)
+  => outputs CapabilityClosure $closure nil;
+
+rule Cell:
+  inputs $cell:(Allocation)
+  => outputs CapabilityStorage $cell nil;
+
+// Retained capability uses the historical storage-source policy for any
+// unary leaf. This is not the exact callback binding's load-only contract.
+rule StoredSource:
+  inputs (Unary source:$source)
+  => outputs CapabilityStorage $source nil;
+
+// A wrapper receiving a callback may retain it without promising to invoke
+// it. Keep this general argument scan distinct from exact factory relations.
+rule Arguments:
+  inputs (Call common:$common)
+  => outputs CapabilityArguments nil $common.Args;

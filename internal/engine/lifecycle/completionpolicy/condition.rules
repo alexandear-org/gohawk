@@ -1,0 +1,71 @@
+signature total fallback outputs (Opaque);
+union Step = ConditionStep tag Kind {
+  Opaque = ConditionOpaque;
+  Outcome = ConditionOutcome {
+    value: Value;
+    outcome: Outcome;
+  };
+  Follow = ConditionFollow {
+    value: Value;
+    truth: Truth;
+  };
+};
+view Comparison = *ssa.BinOp {
+  left: X;
+  right: Y;
+  op: Op;
+};
+view Constant = *ssa.Const {
+  value: Value;
+};
+const conditionEqualToken, conditionNotEqualToken;
+match Boolean = conditionBoolean;
+guard errorNilComparison, nonconstantOperand;
+build nilOutcome = nilComparisonOutcome;
+build operandTruth = comparisonOperandTruth;
+
+// Prefer the existing right constant. Swapping occurs only if that operand
+// is not constant; this differs from the provider's literal-left convention.
+rule NilRight:
+  inputs
+    (Comparison
+      left:$operand
+      right:$literal:(Constant)
+      op:$op:(or conditionEqualToken conditionNotEqualToken)
+    )
+    $truth
+  && errorNilComparison $literal $operand
+  => outputs (Outcome value:$operand outcome:(nilOutcome $op $truth));
+
+rule BooleanRight:
+  inputs
+    (Comparison
+      left:$operand
+      right:(Constant value:(Boolean $literal))
+      op:$op:(or conditionEqualToken conditionNotEqualToken)
+    )
+    $truth
+  => outputs (Follow value:$operand truth:(operandTruth $op $truth $literal));
+
+rule NilLeft:
+  inputs
+    (Comparison
+      left:$literal:(Constant)
+      right:$operand
+      op:$op:(or conditionEqualToken conditionNotEqualToken)
+    )
+    $truth
+  && nonconstantOperand $operand
+  && errorNilComparison $literal $operand
+  => outputs (Outcome value:$operand outcome:(nilOutcome $op $truth));
+
+rule BooleanLeft:
+  inputs
+    (Comparison
+      left:(Constant value:(Boolean $literal))
+      right:$operand
+      op:$op:(or conditionEqualToken conditionNotEqualToken)
+    )
+    $truth
+  && nonconstantOperand $operand
+  => outputs (Follow value:$operand truth:(operandTruth $op $truth $literal));

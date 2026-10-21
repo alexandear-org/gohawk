@@ -1,7 +1,9 @@
 package lifecycle
 
 import (
+	"go/constant"
 	"go/token"
+	"go/types"
 	"reflect"
 	"testing"
 
@@ -11,6 +13,25 @@ import (
 	"github.com/kojah/gohawk/internal/engine/ssaflow/ssaflowtest"
 	"golang.org/x/tools/go/ssa"
 )
+
+func TestCompletionComparisonPrefersRightConstant(t *testing.T) {
+	left := ssa.NewConst(constant.MakeBool(true), types.Typ[types.Bool])
+	right := ssa.NewConst(constant.MakeBool(false), types.Typ[types.Bool])
+	// Construct this directly because SSA folds two literal operands. The
+	// decoder must retain its chosen operand's identity before recursive tests.
+	for _, test := range []struct {
+		op      token.Token
+		outcome ssacall.Outcome
+	}{
+		{token.EQL, ssacall.OutcomeFalse},
+		{token.NEQ, ssacall.OutcomeTrue},
+	} {
+		value, outcome := completionComparison(&ssa.BinOp{Op: test.op, X: left, Y: right}, true)
+		if value != left || outcome != test.outcome {
+			t.Fatalf("%s retained operand %v with outcome %v, want left and %v", test.op, value, outcome, test.outcome)
+		}
+	}
+}
 
 const conditionalCompletionFixture = `package ssaflowtest
 type resource struct{}

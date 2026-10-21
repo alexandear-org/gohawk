@@ -2,10 +2,10 @@ package lifecycle
 
 import (
 	"go/token"
-	"go/types"
 	"slices"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -90,70 +90,8 @@ func (search *enclosingSearch) walk(frame *enclosingFrame) bool {
 	})
 }
 
-func callbackStorageType(t types.Type) bool {
-	for range 8 {
-		switch underlying := t.Underlying().(type) {
-		case *types.Signature:
-			return true
-		case *types.Pointer:
-			t = underlying.Elem()
-		case *types.Slice:
-			t = underlying.Elem()
-		case *types.Array:
-			t = underlying.Elem()
-		default:
-			return false
-		}
-	}
-	return true
-}
-
-func localCallbackAddress(value ssa.Value) bool {
-	for range 8 {
-		switch valueType := value.(type) {
-		case *ssa.Alloc:
-			return true
-		case *ssa.IndexAddr:
-			value = valueType.X
-		case *ssa.Slice:
-			value = valueType.X
-		default:
-			return false
-		}
-	}
-	return false
-}
-
-// Reject escapes before collecting contexts: finding one safe invocation must
-// not hide another invocation through a returned, stored, or opaque callback.
-func callbackContextInstructionSafe(instruction ssa.Instruction) bool {
-	switch instruction := instruction.(type) {
-	case *ssa.Go, *ssa.Send:
-		return false
-	case *ssa.MakeInterface:
-		if callbackStorageType(instruction.X.Type()) {
-			return false
-		}
-	case *ssa.MapUpdate:
-		if callbackStorageType(instruction.Value.Type()) {
-			return false
-		}
-	case *ssa.Return:
-		for _, result := range instruction.Results {
-			if callbackStorageType(result.Type()) {
-				return false
-			}
-		}
-	case *ssa.Store:
-		if callbackStorageType(instruction.Val.Type()) && !localCallbackAddress(instruction.Addr) {
-			return false
-		}
-	}
-	return true
-}
-
 func (search *enclosingSearch) instruction(frame *enclosingFrame, instruction ssa.Instruction) bool {
-	if !callbackContextInstructionSafe(instruction) {
+	if !completionpolicy.ContextInstructionSafe(instruction) {
 		return false
 	}
 	common := ssaflow.InstructionCall(instruction)
@@ -170,7 +108,7 @@ func (search *enclosingSearch) instruction(frame *enclosingFrame, instruction ss
 	callee := common.StaticCallee()
 	relevant := callee == nil && !common.IsInvoke() || callee != nil && callee.Parent() != nil
 	for _, arg := range common.Args {
-		relevant = relevant || callbackStorageType(arg.Type())
+		relevant = relevant || completionpolicy.CallbackStorageType(arg.Type())
 	}
 	if !relevant {
 		return true
@@ -267,26 +205,22 @@ func (search *enclosingSearch) resolve(ref callbackValue) (ssa.Value, bool) { //
 			return search.resolve(next)
 		}
 	}
-	if load, ok := ref.value.(*ssa.UnOp); ok && load.Op == token.MUL {
-		if field, ok := load.X.(*ssa.FieldAddr); ok {
-			return search.resolveField(ref, field)
-		}
-		cell, ok := load.X.(*ssa.Alloc)
-		if !ok {
-			return nil, false
-		}
-		stored := heapmodel.NewStorage(search.request.Budget).StableContent(cell, load)
+	step := completionpolicy.RecognizeEnclosing(ref.value)
+	switch step.Kind {
+	case completionpolicy.EnclosingField:
+		return search.resolveField(ref, step.Field)
+	case completionpolicy.EnclosingCell:
+		stored := heapmodel.NewStorage(search.request.Budget).StableContent(step.Cell, step.Load)
 		if !stored.Proven() {
 			return nil, false
 		}
 		ref.value = stored.Value
 		return search.resolve(ref)
+	case completionpolicy.EnclosingExact:
+		return ref.value, true
+	case completionpolicy.EnclosingOpaque:
 	}
-	switch ref.value.(type) {
-	case *ssa.Parameter, *ssa.FreeVar, *ssa.Phi:
-		return nil, false
-	}
-	return ref.value, true
+	return nil, false
 }
 
 func (search *enclosingSearch) resolveField(ref callbackValue, field *ssa.FieldAddr) (ssa.Value, bool) { //nolint:ireturn // Preserve SSA identity.

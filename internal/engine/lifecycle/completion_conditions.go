@@ -1,17 +1,16 @@
 package lifecycle
 
 import (
-	"go/constant"
 	"go/token"
 	"go/types"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	ssapath "github.com/kojah/gohawk/internal/engine/ssaflow/path"
-	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -65,28 +64,15 @@ func completionTest(value ssa.Value, truth bool) (ssa.Value, ssacall.Outcome) {
 }
 
 func completionComparison(comparison *ssa.BinOp, truth bool) (ssa.Value, ssacall.Outcome) {
-	if comparison.Op != token.EQL && comparison.Op != token.NEQ {
-		return nil, ssacall.OutcomeAny
+	step := completionpolicy.RecognizeCondition(comparison, truth)
+	switch step.Kind {
+	case completionpolicy.ConditionOutcome:
+		return step.Value, step.Outcome
+	case completionpolicy.ConditionFollow:
+		return completionTest(step.Value, step.Truth)
+	case completionpolicy.ConditionOpaque:
 	}
-	operand, literal := comparison.X, comparison.Y
-	if _, ok := literal.(*ssa.Const); !ok {
-		operand, literal = literal, operand
-	}
-	c, ok := literal.(*ssa.Const)
-	if !ok {
-		return nil, ssacall.OutcomeAny
-	}
-	equal := truth == (comparison.Op == token.EQL)
-	if c.IsNil() && syntax.IsErrorType(operand.Type()) {
-		if equal {
-			return operand, ssacall.OutcomeNil
-		}
-		return operand, ssacall.OutcomeNonNil
-	}
-	if c.Value == nil || c.Value.Kind() != constant.Bool {
-		return nil, ssacall.OutcomeAny
-	}
-	return completionTest(operand, equal == constant.BoolVal(c.Value))
+	return nil, ssacall.OutcomeAny
 }
 
 type conditionalCompletionState struct {

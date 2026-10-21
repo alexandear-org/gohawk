@@ -66,7 +66,7 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
-| Lifecycle completion/transfer recognition and outcome selection | Generated launch/callback recognition and unproven-completion outcomes; recursive coverage, path mapping and the existing transfer table stay in Go |
+| Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions; recursive coverage, storage, environment mapping and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
@@ -610,3 +610,28 @@ A nil pair never reaches `constant.Compare`; missing literal payloads and
 unsupported operators remain undecided. Existing path, execution-oracle and
 local/shared budget tests cover the consuming flow, and the loaded-format test
 pins the nonempty unavailable payload.
+
+## Callback value and context policy
+
+`completionpolicy` recognizes retained capability separately from exact
+callback identity. A generic call's arguments may carry a callback without
+promising its invocation; this remains broader than the exact `OnceFunc`
+contract. The existing any-origin fold and storage/callee queries consume the
+selected source or argument list without a new walk or allowance.
+
+Binding rules distinguish direct functions/closures, field loads, element
+loads, ordinary dereferences and stable cells. Go still substitutes invocation
+environments and transparent wrappers before selection, and preserves the
+observation point in each storage query. Whole-slice aggregate views require
+all three bounds to be absent. Enclosing reference rules intentionally use a
+different contract: only field or local-allocation loads can resolve; other
+loads and unresolved parameters, free variables and phis remain unavailable.
+
+Context admission rejects launches, sends and callback-bearing boxes, maps,
+returns and nonlocal stores before collecting invocation frames. Its bounded
+type/address predicates retain their original limits and conservative polarity.
+Conditional comparison rules prefer an existing right constant, swap only when
+it is not constant, and either select error nilness or return a Boolean operand
+for the existing recursive decoder. The exact operand identity is covered by a
+regression; callback, enclosing-frame, field/element and cutoff fixtures remain
+the consuming tests for these generated policies.

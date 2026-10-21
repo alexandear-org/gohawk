@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -47,20 +48,19 @@ func (search *completionSearch) valueCallsMethod(value, target ssa.Value) bool {
 // A revisited origin supplies no capability and never proves invocation.
 func (search *completionSearch) callbackCapability(walk ssaflow.ReachingWalk, value, target ssa.Value) bool {
 	return walk.Any(value, func(next ssaflow.ReachingWalk, leaf ssa.Value) bool {
-		switch typed := leaf.(type) {
-		case *ssa.MakeClosure:
-			callees, ok := closureCallees(typed, launchCallback, search.budget)
+		kind, source, arguments := completionpolicy.RetainedCallback(leaf)
+		switch kind {
+		case completionpolicy.CapabilityClosure:
+			callees, ok := closureCallees(source, launchCallback, search.budget)
 			return ok && search.calleeCompletes(callees[0], target, nil).proven
-		case *ssa.Alloc:
-			return search.storedValueCallsMethod(next, typed, target)
-		case *ssa.UnOp:
-			return search.storedValueCallsMethod(next, typed.X, target)
-		case *ssa.Call:
-			// This is a possible retained capability, not an exact factory relation:
-			// a wrapper receiving a callback may carry it in its returned value.
-			return slices.ContainsFunc(typed.Common().Args, func(argument ssa.Value) bool {
+		case completionpolicy.CapabilityStorage:
+			return search.storedValueCallsMethod(next, source, target)
+		case completionpolicy.CapabilityArguments:
+			// A wrapper may retain an argument without promising to invoke it.
+			return slices.ContainsFunc(arguments, func(argument ssa.Value) bool {
 				return search.callbackCapability(next, argument, target)
 			})
+		case completionpolicy.CapabilityAbsent:
 		}
 		return false
 	})

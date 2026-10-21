@@ -1,0 +1,38 @@
+signature total fallback outputs (Opaque);
+union Step = BindingStep tag Kind {
+  Opaque = BindingOpaque;
+  Exact = BindingExact;
+  Field = BindingField {
+    field: Field;
+  };
+  Element = BindingElement {
+    element: Element;
+  };
+  Load = BindingLoad {
+    source: Source;
+  };
+  Cell = BindingCell {
+    source: Source;
+  };
+};
+
+rule Exact:
+  inputs (or (Function) (Closure))
+  => outputs (Exact);
+
+rule Field:
+  inputs (Unary source:$field:(FieldAddress) op:bindingLoadToken)
+  => outputs (Field field:$field);
+
+rule Element:
+  inputs (Unary source:$element:(IndexAddress) op:bindingLoadToken)
+  => outputs (Element element:$element);
+
+rule Load:
+  inputs (Unary source:$source op:bindingLoadToken)
+  => outputs (Load source:$source);
+
+// Stable content is requested at the original observation point by Go.
+rule Cell:
+  inputs $cell:(Allocation)
+  => outputs (Cell source:$cell);

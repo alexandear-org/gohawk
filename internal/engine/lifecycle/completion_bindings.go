@@ -6,6 +6,7 @@ import (
 	"go/types"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -124,25 +125,23 @@ func resolveCallbackBinding(walk ssaflow.ReachingWalk, ref callbackValue, budget
 		ref.value = inner
 		return resolveCallbackBinding(walk, ref, budget)
 	}
-	switch value := ref.value.(type) {
-	case *ssa.Function, *ssa.MakeClosure:
+	step := completionpolicy.RecognizeBinding(ref.value)
+	switch step.Kind {
+	case completionpolicy.BindingExact:
 		return ref, true
-	case *ssa.UnOp:
-		if value.Op == token.MUL {
-			if field, ok := value.X.(*ssa.FieldAddr); ok {
-				return resolveCallbackField(walk, ref, field, budget)
-			}
-			if index, ok := value.X.(*ssa.IndexAddr); ok {
-				return resolveCallbackElement(walk, ref, index, budget)
-			}
-			ref.value = value.X
-			return resolveCallbackBinding(walk, ref, budget)
-		}
-	case *ssa.Alloc:
-		if stored := heapmodel.NewStorage(budget).StableContent(value, ref.observation); stored.Proven() {
+	case completionpolicy.BindingField:
+		return resolveCallbackField(walk, ref, step.Field, budget)
+	case completionpolicy.BindingElement:
+		return resolveCallbackElement(walk, ref, step.Element, budget)
+	case completionpolicy.BindingLoad:
+		ref.value = step.Source
+		return resolveCallbackBinding(walk, ref, budget)
+	case completionpolicy.BindingCell:
+		if stored := heapmodel.NewStorage(budget).StableContent(step.Source, ref.observation); stored.Proven() {
 			ref.value = stored.Value
 			return resolveCallbackBinding(walk, ref, budget)
 		}
+	case completionpolicy.BindingOpaque:
 	}
 	return callbackValue{}, false
 }
@@ -160,15 +159,18 @@ func callbackAggregate(ref callbackValue, budget *proofs.SearchBudget) (callback
 				continue
 			}
 		}
-		if slice, ok := ref.value.(*ssa.Slice); ok {
-			if slice.Low != nil || slice.High != nil || slice.Max != nil {
-				return callbackValue{}, false
-			}
-			ref.value = slice.X
+		kind, source := completionpolicy.RecognizeAggregate(ref.value)
+		switch kind {
+		case completionpolicy.AggregateFollow:
+			ref.value = source
 			continue
+		case completionpolicy.AggregateRoot:
+			return ref, true
+		case completionpolicy.AggregateBounded:
+			return callbackValue{}, false
+		case completionpolicy.AggregateOpaque:
 		}
-		_, ok := ref.value.(*ssa.Alloc)
-		return ref, ok
+		return ref, false
 	}
 	return callbackValue{}, false
 }

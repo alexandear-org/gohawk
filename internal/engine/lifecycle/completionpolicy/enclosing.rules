@@ -1,0 +1,30 @@
+signature total fallback outputs (Exact);
+union Step = EnclosingStep tag Kind {
+  Opaque = EnclosingOpaque;
+  Exact = EnclosingExact;
+  Field = EnclosingField {
+    field: Field;
+  };
+  Cell = EnclosingCell {
+    cell: Cell;
+    load: Load;
+  };
+};
+
+rule Field:
+  inputs (Unary source:$field:(FieldAddress) op:bindingLoadToken)
+  => outputs (Field field:$field);
+
+// Enclosing reference resolution observes the cell at this load, not at
+// registration time. Unlike callback binding, it does not follow index loads.
+rule Cell:
+  inputs $load:(Unary source:$cell:(Allocation) op:bindingLoadToken)
+  => outputs (Cell cell:$cell load:$load);
+
+rule OtherLoad:
+  inputs (Unary op:bindingLoadToken)
+  => outputs (Opaque);
+
+rule Ambiguous:
+  inputs (or (Parameter) (Free) (Phi))
+  => outputs (Opaque);

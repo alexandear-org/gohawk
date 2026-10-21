@@ -553,3 +553,45 @@ targets:
     function: decideLiteralComparison
     rules: [internal/engine/ssaflow/path/branch_compare.rules]
     out: internal/engine/ssaflow/path/branch_compare_gen.go
+  - name: lifecycle_retained_callback
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/capability.go
+    signature: capabilitySignature
+    function: RetainedCallback
+    rules: [internal/engine/lifecycle/completionpolicy/retained.rules]
+    out: internal/engine/lifecycle/completionpolicy/retained_gen.go
+  - name: lifecycle_callback_binding
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/binding.go
+    signature: bindingSignature
+    function: RecognizeBinding
+    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/binding.rules]
+    out: internal/engine/lifecycle/completionpolicy/binding_gen.go
+  - name: lifecycle_callback_aggregate
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/binding.go
+    signature: aggregateSignature
+    function: RecognizeAggregate
+    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/aggregate.rules]
+    out: internal/engine/lifecycle/completionpolicy/aggregate_gen.go
+  - name: lifecycle_enclosing_reference
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/binding.go
+    signature: enclosingSignature
+    function: RecognizeEnclosing
+    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/enclosing.rules]
+    out: internal/engine/lifecycle/completionpolicy/enclosing_gen.go
+  - name: lifecycle_callback_context_safe
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/retention.go
+    signature: contextSafeSignature
+    function: ContextInstructionSafe
+    rules: [internal/engine/lifecycle/completionpolicy/context_safe.rules]
+    out: internal/engine/lifecycle/completionpolicy/context_safe_gen.go
+  - name: lifecycle_condition_comparison
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/condition.go
+    signature: conditionSignature
+    function: RecognizeCondition
+    rules: [internal/engine/lifecycle/completionpolicy/condition.rules]
+    out: internal/engine/lifecycle/completionpolicy/condition_gen.go

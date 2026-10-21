@@ -1,5 +1,7 @@
-// Package completionpolicy selects structural invocation plans and completion
-// outcomes. It does not traverse SSA, resolve storage or spend search allowance.
+// Package completionpolicy selects structural invocation and binding plans,
+// retained callback capabilities and completion outcomes. Bounded type/address
+// checks classify context escapes; completion recursion, storage evidence and
+// search allowance remain with the consuming lifecycle search.
 package completionpolicy
 
 import proofs "github.com/kojah/gohawk/internal/engine/proof"
