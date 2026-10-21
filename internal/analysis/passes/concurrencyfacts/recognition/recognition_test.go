@@ -1,6 +1,7 @@
 package recognition_test
 
 import (
+	"go/token"
 	"testing"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
@@ -134,5 +135,123 @@ func deferred(f func()){defer f()}
 	}
 	if _, _, recognized := recognition.CallbackCall(nil); recognized || recognition.CallbackInput(nil, nil) {
 		t.Fatal("missing callback input was admitted")
+	}
+}
+
+func TestResourceReferenceRetainsRejectedCallAndExactInputs(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "referencecases", `package referencecases
+ import("context";"sync")
+ var shared sync.Mutex
+ type holder struct{mu sync.Mutex}
+ func NewCond(mu *sync.Mutex)*sync.Cond{return sync.NewCond(mu)}
+ func exact(mu *sync.Mutex)*sync.Cond{return sync.NewCond(mu)}
+ func mimic(mu *sync.Mutex)*sync.Cond{return NewCond(mu)}
+ func inputs(mu *sync.Mutex,ctx context.Context,cancel context.CancelFunc,ch chan int){}
+ func field(p *holder)*sync.Mutex{return &p.mu}
+ func local()*sync.Mutex{return new(sync.Mutex)}
+ func ordinary()*int{return new(int)}
+ `)
+	for _, tt := range []struct {
+		name string
+		kind recognition.ReferenceKind
+	}{
+		{"exact", recognition.ReferenceExact}, {"mimic", recognition.ReferenceRejected},
+	} {
+		call := ssaflow.InstructionsOf[*ssa.Call](pkg.Func(tt.name))[0]
+		kind, value, cancellation := recognition.ResourceReference(call)
+		if kind != tt.kind || value != call || cancellation {
+			t.Fatalf("%s: kind=%v value=%v cancellation=%v", tt.name, kind, value, cancellation)
+		}
+	}
+	for i, parameter := range pkg.Func("inputs").Params {
+		kind, value, cancellation := recognition.ResourceReference(parameter)
+		if kind != recognition.ReferenceExact || value != parameter || cancellation != (i == 1 || i == 2) {
+			t.Fatalf("%s: kind=%v value=%v cancellation=%v", parameter, kind, value, cancellation)
+		}
+	}
+	field := ssaflow.InstructionsOf[*ssa.FieldAddr](pkg.Func("field"))[0]
+	global := pkg.Members["shared"].(*ssa.Global)
+	allocation := ssaflow.InstructionsOf[*ssa.Alloc](pkg.Func("local"))[0]
+	ordinary := ssaflow.InstructionsOf[*ssa.Alloc](pkg.Func("ordinary"))[0]
+	for _, tt := range []struct {
+		input ssa.Value
+		kind  recognition.ReferenceKind
+	}{
+		{field, recognition.ReferenceAddress},
+		{global, recognition.ReferenceAddress},
+		{allocation, recognition.ReferenceExact},
+		{ordinary, recognition.ReferenceUnknown},
+	} {
+		kind, value, cancellation := recognition.ResourceReference(tt.input)
+		want := tt.input
+		if tt.kind == recognition.ReferenceUnknown {
+			want = nil
+		}
+		if kind != tt.kind || value != want || cancellation {
+			t.Fatalf("%s: kind=%v value=%v cancellation=%v", tt.input, kind, value, cancellation)
+		}
+	}
+}
+
+const rootSelectorFixture = `package rootcases
+ import "sync"
+ var mu sync.Mutex
+ type holder struct{mu *sync.Mutex}
+ func field(p *holder)*sync.Mutex{return p.mu}
+ func capture(ch chan *sync.Mutex)func()*sync.Mutex{return func()*sync.Mutex{return <-ch}}
+ `
+
+func TestRootSelectorsKeepFieldAndGlobalAddresses(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "rootcases", rootSelectorFixture)
+	fieldLoad := ssaflow.InstructionsOf[*ssa.UnOp](pkg.Func("field"))[0]
+	field := fieldLoad.X.(*ssa.FieldAddr)
+	bindingRoot := func(load *ssa.UnOp) (recognition.AddressKind, *ssa.FreeVar, *ssa.FieldAddr) {
+		return recognition.BindingRoot(load)
+	}
+	for _, choose := range []recognition.FixedLoadSignature{recognition.FixedLoad, bindingRoot} {
+		kind, capture, address := choose(fieldLoad)
+		if kind != recognition.AddressField || capture != nil || address != field {
+			t.Fatalf("field root=%v/%v/%v", kind, capture, address)
+		}
+	}
+	global := pkg.Members["mu"].(*ssa.Global)
+	if admitted, load := recognition.PathRoot(global, true); !admitted || load != nil {
+		t.Fatal("global mutex address lost")
+	}
+	if admitted, load := recognition.PathRoot(global, false); admitted || load != nil {
+		t.Fatal("global content became an exact root")
+	}
+}
+
+func TestRootSelectorsKeepCaptureAndReceiveEvidenceSeparate(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "rootcases", rootSelectorFixture)
+	bindingRoot := func(load *ssa.UnOp) (recognition.AddressKind, *ssa.FreeVar, *ssa.FieldAddr) {
+		return recognition.BindingRoot(load)
+	}
+	// SSA reads the captured channel cell before receiving. Only that cell
+	// read is a fixed load; the receive needs separate path evidence.
+	var captured, received *ssa.UnOp
+	var capture *ssa.FreeVar
+	for _, unary := range ssaflow.InstructionsOf[*ssa.UnOp](pkg.Func("capture").AnonFuncs[0]) {
+		if unary.Op == token.ARROW {
+			received = unary
+		}
+		if source, ok := unary.X.(*ssa.FreeVar); ok && unary.Op == token.MUL {
+			captured, capture = unary, source
+		}
+	}
+	if captured == nil || received == nil {
+		t.Fatal("missing captured channel read or receive")
+	}
+	for _, choose := range []recognition.FixedLoadSignature{recognition.FixedLoad, bindingRoot} {
+		if kind, got, address := choose(captured); kind != recognition.AddressCapture || got != capture || address != nil {
+			t.Fatalf("captured cell=%v/%v/%v", kind, got, address)
+		}
+	}
+	if kind, got, address := recognition.FixedLoad(received); kind != recognition.AddressBlocked || got != nil || address != nil {
+		t.Fatalf("receive became fixed load=%v/%v/%v", kind, got, address)
+	}
+	if admitted, load := recognition.PathRoot(received, false); admitted || load != received {
+		t.Fatal("unary root lost its deferred proof")
 	}
 }

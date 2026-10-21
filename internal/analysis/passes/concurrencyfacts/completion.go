@@ -7,9 +7,8 @@ import (
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
 	"github.com/kojah/gohawk/internal/engine/ssaflow/calls/synchronization"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
-	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
-	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -21,7 +20,7 @@ func (engine *Engine) callSummary(instruction ssa.CallInstruction) Summary {
 		return hole
 	}
 	common := engine.resolvedCommon(instruction)
-	if ssacall.CallMatchesSymbol(common, newCond) {
+	if recognition.ConditionConstructor(common) {
 		if _, ok := condLocker(instruction); ok {
 			return Summary{}
 		}
@@ -86,10 +85,8 @@ func straightLineBody(function *ssa.Function) bool {
 // Conditions retain their own identity in summaries. The associated locker
 // can only be recovered from an exact NewCond call, never a mutable L field.
 
-var newCond = syntax.PackageFunction("sync", "NewCond")
-
 func condLocker(call ssa.CallInstruction) (ssa.Value, bool) {
-	if !ssacall.CallMatchesSymbol(call.Common(), newCond) || len(call.Common().Args) != 1 {
+	if !recognition.ConditionConstructor(call.Common()) || len(call.Common().Args) != 1 {
 		return nil, false
 	}
 	wrapped, ok := call.Common().Args[0].(*ssa.MakeInterface)

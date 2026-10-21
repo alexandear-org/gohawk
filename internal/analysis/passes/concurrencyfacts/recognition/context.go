@@ -1,4 +1,4 @@
-// Package recognition identifies symbolic context and callback operations.
+// Package recognition identifies symbolic resources, contexts and callbacks.
 // It returns exact SSA operands without resolving storage, binding callbacks,
 // building summaries, or claiming that an operation completes a lifecycle.
 package recognition

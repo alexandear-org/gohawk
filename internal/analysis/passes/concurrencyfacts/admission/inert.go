@@ -51,24 +51,24 @@ func lookupElement(value ssa.Value) types.Type {
 	return value.Type()
 }
 
-// Builtin admits operations that read lengths, compare scalars, or copy inert
-// elements without blocking, synchronizing, or publishing a resource.
-func Builtin(common *ssa.CallCommon) bool {
+// BuiltinSignature admits only builtin operations on inert resource-free data.
+type BuiltinSignature func(*ssa.CallCommon) bool
+
+var _ BuiltinSignature = Builtin
+
+func builtinName(common *ssa.CallCommon) (string, bool) {
 	builtin, ok := common.Value.(*ssa.Builtin)
 	if !ok {
-		return false
+		return "", false
 	}
-	switch builtin.Name() {
-	case "len", "cap", "min", "max":
-		return true
-	case "append", "copy":
-		return Elements(common.Args[0].Type()) && (len(common.Args) < 2 || Elements(common.Args[1].Type()))
-	case "delete":
-		return Value(common.Args[1].Type())
-	default:
-		return false
-	}
+	return builtin.Name(), true
 }
+
+func copiedElements(common *ssa.CallCommon) bool {
+	return Elements(common.Args[0].Type()) && (len(common.Args) < 2 || Elements(common.Args[1].Type()))
+}
+
+func deletedElement(common *ssa.CallCommon) bool { return Value(common.Args[1].Type()) }
 
 // Atomic applies the sync/atomic package contract: its functions and
 // methods are atomic memory accesses that never block and take no lock, so

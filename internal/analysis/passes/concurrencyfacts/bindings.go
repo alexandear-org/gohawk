@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
@@ -186,25 +187,18 @@ func (engine *Engine) resolvedReference(value ssa.Value) (Reference, bool) {
 	if reference, ok := engine.cancellationReference(value); ok {
 		return reference, true
 	}
-	switch value := value.(type) {
-	case *ssa.Call:
-		return Reference{Value: value}, ssacall.CallMatchesSymbol(value.Common(), newCond)
-	case *ssa.Parameter, *ssa.FreeVar, *ssa.MakeChan:
-		return Reference{Value: value, Cancellation: admission.CancellationType(value.Type())}, true
-	case *ssa.Alloc:
-		if admission.SynchronizationPointer(value.Type()) {
-			return Reference{Value: value}, true
+	kind, value, cancellation := recognition.ResourceReference(value)
+	switch kind {
+	case recognition.ReferenceExact:
+		return Reference{Value: value, Cancellation: cancellation}, true
+	case recognition.ReferenceAddress:
+		if path, ok := engine.identityPath(value); ok && path.Depth > 0 {
+			value, found := engine.fieldAddress(value.Parent(), path)
+			return Reference{Value: value}, found
 		}
-	case *ssa.Global, *ssa.FieldAddr:
-		// Mutex addresses identify cells, not mutable contents. Such values
-		// can bind formal mutex parameters but cannot be exported as formals.
-		if MutexPointer(value.Type()) {
-			if path, ok := engine.identityPath(value); ok && path.Depth > 0 {
-				value, found := engine.fieldAddress(value.Parent(), path)
-				return Reference{Value: value}, found
-			}
-			return Reference{Value: value}, true
-		}
+		return Reference{Value: value}, true
+	case recognition.ReferenceRejected, recognition.ReferenceUnknown:
+		return Reference{Value: value}, false
 	}
 	return Reference{}, false
 }

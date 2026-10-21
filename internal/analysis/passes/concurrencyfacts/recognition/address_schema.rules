@@ -1,0 +1,12 @@
+view Unary = *ssa.UnOp {
+  op: Op;
+  source: X;
+};
+view Capture = *ssa.FreeVar {
+};
+view Field = *ssa.FieldAddr {
+};
+view Global = *ssa.Global {
+};
+const dereferenceToken;
+const AddressBlocked, AddressBinding, AddressGlobal, AddressCapture, AddressField;

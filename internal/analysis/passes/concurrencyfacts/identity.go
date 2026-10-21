@@ -4,6 +4,7 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -68,14 +69,11 @@ func (engine *Engine) identityPath(value ssa.Value) (ssaflow.EmbeddedFieldPath, 
 // cell; the launch binds the cell to its content, which the heap model must
 // prove stable (see bindRoot).
 func (engine *Engine) fixedLoad(load *ssa.UnOp) (*ssa.UnOp, bool) {
-	if load.Op != token.MUL {
-		return nil, false
-	}
-	if capture, ok := load.X.(*ssa.FreeVar); ok {
+	kind, capture, address := recognition.FixedLoad(load)
+	if kind == recognition.AddressCapture {
 		return capturedLoadWithin(load, capture, engine.budget)
 	}
-	address, ok := load.X.(*ssa.FieldAddr)
-	if !ok || !engine.writeOnce(load.Parent()).Fixed(fieldOf(address)) {
+	if kind != recognition.AddressField || !engine.writeOnce(load.Parent()).Fixed(fieldOf(address)) {
 		return nil, false
 	}
 	canonical, seen := engine.fields.canonical[load]
@@ -123,17 +121,15 @@ func capturedLoadWithin(load *ssa.UnOp, capture *ssa.FreeVar, budget *proofs.Sea
 
 // bindRoot maps a callee path root to the caller's path for the same object.
 func (engine *Engine) bindRoot(root ssa.Value, bindings []ssacall.CallBinding, instruction ssa.Instruction) (ssaflow.EmbeddedFieldPath, bool) {
-	switch root := root.(type) {
-	case *ssa.Global:
+	kind, capture, address := recognition.BindingRoot(root)
+	switch kind {
+	case recognition.AddressGlobal:
 		return ssaflow.EmbeddedFieldPath{Root: root}, true
-	case *ssa.UnOp:
-		if capture, ok := root.X.(*ssa.FreeVar); ok {
-			return engine.bindCapturedRoot(capture, bindings, instruction)
-		}
-		address, ok := root.X.(*ssa.FieldAddr)
-		if !ok {
-			return ssaflow.EmbeddedFieldPath{}, false
-		}
+	case recognition.AddressBlocked:
+		return ssaflow.EmbeddedFieldPath{}, false
+	case recognition.AddressCapture:
+		return engine.bindCapturedRoot(capture, bindings, instruction)
+	case recognition.AddressField:
 		base, ok := pathFromWithin(address, engine.fixedLoad, engine.budget)
 		if !ok {
 			return ssaflow.EmbeddedFieldPath{}, false
@@ -148,10 +144,11 @@ func (engine *Engine) bindRoot(root ssa.Value, bindings []ssacall.CallBinding, i
 		}
 		load, ok := engine.callerLoad(instruction.Parent(), inner, fieldOf(address))
 		return ssaflow.EmbeddedFieldPath{Root: load}, ok
-	}
-	for _, binding := range bindings {
-		if binding.Local == root {
-			return pathFromWithin(binding.Supplied, engine.fixedLoad, engine.budget)
+	case recognition.AddressBinding:
+		for _, binding := range bindings {
+			if binding.Local == root {
+				return pathFromWithin(binding.Supplied, engine.fixedLoad, engine.budget)
+			}
 		}
 	}
 	return ssaflow.EmbeddedFieldPath{}, false

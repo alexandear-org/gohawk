@@ -1,0 +1,19 @@
+signature total fallback outputs false;
+match builtin = builtinName;
+guard copiedElements, deletedElement;
+
+// Declaration identity is checked by the builtin matcher. Project-defined
+// functions with these names cannot enter the synchronization-free whitelist.
+rule Scalar:
+  inputs (builtin (or "len" "cap" "min" "max"))
+  => outputs true;
+
+rule Copy:
+  inputs $common:(builtin (or "append" "copy"))
+  && copiedElements $common
+  => outputs true;
+
+rule Delete:
+  inputs $common:(builtin "delete")
+  && deletedElement $common
+  => outputs true;

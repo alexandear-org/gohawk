@@ -3,6 +3,7 @@ package concurrencyfacts
 import (
 	"go/token"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -31,17 +32,16 @@ func embeddedPathWithin(value ssa.Value, budget *proofs.SearchBudget) (ssaflow.E
 func pathFromWithin(value ssa.Value, loaded func(*ssa.UnOp) (*ssa.UnOp, bool), budget *proofs.SearchBudget) (ssaflow.EmbeddedFieldPath, bool) {
 	mutex := MutexPointer(value.Type())
 	path, ok := ssaflow.ResolveEmbeddedFieldPath(ssaflow.NewReachingWalk(ssaflow.TransparentNone).Within(budget), value, func(root ssa.Value) bool {
-		switch root := root.(type) {
-		case *ssa.Alloc, *ssa.Parameter, *ssa.FreeVar:
+		admitted, load := recognition.PathRoot(root, mutex)
+		if admitted {
 			return true
-		case *ssa.Global:
-			return mutex
-		case *ssa.UnOp:
-			if _, spilled := spilledParameterWithin(root, budget); spilled {
+		}
+		if load != nil {
+			if _, spilled := spilledParameterWithin(load, budget); spilled {
 				return true
 			}
 			if loaded != nil {
-				_, fixed := loaded(root)
+				_, fixed := loaded(load)
 				return fixed
 			}
 		}

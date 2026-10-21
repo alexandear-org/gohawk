@@ -1,0 +1,19 @@
+signature total fallback outputs false nil;
+view Allocation = *ssa.Alloc {
+};
+view Parameter = *ssa.Parameter {
+};
+
+rule Local:
+  inputs (or (Allocation) (Parameter) (Capture)) _
+  => outputs true nil;
+
+// A global is an exact address only for mutex identity. Channel slots still
+// need content stability and cannot inherit their global owner's identity.
+rule GlobalMutex:
+  inputs (Global) true
+  => outputs true nil;
+
+rule Unary:
+  inputs $load:(Unary) _
+  => outputs false $load;

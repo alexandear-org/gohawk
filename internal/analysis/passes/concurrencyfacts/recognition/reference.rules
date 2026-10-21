@@ -1,0 +1,52 @@
+signature total fallback outputs ReferenceUnknown nil false;
+view Call = *ssa.Call {
+};
+view Parameter = *ssa.Parameter {
+};
+view Capture = *ssa.FreeVar {
+};
+view Channel = *ssa.MakeChan {
+};
+view Allocation = *ssa.Alloc {
+};
+view Global = *ssa.Global {
+};
+view Field = *ssa.FieldAddr {
+};
+build typeOf = referenceValue.Type;
+build common = referenceCall.Common;
+build canceled = admission.CancellationType;
+guard condition = ConditionConstructor;
+guard synchronization = admission.SynchronizationPointer;
+guard mutex = admission.MutexPointer;
+const ReferenceUnknown, ReferenceExact, ReferenceAddress, ReferenceRejected;
+
+rule Condition:
+  inputs $call:(Call)
+  let $common = common $call
+  && condition $common
+  => outputs ReferenceExact $call false;
+
+// A rejected call still returns its original value with false availability.
+rule OtherCall:
+  inputs $call:(Call)
+  => outputs ReferenceRejected $call false;
+
+rule Symbolic:
+  inputs $value:(or (Parameter) (Capture) (Channel))
+  let $type = typeOf $value
+  => outputs ReferenceExact $value (canceled $type);
+
+rule Local:
+  inputs $value:(Allocation)
+  let $type = typeOf $value
+  && synchronization $type
+  => outputs ReferenceExact $value false;
+
+// Mutex addresses name cells, not mutable contents. The engine materializes
+// a nonempty embedded path to an existing address before exporting identity.
+rule Address:
+  inputs $value:(or (Global) (Field))
+  let $type = typeOf $value
+  && mutex $type
+  => outputs ReferenceAddress $value false;

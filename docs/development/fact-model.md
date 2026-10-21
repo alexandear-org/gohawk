@@ -1067,6 +1067,24 @@ The actual SSA and child/fresh controls are in
 [fields_test.go](../../internal/analysis/passes/concurrencyfacts/fields_test.go).
 Existing imported formal-field guarantees and the fact schema remain unchanged.
 
+Hyrule's resource-reference, binding-root, fixed-load and path-root selectors
+own the supported SSA forms. Cancellation provenance still runs before resource
+recognition, and rejected calls retain their original SSA value alongside false
+availability. Standard condition constructors share one declaration-identity
+contract across summary collection and reference recognition. Pure selection
+never spends the request allowance or fills the canonical-load cache.
+
+Root binding and fixed-load recognition deliberately have separate rules:
+binding retains the original unary-source contract, while a fixed load requires
+dereference. Embedded-path roots admit globals only for mutex addresses; a
+channel slot does not inherit its global owner's identity. Spill proofs,
+canonicalization, cache sentinels and nested caller binding keep their original
+order in Go. The adjacent inert-builtin rules remain a completeness whitelist:
+only SSA builtins match, and copy/delete operations retain their original inert
+operand checks. The existing effect and field-binding regressions remain the
+consumer checks; recognition tests cover rejected-call payloads, declaration
+identity, and the distinct unary contracts.
+
 ### Concurrency publication allowance
 
 Export inference, linear publication validation, and a branch-alternative retry
