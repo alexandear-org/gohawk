@@ -5,6 +5,8 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
+
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -35,7 +37,7 @@ func goroutineReceivesCallerSignal(pass *analysis.Pass, spawn *ssa.Go, budget *p
 		return false
 	}
 	for instruction := range ssaflow.InstructionsWithin(function, budget) {
-		if receivesFromWithin(instruction, func(channel ssa.Value) bool {
+		if receives.FromWithin(instruction, func(channel ssa.Value) bool {
 			return callerSuppliedValue(spawn, function, closure, channel, budget)
 		}, budget) {
 			return true
@@ -337,7 +339,7 @@ func (search *workerReceiveSearch) prove(function *ssa.Function, local ssa.Value
 func (search *workerReceiveSearch) search(function *ssa.Function, local ssa.Value) proofs.Proof {
 	result := proofs.Proof{State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound, Provenance: proofs.EvidenceFromLocalSSA}
 	for instruction := range ssaflow.InstructionsWithin(function, search.budget) {
-		if receivesFromWithin(instruction, func(channel ssa.Value) bool { return search.matches(function, local, channel) }, search.budget) {
+		if receives.FromWithin(instruction, func(channel ssa.Value) bool { return search.matches(function, local, channel) }, search.budget) {
 			return proofs.Proof{State: proofs.EvidenceProven, Reason: proofs.EvidenceStructuralWalk, Provenance: proofs.EvidenceFromLocalSSA}
 		}
 		common := ssaflow.InstructionCall(instruction)

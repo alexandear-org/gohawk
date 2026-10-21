@@ -74,6 +74,9 @@ func loadAnalyzerLayoutPackages(
 			continue
 		}
 		parts := strings.Split(relative, "/")
+		if len(parts) > 2 {
+			continue // Owned implementation packages are checked after the roots.
+		}
 		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 			t.Errorf("%s must be exactly internal/analysis/analyzers/<group>/<name>; group directories must not be Go packages", pkg.PkgPath)
 			continue
@@ -90,7 +93,68 @@ func loadAnalyzerLayoutPackages(
 			pkg: pkg, group: parts[0], name: parts[1], dir: filepath.Dir(stableAbsolutePath(pkg.CompiledGoFiles[0])),
 		})
 	}
+	owners := make(map[string]bool, len(result))
+	for _, analyzerPackage := range result {
+		owners[analyzerPackage.group+"/"+analyzerPackage.name] = true
+	}
+	for _, message := range analyzerHelperPlacementErrors(loaded, modulePath, owners) {
+		t.Error(message)
+	}
 	return result, catalogPackage, modulePath, loaded
+}
+
+// A nested helper belongs to one catalog analyzer and cannot expose a second
+// Analyzer entry point. Root factory and runtime-bijection checks remain separate.
+func analyzerHelperPlacementErrors(loaded []*packages.Package, modulePath string, owners map[string]bool) []string {
+	prefix := modulePath + "/internal/analysis/analyzers/"
+	var failures []string
+	for _, pkg := range loaded {
+		relative, underAnalyzers := strings.CutPrefix(pkg.PkgPath, prefix)
+		if !underAnalyzers {
+			continue
+		}
+		parts := strings.Split(relative, "/")
+		if len(parts) <= 2 {
+			continue
+		}
+		if !owners[parts[0]+"/"+parts[1]] {
+			failures = append(failures, pkg.PkgPath+" helper must belong to an active analyzer package")
+		}
+		if pkg.Types.Scope().Lookup("Analyzer") != nil {
+			failures = append(failures, pkg.PkgPath+" helper must not declare Analyzer; entry points belong at analyzers/<group>/<name>")
+		}
+		if pkg.Name != parts[len(parts)-1] {
+			failures = append(failures, pkg.PkgPath+" helper package name must match its directory")
+		}
+	}
+	return failures
+}
+
+func TestAnalyzerHelperPlacementPolicy(t *testing.T) {
+	const module = "example.test/project"
+	for _, test := range []struct {
+		name, relative, packageName string
+		declaresAnalyzer, fails     bool
+	}{
+		{"owned", "concurrency/worker/receives", "receives", false, false},
+		{"deep", "concurrency/worker/receives/forms", "forms", false, false},
+		{"orphan", "concurrency/missing/receives", "receives", false, true},
+		{"entry", "concurrency/worker/receives", "receives", true, true},
+		{"wrong-name", "concurrency/worker/receives", "other", false, true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			pkgPath := module + "/internal/analysis/analyzers/" + test.relative
+			pkg := types.NewPackage(pkgPath, test.packageName)
+			if test.declaresAnalyzer {
+				pkg.Scope().Insert(types.NewFunc(0, pkg, "Analyzer", types.NewSignatureType(nil, nil, nil, nil, nil, false)))
+			}
+			loaded := []*packages.Package{{PkgPath: pkgPath, Name: test.packageName, Types: pkg}}
+			failures := analyzerHelperPlacementErrors(loaded, module, map[string]bool{"concurrency/worker": true})
+			if (len(failures) != 0) != test.fails {
+				t.Fatalf("placement failures=%v, want failure=%v", failures, test.fails)
+			}
+		})
+	}
 }
 
 func assertAnalyzerSourceDepth(t *testing.T, inventory repositorySourceInventory, layout []analyzerLayoutPackage) {
@@ -102,15 +166,15 @@ func assertAnalyzerSourceDepth(t *testing.T, inventory repositorySourceInventory
 	for _, source := range inventory.productionGoFiles(t, "internal/analysis/analyzers") {
 		relative := strings.TrimPrefix(source.repositoryPath, "internal/analysis/analyzers/")
 		parts := strings.Split(relative, "/")
-		if len(parts) != 3 || parts[0] == "" || parts[1] == "" {
-			t.Errorf("%s must be directly inside internal/analysis/analyzers/<group>/<name>", source.repositoryPath)
+		if len(parts) < 3 || parts[0] == "" || parts[1] == "" {
+			t.Errorf("%s must belong to internal/analysis/analyzers/<group>/<name>", source.repositoryPath)
 			continue
 		}
 		identity := parts[0] + "/" + parts[1]
 		if !known[identity] {
 			t.Errorf("%s has no active analyzer package or runtime registration", source.repositoryPath)
 		}
-		if source.file.Name.Name != parts[1] {
+		if len(parts) == 3 && source.file.Name.Name != parts[1] {
 			t.Errorf("%s package name = %q, want %q", source.repositoryPath, source.file.Name.Name, parts[1])
 		}
 	}

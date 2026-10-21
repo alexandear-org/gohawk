@@ -1,0 +1,19 @@
+signature total fallback outputs actionNone reasonNone false;
+query stored = storedTerminationInstruction;
+query selected = spawnAnalysis.selectedSignalEntry;
+query possible = spawnAnalysis.selectedPossibleEntry;
+const actionNone, actionJoin, actionUnknown;
+const reasonNone, reasonLabelStoredTestingReceiver;
+const reasonLabelSignalReceived, reasonLabelPossibleSignalReceive;
+
+// Arm-entry evidence precedes the instruction's own consumption: a selected
+// receive settles that arm even when its first instruction publishes the handle.
+rule Instruction:
+  inputs $analysis $instruction
+  => query stored $instruction
+           select true => outputs actionUnknown reasonLabelStoredTestingReceiver true
+     <|> query selected $analysis $instruction
+           select true => outputs actionJoin reasonLabelSignalReceived true
+     <|> query possible $analysis $instruction
+           select true => outputs actionUnknown reasonLabelPossibleSignalReceive true
+     <|> pure outputs actionNone reasonNone false;

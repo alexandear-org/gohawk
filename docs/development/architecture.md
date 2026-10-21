@@ -50,7 +50,15 @@ the per-function guarantees. These boundaries preserve one fact schema and
 one inference path rather than adding adapters between parallel models.
 
 Goroutine ownership instruction orchestration remains in `classify.go`;
-`call_actions.go` and `receive_actions.go` own their distinct evidence contracts.
+`call_actions.go` owns synchronous and opaque call contracts.
+`entry.rules` and `classify.rules` select instruction labels; `classify.go` keeps
+identity, cache and terminal proof dispatch. The analyzer-local `receives` package
+recognizes receive sites using caller-supplied channel predicates. Nested
+implementation packages belong to one `analyzers/<group>/<name>` owner: they
+may import helpers under that owner, but cannot import the analyzer entry package
+or any other analyzer's implementation. Helpers require an active analyzer owner
+and cannot declare an `Analyzer` entry point; catalog factories stay directly at
+`analyzers/<group>/<name>`.
 `obligation.go` finds and binds completion promises, while
 `completion_coverage.go` keeps terminal-work and return-coverage requirements
 separate. Callback targets use the shared resolver with opaque merges, so
@@ -290,8 +298,10 @@ the code cannot drift apart silently.
 | `TestTestFileLimit` | every directory has at most twenty direct `_test.go` files, counted separately from production files; tests are grouped by behavior rather than moved, because white-box tests must stay beside their package |
 | `TestTestFileLimitCountingScope` | twenty tests and twenty production files may share a directory; generated tests count, fixture and hidden trees do not, and a twenty-first test fails |
 | `TestInternalPackagesRespectDependencyDirection` | analyzers may use shared tools; shared tools never depend on analyzers or the catalog |
+| `TestAnalyzerImplementationBoundaries` | an analyzer may use its owned implementation helpers; helpers cannot import an entry package or another analyzer |
+| `TestAnalyzerHelperPlacementPolicy` | nested helpers require an active analyzer owner and cannot declare another `Analyzer` entry point |
 | `TestSSADependencyBoundaries` | CFG and value mechanics sit below calls, and calls below path proofs; reverse dependencies are forbidden |
-| `TestAnalyzerPackageLayout` | one package per analyzer under `internal/analysis/analyzers/<group>/<name>` |
+| `TestAnalyzerPackageLayout` | one registered entry package per analyzer under `internal/analysis/analyzers/<group>/<name>`, with helpers owned beneath it |
 | `TestInfrastructureAnalyzerPlacementPolicy` | prerequisite analyzers remain top-level passes; nested helpers require a registered owning pass and cannot declare another analyzer |
 | `TestAnalyzersUseSharedReporting` | diagnostics only through `check.Report` or `check.Reportf`, never `analysis.Pass.Report` directly |
 | `TestAnalyzerCodeUsesStructuredTracing` | production analyzer and analysis-pass code uses `internal/reporting/trace` rather than `fmt.Print`, `fmt.Printf`, or `fmt.Println` probes |

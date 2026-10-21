@@ -45,7 +45,7 @@ path is removed; generator support and examples alone do not qualify.
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, transparent aliases and field-use admission; heap-operation classification remains; recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
-| Goroutine ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
+| Goroutine ownership instruction/call labels | Generated arm-entry, receive and publication decisions; terminal return/store/call policies and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
@@ -184,3 +184,22 @@ field-call proofs on compiled SSA, including wrappers, merged aliases, local
 spills, synchronous/deferred/launched calls, capture loads, nested field paths,
 and recovery with a fresh allowance after exhaustion. The existing metadata
 allowance tests continue to cover late matching arguments and captures.
+
+## Goroutine instruction labels
+
+`goroutineownership/entry.rules` preserves the precedence of a stored testing
+receiver, an exact selected receive and a possible selected receive before an
+instruction's own effect. `classify.rules` handles ordered receive evidence and
+channel/map publication. All identity, containment and selected-case questions
+are explicit queries; no counted search is a speculative guard.
+
+The enclosing instruction cache and trace boundary are unchanged. Go dispatches
+returns, stores and calls to their existing proof functions. Standalone receive
+recognizers live under the analyzer's `receives` package, while spawn-specific
+identity remains with its classifier. Query phases live beside spawn budgets.
+No traversal, budget accounting, callback binding or flow query moves into rules.
+
+The classifier's compiled-SSA tests preserve action/reason pairs and cache reuse,
+including a send at a selected receive's arm entry. Full analyzer fixtures retain
+mixed select, alias, ownership-transfer and budget controls. Call, return and
+store proof policies remain migration candidates independently of this dispatcher.

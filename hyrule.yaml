@@ -1,5 +1,19 @@
 version: 1
 targets:
+  - name: goroutine_instruction_label
+    package: internal/analysis/analyzers/concurrency/goroutineownership
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/classify.go
+    signature: classifySignature
+    function: classifySpawnInstruction
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/classify.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/classify_gen.go
+  - name: goroutine_entry_recognition
+    package: internal/analysis/analyzers/concurrency/goroutineownership
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/classify.go
+    signature: recognizeSignature
+    function: recognizeSpawnEntry
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/entry.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/entry_gen.go
   - name: call_effect_use
     package: internal/engine/ssaflow/calls
     bindings: internal/engine/ssaflow/calls/call_effect_uses.go

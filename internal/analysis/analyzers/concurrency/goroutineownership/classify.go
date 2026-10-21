@@ -1,7 +1,11 @@
 package goroutineownership
 
 import (
+	"go/types"
 	"slices"
+
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
+	proofs "github.com/kojah/gohawk/internal/engine/proof"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -127,51 +131,58 @@ func (analysis *spawnAnalysis) traceLabel(instruction ssa.Instruction, action ow
 // classify labels the instruction and names the rule that decided it, so a
 // trace of an opaque use says which boundary it was.
 func (analysis *spawnAnalysis) classify(instruction ssa.Instruction) (ownershipAction, goroutineOwnershipReason) {
-	if call, ok := instruction.(*ssa.Call); ok && storedTerminationReceiver(call.Common()) {
-		return actionUnknown, reasonLabelStoredTestingReceiver
+	action, reason, recognized := recognizeSpawnEntry(analysis, instruction)
+	if recognized {
+		return action, reason
 	}
-	if selectedReceiveAtEntry(instruction, analysis.isSignal) {
-		return actionJoin, reasonLabelSignalReceived
-	}
-	if selectedReceiveAtEntry(instruction, analysis.possibleSignal) {
-		return actionUnknown, reasonLabelPossibleSignalReceive
-	}
+	// These terminal proof queries dispatch by SSA type. Their implementation
+	// retains return precedence, external-store identity and call contracts.
 	switch typed := instruction.(type) {
 	case *ssa.Return:
-		// Return ownership uses the same cache as other instructions: a merged
-		// return or a guarded re-walk must not repeat the query or its label.
+		// A merged return or guarded re-walk uses the same instruction cache;
+		// neither the query nor its label should be repeated.
 		return analysis.returnAction(typed)
-	case *ssa.MakeClosure:
-		// Capturing a value has no effect by itself. The closure's defer,
-		// return, store, launch, or opaque call is classified where it happens.
-		return actionNone, reasonNone
-	case *ssa.UnOp, *ssa.Select, *ssa.Range:
-		if guaranteedReceive(instruction, analysis.isSignal) {
-			return actionJoin, reasonLabelSignalReceived
-		}
-		if guaranteedReceive(instruction, analysis.possibleSignal) {
-			return actionUnknown, reasonLabelPossibleSignalReceive
-		}
-		if receivesFrom(instruction, analysis.signalAggregateCarries) {
-			return actionUnknown, reasonLabelSignalAggregateReceive
-		}
-		if analysis.selectSends(instruction) {
-			return actionUnknown, reasonLabelSelectSends
-		}
 	case *ssa.Store:
 		return analysis.storeAction(typed), reasonLabelStoredOutside
-	case *ssa.Send:
-		if analysis.consumes(typed.X) {
-			return actionUnknown, reasonLabelSent
-		}
-	case *ssa.MapUpdate:
-		if analysis.consumes(typed.Value) {
-			return actionUnknown, reasonLabelStoredInMap
-		}
 	case *ssa.Call, *ssa.Defer, *ssa.Go:
 		return analysis.callAction(instruction, ssaflow.InstructionCall(instruction))
 	}
-	return actionNone, reasonNone
+	return classifySpawnInstruction(analysis, instruction)
+}
+
+type (
+	classifySignature  func(analysis *spawnAnalysis, instruction ssa.Instruction) (ownershipAction, goroutineOwnershipReason)
+	recognizeSignature func(analysis *spawnAnalysis, instruction ssa.Instruction) (ownershipAction, goroutineOwnershipReason, bool)
+)
+
+var (
+	_ classifySignature  = classifySpawnInstruction
+	_ recognizeSignature = recognizeSpawnEntry
+)
+
+func storedTerminationInstruction(instruction ssa.Instruction) bool {
+	call, ok := instruction.(*ssa.Call)
+	return ok && storedTerminationReceiver(call.Common())
+}
+
+func (analysis *spawnAnalysis) selectedSignalEntry(instruction ssa.Instruction) bool {
+	return receives.SelectedAtEntry(instruction, analysis.isSignal)
+}
+
+func (analysis *spawnAnalysis) selectedPossibleEntry(instruction ssa.Instruction) bool {
+	return receives.SelectedAtEntry(instruction, analysis.possibleSignal)
+}
+
+func (analysis *spawnAnalysis) guaranteedSignal(instruction ssa.Instruction) bool {
+	return receives.Guaranteed(instruction, analysis.isSignal)
+}
+
+func (analysis *spawnAnalysis) guaranteedPossible(instruction ssa.Instruction) bool {
+	return receives.Guaranteed(instruction, analysis.possibleSignal)
+}
+
+func (analysis *spawnAnalysis) aggregateReceive(instruction ssa.Instruction) bool {
+	return receives.From(instruction, analysis.signalAggregateCarries)
 }
 
 // Capturing a strict testing object introduces a receiver load that the
@@ -239,4 +250,91 @@ func (analysis *spawnAnalysis) storeAction(store *ssa.Store) ownershipAction {
 		}
 	}
 	return actionNone
+}
+
+func (analysis *spawnAnalysis) selectedJoinEdge(from, to *ssa.BasicBlock) bool {
+	channel, selected := ssapath.SelectedReceiveOnEdge(from, to)
+	joined := selected && analysis.isSignal(channel)
+	if joined {
+		analysis.recordEdge(from, to, reasonSelectedReceiveEdge, ssapath.ObligationExact)
+	}
+	return joined
+}
+
+// recordEdge keeps the authoritative reason and action for the trace. Tracing
+// projects the action instead of reconstructing proof strength from reason names.
+func (analysis *spawnAnalysis) recordEdge(from, to *ssa.BasicBlock, reason goroutineOwnershipReason, action ssapath.ObligationAction) {
+	if !analysis.tracing {
+		return
+	}
+	if analysis.edgeEvidence == nil {
+		analysis.edgeEvidence = make(map[[2]int]joinEdgeEvidence)
+	}
+	analysis.edgeEvidence[[2]int{from.Index, to.Index}] = joinEdgeEvidence{reason: reason, action: action}
+}
+
+// selectSends reports whether a select statement offers a tracked value on a
+// send case; like a plain send, the receiver may retain it.
+func (analysis *spawnAnalysis) selectSends(instruction ssa.Instruction) bool {
+	choice, ok := instruction.(*ssa.Select)
+	if !ok {
+		return false
+	}
+	return slices.ContainsFunc(choice.States, func(state *ssa.SelectState) bool {
+		return state.Dir == types.SendOnly && analysis.consumes(state.Send)
+	})
+}
+
+// isSignal requires exact channel identity. An aggregate root or a phi with
+// one matching alternative explains possible completion, never an exact join.
+func (analysis *spawnAnalysis) isSignal(value ssa.Value) bool {
+	return analysis.isSignalWithin(value, analysis.budget())
+}
+
+// isSignalWithin shares exact channel identity between observations and relay
+// discovery. Aggregate roots retain possible ownership, never an exact join.
+func (analysis *spawnAnalysis) isSignalWithin(value ssa.Value, budget *proofs.SearchBudget) bool {
+	if !ssaflow.ChannelType(value) {
+		return false
+	}
+	storage := heapmodel.NewStorage(budget)
+	for _, signal := range analysis.signals {
+		if !budget.Spend() {
+			return false
+		}
+		if ssaflow.ChannelType(signal) && storage.Same(value, signal).Proven() {
+			return true
+		}
+	}
+	return false
+}
+
+// possibleSignal retains the previous broad receive boundary for unknown
+// ownership and guarded joins. Matching sibling fields/indexes does not show
+// that the caller observed this worker's completion handle.
+func (analysis *spawnAnalysis) possibleSignal(value ssa.Value) bool {
+	if heapmodel.MayAliasAny(value, analysis.signals) {
+		return true
+	}
+	root := aggregateRoot(value)
+	return root != value && slices.ContainsFunc(analysis.signals, func(signal ssa.Value) bool {
+		if !ssaflow.ChannelType(signal) {
+			// Captured slice cells and their loaded slice share an aggregate root.
+			// Index correlation stays unknown under countedJoin, not proven exact.
+			// https://github.com/bazel-contrib/buildtools/blob/933e9bbe17f7619afaca1dd58ce22810042f1c13/buildifier/buildifier.go#L241-L268
+			return heapmodel.MayAlias(ssaflow.CapturedBindingValue(root), ssaflow.CapturedBindingValue(aggregateRoot(signal)))
+		}
+		signalRoot := aggregateRoot(signal)
+		return signalRoot != signal && heapmodel.MayAlias(root, signalRoot)
+	})
+}
+
+// A worker-side field can resolve only to the constructor's aggregate result,
+// while its caller receives the original channel passed to that constructor.
+// Containment cannot identify the exact field, so this is unknown, not a join.
+// https://github.com/lotusirous/go-concurrency-patterns/blob/791337ff11e69cd9d1a8587e53474a8469b3510f/17-ring-buffer-channel/main.go#L49-L62
+func (analysis *spawnAnalysis) signalAggregateCarries(value ssa.Value) bool {
+	return slices.ContainsFunc(analysis.signals, func(signal ssa.Value) bool {
+		return !ssaflow.ChannelType(signal) && carries(ssaflow.NewReachingWalk(carryForms), signal, value)
+	})
 }

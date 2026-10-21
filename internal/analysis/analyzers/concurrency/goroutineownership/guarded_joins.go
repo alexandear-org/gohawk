@@ -4,6 +4,8 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
+
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -134,7 +136,7 @@ func (analysis *spawnAnalysis) branchGuardsJoin(branch *ssa.If) bool {
 			// count, not a join. A selectable receive still supplies that
 			// possible completion action even when another arm can win.
 			if instruction != analysis.spawn &&
-				(analysis.action(instruction) != actionNone || receivesFrom(instruction, analysis.possibleSignal)) {
+				(analysis.action(instruction) != actionNone || receives.From(instruction, analysis.possibleSignal)) {
 				return true
 			}
 		}

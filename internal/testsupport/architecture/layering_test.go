@@ -177,7 +177,40 @@ func analyzerImplementationDependency(from, to, sourceDirectory, importedPath st
 		return false
 	}
 	sourcePackage := strings.TrimPrefix(sourceDirectory, "internal/")
-	return sourcePackage != importedPath
+	if sourcePackage == importedPath {
+		return false
+	}
+	// Each analyzer owns analysis/analyzers/<group>/<name>. Its nested
+	// implementation packages may depend on one another, but cannot import
+	// the entry package or any other analyzer's implementation.
+	components := strings.Split(sourcePackage, "/")
+	if len(components) < 4 || components[0] != "analysis" || components[1] != "analyzers" {
+		return true
+	}
+	owner := strings.Join(components[:4], "/")
+	return !strings.HasPrefix(importedPath, owner+"/")
+}
+
+func TestAnalyzerImplementationBoundaries(t *testing.T) {
+	for _, test := range []layerDependencyCase{
+		{"analysis/analyzers/concurrency/worker", "analysis/analyzers/concurrency/worker/receives", false},
+		{"analysis/analyzers/concurrency/worker/receives", "analysis/analyzers/concurrency/worker/identity", false},
+		{"analysis/analyzers/concurrency/worker/receives", "analysis/analyzers/concurrency/worker/receives/forms", false},
+		{"analysis/analyzers/concurrency/worker/receives", "analysis/analyzers/concurrency/worker", true},
+		{"analysis/analyzers/concurrency/other", "analysis/analyzers/concurrency/worker/receives", true},
+		{"analysis/analyzers/resources/worker", "analysis/analyzers/concurrency/worker/receives", true},
+		{"analysis/analyzers/concurrency/worker", "analysis/analyzers/concurrency/other", true},
+		{"analysis/analyzers/concurrency/worker", "analysis/analyzers/concurrency/workerExtra/receives", true},
+		{"analysis/analyzers/concurrency/worker", "analysis/analyzers/concurrency", true},
+		{"analysis/analyzers/concurrency", "analysis/analyzers/concurrency/worker/receives", true},
+	} {
+		t.Run(test.from+"/"+test.to, func(t *testing.T) {
+			got := analyzerImplementationDependency(internalLayer(test.from), internalLayer(test.to), "internal/"+test.from, test.to)
+			if got != test.forbid {
+				t.Fatalf("forbidden analyzer dependency = %v, want %v", got, test.forbid)
+			}
+		})
+	}
 }
 
 // lifecycleFamilies names the layers inside internal/engine/lifecycle from lowest to

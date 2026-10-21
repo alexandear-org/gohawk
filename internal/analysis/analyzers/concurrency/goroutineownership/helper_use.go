@@ -3,6 +3,8 @@ package goroutineownership
 import (
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
+
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
@@ -160,7 +162,7 @@ func (search *helperSearch) instructionJoins(instruction ssa.Instruction, kind t
 	if _, launched := instruction.(*ssa.Go); launched {
 		return false
 	}
-	if kind == trackedSignal && guaranteedReceive(instruction, derives) {
+	if kind == trackedSignal && receives.Guaranteed(instruction, derives) {
 		return true
 	}
 	common := ssaflow.InstructionCall(instruction)

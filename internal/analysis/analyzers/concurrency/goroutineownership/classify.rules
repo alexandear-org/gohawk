@@ -1,0 +1,60 @@
+signature total fallback outputs actionNone reasonNone;
+view Closure = *ssa.MakeClosure {
+};
+view Receive = *ssa.UnOp {
+};
+view Select = *ssa.Select {
+};
+view Range = *ssa.Range {
+};
+view Send = *ssa.Send {
+  value: X;
+};
+view MapUpdate = *ssa.MapUpdate {
+  value: Value;
+};
+query exact = spawnAnalysis.guaranteedSignal;
+query possible = spawnAnalysis.guaranteedPossible;
+query aggregate = spawnAnalysis.aggregateReceive;
+query selectSends = spawnAnalysis.selectSends;
+query consumes = spawnAnalysis.consumes;
+const actionNone, actionJoin, actionUnknown;
+const reasonNone, reasonLabelSignalReceived;
+const reasonLabelPossibleSignalReceive, reasonLabelSignalAggregateReceive;
+const reasonLabelSelectSends, reasonLabelSent, reasonLabelStoredInMap;
+
+// Capturing a value has no effect by itself. Classify the closure's defer,
+// return, store, launch or opaque call where that lifecycle action happens.
+rule ClosureCreation:
+  inputs _ (Closure)
+  => outputs actionNone reasonNone;
+
+rule Reception:
+  inputs $analysis $instruction:(or (Receive) (Select) (Range))
+  => query exact $analysis $instruction
+           select true => outputs actionJoin reasonLabelSignalReceived
+     <|> query possible $analysis $instruction
+           select true => outputs actionUnknown reasonLabelPossibleSignalReceive
+     <|> query aggregate $analysis $instruction
+           select true => outputs actionUnknown reasonLabelSignalAggregateReceive
+     <|> query selectSends $analysis $instruction
+           select true => outputs actionUnknown reasonLabelSelectSends
+     <|> pure outputs actionNone reasonNone;
+
+rule Sent:
+  inputs $analysis (Send value:$value)
+  => query consumes $analysis $value {
+       true => outputs actionUnknown reasonLabelSent;
+       false => outputs actionNone reasonNone;
+     };
+
+rule Mapped:
+  inputs $analysis (MapUpdate value:$value)
+  => query consumes $analysis $value {
+       true => outputs actionUnknown reasonLabelStoredInMap;
+       false => outputs actionNone reasonNone;
+     };
+
+rule Other:
+  inputs _ _
+  => outputs actionNone reasonNone;

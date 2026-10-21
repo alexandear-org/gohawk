@@ -6,10 +6,14 @@ why. Update it with the fixtures when a boundary changes.
 
 ## Implementation responsibilities
 
-`classify.go` owns the action lattice and instruction-label orchestration.
+`classify.go` owns the action lattice, cached labels, exact versus possible
+signal identity, and terminal proof dispatch. `entry.rules` and `classify.rules`
+own ordered arm-entry, receive and publication decisions.
 `call_actions.go` owns synchronous, launched and opaque call contracts;
-`receive_actions.go` owns exact versus possible signal identity and selected-arm
-observations. They feed the same cached labels and final proof.
+`receives` owns standalone receive-site recognition with caller-supplied channel
+predicates. It distinguishes selected arms from every-case receives and feeds
+the same cached labels and final proof. Spawn query-phase names live beside
+the candidate budgets in `spawn.go`.
 
 `obligation.go` owns completion-handle discovery and parent binding;
 `completion_coverage.go` owns terminal-work and return-coverage requirements.
@@ -741,3 +745,27 @@ and fresh live channels retain possible publication.
 forms, checks small-child/live-parent cutoffs and fresh recovery. Parent SSA
 controls measured completed queries at limits 3 and 2 respectively; restoring
 the old standalone nil fold fails both cutoff assertions.
+
+## Generated instruction labels
+
+The instruction classifier asks stored-testing-receiver, exact selected-arm and
+possible selected-arm questions in their original order through `entry.rules`.
+These are committed queries: matching cannot share or speculatively repeat their
+storage searches or counted allowances. Only an unanswered entry proceeds to
+the instruction's own effect. A send at an exact selected receive's arm entry
+therefore retains the join label before its publication could make it opaque.
+
+`classify.rules` orders exact receive, possible receive, aggregate receive and
+tracked select-send evidence, and labels direct sends and map publication.
+Closure construction itself remains `none`. The Go dispatcher sends returns,
+stores and calls to the existing terminal proof functions; their exact identity,
+containment and helper policies remain authoritative. The action cache surrounds
+both generated stages and terminal proofs, so repeated walks do not repeat a
+query or trace label.
+
+`classify_test.go` checks the same baseline labels and reasons on compiled SSA:
+exact and merged receives, aggregate handles, unrelated channels, returned and
+stored handles, publication, closure construction, selected-arm precedence and
+synchronous/deferred/launched WaitGroup calls. It also checks that looking up a
+cached action leaves the candidate pool unchanged. Existing receive-search and
+analyzer fixtures cover mixed select arms, helper bindings and exhausted budgets.
