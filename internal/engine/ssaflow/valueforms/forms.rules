@@ -1,4 +1,23 @@
-match changeInterface, changeType, convert, makeInterface, assertion, extract;
+view changeInterface = *ssa.ChangeInterface {
+  value: X;
+};
+view changeType = *ssa.ChangeType {
+  value: X;
+};
+view convert = *ssa.Convert {
+  value: X;
+};
+view makeInterface = *ssa.MakeInterface {
+  value: X;
+};
+view assertion = *ssa.TypeAssert {
+  value: X;
+  commaOK: CommaOk;
+};
+view extract = *ssa.Extract {
+  tuple: Tuple;
+  index: Index;
+};
 guard allows;
 const ChangeInterface, ChangeType, Convert, MakeInterface, TypeAssert;
 

@@ -49,7 +49,7 @@ path is removed; generator support and examples alone do not qualify.
 | Cancellation ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
 | Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
-| Defer-in-loop resource classification | Handwritten; migration remains |
+| Defer-in-loop resource classification | Generated ordered per-value classifier; acquisition discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Handwritten; migration remains for substantial pattern/decision families |
 | Producer lifecycle use classification | Handwritten; migration remains for instruction classifications |
@@ -76,3 +76,18 @@ Transparent-wrapper rules recognize exactly one step under the caller's form
 mask. Conversions remain opt-in, comma-ok assertions require result-zero
 extraction, and success flags or unrelated tuples remain opaque. Reaching walks
 and Boolean-negation traversal retain their existing Go budgets and termination.
+
+## Native host boundaries
+
+Defer-in-loop classification uses a native four-parameter, two-result signature.
+Its rules call the existing transfer and argument-evidence functions through
+explicit field forwarding. Boolean queries use `true`/`false` arms, and tuple
+outcomes declare their discriminator and payload slots. Unrecognized outcomes
+return the declared `Unknown reasonNone` fallback, without retrying another
+rule. No request, query-host, Boolean-answer or decision wrapper structs remain.
+The three small Go hooks still own call presence and the cleanup contract.
+
+Transparent SSA wrapper extraction uses read-only views of the original SSA
+nodes. The views generate checked assertions and field reads; the rules retain
+form masks and the distinction between an asserted value and its success flag.
+The existing reaching walks and ownership proofs remain authoritative.

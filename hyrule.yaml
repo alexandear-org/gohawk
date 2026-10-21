@@ -35,3 +35,10 @@ targets:
     function: Unwrap
     rules: [internal/engine/ssaflow/valueforms/forms.rules]
     out: internal/engine/ssaflow/valueforms/forms_gen.go
+  - name: deferred_resource_use
+    package: internal/analysis/analyzers/resources/deferinloop
+    bindings: internal/analysis/analyzers/resources/deferinloop/classify_bindings.go
+    signature: useSignature
+    function: classifyValueUse
+    rules: [internal/analysis/analyzers/resources/deferinloop/classify.rules]
+    out: internal/analysis/analyzers/resources/deferinloop/classify_gen.go

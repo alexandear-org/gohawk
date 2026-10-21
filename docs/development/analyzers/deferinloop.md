@@ -65,3 +65,21 @@ budget. The state and successor policy remain unchanged.
 and beyond the block end; the accepted and diagnostic lifetime fixtures remain
 the behavior gate. Measurements live in
 [the performance investigation](../analysis-performance-2026-10-06.md).
+
+## Declarative resource-use decisions
+
+`classify.rules` owns the ordered per-value decision: transfer first, then
+non-call opacity or receiver cleanup, and finally callee/argument evidence.
+Queries retain the existing host searches and tracing. A recognized receiver's
+ordinary methods leave its obligation live without asking callee ownership;
+a proven transfer settles before storage can be classified as opaque.
+The owner fallback still asks about the response only when the body remains
+live, with no cleanup methods attached to that response obligation.
+`classify_test.go` checks these precedence boundaries on actual SSA.
+
+The generated classifier keeps the original native evidence/probe/instruction/
+obligation arguments and returns status/reason directly. Boolean and tuple
+query outcomes need no host wrapper storage. Field-forwarding declarations make
+context explicit, and the total signature's `Unknown reasonNone` fallback
+suppresses reporting if an outcome falls outside its declared domain. The
+fallback never credits cleanup and does not rerun another rule.
