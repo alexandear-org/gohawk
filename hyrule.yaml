@@ -490,3 +490,38 @@ targets:
     function: decideGuaranteed
     rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed_gen.go
+  - name: call_fixed_outcome
+    package: internal/engine/ssaflow/calls
+    bindings: internal/engine/ssaflow/calls/call_constants.go
+    signature: fixedOutcomeSignature
+    function: decideFixedOutcome
+    rules: [internal/engine/ssaflow/calls/fixed_outcome.rules]
+    out: internal/engine/ssaflow/calls/fixed_outcome_gen.go
+  - name: result_return_relation
+    package: internal/analysis/passes/resultfacts
+    bindings: internal/analysis/passes/resultfacts/relations.go
+    signature: returnHoldsSignature
+    function: decideReturnHolds
+    rules: [internal/analysis/passes/resultfacts/return.rules]
+    out: internal/analysis/passes/resultfacts/return_gen.go
+  - name: result_assumed_leaf
+    package: internal/analysis/passes/resultfacts
+    bindings: internal/analysis/passes/resultfacts/relations.go
+    signature: assumedLeafSignature
+    function: decideAssumedLeaf
+    rules: [internal/analysis/passes/resultfacts/assumed.rules]
+    out: internal/analysis/passes/resultfacts/assumed_gen.go
+  - name: summary_result_condition
+    package: internal/analysis/summaries
+    bindings: internal/analysis/summaries/results.go
+    signature: resultConditionSignature
+    function: decideResultCondition
+    rules: [internal/analysis/summaries/condition.rules]
+    out: internal/analysis/summaries/condition_gen.go
+  - name: summary_result_comparison
+    package: internal/analysis/summaries
+    bindings: internal/analysis/summaries/results.go
+    signature: resultComparisonSignature
+    function: decideResultComparison
+    rules: [internal/analysis/summaries/comparison.rules]
+    out: internal/analysis/summaries/comparison_gen.go

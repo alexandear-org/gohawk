@@ -77,31 +77,34 @@ func (provider *Provider) Successors() func(block, predecessor *ssa.BasicBlock) 
 }
 
 func (provider *Provider) resultCondition(value ssa.Value, block *ssa.BasicBlock, budget *proofs.SearchBudget) (bool, bool) {
-	guarantee := provider.ResultOf(value, budget)
-	if guarantee == resultfacts.AlwaysTrue || guarantee == resultfacts.AlwaysFalse {
-		return guarantee == resultfacts.AlwaysTrue, true
-	}
-	comparison, ok := value.(*ssa.BinOp)
-	if !ok || comparison.Op != token.EQL && comparison.Op != token.NEQ {
-		return false, false
-	}
-	left, right := comparison.X, comparison.Y
-	if _, constantLeft := left.(*ssa.Const); constantLeft {
-		left, right = right, left
-	}
-	literal, ok := right.(*ssa.Const)
-	if !ok {
-		return false, false
-	}
-	equal, known := resultEqualsLiteral(provider.ResultOf(left, budget), literal)
-	if !known && literal.IsNil() {
-		equal, known = provider.pairedNilness(left, block, budget)
-	}
-	if comparison.Op == token.NEQ {
-		equal = !equal
-	}
-	return equal, known
+	// Resolve the original value first, even for a comparison the policy cannot use.
+	return decideResultCondition(provider, value, provider.ResultOf(value, budget), block, budget)
 }
+
+type (
+	resultConditionSignature  func(*Provider, ssa.Value, resultfacts.Guarantee, *ssa.BasicBlock, *proofs.SearchBudget) (bool, bool)
+	resultComparisonSignature func(*Provider, ssa.Value, *ssa.Const, *ssa.BasicBlock, *proofs.SearchBudget) (bool, bool)
+)
+
+var (
+	_ resultConditionSignature  = decideResultCondition
+	_ resultComparisonSignature = decideResultComparison
+)
+
+func (provider *Provider) literalEquality(value ssa.Value, literal *ssa.Const, budget *proofs.SearchBudget) (bool, bool) {
+	return resultEqualsLiteral(provider.ResultOf(value, budget), literal)
+}
+
+func comparisonNil(literal *ssa.Const) bool { return literal.IsNil() }
+
+func comparisonTruth(equal bool, op token.Token) bool { return equal != (op == token.NEQ) }
+
+const (
+	resultAlwaysTrue   = resultfacts.AlwaysTrue
+	resultAlwaysFalse  = resultfacts.AlwaysFalse
+	comparisonEqual    = token.EQL
+	comparisonNotEqual = token.NEQ
+)
 
 // pairedNilness decides a result's nilness from its callee's result-pair
 // relation and the error branch already taken on the path: a result proven

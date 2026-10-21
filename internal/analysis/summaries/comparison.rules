@@ -1,0 +1,36 @@
+signature total fallback outputs false false;
+query literal = Provider.literalEquality;
+query paired = Provider.pairedNilness;
+guard Nil = comparisonNil;
+// Paired-result evidence is meaningful only for a nil literal and only after
+// the unconditional summary could not decide equality. Keep the two requests
+// sequential and in the same allowance; no result is queried speculatively.
+union Equality = (bool, bool) tag 1 {
+  Known = true {
+    equal: 0;
+  };
+  Unknown = false {
+    equal: 0;
+  };
+};
+
+rule NilComparison:
+  inputs $provider $value $literal $block $budget
+  && Nil $literal
+  => query $answer = literal $provider $value $literal $budget
+     decide $answer {
+       Known => $answer;
+       Unknown => query $paired = paired $provider $value $block $budget
+       decide $paired {
+         Known => $paired;
+         Unknown => $paired;
+       };
+     };
+
+rule OtherComparison:
+  inputs $provider $value $literal _ $budget
+  => query $answer = literal $provider $value $literal $budget
+     decide $answer {
+       Known => $answer;
+       Unknown => $answer;
+     };

@@ -58,3 +58,48 @@ func caller(flag bool) (bool,bool,*box,*box,any,bool,bool) {
 		t.Error("exhausted summary query retained a call guarantee")
 	}
 }
+
+func TestResultConditionOperandOrderAndUnknownPayload(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "conditions", `package conditions
+ type box struct{}
+ func yes() bool { return true }
+ func no() bool { return false }
+ func fresh() *box { return new(box) }
+ func empty() *box { return nil }
+ func unknown(value *box) *box { return value }
+ func number(value int) int { return value }
+ func rightTrue() bool { return yes() == true }
+ func leftTrue() bool { return true == no() }
+ func rightFalseNot() bool { return no() != false }
+ func leftFalseNot() bool { return false != yes() }
+ func notNil() bool { return fresh() != nil }
+ func leftNil() bool { return nil == empty() }
+ func unknownEqual(value *box) bool { return unknown(value) == nil }
+ func unknownNotEqual(value *box) bool { return unknown(value) != nil }
+ func unsupported(value int) bool { return number(value) > 0 }
+ `)
+	pass := &analysis.Pass{ResultOf: map[*analysis.Analyzer]any{resultfacts.Analyzer: resultfacts.NewEngine()}}
+	provider := Select(Requirements{Results: true}).Provider(pass)
+	for _, test := range []struct {
+		name         string
+		holds, known bool
+	}{
+		{"rightTrue", true, true},
+		{"leftTrue", false, true},
+		{"rightFalseNot", false, true},
+		{"leftFalseNot", true, true},
+		{"notNil", true, true},
+		{"leftNil", true, true},
+		{"unknownEqual", false, false},
+		{"unknownNotEqual", true, false},
+		{"unsupported", false, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			returned := ssaflow.InstructionsOf[*ssa.Return](pkg.Func(test.name))[0]
+			holds, known := provider.resultCondition(returned.Results[0], nil, nil)
+			if holds != test.holds || known != test.known {
+				t.Fatalf("condition = (%v, %v), want (%v, %v)", holds, known, test.holds, test.known)
+			}
+		})
+	}
+}

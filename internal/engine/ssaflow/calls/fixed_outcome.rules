@@ -1,0 +1,48 @@
+signature total fallback outputs OutcomeAny false;
+const OutcomeAny, OutcomeTrue, OutcomeFalse, OutcomeNil, OutcomeNonNil;
+view Constant = *ssa.Const {
+  literal: Value;
+};
+view Allocation = *ssa.Alloc {
+};
+view Map = *ssa.MakeMap {
+};
+view Slice = *ssa.MakeSlice {
+};
+view Channel = *ssa.MakeChan {
+};
+view Closure = *ssa.MakeClosure {
+};
+view Box = *ssa.MakeInterface {
+};
+view Function = *ssa.Function {
+};
+match Boolean = outcomeBoolean;
+guard Nil = outcomeNil;
+guard Nilable = outcomeNilable;
+
+// Caller-fixed evidence has precedence over literal or construction evidence.
+// Preserve its exact value, including OutcomeAny, rather than strengthening it.
+rule Bound:
+  inputs _ $outcome true
+  => outputs $outcome true;
+
+rule True:
+  inputs (Constant literal:(Boolean true)) _ false
+  => outputs OutcomeTrue true;
+
+rule False:
+  inputs (Constant literal:(Boolean false)) _ false
+  => outputs OutcomeFalse true;
+
+rule Nil:
+  inputs $literal:(Constant) _ false
+  && Nil $literal
+  => outputs OutcomeNil true;
+
+// A box has a dynamic type even around a typed nil pointer. Retain the
+// original nilable-type gate for all construction forms, including functions.
+rule Constructed:
+  inputs $value:(or (Allocation) (Map) (Slice) (Channel) (Closure) (Box) (Function)) _ false
+  && Nilable $value
+  => outputs OutcomeNonNil true;

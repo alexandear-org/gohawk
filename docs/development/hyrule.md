@@ -75,7 +75,7 @@ path is removed; generator support and examples alone do not qualify.
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves and identity/loop-origin cases; storage/reaching searches, held-state updates and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
-| Result and lifecycle summary leaf recognition | Generated static result leaves, response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
+| Result and lifecycle summary leaf recognition | Generated static result leaves, fixed argument outcomes, assumed leaves, conditional return decisions and branch comparisons, plus response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
 
 ## Preserved boundaries
 
@@ -568,3 +568,21 @@ map updates, deferred-release registration, caller-ownership checks, and exclusi
 acquisition queries. Moving the whole transfer into a pure builder would violate
 that order; a separate rule dispatcher would leave the same state machine in Go.
 The substantial finite source decisions it consumes are generated instead.
+
+## Conditional result policy
+
+Result inference uses generated decisions for assumed Boolean leaves and the
+relationship between a result and its paired error. The reaching fold, exact
+forwarded-slot decoding and callee summary memo remain Go queries. A vacuous
+return does not query its result or a forwarded summary; a decided assumption
+returns before the cutoff fallback, while an undecided cutoff never invokes
+unconditional leaf inference. Witness and hold remain separate outputs.
+
+The summaries provider also uses generated comparison decisions. It queries the
+original value before structural recognition, preserves literal-left swapping,
+and queries paired-result evidence only when unconditional equality is unknown
+and the comparison literal is nil. Negation retains the Boolean payload even
+when unknown; only a known answer can prune flow. The fixed-argument recognizer
+retains caller bindings before construction evidence, including a bound
+`OutcomeAny`, and preserves typed-nil interface boxing. These policies share no
+new cache or allowance and do not broaden the proof model.

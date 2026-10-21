@@ -172,37 +172,24 @@ func comparesWithNilWithin(user ssa.Instruction, budget *proofs.SearchBudget) bo
 // a Boolean literal, nil, a value that is never nil, or a caller value that
 // known fixes. An interface holding a typed nil pointer is not nil.
 func fixedOutcome(value ssa.Value, known FixedValues) (Outcome, bool) {
-	if outcome, ok := known[value]; ok {
-		return outcome, true
-	}
-	if literal, ok := value.(*ssa.Const); ok {
-		switch {
-		case literal.Value != nil && literal.Value.Kind() == constant.Bool:
-			if constant.BoolVal(literal.Value) {
-				return OutcomeTrue, true
-			}
-			return OutcomeFalse, true
-		case literal.IsNil():
-			return OutcomeNil, true
-		}
-		return OutcomeAny, false
-	}
-	if neverNil(value) {
-		return OutcomeNonNil, true
-	}
-	return OutcomeAny, false
+	outcome, bound := known[value]
+	return decideFixedOutcome(value, outcome, bound)
 }
 
-// neverNil reports whether a value is non-nil by construction: a fresh
-// allocation, a made map, slice, channel, or closure, a function, or an
-// interface box, which has a dynamic type even around a nil pointer.
-func neverNil(value ssa.Value) bool {
-	switch value.(type) {
-	case *ssa.Alloc, *ssa.MakeMap, *ssa.MakeSlice, *ssa.MakeChan, *ssa.MakeClosure, *ssa.MakeInterface, *ssa.Function:
-		return Nilable(value.Type())
+type fixedOutcomeSignature func(ssa.Value, Outcome, bool) (Outcome, bool)
+
+var _ fixedOutcomeSignature = decideFixedOutcome
+
+func outcomeBoolean(literal constant.Value) (bool, bool) {
+	if literal == nil || literal.Kind() != constant.Bool {
+		return false, false
 	}
-	return false
+	return constant.BoolVal(literal), true
 }
+
+func outcomeNil(literal *ssa.Const) bool { return literal.IsNil() }
+
+func outcomeNilable(value ssa.Value) bool { return Nilable(value.Type()) }
 
 // capturedOutcomeWithin reports the outcome every read of a captured cell yields:
 // a cell written once before capture with a fixed value, whose captures only

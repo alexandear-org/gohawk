@@ -1,0 +1,55 @@
+signature total fallback outputs false false;
+const resultAlwaysTrue, resultAlwaysFalse, comparisonEqual, comparisonNotEqual;
+view Comparison = *ssa.BinOp {
+  left: X;
+  right: Y;
+  op: Op;
+};
+view Constant = *ssa.Const {
+};
+build truth = comparisonTruth;
+query equality = decideResultComparison;
+union Equality = (bool, bool) tag 1 {
+  Known = true {
+    equal: 0;
+  };
+  Unknown = false {
+    equal: 0;
+  };
+};
+
+rule True:
+  inputs _ _ resultAlwaysTrue _ _
+  => outputs true true;
+
+rule False:
+  inputs _ _ resultAlwaysFalse _ _
+  => outputs false true;
+
+// A literal on the left is swapped first, including when both sides are
+// constants. Do not request a summary for unsupported operators or operands.
+rule LiteralLeft:
+  inputs
+    $provider
+    (Comparison left:$literal:(Constant) right:$left op:$op:(or comparisonEqual comparisonNotEqual))
+    _
+    $block
+    $budget
+  => query equality $provider $left $literal $block $budget {
+       Known equal:$equal => outputs (truth $equal $op) true;
+       Unknown equal:$equal => outputs (truth $equal $op) false;
+     };
+
+// Preserve the equality payload even when unknown: the caller still requires
+// known before pruning a successor, and this keeps the native result contract.
+rule LiteralRight:
+  inputs
+    $provider
+    (Comparison left:$left right:$literal:(Constant) op:$op:(or comparisonEqual comparisonNotEqual))
+    _
+    $block
+    $budget
+  => query equality $provider $left $literal $block $budget {
+       Known equal:$equal => outputs (truth $equal $op) true;
+       Unknown equal:$equal => outputs (truth $equal $op) false;
+     };

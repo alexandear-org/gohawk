@@ -165,17 +165,7 @@ func (engine *Engine) assumedValue(value ssa.Value, assumed ssacall.FixedValues,
 	result, ok := ssaflow.ResolveReachingValue(
 		ssaflow.NewReachingWalk(ssaflow.TransparentChangeType).Within(budget), value,
 		func(_ ssaflow.ReachingWalk, leaf ssa.Value) (Guarantee, bool) {
-			if holds, decided := assumed.HoldsWithin(leaf, budget); decided {
-				if holds {
-					return AlwaysTrue, true
-				}
-				return AlwaysFalse, true
-			}
-			if budget.Exhausted() {
-				return Unknown, false
-			}
-			guarantee := engine.leaf(leaf, budget)
-			return guarantee, guarantee != Unknown
+			return decideAssumedLeaf(engine, leaf, assumed, budget)
 		},
 		func(guarantee Guarantee) Guarantee { return guarantee },
 	)
@@ -211,32 +201,43 @@ func (engine *Engine) resultRelation(function *ssa.Function, result, operand int
 // witnesses it rather than holding only vacuously, as a return whose error is
 // nil does for a claim about non-nil errors.
 func (engine *Engine) returnHolds(resultValue, errorValue ssa.Value, kind pairedCase, budget *proofs.SearchBudget) (bool, bool) {
-	switch engine.value(errorValue, budget) {
-	case AlwaysNil:
-		if kind.errorOutcome == ssacall.OutcomeNil {
-			return engine.value(resultValue, budget) == AlwaysNonNil, true
-		}
-		return true, false
-	case AlwaysNonNil:
-		if kind.errorOutcome == ssacall.OutcomeNonNil {
-			return engine.value(resultValue, budget) == AlwaysNil, true
-		}
-		return true, false
-	case Unknown, AlwaysTrue, AlwaysFalse:
-		// An error of unknown nilness is decided below by the result alone
-		// or by a forwarded pair.
-	}
-	// A return whose result already has the implied nilness holds the
-	// implication whatever its error: return nil, err after a failed call is
-	// nil where the error is non-nil.
-	if resultSatisfies(engine.value(resultValue, budget), kind) {
-		return true, true
-	}
+	return decideReturnHolds(engine, engine.value(errorValue, budget), resultValue, errorValue, kind, budget)
+}
+
+type (
+	returnHoldsSignature func(*Engine, Guarantee, ssa.Value, ssa.Value, pairedCase, *proofs.SearchBudget) (bool, bool)
+	assumedLeafSignature func(*Engine, ssa.Value, ssacall.FixedValues, *proofs.SearchBudget) (Guarantee, bool)
+)
+
+var (
+	_ returnHoldsSignature = decideReturnHolds
+	_ assumedLeafSignature = decideAssumedLeaf
+)
+
+func (engine *Engine) resultIs(value ssa.Value, expected Guarantee, budget *proofs.SearchBudget) bool {
+	return engine.value(value, budget) == expected
+}
+
+func (engine *Engine) consequentHolds(value ssa.Value, kind pairedCase, budget *proofs.SearchBudget) bool {
+	return resultSatisfies(engine.value(value, budget), kind)
+}
+
+// forwardedRelation asks only about the original pair's exact source slots.
+// Its single dispatch charge and the callee summary share the caller's budget.
+func (engine *Engine) forwardedRelation(resultValue, errorValue ssa.Value, kind pairedCase, budget *proofs.SearchBudget) bool {
 	callee, resultIndex, operandIndex, forwarded := forwardedPair(resultValue, errorValue, budget)
-	if !forwarded || !engine.function(callee, budget).Implies(errorOutcome(operandIndex, kind.errorOutcome), resultIndex, kind.resultOutcome) {
-		return false, false
-	}
-	return true, true
+	return forwarded && engine.function(callee, budget).Implies(errorOutcome(operandIndex, kind.errorOutcome), resultIndex, kind.resultOutcome)
+}
+
+func assumedHolds(assumed ssacall.FixedValues, value ssa.Value, budget *proofs.SearchBudget) (bool, bool) {
+	return assumed.HoldsWithin(value, budget)
+}
+
+func resultBudgetExhausted(budget *proofs.SearchBudget) bool { return budget.Exhausted() }
+
+func (engine *Engine) knownLeaf(value ssa.Value, budget *proofs.SearchBudget) (Guarantee, bool) {
+	guarantee := engine.leaf(value, budget)
+	return guarantee, guarantee != Unknown
 }
 
 // resultSatisfies reports whether a result of this guarantee meets the
@@ -268,4 +269,16 @@ func forwardedPair(resultValue, errorValue ssa.Value, budget *proofs.SearchBudge
 func isBoolean(value types.Type) bool {
 	basic, ok := value.Underlying().(*types.Basic)
 	return ok && basic.Kind() == types.Bool
+}
+
+const (
+	nilOutcome    = ssacall.OutcomeNil
+	nonNilOutcome = ssacall.OutcomeNonNil
+)
+
+func booleanGuarantee(holds bool) Guarantee {
+	if holds {
+		return AlwaysTrue
+	}
+	return AlwaysFalse
 }

@@ -158,6 +158,14 @@ summary; it performs no wrapper or referrer search. Cutoff cannot retain a case
 from an interrupted walk, even if an earlier return supplied its witness.
 The summary memo discards interrupted answers and permits a fresh query.
 
+Hyrule selects the assumed-leaf and conditional-return outcomes and the
+provider's comparison decisions. SSA walks, storage and summary memoization
+remain Go queries. Vacuous returns skip result inference, and paired nilness is
+queried only after an unknown unconditional equality against nil. Fixed argument
+outcomes prefer an exact caller binding, including a bound unknown outcome,
+before recognizing literals and non-nil construction forms. The generated
+policies retain the same query order and allowance as their callers.
+
 Unconditional result folds attach that same allowance at
 `storedResultQuery.resolve`, including wrapper, phi and revisit work before
 leaf inference. Storage recursion reuses the reaching walk and its cycle

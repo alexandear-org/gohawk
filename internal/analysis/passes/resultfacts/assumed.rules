@@ -1,0 +1,39 @@
+signature total fallback outputs Unknown false;
+const Unknown, AlwaysTrue, AlwaysFalse;
+union Assumption = (bool, bool) tag 1 {
+  Decided = true {
+    holds: 0;
+  };
+  Undecided = false {
+    holds: 0;
+  };
+};
+union Leaf = (Guarantee, bool) tag 1 {
+  Resolved = true {
+    guarantee: 0;
+  };
+  Unavailable = false {
+    guarantee: 0;
+  };
+};
+query assumption = assumedHolds;
+query exhausted = resultBudgetExhausted;
+query leaf = Engine.knownLeaf;
+build booleanGuarantee;
+
+// The reaching fold owns wrapper/phi traversal. A decided assumption wins
+// immediately; an undecided cutoff must stop before unconditional inference.
+rule AssumedLeaf:
+  inputs $engine $value $assumed $budget
+  => query assumption $assumed $value $budget {
+       Decided holds:$holds => outputs (booleanGuarantee $holds) true;
+       Undecided => do {
+         false <- query exhausted $budget
+           else outputs Unknown false;
+         Resolved guarantee:$guarantee <- query leaf $engine $value $budget
+           else {
+             Unavailable => outputs Unknown false;
+           };
+         pure outputs $guarantee true;
+       };
+     };

@@ -1,0 +1,43 @@
+signature total fallback outputs false false;
+const AlwaysNil, AlwaysNonNil;
+const nilOutcome, nonNilOutcome;
+record Case = pairedCase {
+  errorOutcome;
+  resultOutcome;
+};
+query resultIs = Engine.resultIs;
+query consequent = Engine.consequentHolds;
+query forwarded = Engine.forwardedRelation;
+
+rule NilError:
+  inputs $engine AlwaysNil $result _ (Case errorOutcome:nilOutcome) $budget
+  => query resultIs $engine $result AlwaysNonNil $budget {
+       true => outputs true true;
+       false => outputs false true;
+     };
+
+rule VacuousNilError:
+  inputs _ AlwaysNil _ _ _ _
+  => outputs true false;
+
+rule NonNilError:
+  inputs $engine AlwaysNonNil $result _ (Case errorOutcome:nonNilOutcome) $budget
+  => query resultIs $engine $result AlwaysNil $budget {
+       true => outputs true true;
+       false => outputs false true;
+     };
+
+rule VacuousNonNilError:
+  inputs _ AlwaysNonNil _ _ _ _
+  => outputs true false;
+
+// Unknown error nilness may still satisfy the consequent directly. Otherwise
+// only two unchanged slots of one call can inherit the callee's relation.
+// A vacuous return above never requests either of these queries.
+rule OtherError:
+  inputs $engine _ $result $error $kind $budget
+  => query consequent $engine $result $kind $budget
+           select true => outputs true true
+     <|> query forwarded $engine $result $error $kind $budget
+           select true => outputs true true
+     <|> pure outputs false false;
