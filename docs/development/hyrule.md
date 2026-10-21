@@ -733,4 +733,13 @@ original reason payload. In particular, a non-consuming builtin remains
 `DynamicCallee/false`, and a readable or summarized static callee can remain
 `UnsummarizedCallee/false`. Those values describe an inspected alternative, not
 numeric action codes. Sends and select arms share one handoff/payload policy;
-arm iteration, closure evidence, storage caches and recursive searches stay in Go.
+arm iteration, storage caches and recursive searches stay in Go.
+
+Closure decisions use the same domain and explicit query boundary. Deferred-cell
+cleanup precedes guarded-body evidence, which retains its separate 1,000-step
+allowance. Aggregate-owner evidence precedes the optional capture search; a
+carried argument skips capture, while absent capture prevents even a launched
+literal from becoming an opacity label. Started literals stop before body
+queries. For local literals, unreadable-callee evidence precedes retention;
+negative retention still returns `CapturedByRetainingLiteral/false`. The existing
+capture, storage and lifecycle searches remain authoritative Go queries.

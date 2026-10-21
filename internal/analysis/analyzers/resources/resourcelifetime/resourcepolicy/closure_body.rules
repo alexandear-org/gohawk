@@ -1,0 +1,23 @@
+signature total fallback outputs None false;
+query guarded = ClosureQueries.Guarded;
+query owner = ClosureQueries.Owner;
+query capture = ClosureCapture;
+query unknown = Evidence.Unknown;
+
+// A captured aggregate may be populated after closure creation. Its fields are
+// observed when called; unresolved cleanup cannot establish that it leaks.
+// https://github.com/Autumn-27/ARTEX/blob/bf7f414477832b77d2152539c0723dc691086522/traffic/traffic.go#L1129-L1176
+rule Body:
+  inputs $queries $instruction $closure $carried
+  => do {
+       $guarded <- query guarded $queries $instruction $closure;
+       false <- query unknown $guarded
+         else outputs $guarded.Reason true;
+       Disproven <- query owner $queries $closure
+         else {
+           Proven reason:$reason => outputs $reason true;
+           Unknown reason:$reason => outputs $reason true;
+         };
+       $answer <- query capture $queries $instruction $closure $carried;
+       pure $answer;
+     };

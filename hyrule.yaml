@@ -805,3 +805,31 @@ targets:
     function: StoreConsumption
     rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store_gen.go
+  - name: resource_opacity_closure
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
+    signature: closureSignature
+    function: Closure
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_gen.go
+  - name: resource_opacity_closure_body
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
+    signature: closureSignature
+    function: ClosureBody
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body_gen.go
+  - name: resource_opacity_closure_capture
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
+    signature: closureSignature
+    function: ClosureCapture
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture_gen.go
+  - name: resource_opacity_closure_finish
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
+    signature: closureFinishSignature
+    function: ClosureFinish
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish_gen.go

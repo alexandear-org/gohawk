@@ -1,0 +1,26 @@
+signature total fallback outputs None false;
+query deferred = ClosureQueries.Deferred;
+query body = ClosureBody;
+
+// A deferred literal observes the cell at return, which can differ from its
+// registration-time value. Reuse prior-registration uncertainty before treating
+// an unresolved release as a transparent call.
+// https://github.com/anton48/vk-turn-proxy-ios/blob/001caf2ae24ecd07b021d7ca7b14a98a006bff65/third_party/speedtest-go/speedtest/server.go#L262-L285
+rule Deferred:
+  inputs $queries $instruction:(Defer) $closure $carried
+  => do {
+       Disproven <- query deferred $queries $instruction
+         else {
+           Proven reason:$reason => outputs $reason true;
+           Unknown reason:$reason => outputs $reason true;
+         };
+       $answer <- query body $queries $instruction $closure $carried;
+       pure $answer;
+     };
+
+rule Other:
+  inputs $queries $instruction $closure $carried
+  => do {
+       $answer <- query body $queries $instruction $closure $carried;
+       pure $answer;
+     };

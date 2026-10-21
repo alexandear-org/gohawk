@@ -4,6 +4,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -20,59 +21,33 @@ import (
 // These are classifier inputs to the ordinary resource flow, not another flow.
 
 func (analysis *resourceAnalysis) opaqueClosureCall(instruction ssa.Instruction, closure *ssa.MakeClosure, carried bool) (resourceLifetimeReason, bool) {
-	// A deferred literal observes the cell at return, which can differ from
-	// its registration-time value. Reuse the prior-registration uncertainty
-	// boundary rather than treating an unresolved release as a transparent call.
-	// https://github.com/anton48/vk-turn-proxy-ios/blob/001caf2ae24ecd07b021d7ca7b14a98a006bff65/third_party/speedtest-go/speedtest/server.go#L262-L285
-	if deferred, ok := instruction.(*ssa.Defer); ok {
-		proof := analysis.proveCapturedCellCleanupWithin(deferred, analysis.budget(proofs.SummaryBudget))
-		if proof.State != proofs.EvidenceDisproven {
-			return proof.Reason, true
-		}
-	}
-	if proof := analysis.proveGuardedCapturedBodyWithin(instruction, closure, analysis.budget(1000)); proof.State == proofs.EvidenceUnknown {
-		return proof.Reason, true
-	}
-	// A captured aggregate can be populated after closure creation. The
-	// closure observes its fields when called, so an unresolved cleanup of
-	// that owner is unknown rather than proof that the acquisition leaks.
-	// https://github.com/Autumn-27/ARTEX/blob/bf7f414477832b77d2152539c0723dc691086522/traffic/traffic.go#L1129-L1176
-	if owner := analysis.proveCapturedAggregateOwnerWithin(closure, analysis.budget(proofs.SummaryBudget)); owner.State != proofs.EvidenceDisproven {
-		return owner.Reason, true
-	}
-	if !carried {
-		capture := analysis.proveClosureCarryWithin(closure, analysis.budget(proofs.SummaryBudget))
-		if capture.State == proofs.EvidenceUnknown {
-			return capture.Reason, true
-		}
-		if !capture.Proven() {
-			return resourceReasonNone, false
-		}
-	}
-	// A started literal runs on another goroutine, so a release inside it
-	// cannot be ordered against this function's returns and the resource
-	// is beyond what this flow can judge.
-	if _, started := instruction.(*ssa.Go); started {
-		return resourceReasonCapturedByStartedLiteral, true
-	}
-	// A called or deferred literal runs in this frame, so its body is as
-	// readable as a named callee's. A release inside it was already proved
-	// before this point, so what is left to ask is whether it keeps the
-	// resource: if it does the obligation moved, and if it does not the
-	// literal is transparent and this function still owns the resource.
-	//
-	// That holds only for a body this pass can judge. A capture is a cell
-	// the body loads first, so the argument at a call inside the literal is
-	// the load rather than the acquired value, and a summary matched on
-	// exact identity does not recognize it. block/spirit closes rows
-	// through a helper in another package from inside a deferred literal,
-	// and the release went uncredited while the literal was called
-	// transparent:
-	// https://github.com/block/spirit/blob/c554eae/pkg/checksum/single.go#L493-L503
-	if analysis.evidence.ClosureHandsValueToUnreadableCallee(closure, analysis.resource) {
-		return resourceReasonCapturedByLiteralCallingUnreadableCallee, true
-	}
-	return resourceReasonCapturedByRetainingLiteral, analysis.evidence.ClosureRetainsValue(closure, analysis.resource)
+	return resourcepolicy.Closure(opacityQueries{analysis}, instruction, closure, carried)
+}
+
+// Closure queries keep observation-time storage and the original per-query
+// limits. The rules order these proofs; their recursive searches remain here.
+func (q opacityQueries) Deferred(deferred *ssa.Defer) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveCapturedCellCleanupWithin(deferred, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Guarded(instruction ssa.Instruction, closure *ssa.MakeClosure) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveGuardedCapturedBodyWithin(instruction, closure, q.analysis.budget(1000)))
+}
+
+func (q opacityQueries) Owner(closure *ssa.MakeClosure) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveCapturedAggregateOwnerWithin(closure, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Capture(closure *ssa.MakeClosure) resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(q.analysis.proveClosureCarryWithin(closure, q.analysis.budget(proofs.SummaryBudget)))
+}
+
+func (q opacityQueries) Unreadable(closure *ssa.MakeClosure) bool {
+	return q.analysis.evidence.ClosureHandsValueToUnreadableCallee(closure, q.analysis.resource)
+}
+
+func (q opacityQueries) Retains(closure *ssa.MakeClosure) bool {
+	return q.analysis.evidence.ClosureRetainsValue(closure, q.analysis.resource)
 }
 
 // A capture can refer to a discovered aggregate owner even when the resource

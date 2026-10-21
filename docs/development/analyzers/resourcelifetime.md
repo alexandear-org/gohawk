@@ -24,8 +24,15 @@ classification before another query can reinterpret it as absence.
 
 The send policy is shared by sends and select arms. Select iteration and early
 exit remain in Go. Storage resolves its owner once, preserves uncertainty before
-collection-owner inspection, then asks about foreign wrappers. Closure evidence
-retains its existing Go proof. False answers keep their inspected reason payloads;
+collection-owner inspection, then asks about foreign wrappers.
+
+Closure decisions also use these rules: deferred-cell evidence precedes the
+1,000-step guarded-body query, aggregate ownership precedes capture, and only an
+otherwise uncarried closure needs capture evidence. Started literals stop before
+unreadable-callee or retention queries. The capture/storage searches remain in
+Go with their original allowances.
+
+False answers keep their inspected reason payloads;
 trace codes and reason ordinals remain unchanged. Query-order tests cover cold
 cutoffs, callback/exposure order and conditional publication; the existing SSA
 fixtures and label tests cover actual ownership and cleanup behavior.
