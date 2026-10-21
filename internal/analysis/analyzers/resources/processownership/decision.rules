@@ -24,12 +24,12 @@ union Entry = processEntryEvidence tag owned {
 };
 
 rule AmbiguousSettlement:
-  (Request witness:nil unknown:true)
-  => (Decision state:decisionUnknown reason:reasonAmbiguousWaitOwnership);
+  Request witness:nil unknown:true
+  => Decision state:decisionUnknown reason:reasonAmbiguousWaitOwnership;
 
 rule Settled:
-  (Request witness:nil)
-  => (Decision state:decisionDisproven reason:reasonWaitOwnershipProven);
+  Request witness:nil
+  => Decision state:decisionDisproven reason:reasonWaitOwnershipProven;
 
 // Fire-and-forget alone cannot distinguish an intentional browser or daemon
 // launch from a defect. Retiring the detached audit must not broaden missing-wait
@@ -41,13 +41,13 @@ rule Settled:
 // https://github.com/coder/acp-go-sdk/blob/0845a3bb9eddda5bfc22a94dd3598c90cb842451/example/agent/main.go#L401-L423
 rule UncoveredReturn:
   $request
-  => query $use = (commandUse $request)
+  => query $use = commandUse $request
      decide $use {
-       (Uncertain) => (Decision state:decisionUnknown reason:reasonCommandUseCutoff);
-       (Unused) => (Decision state:decisionUnknown reason:reasonUnusedCommandOwnershipUnknown);
-       (Used) => query $entry = (entryLifetime $request)
+       Uncertain => Decision state:decisionUnknown reason:reasonCommandUseCutoff;
+       Unused => Decision state:decisionUnknown reason:reasonUnusedCommandOwnershipUnknown;
+       Used => query $entry = entryLifetime $request
        decide $entry {
-         (ProgramLifetime) => (Decision state:decisionUnknown reason:reasonProgramLifetimeOwnershipUnknown);
-         (OrdinaryLifetime) => (Decision state:decisionProven reason:reasonUnownedReturn);
+         ProgramLifetime => Decision state:decisionUnknown reason:reasonProgramLifetimeOwnershipUnknown;
+         OrdinaryLifetime => Decision state:decisionProven reason:reasonUnownedReturn;
        };
      };

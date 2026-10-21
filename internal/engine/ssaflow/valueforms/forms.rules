@@ -3,33 +3,33 @@ guard allows;
 const ChangeInterface, ChangeType, Convert, MakeInterface, TypeAssert;
 
 rule ChangedInterface:
-  (changeInterface $value)
-  && (allows ChangeInterface)
+  changeInterface $value
+  && allows ChangeInterface
   => $value;
 
 rule ChangedType:
-  (changeType $value)
-  && (allows ChangeType)
+  changeType $value
+  && allows ChangeType
   => $value;
 
 rule Converted:
-  (convert $value)
-  && (allows Convert)
+  convert $value
+  && allows Convert
   => $value;
 
 rule Boxed:
-  (makeInterface $value)
-  && (allows MakeInterface)
+  makeInterface $value
+  && allows MakeInterface
   => $value;
 
 // A comma-ok assertion produces a tuple. Only extraction of element zero
 // denotes the asserted object; the success flag is different evidence.
 rule DirectAssertion:
-  (assertion $value false)
-  && (allows TypeAssert)
+  assertion $value false
+  && allows TypeAssert
   => $value;
 
 rule ExtractedAssertion:
-  (extract (assertion $value _) 0)
-  && (allows TypeAssert)
+  extract (assertion $value _) 0
+  && allows TypeAssert
   => $value;
