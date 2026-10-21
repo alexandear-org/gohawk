@@ -48,6 +48,29 @@ disproven result. Opaque consumption, HTTP acquisition uncertainty, possible
 pre-acquisition deferred release and unavailable instruction evidence remain
 unknown. The reporter does not reconstruct this distinction from reason codes.
 
+The final evaluation pipeline also runs through `resourcepolicy`. Its initial
+query context contains only candidate inputs. The memory-writer exclusion runs
+before `Begin` constructs tracing and the shared pool. Acquisition queries return
+typed correlation and initialization contexts, so an incomplete correlation
+cannot select a resource phi or initialize owner discovery. Completed negative
+paired-error evidence retains its original value payload through assertion,
+correlation and flow.
+
+A non-reportable flow result returns intact before final exclusions. For a
+reportable result, database-parent cleanup precedes pool cutoff, and positive
+process-exit evidence precedes its child cutoff. Unknown answers discard the
+witness; an uncovered return retains the exact witness when no exclusion applies.
+Preparation is also ordered by rules: possible deferred release stops before
+owner discovery; incomplete owners stop before collection/guarded-defer setup;
+prior-cleanup trace observations commit at their reached query. The policy tests
+pin these phase boundaries and the actual SSA fixtures retain
+optional-acquisition, cleanup, budget and final diagnostic controls.
+
+`flow.go` retains phase construction beside the path walk because both own one
+candidate's allowance, observation points and private correlation representation.
+The rules own query order and result selection; Go owns setup, caches and the
+work list. This keeps the existing larger flow file within one evidence model.
+
 The existing memory-writer check still precedes candidate evidence and all flow
 queries. It now yields a final accepted policy decision instead of bypassing
 that boundary. Its reason explicitly excludes external-resource ownership;

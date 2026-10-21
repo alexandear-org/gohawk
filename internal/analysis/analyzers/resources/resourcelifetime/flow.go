@@ -4,6 +4,7 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy"
 	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -35,88 +36,8 @@ func evaluateResourceFlow(
 	resource ssa.Value,
 	contract resourceContract,
 ) resourceLifetimePolicyResult {
-	// This is a policy exclusion, not proof that a compressor was finalized.
-	// Keep it before candidate evidence and all flow queries, as in the entry
-	// point's former gate, so moving the decision does not add analysis work.
-	if memoryWriterExempt(call, contract) {
-		return acceptedResourceLifetime(resourceReasonMemoryWriter)
-	}
-	evidence.ForCandidate(call.Pos())
-	probe := analysisTrace.For(pass, "resourcelifetime", string(check.ResourceRelease), call.Pos())
-	pool := proofs.NewSearchBudget(resourcePoolBudget).Observed(probe.Observer())
-	// The paired error restricts the edges on which acquisition creates an
-	// obligation. A shortened lookup must stop here, before missing evidence
-	// can activate ownership on a failed acquisition edge.
-	errorResult := proveAcquisitionErrorResultWithin(call, pool.Within(releaseSearchBudget))
-	if errorResult.proof.State == proofs.EvidenceUnknown {
-		return unknownResourceLifetime(errorResult.proof.Reason)
-	}
-	errorValue := errorResult.value
-	if reason := httpAcquisitionBoundary(pass, call, pool.Within(releaseSearchBudget)); reason != resourceReasonNone {
-		return unknownResourceLifetime(reason)
-	}
-	canceled := proveAcquisitionContextCanceledWithin(call, pool.Within(releaseSearchBudget))
-	if canceled.State == proofs.EvidenceUnknown {
-		return unknownResourceLifetime(canceled.Reason)
-	}
-	if canceled.Proven() {
-		return acceptedResourceLifetime(resourceReasonCanceledAcquisition)
-	}
-	assertedError := proveAcquisitionErrorWithin(call, resource, errorValue, contract.packagePath == "net/http", pool.Within(releaseSearchBudget))
-	if assertedError.State == proofs.EvidenceUnknown {
-		return unknownResourceLifetime(assertedError.Reason)
-	}
-	if assertedError.Proven() {
-		return acceptedResourceLifetime(resourceReasonReleaseProven)
-	}
-	// Optional acquisition correlates the resource and its paired error on
-	// the same diamond edge. Only a complete correlation may replace the
-	// resource input used by owner discovery and the subsequent path proof.
-	optionalAcquisition := proveOptionalAcquisitionWithin(call, resource, errorValue, pool.Within(releaseSearchBudget))
-	if optionalAcquisition.proof.State == proofs.EvidenceUnknown {
-		return unknownResourceLifetime(optionalAcquisition.proof.Reason)
-	}
-	if optionalAcquisition.Proven() {
-		resource = optionalAcquisition.resourcePhi
-	}
-	analysis := &resourceAnalysis{
-		acquisition: call,
-		summaries:   resourceSummaries.Provider(pass),
-		pass:        pass, evidence: evidence, function: call.Parent(), resource: resource, candidate: call.Pos(),
-		contract: contract, optional: optionalAcquisition, actions: map[ssa.Instruction]resourceAction{},
-		probe: probe, pool: pool,
-	}
-	setup := analysis.prepareResourceFlow()
-	if setup.State == proofs.EvidenceUnknown {
-		return unknownResourceLifetime(setup.Reason)
-	}
-
-	flow := analysis.proveResourceFlow(errorValue)
-	if flow.state != proofs.EvidenceProven {
-		return flow
-	}
-	// DB-prepared driver statements belong to pooled connections, whose
-	// finalClose closes their open statements. This does not settle Rows,
-	// Tx, or Conn obligations, nor claim DB.Close is identical to Stmt.Close.
-	// https://go.dev/src/database/sql/sql.go (driverConn.finalClose, DB.prepareDC)
-	// https://github.com/mariadb-operator/mariadb-operator/blob/e8ece7a8076954674e10e0381571bd80278ac35f/licenses/go-licenses/github.com/go-sql-driver/mysql/driver_test.go#L2809
-	if sqlDatabaseCall(call.Common(), "Prepare", "PrepareContext") && lifecycle.ProveEnclosingCompletion(lifecycle.EnclosingCompletionRequest{
-		Function: call.Parent(), Value: ssaflow.CallReceiver(call.Common()), Methods: []string{"Close"},
-		Budget: analysis.budget(10000),
-	}).Proven() {
-		return acceptedResourceLifetime(resourceReasonParentCleanup)
-	}
-	if analysis.pool.Exhausted() {
-		return unknownResourceLifetime(resourceReasonBudgetExhausted)
-	}
-	entryBudget := analysis.budget(releaseSearchBudget)
-	if processExitReclaims(call, contract, entryBudget) {
-		return acceptedResourceLifetime(resourceReasonProcessExitReclaims)
-	}
-	if entryBudget.Exhausted() {
-		return unknownResourceLifetime(resourceReasonBudgetExhausted)
-	}
-	return flow
+	decision := resourcepolicy.Evaluate(evaluationQueries{pass: pass, evidence: evidence, call: call, resource: resource, contract: contract})
+	return resourceLifetimePolicyResult{state: decision.State, reason: decision.Reason, leak: decision.Leak}
 }
 
 // emitAction traces a settled or unknown label. An instruction labelled none
@@ -221,33 +142,7 @@ func processExitReclaims(call *ssa.Call, contract resourceContract, budget *proo
 // before the path proof starts. A possible prior release stops at uncertainty;
 // partial discovery cannot supply classifiers with an authoritative census.
 func (analysis *resourceAnalysis) prepareResourceFlow() resourceProof {
-	// This query uses anywhere coverage, not every-return settlement. A
-	// dominating defer may release a later acquisition through captured storage.
-	deferred := analysis.proveDeferredBeforeAcquisitionWithin(analysis.acquisition, analysis.budget(releaseSearchBudget))
-	if deferred.State == proofs.EvidenceUnknown {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: deferred.Reason}
-	}
-	if deferred.Proven() {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonPriorDeferMayRelease}
-	}
-	owners := analysis.discoverResourceOwnersWithin(analysis.budget(releaseSearchBudget))
-	if !owners.Proven() {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonBudgetExhausted}
-	}
-	analysis.collection = analysis.localCollection()
-	guarded := analysis.discoverResultGuardedDefersWithin(analysis.budget(releaseSearchBudget))
-	if guarded.State == proofs.EvidenceUnknown {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: guarded.Reason}
-	}
-	prior := analysis.provePriorCleanupWithin(analysis.acquisition, analysis.budget(releaseSearchBudget))
-	if prior.State == proofs.EvidenceUnknown {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: prior.Reason}
-	}
-	if prior.Proven() {
-		analysis.emitAction(prior.Instruction, actionUnknown, prior.Reason)
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonOpaqueConsumption}
-	}
-	return resourceProof{State: proofs.EvidenceProven, Reason: resourceReasonNone}
+	return resourceProof(resourcepolicy.PrepareFlow(preparationQueries{analysis}))
 }
 
 // The resource walk keeps activation, cleanup and uncertainty on each path.
@@ -483,4 +378,123 @@ func resourceSuccessorStates(
 
 func unavailableResourceSuccessors() resourceSuccessorsProof {
 	return resourceSuccessorsProof{resourceProof: resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonBudgetExhausted}}
+}
+
+// Evaluation contexts carry the reached phase's inputs explicitly. Begin is the
+// only constructor of candidate tracing and allowances; initialization retains
+// the correlation packet without exposing its search representation to policy.
+type evaluationQueries struct {
+	pass     *analysis.Pass
+	evidence *lifecyclefacts.LifecycleEvidence
+	call     *ssa.Call
+	resource ssa.Value
+	contract resourceContract
+}
+
+func (q evaluationQueries) MemoryWriter() bool { return memoryWriterExempt(q.call, q.contract) }
+
+func (q evaluationQueries) Begin() resourcepolicy.AcquisitionQueries {
+	q.evidence.ForCandidate(q.call.Pos())
+	probe := analysisTrace.For(q.pass, "resourcelifetime", string(check.ResourceRelease), q.call.Pos())
+	pool := proofs.NewSearchBudget(resourcePoolBudget).Observed(probe.Observer())
+	return acquisitionQueries{evaluationQueries: q, probe: probe, pool: pool}
+}
+
+type acquisitionQueries struct {
+	evaluationQueries
+	probe analysisTrace.Probe
+	pool  *proofs.SearchBudget
+}
+
+func (q acquisitionQueries) Error() resourcepolicy.PairedError {
+	result := proveAcquisitionErrorResultWithin(q.call, q.pool.Within(releaseSearchBudget))
+	return resourcepolicy.PairedError{State: result.proof.State, Reason: result.proof.Reason, Value: result.value}
+}
+
+func (q acquisitionQueries) Boundary() resourcepolicy.Reason {
+	return httpAcquisitionBoundary(q.pass, q.call, q.pool.Within(releaseSearchBudget))
+}
+
+func (q acquisitionQueries) Canceled() resourcepolicy.Evidence {
+	return resourcepolicy.Evidence(proveAcquisitionContextCanceledWithin(q.call, q.pool.Within(releaseSearchBudget)))
+}
+
+func (q acquisitionQueries) Asserted(errorValue ssa.Value) resourcepolicy.Evidence {
+	proof := proveAcquisitionErrorWithin(q.call, q.resource, errorValue, q.contract.packagePath == "net/http", q.pool.Within(releaseSearchBudget))
+	return resourcepolicy.Evidence(proof)
+}
+
+func (q acquisitionQueries) Optional(errorValue ssa.Value) resourcepolicy.Correlation {
+	optional := proveOptionalAcquisitionWithin(q.call, q.resource, errorValue, q.pool.Within(releaseSearchBudget))
+	return resourcepolicy.Correlation{
+		State: optional.proof.State, Reason: optional.proof.Reason,
+		Initialize: initializationQueries{acquisitionQueries: q, optional: optional},
+	}
+}
+
+type initializationQueries struct {
+	acquisitionQueries
+	optional optionalAcquisitionProof
+}
+
+func (q initializationQueries) Prepare() resourcepolicy.Prepared {
+	resource := q.resource
+	if q.optional.Proven() {
+		resource = q.optional.resourcePhi
+	}
+	a := &resourceAnalysis{
+		acquisition: q.call, summaries: resourceSummaries.Provider(q.pass), pass: q.pass, evidence: q.evidence,
+		function: q.call.Parent(), resource: resource, candidate: q.call.Pos(), contract: q.contract, optional: q.optional,
+		actions: map[ssa.Instruction]resourceAction{}, probe: q.probe, pool: q.pool,
+	}
+	setup := a.prepareResourceFlow()
+	return resourcepolicy.Prepared{State: setup.State, Reason: setup.Reason, Queries: evaluationFlow{analysis: a}}
+}
+
+type evaluationFlow struct{ analysis *resourceAnalysis }
+
+func (q evaluationFlow) Flow(errorValue ssa.Value) resourcepolicy.Decision {
+	result := q.analysis.proveResourceFlow(errorValue)
+	return resourcepolicy.Decision{State: result.state, Reason: result.reason, Leak: result.leak}
+}
+
+func (q evaluationFlow) DatabaseCleanup() bool {
+	a := q.analysis
+	return sqlDatabaseCall(a.acquisition.Common(), "Prepare", "PrepareContext") && lifecycle.ProveEnclosingCompletion(lifecycle.EnclosingCompletionRequest{
+		Function: a.acquisition.Parent(), Value: ssaflow.CallReceiver(a.acquisition.Common()), Methods: []string{"Close"}, Budget: a.budget(10000),
+	}).Proven()
+}
+func (q evaluationFlow) PoolExhausted() bool { return q.analysis.pool.Exhausted() }
+func (q evaluationFlow) Exit() resourcepolicy.ExitEvidence {
+	budget := q.analysis.budget(releaseSearchBudget)
+	reclaimed := processExitReclaims(q.analysis.acquisition, q.analysis.contract, budget)
+	return resourcepolicy.ExitEvidence{Reclaimed: reclaimed, Exhausted: budget.Exhausted()}
+}
+
+// Preparation queries own the classifier input mutations and immediate evidence
+// observations. The policy selects their order and conservative stop points.
+type preparationQueries struct{ analysis *resourceAnalysis }
+
+func (q preparationQueries) Deferred() resourcepolicy.Evidence {
+	a := q.analysis
+	return resourcepolicy.Evidence(a.proveDeferredBeforeAcquisitionWithin(a.acquisition, a.budget(releaseSearchBudget)))
+}
+
+func (q preparationQueries) Owners() bool {
+	return q.analysis.discoverResourceOwnersWithin(q.analysis.budget(releaseSearchBudget)).Proven()
+}
+
+func (q preparationQueries) Guarded() resourcepolicy.Evidence {
+	a := q.analysis
+	a.collection = a.localCollection()
+	return resourcepolicy.Evidence(a.discoverResultGuardedDefersWithin(a.budget(releaseSearchBudget)))
+}
+
+func (q preparationQueries) Prior() resourcepolicy.Evidence {
+	a := q.analysis
+	prior := a.provePriorCleanupWithin(a.acquisition, a.budget(releaseSearchBudget))
+	if prior.Proven() {
+		a.emitAction(prior.Instruction, actionUnknown, prior.Reason)
+	}
+	return resourcepolicy.Evidence(prior.resourceProof)
 }

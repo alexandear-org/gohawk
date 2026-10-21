@@ -743,3 +743,25 @@ literal from becoming an opacity label. Started literals stop before body
 queries. For local literals, unreadable-callee evidence precedes retention;
 negative retention still returns `CapturedByRetainingLiteral/false`. The existing
 capture, storage and lifecycle searches remain authoritative Go queries.
+
+## Resource final evaluation
+
+`resourcepolicy` sequences the memory-writer exclusion, acquisition evidence,
+correlation, initialization, flow and final exclusions. `Begin` is reached only
+after the exclusion fails, so it alone binds candidate tracing and the allowance.
+Queries return explicit phase contexts; no later query relies on a field filled
+by an earlier query. Go retains correlation storage and resource-phi binding at
+initialization, which cannot run until correlation availability is established.
+
+The paired error's exact value survives a completed negative lookup. A
+non-reportable flow returns intact without querying exclusions. A reportable flow
+queries database cleanup before pool availability, then evaluates one process-exit
+child whose positive result precedes its cutoff. Only an available, unexcluded
+flow retains its original diagnostic witness. The graph walk, owner discovery,
+classifier caches and effect application remain in Go.
+
+Preparation sequences dominating-defer evidence, complete owner discovery,
+collection/guarded-defer initialization and prior cleanup before the path walk.
+A positive prior-cleanup observation commits immediately in its Go query; the
+rules then return uncertainty. Partial owner discovery supplies no classifier
+inputs, and guarded-defer uncertainty stops before prior-cleanup evidence.

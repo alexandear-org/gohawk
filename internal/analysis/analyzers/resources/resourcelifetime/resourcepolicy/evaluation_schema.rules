@@ -1,0 +1,28 @@
+union Decision = Decision tag State {
+  Accepted = evidenceDisproven {
+    reason: Reason;
+  };
+  Unavailable = evidenceUnknown {
+    reason: Reason;
+  };
+  Reported = evidenceProven {
+    reason: Reason;
+    leak: Leak;
+  };
+};
+union Error = PairedError tag State {
+  Paired = evidenceProven;
+  Absent = evidenceDisproven;
+  ErrorUnavailable = evidenceUnknown;
+};
+union Correlation = Correlation tag State {
+  Correlated = evidenceProven;
+  Uncorrelated = evidenceDisproven;
+  CorrelationUnavailable = evidenceUnknown;
+};
+union Prepared = Prepared tag State {
+  Ready = evidenceProven;
+  Declined = evidenceDisproven;
+  PreparationUnavailable = evidenceUnknown;
+};
+const EvidenceUnavailable;

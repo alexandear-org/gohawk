@@ -1,0 +1,34 @@
+signature total fallback outputs (Unavailable reason:EvidenceUnavailable);
+query flow = FlowQueries.Flow;
+query reportable = Decision.Reportable;
+query database = FlowQueries.DatabaseCleanup;
+query poolExhausted = FlowQueries.PoolExhausted;
+query exit = FlowQueries.Exit;
+query reclaimed = exitReclaimed;
+query interrupted = exitInterrupted;
+const ParentCleanup, BudgetExhausted, ProcessExitReclaims;
+
+// DB-prepared driver statements belong to pooled connections, whose finalClose
+// closes their open statements. This does not settle Rows, Tx, or Conn, nor
+// claim that DB.Close is identical to Stmt.Close.
+// https://go.dev/src/database/sql/sql.go (driverConn.finalClose, DB.prepareDC)
+// https://github.com/mariadb-operator/mariadb-operator/blob/e8ece7a8076954674e10e0381571bd80278ac35f/licenses/go-licenses/github.com/go-sql-driver/mysql/driver_test.go#L2809
+// Preserve a non-reportable answer intact. Only a reportable flow reaches the
+// exclusions, and an available witness survives when none of them applies.
+rule Final:
+  inputs $queries $error
+  => do {
+       $flow <- query flow $queries $error;
+       true <- query reportable $flow
+         else outputs $flow;
+       false <- query database $queries
+         else outputs (Accepted reason:ParentCleanup);
+       false <- query poolExhausted $queries
+         else outputs (Unavailable reason:BudgetExhausted);
+       $exit <- query exit $queries;
+       false <- query reclaimed $exit
+         else outputs (Accepted reason:ProcessExitReclaims);
+       false <- query interrupted $exit
+         else outputs (Unavailable reason:BudgetExhausted);
+       pure outputs $flow;
+     };

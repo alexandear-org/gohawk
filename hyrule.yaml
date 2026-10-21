@@ -833,3 +833,31 @@ targets:
     function: ClosureFinish
     rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish_gen.go
+  - name: resource_evaluation_policy
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
+    signature: evaluationSignature
+    function: Evaluate
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_gen.go
+  - name: resource_acquisition_policy
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
+    signature: acquisitionSignature
+    function: Acquire
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition_gen.go
+  - name: resource_final_flow_policy
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
+    signature: finalFlowSignature
+    function: Finalize
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow_gen.go
+  - name: resource_preparation_policy
+    package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
+    signature: preparationSignature
+    function: PrepareFlow
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation_gen.go
