@@ -1047,6 +1047,33 @@ mutable-cell and caller-fixed named-result policies. Summary guard discovery's
 default `ComparesWithNil` remains a separate setup query.
 
 
+### Local completion mapping policy
+
+`lifecycle/completionmapping` owns the ordered capture, argument, deferred-cell
+and receiver rules. The consuming completion search supplies callback and
+containment evidence, direct-store/deferred-value queries, and availability
+effects. Mapping results share one representation for exact values, strict
+projections, owners, and callbacks; the surrounding search still owns binding
+iteration, recursion, observation points, path translation and memo publication.
+
+Exact capture and argument misses retain their supplied-value payload alongside
+false availability. General argument mapping first asks storage identity; a
+possible alias then marks the request incomplete without trying containment.
+Strict-projection and stored-path cutoffs additionally invalidate the enclosing
+memo, including a child cutoff while its parent allowance remains available.
+An admitted containment mapping retains its stored path even when that path
+proof is unavailable; only its explicit budget-exhaustion result aborts mapping.
+
+Deferred capture keeps the original binding-match result separately from the
+later alias test, and reads directly written captured cells when defers run.
+A captured-cell owner match commits to its storage result: failure cannot try
+aggregate containment instead. Receiver rules require the exact selected field
+path; possible derivation after an unavailable path supplies uncertainty only.
+These are policy moves with unchanged evidence order and charges. The existing
+completion mapping/binding and storage tests exercise their SSA and cutoff
+boundaries; the child package's public tests pin failure payloads and committed
+capture alternatives.
+
 ### Concurrency spill paths and canonical-load availability
 
 Concurrency field paths retain the read time of a spilled parameter. A unique

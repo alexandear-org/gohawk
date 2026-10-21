@@ -148,8 +148,8 @@ func (search *completionSearch) conditionalReturn(
 	nested := *search
 	nested.condition = ssacall.CallCondition{Result: index, Outcome: condition.Outcome}
 	for _, local := range locals {
-		if local.kind == localExact {
-			if nested.completes(call, local.local).proven {
+		if local.Kind == localExact {
+			if nested.completes(call, local.Local).proven {
 				return true, true
 			}
 		}

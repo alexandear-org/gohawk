@@ -1,0 +1,55 @@
+signature total fallback outputs (emptyLocal) false;
+
+rule Exact:
+  inputs $context:(Request exact:true) $local $argument $target _
+  => query same $context $argument $target {
+       true => outputs (Exact local:$local supplied:$argument path:nil) true;
+       false => outputs (Exact local:$local supplied:$argument path:nil) (identical $argument $target);
+     };
+
+// A possible alias cannot fall through to aggregate containment and become an
+// exact mapping. Mark uncertainty without invalidating unrelated memo entries.
+// Same-storage owner evidence mirrors the captured receiver's exact field:
+// https://github.com/centrifugal/centrifuge-go/blob/080126041ccc71654718bd0601b920ff8b22a8bf/subscription.go#L1156-L1183
+rule Argument:
+  inputs $context $local $argument $target $invocation
+  => query same $context $argument $target
+           select true => outputs (Exact local:$local supplied:$argument path:nil) true
+     <|> query ambiguous $argument $target
+           select true => do {
+             $answer <- query uncertain $context.Queries;
+             pure $answer;
+           }
+     <|> query identity $context $argument $target
+           select true => outputs (Exact local:$local supplied:$argument path:nil) true
+     <|> query callback $context.Queries $argument $target
+           select true => outputs (Callback local:$local supplied:$argument) true
+     <|> do {
+           PathFound path:$path <- query projection $context $argument $target
+             else {
+               PathMissing => decline;
+               PathCutoff => do {
+                 $answer <- query cutoff $context.Queries;
+                 pure $answer;
+               };
+             };
+           pure outputs (Projection local:$local supplied:$argument path:$path) true;
+         }
+     <|> query owner $context $argument $target
+           select KnownValue value:$owner => outputs (Owner local:$local supplied:$owner) true
+     <|> do {
+           true <- query contains $context.Queries $argument $target
+             else decline;
+           PathFound path:$path <- query storedPath $context $argument $target $invocation
+             else {
+               PathMissing => outputs (emptyLocal) false;
+               PathCutoff => do {
+                 $answer <- query cutoff $context.Queries;
+                 pure $answer;
+               };
+             };
+           pure outputs (Exact local:$local supplied:$argument path:$path) true;
+         }
+     <|> query pathFrom $target $argument $context.Budget
+           select true => outputs (Owner local:$local supplied:$argument) true
+     <|> pure outputs (emptyLocal) false;

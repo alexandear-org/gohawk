@@ -166,7 +166,7 @@ func ProveCompletionForCase(function *ssa.Function, condition ssacall.CallCondit
 	if request.InvokeTarget {
 		methods = []string{""}
 	}
-	locals := []mappedLocal{{local: parameter, supplied: parameter, kind: localExact}}
+	locals := []mappedLocal{{Local: parameter, Supplied: parameter, Kind: localExact}}
 	resultTest := ssacall.CallCondition{Result: condition.Result, Outcome: condition.Outcome}
 	for _, method := range methods {
 		search := newCompletionSearch(method, CoverageEveryReturn, request.Budget)

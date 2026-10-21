@@ -1,0 +1,63 @@
+signature total fallback outputs (matching false);
+build matching = MatchProof;
+build possible, samePath;
+guard nonempty;
+query hasPath = nonempty;
+query relativePath, mirrored;
+query exactReceiver = ExactReceiver;
+union ReceiverPath = (pathList, bool) tag 1 {
+  KnownPath = true {
+    path: 0;
+  };
+  MissingPath = false;
+};
+
+rule Absent:
+  inputs _ nil _ _
+  => outputs (matching false);
+
+// A field cleanup must select the target's exact path, never a sibling field.
+// When an exact path is unavailable, derivation supplies possible cleanup only;
+// a loop's dynamic element cannot become a must-complete action.
+rule ExactPath:
+  inputs (Exact local:$local path:$path) $receiver _ $budget
+  && nonempty $path
+  => query relativePath $receiver $local $budget {
+       MissingPath => query derives $receiver $local $budget {
+         true => outputs (possible);
+         false => outputs (matching false);
+       };
+       KnownPath path:$actual => query hasPath $actual {
+         true => outputs (matching (samePath $actual $path));
+         false => do {
+           $match <- query derives $receiver $local $budget;
+           pure outputs (matching $match);
+         };
+       };
+     };
+
+rule ExactValue:
+  inputs (Exact local:$local) $receiver _ $budget
+  => do {
+       $match <- query derives $receiver $local $budget;
+       pure outputs (matching $match);
+     };
+
+rule Projection:
+  inputs (Projection local:$local) $receiver _ $budget
+  => do {
+       $match <- query exactReceiver $receiver $local $budget;
+       pure outputs (matching $match);
+     };
+
+// Mirror the caller target's path beneath its supplied owner in the callee.
+rule Owner:
+  inputs $mapping:(Owner) $receiver $target $budget
+  => do {
+       $answer <- query mirrored $mapping $receiver $target $budget;
+       pure outputs $answer;
+     };
+
+rule Callback:
+  inputs (Callback) _ _ _
+  => outputs (matching false);

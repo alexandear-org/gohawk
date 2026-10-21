@@ -1,0 +1,27 @@
+signature total fallback outputs (emptyLocal) false;
+
+rule Exact:
+  inputs _ $local _ _ $value _ true _
+  => outputs (Exact local:$local supplied:$value path:nil) true;
+
+// A captured projection of the target retains exact completion semantics.
+// A path rooted at the captured cell must keep that cell on both sides;
+// unavailable storage there commits to failure rather than trying containment.
+// An aggregate may carry the target without holding it directly.
+rule Related:
+  inputs $context $local $binding $target $value $matches false $invocation
+  => query callback $context.Queries $value $target
+           select true => outputs (Callback local:$local supplied:$value) true
+     <|> query derives $value $target $context.Budget
+           select true => outputs (Exact local:$local supplied:$value path:nil) true
+     <|> query pathFrom $target $value $context.Budget
+           select true => outputs (Owner local:$local supplied:$value) true
+     <|> do {
+           true <- query pathFrom $target $binding $context.Budget
+             else decline;
+           $answer <- query capturedOwner $context $local $binding $invocation;
+           pure $answer;
+         }
+     <|> query unmatchedContainment $context $binding $target $matches
+           select true => outputs (Exact local:$local supplied:$binding path:nil) true
+     <|> pure outputs (emptyLocal) false;

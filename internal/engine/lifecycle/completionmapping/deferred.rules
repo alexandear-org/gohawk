@@ -1,0 +1,43 @@
+signature total fallback outputs (emptyLocal) false;
+query relation = heapmodel.DeferredCellRelationWithin;
+union DeferredRelation = (heapmodel.DeferredCellMatch, bool) tag 1 {
+  KnownRelation = true {
+    relation: 0;
+  };
+  UnknownRelation = false;
+};
+query classifyRelation = RelateCell;
+
+// Read the captured cell when defers run, after subsequent stores. A cleared
+// cell can still settle a target on every path where that target was stored.
+// https://github.com/transparency-dev/witness/blob/f8056f8fa0d33469be430dac2982e1f3cf745322/persistence/sqlite/sql.go#L199-L207
+// An aggregate may grow between registration and invocation of deferred cleanup:
+// https://github.com/bazel-contrib/rules_img/blob/af5e1452f0cb68b1ed64dc6095210f1eb4ae625f/img_tool/cmd/mtree/mtree.go#L110-L128
+// A captured owner holds the object, not its embedded mutex. Prove the stable
+// owner before asking the merged cell relation; reassignment stays unavailable.
+// https://github.com/basecamp/basecamp-cli/blob/d91fc7b3ae5ee3c54a7fea389f59e791173e647b/internal/connector/queue.go#L264-L290
+rule Deferred:
+  inputs $context $local $cell $target $invocation
+  => do {
+           $stored <- query stable $context $cell $invocation;
+           true <- query proven $stored
+             else decline;
+           KnownValue value:$owner <- query owner $context $stored.Value $target
+             else {
+               MissingValue => decline;
+             };
+           pure outputs (Owner local:$local supplied:$owner) true;
+         }
+     <|> do {
+           KnownRelation relation:$relation <- query relation
+                                                       $cell
+                                                       $target
+                                                       $invocation
+                                                       $context.Budget
+             else {
+               UnknownRelation => outputs (emptyLocal) false;
+             };
+           $answer <- query classifyRelation $context $local $cell $target $invocation $relation;
+           pure $answer;
+         }
+     <|> pure outputs (emptyLocal) false;

@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -121,12 +123,12 @@ func opaqueCell(s *T) {
 
 func checkStorageOwnerAllowance(t *testing.T, target, argument ssa.Value, want bool) {
 	t.Helper()
-	if got := sameValueStorageOwner(target, argument, nil) != nil; got != want {
+	if got := completionmapping.StorageOwner(target, argument, nil) != nil; got != want {
 		t.Fatalf("default owner=%v, want %v", got, want)
 	}
 	for limit := 1; limit <= proofs.QueryBudget; limit++ {
 		budget := proofs.NewSearchBudget(limit)
-		owner := sameValueStorageOwner(target, argument, budget)
+		owner := completionmapping.StorageOwner(target, argument, budget)
 		if budget.Exhausted() {
 			if owner != nil {
 				t.Fatalf("cut %d publishes owner %v", limit, owner)

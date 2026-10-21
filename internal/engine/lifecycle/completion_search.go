@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
 	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -81,39 +82,15 @@ type completionCallee struct {
 	function    *ssa.Function
 }
 
-// mappedLocal is one callee parameter or captured variable that stands for
-// the caller's target, together with the caller value supplied to it.
-type mappedLocal struct {
-	local    ssa.Value
-	supplied ssa.Value
-	kind     localKind
-	// path is where the target sits beneath the supplied aggregate when the
-	// mapping came from containment (localExact). For localProjection it is
-	// the supplied value's proven path beneath the target. A receiver that is a
-	// proper projection of the local must then be at this path: closing
-	// j.other is not closing the file stored in j.out.
-	path []string
-}
-
-// localKind is how the supplied caller value relates to the target, which
-// decides which callee receivers stand for the target.
-type localKind uint8
+// mappedLocal retains search-local methods over the mapping package's shared
+// representation. Conversion never copies or reinterprets the path's storage.
+type mappedLocal completionmapping.Local
 
 const (
-	// localExact: the supplied value is the target, or an aggregate that
-	// stores it, so any receiver derived from the local completes it.
-	localExact localKind = iota
-	// localProjection: the supplied value is a stable field or index path
-	// beneath the target. Only the local itself may discharge the
-	// obligation, because further projections, phis, and loads inside the
-	// callee could select a different owner.
-	localProjection
-	// localOwner: the target is a stable path beneath the supplied value.
-	// The receiver must select the mirrored path beneath the local.
-	localOwner
-	// localCallback: the supplied value is a callback bound to the method on
-	// the target, so invoking the local is the completion.
-	localCallback
+	localExact      = completionmapping.Exact
+	localProjection = completionmapping.Projection
+	localOwner      = completionmapping.Owner
+	localCallback   = completionmapping.Callback
 )
 
 // completionSearch proves one method for one instruction and target. Its memo
@@ -213,11 +190,11 @@ func (search *completionSearch) calleeCoverage(callee completionCallee, target s
 	var nonNil ssa.Value
 	var concrete types.Type
 	for _, local := range locals {
-		if local.kind == localExact || local.kind == localProjection {
-			nonNil = local.local
+		if local.Kind == localExact || local.Kind == localProjection {
+			nonNil = local.Local
 			// The local holds the target itself, not an aggregate around
 			// it, so the target's static type is what an assertion sees.
-			if local.kind == localExact && len(local.path) == 0 && heapmodel.DefinitelySameValue(local.supplied, target) {
+			if local.Kind == localExact && len(local.Path) == 0 && heapmodel.DefinitelySameValue(local.Supplied, target) {
 				concrete = target.Type()
 			}
 			break
@@ -272,22 +249,22 @@ func (search *completionSearch) instructionCompletes(candidate ssa.Instruction, 
 		// a nested launch. crabbox hands cmd.Wait to a helper that invokes it
 		// on a waiter goroutine:
 		// https://github.com/openclaw/crabbox/blob/3ef3f98cbe27e6ddc814c11fde15b89c1639bcbe/internal/cli/ssh_forward_startup.go#L15-L22
-		if local.kind == localCallback {
-			if called != nil && invokesLocal(called.Value, local.local) {
+		if local.Kind == localCallback {
+			if called != nil && invokesLocal(called.Value, local.Local) {
 				search.paths.record("", false)
 				return true
 			}
-			if search.forCallback().completes(candidate, local.local).proven {
+			if search.forCallback().completes(candidate, local.Local).proven {
 				search.paths.record("", false)
 				return true
 			}
 			continue
 		}
-		if search.invokeTarget && local.kind == localExact && called != nil && search.invokesTargetLocal(called.Value, local.local) {
+		if search.invokeTarget && local.Kind == localExact && called != nil && search.invokesTargetLocal(called.Value, local.Local) {
 			search.paths.record("", false)
 			return true
 		}
-		if answer := search.completes(candidate, local.local); answer.proven {
+		if answer := search.completes(candidate, local.Local); answer.proven {
 			// The nested answer's path is beneath the local; translate it
 			// onto the target through the local's mapping.
 			path, known := search.mappedPath(local, target, ssaflow.SplitAccessPath(answer.paths.path), answer.paths.known())
@@ -335,7 +312,7 @@ func (search *completionSearch) methodCompletes(candidate ssa.Instruction, calle
 
 func (search *completionSearch) receives(local mappedLocal, receiver, target ssa.Value) receiverProof {
 	if search.exactTarget {
-		return receiverMatchProof(search.invokesTargetLocal(receiver, local.local))
+		return receiverMatchProof(search.invokesTargetLocal(receiver, local.Local))
 	}
 	return local.receives(receiver, target, search.budget)
 }
@@ -346,6 +323,6 @@ func (search *completionSearch) startsTarget(candidate ssa.Instruction, locals [
 	}
 	started, ok := candidate.(*ssa.Go)
 	return ok && slices.ContainsFunc(locals, func(local mappedLocal) bool {
-		return search.invokesTargetLocal(started.Common().Value, local.local)
+		return search.invokesTargetLocal(started.Common().Value, local.Local)
 	})
 }

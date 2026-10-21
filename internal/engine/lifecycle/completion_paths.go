@@ -60,7 +60,7 @@ func (paths *completionPaths) known() bool {
 // requiresNestedPath identifies mappings where completing the local as a whole
 // is insufficient: the nested answer must name the caller's exact field.
 func (local mappedLocal) requiresNestedPath() bool {
-	return local.kind == localOwner || local.kind == localExact && len(local.path) > 0
+	return local.Kind == localOwner || local.Kind == localExact && len(local.Path) > 0
 }
 
 // receiverPath names the path beneath the target of a completing call's
@@ -69,7 +69,7 @@ func (search *completionSearch) receiverPath(local mappedLocal, receiver, target
 	if search.exactTarget {
 		return search.mappedPath(local, target, nil, true)
 	}
-	actual, ok := heapmodel.AccessPathFromParameterWithin(receiver, local.local, search.budget)
+	actual, ok := heapmodel.AccessPathFromParameterWithin(receiver, local.Local, search.budget)
 	return search.mappedPath(local, target, actual, ok)
 }
 
@@ -81,15 +81,15 @@ func (search *completionSearch) mappedPath(local mappedLocal, target ssa.Value, 
 	if !known {
 		return "", false
 	}
-	switch local.kind {
+	switch local.Kind {
 	case localExact:
-		if len(local.path) > 0 {
-			// The local holds the target at local.path; a call there is on
+		if len(local.Path) > 0 {
+			// The local holds the target at local.Path; a call there is on
 			// the target itself, and a call on the local or elsewhere is
 			// on the aggregate around it.
-			return "", ssaflow.JoinAccessPath(actual) == ssaflow.JoinAccessPath(local.path)
+			return "", ssaflow.JoinAccessPath(actual) == ssaflow.JoinAccessPath(local.Path)
 		}
-		supplied, ok := ssaflow.AccessPathStepsWithin(local.supplied, target, search.budget)
+		supplied, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
 		if !ok {
 			return "", false
 		}
@@ -100,10 +100,10 @@ func (search *completionSearch) mappedPath(local mappedLocal, target ssa.Value, 
 		if len(actual) > 0 {
 			return "", false
 		}
-		if len(local.path) > 0 {
-			return ssaflow.JoinAccessPath(local.path), true
+		if len(local.Path) > 0 {
+			return ssaflow.JoinAccessPath(local.Path), true
 		}
-		supplied, ok := ssaflow.AccessPathStepsWithin(local.supplied, target, search.budget)
+		supplied, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
 		return ssaflow.JoinAccessPath(supplied), ok
 	case localOwner:
 		// A direct call was already matched to the path beneath the local
@@ -114,7 +114,7 @@ func (search *completionSearch) mappedPath(local mappedLocal, target ssa.Value, 
 		if actual == nil {
 			return "", true
 		}
-		mirrored, ok := ssaflow.AccessPathStepsWithin(local.supplied, target, search.budget)
+		mirrored, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
 		return "", ok && ssaflow.JoinAccessPath(actual) == ssaflow.JoinAccessPath(mirrored)
 	case localCallback:
 	}

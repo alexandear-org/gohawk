@@ -644,3 +644,45 @@ targets:
     function: Builtin
     rules: [internal/analysis/passes/concurrencyfacts/admission/builtin.rules]
     out: internal/analysis/passes/concurrencyfacts/admission/builtin_gen.go
+  - name: lifecycle_capture_mapping
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: captureSignature
+    function: Captured
+    rules: [internal/engine/lifecycle/completionmapping/capture.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/capture_gen.go
+  - name: lifecycle_capture_relation
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: relationSignature
+    function: CaptureRelation
+    rules: [internal/engine/lifecycle/completionmapping/capture_relation.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/capture_relation_gen.go
+  - name: lifecycle_argument_mapping
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: argumentSignature
+    function: Argument
+    rules: [internal/engine/lifecycle/completionmapping/argument.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/argument_gen.go
+  - name: lifecycle_deferred_mapping
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: deferredSignature
+    function: DeferredCell
+    rules: [internal/engine/lifecycle/completionmapping/deferred.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/deferred_gen.go
+  - name: lifecycle_deferred_relation
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: relationCellSignature
+    function: RelateCell
+    rules: [internal/engine/lifecycle/completionmapping/cell_relation.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/cell_relation_gen.go
+  - name: lifecycle_receiver_mapping
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: receiverSignature
+    function: Receives
+    rules: [internal/engine/lifecycle/completionmapping/receiver.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/receiver_gen.go

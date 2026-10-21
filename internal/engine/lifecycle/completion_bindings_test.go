@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -328,15 +330,16 @@ func deferredCleared(p *resource, pick bool){held:=p;defer func(){if held!=nil{h
 	}
 	pool := proofs.NewSearchBudget(10 * proofs.QueryBudget)
 	search := newCompletionSearch("Close", CoverageEveryReturn, pool.Within(1))
-	if _, mapped := search.deferredCellLocal(body.FreeVars[0], cell, function.Params[0], deferred); mapped || !search.budget.Exhausted() {
+	_, mapped := completionmapping.DeferredCell(search.mappingContext(true), body.FreeVars[0], cell, function.Params[0], deferred)
+	if mapped || !search.budget.Exhausted() {
 		t.Fatal("graph relation bypassed the exhausted mapping allowance")
 	}
 	if pool.Exhausted() {
 		t.Fatal("independent child cutoff exhausted the pool")
 	}
 	search.budget = pool.Within(proofs.QueryBudget)
-	local, mapped := search.deferredCellLocal(body.FreeVars[0], cell, function.Params[0], deferred)
-	if !mapped || local.kind != localExact || search.budget.Exhausted() {
+	local, mapped := completionmapping.DeferredCell(search.mappingContext(true), body.FreeVars[0], cell, function.Params[0], deferred)
+	if !mapped || local.Kind != localExact || search.budget.Exhausted() {
 		t.Fatalf("fresh exact cell mapping did not recover: %+v, mapped=%v", local, mapped)
 	}
 }
@@ -369,13 +372,13 @@ func TestExactCleanupReceiverAllowance(t *testing.T) {
 			}
 			if test.want {
 				cut := proofs.NewSearchBudget(1)
-				if exactCleanupReceiver(receiver, fn.Params[0], cut) || !cut.Exhausted() {
+				if completionmapping.ExactReceiver(receiver, fn.Params[0], cut) || !cut.Exhausted() {
 					t.Fatal("wrapper traversal bypassed allowance")
 				}
 			}
 			for limit := 1; limit <= proofs.QueryBudget; limit++ {
 				budget := proofs.NewSearchBudget(limit)
-				got := exactCleanupReceiver(receiver, fn.Params[0], budget)
+				got := completionmapping.ExactReceiver(receiver, fn.Params[0], budget)
 				if budget.Exhausted() {
 					if got {
 						t.Fatal("cut proves exact receiver")
