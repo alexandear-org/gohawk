@@ -1,0 +1,34 @@
+signature total fallback outputs nil false;
+query typedCleanup = resourceResultCleanup;
+query responseBody = responseBodyAcquired;
+query owned = acquisitionEvidence.OwnedResult;
+query ownedMatches($result) = ownedResultMatches $call $target $methods $result;
+union Cleanup = (cleanupMethods, bool) tag 1 {
+  Known = true {
+    methods: 0;
+  };
+  Unrecognized = false;
+};
+// The caller already established that this acquisition repeats before the
+// defer. Prefer exact result/type evidence, then the response-body contract,
+// before asking whether an inferred result owns the target resource.
+union Ownership = (cleanupMethods, int, bool) tag 2 {
+  Owned = true {
+    methods: 0;
+    result: 1;
+  };
+  Unowned = false;
+};
+
+rule Acquisition:
+  inputs $evidence $call $target
+  => query typedCleanup $call $target
+           select Known methods:$methods => outputs $methods true
+     <|> query responseBody $call $target
+           select true => outputs effects ["Close"] true
+     <|> query owned $evidence $call
+           select Owned methods:$methods result:$result => query ownedMatches $result {
+             true => outputs $methods true;
+             false => outputs nil false;
+           }
+     <|> pure outputs nil false;

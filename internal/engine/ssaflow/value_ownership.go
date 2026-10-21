@@ -1,7 +1,7 @@
 package ssaflow
 
 import (
-	"go/token"
+	"github.com/kojah/gohawk/internal/engine/ssaflow/valueforms"
 
 	"golang.org/x/tools/go/ssa"
 )
@@ -21,7 +21,7 @@ func ExternallyOwnedValue(value ssa.Value) bool {
 }
 
 func externalOwnershipLeaf(walk ReachingWalk, value ssa.Value) bool {
-	if source, ok := ownershipSource(value); ok {
+	if source, ok := valueforms.OwnershipSource(value); ok {
 		return walk.Any(source, externalOwnershipLeaf)
 	}
 	switch typed := value.(type) {
@@ -58,47 +58,6 @@ func aggregateElementLeaf(walk ReachingWalk, value ssa.Value) bool {
 			return true
 		}
 	}
-	source, ok := ownershipSource(value)
+	source, ok := valueforms.OwnershipSource(value)
 	return ok && walk.Any(source, aggregateElementLeaf)
-}
-
-func ownershipSource(value ssa.Value) (ssa.Value, bool) {
-	switch typed := value.(type) {
-	case *ssa.FieldAddr:
-		return typed.X, true
-	case *ssa.Field:
-		return typed.X, true
-	case *ssa.IndexAddr:
-		return typed.X, true
-	case *ssa.Index:
-		return typed.X, true
-	case *ssa.UnOp:
-		// A load and a receive both take a value out of something that holds
-		// it, so the holder is a candidate owner. The arithmetic and logical
-		// operators produce a new value from an operand and carry no such
-		// claim: negating a counter does not make the counter its owner.
-		return typed.X, typed.Op == token.MUL || typed.Op == token.ARROW
-	case *ssa.Lookup:
-		return typed.X, true
-	case *ssa.Slice:
-		return typed.X, true
-	case *ssa.TypeAssert:
-		// A type assertion denotes the same object as the interface value it
-		// narrows, so a channel field read through an asserted event is owned
-		// by whoever owns the event.
-		return typed.X, true
-	case *ssa.Extract:
-		return typed.Tuple, true
-	case *ssa.Next:
-		// An element produced by ranging over a map or string belongs to the
-		// aggregate being ranged, so a channel taken from a receiver's map is
-		// owned by the receiver. policyserv closes such channels from a
-		// goroutine in its pubsub Close:
-		// https://github.com/matrix-org/policyserv/blob/16995e82a8518f66c5bdc5b6d6d3be04a7640f33/pubsub/psql.go#L62-L72
-		return typed.Iter, true
-	case *ssa.Range:
-		return typed.X, true
-	default:
-		return nil, false
-	}
 }

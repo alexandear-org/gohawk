@@ -17,15 +17,6 @@ type processDecision struct {
 	reason processReason
 }
 
-func decideProcessReturn(start *ssa.Call, command ssa.Value, witness *ssa.Return, unknown bool, budget *proofs.SearchBudget) processDecision {
-	decision, ok := processReturnDecision(processReturnRequest{start, command, witness, unknown, budget})
-	if !ok {
-		// Invalid host evidence cannot establish a violation.
-		return processDecision{proofs.EvidenceUnknown, reasonCommandUseCutoff}
-	}
-	return decision
-}
-
 func emitProcessDecision(pass *analysis.Pass, function *ssa.Function, start *ssa.Call, command ssa.Value, decision processDecision) {
 	checkID := string(check.ProcessWait)
 	if !analysisTrace.Enabled("processownership", checkID) {

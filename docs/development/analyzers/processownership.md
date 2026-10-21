@@ -354,3 +354,12 @@ use keeps detached intent unknown. Only proven use asks whether the launch has
 program-entry lifetime. Each query outcome is handled exhaustively, with no
 fallthrough or repeated proof search. The Go wrapper conservatively declines an
 invalid generated result. Reporting and tracing consume the same decision.
+
+The return policy takes the original Start, command, return witness, uncertainty
+flag and allowance directly. Its command-use union names the existing
+`proofs.Proof` through a type alias, and entry-lifetime evidence is Boolean.
+There are no request or query-result wrapper structs. The generated total API
+owns the conservative invalid-outcome fallback previously applied by its Go
+wrapper. Settled returns still short-circuit before command-use discovery;
+`command_use_test.go` and `program_entry_test.go` retain the cutoff, unused-handle
+and entry-lifetime controls.

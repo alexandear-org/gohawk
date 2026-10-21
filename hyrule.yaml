@@ -25,7 +25,7 @@ targets:
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/decision_bindings.go
     signature: processReturnSignature
-    function: processReturnDecision
+    function: decideProcessReturn
     rules: [internal/analysis/analyzers/resources/processownership/decision.rules]
     out: internal/analysis/analyzers/resources/processownership/decision_gen.go
   - name: transparent_value_form
@@ -35,6 +35,13 @@ targets:
     function: Unwrap
     rules: [internal/engine/ssaflow/valueforms/forms.rules]
     out: internal/engine/ssaflow/valueforms/forms_gen.go
+  - name: ownership_value_source
+    package: internal/engine/ssaflow/valueforms
+    bindings: internal/engine/ssaflow/valueforms/ownership.go
+    signature: OwnershipSignature
+    function: OwnershipSource
+    rules: [internal/engine/ssaflow/valueforms/ownership.rules]
+    out: internal/engine/ssaflow/valueforms/ownership_gen.go
   - name: deferred_resource_use
     package: internal/analysis/analyzers/resources/deferinloop
     bindings: internal/analysis/analyzers/resources/deferinloop/classify_bindings.go
@@ -42,6 +49,13 @@ targets:
     function: classifyValueUse
     rules: [internal/analysis/analyzers/resources/deferinloop/classify.rules]
     out: internal/analysis/analyzers/resources/deferinloop/classify_gen.go
+  - name: deferred_resource_acquisition
+    package: internal/analysis/analyzers/resources/deferinloop
+    bindings: internal/analysis/analyzers/resources/deferinloop/obligation.go
+    signature: acquisitionSignature
+    function: classifyResourceAcquisition
+    rules: [internal/analysis/analyzers/resources/deferinloop/acquisition.rules]
+    out: internal/analysis/analyzers/resources/deferinloop/acquisition_gen.go
   - name: cancellation_instruction_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go

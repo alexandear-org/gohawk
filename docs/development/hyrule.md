@@ -42,14 +42,14 @@ path is removed; generator support and examples alone do not qualify.
 | Standard synchronization primitives | Generated shared recognition used by concurrency call summaries and heap mutex effects; count acceptance remains summary policy |
 | Concurrency inert-data and passive-instruction admission | Handwritten; migration remains |
 | Concurrency context/callback operation recognition | Handwritten; migration remains |
-| SSA wrapper, projection, and structural source families | Generated transparent-wrapper recognition preserves caller-selected forms; other projection/source families remain |
+| SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Handwritten; migration remains; state application stays in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
 | Goroutine ownership instruction/call labels | Handwritten; migration remains with ordered proof queries |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
-| Defer-in-loop resource classification | Generated ordered per-value classifier; acquisition discovery and loop traversal remain in Go |
+| Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Handwritten; migration remains for substantial pattern/decision families |
 | Producer lifecycle use classification | Handwritten; migration remains for instruction classifications |
@@ -91,6 +91,13 @@ Transparent SSA wrapper extraction uses read-only views of the original SSA
 nodes. The views generate checked assertions and field reads; the rules retain
 form masks and the distinction between an asserted value and its success flag.
 The existing reaching walks and ownership proofs remain authoritative.
+
+Ownership-source rules select one syntactic holder candidate for a field,
+element, load, receive, assertion, extraction or range operation. The source
+keeps its exact SSA identity. Arithmetic/logical unary operations retain a false
+recognition result, and traversal stops there. `ExternallyOwnedValue` and
+`ElementOfAggregate` consume this same generated recognition through their
+existing reaching walks; the rules neither traverse nor establish ownership.
 
 ## Cancellation labels
 

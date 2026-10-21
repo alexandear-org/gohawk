@@ -20,6 +20,16 @@ type deferObligation struct {
 	owner ssa.Value
 }
 
+// Acquisition rules use existing proof APIs directly. These aliases name their
+// exact Go types in the rule schema; they add no request or result storage.
+type (
+	acquisitionEvidence  = lifecyclefacts.LifecycleEvidence
+	cleanupMethods       = []string
+	acquisitionSignature func(*acquisitionEvidence, *ssa.Call, ssa.Value) (cleanupMethods, bool)
+)
+
+var _ acquisitionSignature = classifyResourceAcquisition
+
 // values returns the values whose uses decide the obligation.
 func (obligation deferObligation) values() []ssa.Value {
 	if obligation.owner == nil {
@@ -101,20 +111,22 @@ func resourceAcquiredBeforeDefer(
 		if !acquisitionRepeatsBeforeDefer(call, deferred) {
 			continue
 		}
-		if resultDerivesToTarget(call, target) {
-			if cleanup, known := lifecyclefacts.ResourceCleanup(target.Type()); known {
-				return cleanup, true
-			}
-		}
-		if responseBodyAcquired(call, target) {
-			return []string{"Close"}, true
-		}
-		cleanup, result, owned := evidence.OwnedResult(call)
-		if owned && len(cleanup) > 0 && valueDerivesFrom(target, ssacall.CallResult(call, result)) {
+		if cleanup, acquired := classifyResourceAcquisition(evidence, call, target); acquired {
 			return cleanup, true
 		}
 	}
 	return nil, false
+}
+
+func resourceResultCleanup(call *ssa.Call, target ssa.Value) (cleanupMethods, bool) {
+	if !resultDerivesToTarget(call, target) {
+		return nil, false
+	}
+	return lifecyclefacts.ResourceCleanup(target.Type())
+}
+
+func ownedResultMatches(call *ssa.Call, target ssa.Value, methods cleanupMethods, result int) bool {
+	return len(methods) > 0 && valueDerivesFrom(target, ssacall.CallResult(call, result))
 }
 
 // A response's resource is its body: a deferred Body.Close is the cleanup of

@@ -1,5 +1,6 @@
-// Package valueforms recognizes one transparent SSA wrapper under an explicit
-// caller-selected mask. It does not traverse values or infer transparency.
+// Package valueforms recognizes one SSA source form. Transparent wrappers use
+// an explicit caller-selected mask; ownership forms expose a holder candidate.
+// Neither API traverses values or establishes ownership by itself.
 package valueforms
 
 import "golang.org/x/tools/go/ssa"

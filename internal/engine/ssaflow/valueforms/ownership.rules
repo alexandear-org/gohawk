@@ -1,0 +1,71 @@
+signature total fallback outputs nil false;
+view FieldAddress = *ssa.FieldAddr {
+  source: X;
+};
+view FieldValue = *ssa.Field {
+  source: X;
+};
+view IndexAddress = *ssa.IndexAddr {
+  source: X;
+};
+view IndexValue = *ssa.Index {
+  source: X;
+};
+view Lookup = *ssa.Lookup {
+  source: X;
+};
+view Slice = *ssa.Slice {
+  source: X;
+};
+view Assertion = *ssa.TypeAssert {
+  source: X;
+};
+view Extraction = *ssa.Extract {
+  source: Tuple;
+};
+view Next = *ssa.Next {
+  source: Iter;
+};
+view Range = *ssa.Range {
+  source: X;
+};
+view Unary = *ssa.UnOp {
+  source: X;
+  op: Op;
+};
+const loadToken, receiveToken;
+
+rule Aggregate:
+  inputs
+    (or
+      (FieldAddress $source)
+      (FieldValue $source)
+      (IndexAddress $source)
+      (IndexValue $source)
+      (Lookup $source)
+      (Slice $source)
+    )
+  => outputs $source true;
+
+// An assertion preserves the interface's object. Extraction refers back to
+// its producer; the ownership walk decides what that producer can establish.
+rule AssertedOrExtracted:
+  inputs (or (Assertion $source) (Extraction $source))
+  => outputs $source true;
+
+// Range elements retain their aggregate as a possible owner. policyserv
+// closes channels selected from a receiver's map in a spawned cleanup:
+// https://github.com/matrix-org/policyserv/blob/16995e82a8518f66c5bdc5b6d6d3be04a7640f33/pubsub/psql.go#L62-L72
+rule Iterated:
+  inputs (or (Next $source) (Range $source))
+  => outputs $source true;
+
+// Loads and receives select from a holder. Arithmetic and logical operations
+// create a new value and supply no such ownership edge.
+rule LoadedOrReceived:
+  inputs (Unary source:$source op:(or loadToken receiveToken))
+  => outputs $source true;
+
+rule OtherUnary:
+  inputs (Unary source:$source)
+  => outputs $source false;

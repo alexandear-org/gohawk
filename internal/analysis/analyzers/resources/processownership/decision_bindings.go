@@ -6,39 +6,21 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
-// These bindings expose post-Start evidence without choosing a diagnostic.
-// The generated decision owns query order and uncertainty policy; SSA searches
-// retain their existing budget and feasible-path semantics.
-type processReturnRequest struct {
-	start   *ssa.Call
-	command ssa.Value
-	witness *ssa.Return
-	unknown bool
-	budget  *proofs.SearchBudget
-}
+// The generated policy consumes the existing command-use proof and Boolean
+// entry-lifetime evidence directly. Searches keep their original allowance.
+type processReturnSignature func(start *ssa.Call, command ssa.Value, witness *ssa.Return, unknown bool, budget *proofs.SearchBudget) processDecision
 
-type processReturnSignature func(processReturnRequest) (processDecision, bool)
+var _ processReturnSignature = decideProcessReturn
 
-var _ processReturnSignature = processReturnDecision
-
-type (
-	processUseEvidence   struct{ state proofs.EvidenceState }
-	processEntryEvidence struct{ owned bool }
-)
+// Hyrule's named struct domain is the original proof, without wrapping it.
+type processUseEvidence = proofs.Proof
 
 const (
-	decisionUnknown        = proofs.EvidenceUnknown
-	decisionDisproven      = proofs.EvidenceDisproven
-	decisionProven         = proofs.EvidenceProven
-	entryOwned        bool = true
-	entryOrdinary     bool = false
+	decisionUnknown   = proofs.EvidenceUnknown
+	decisionDisproven = proofs.EvidenceDisproven
+	decisionProven    = proofs.EvidenceProven
 )
 
-func commandUse(request processReturnRequest) processUseEvidence {
-	proof := proveCommandUseAfterStart(request.start, request.command, request.budget)
-	return processUseEvidence{proof.State}
-}
-
-func entryLifetime(request processReturnRequest) processEntryEvidence {
-	return processEntryEvidence{ssacall.RunsOnceInProgramEntry(request.start)}
+func entryLifetime(start *ssa.Call) bool {
+	return ssacall.RunsOnceInProgramEntry(start)
 }

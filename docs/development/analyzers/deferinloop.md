@@ -83,3 +83,20 @@ query outcomes need no host wrapper storage. Field-forwarding declarations make
 context explicit, and the total signature's `Unknown reasonNone` fallback
 suppresses reporting if an outcome falls outside its declared domain. The
 fallback never credits cleanup and does not rerun another rule.
+
+## Declarative acquisition evidence
+
+`acquisition.rules` selects the resource contract for one eligible call. Exact
+result derivation and the shared type contract take precedence over an acquired
+response body, which in turn takes precedence over the existing inferred
+owned-result query. Owned results require nonempty cleanup methods and exact
+derivation of the selected result to the deferred target. A misleading `Close`
+method or an unrelated file does not establish acquisition.
+
+The Go caller retains the ordered call census, dominance and repeating-region
+checks. Response-body replacement and temporal storage resolution remain in
+their existing evidence helpers. The rule signature returns cleanup methods and
+the recognition flag as native values; a failed outcome declines the candidate.
+`acquisition_test.go` checks direct file results, unrelated file targets, response
+bodies, replacement and misleading project types on compiled SSA. Existing
+loop, inferred-owner and response fixtures preserve accepted and diagnostic forms.
