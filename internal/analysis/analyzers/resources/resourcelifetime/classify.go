@@ -4,6 +4,7 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/sqlparents"
 	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts"
 	"github.com/kojah/gohawk/internal/analysis/summaries"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
@@ -107,43 +108,35 @@ func (analysis *resourceAnalysis) action(instruction ssa.Instruction) resourceAc
 // that stopped the proof, so a reader can tell an interface call from a
 // callee with no body without rereading this code.
 func (analysis *resourceAnalysis) classify(instruction ssa.Instruction) (resourceAction, resourceLifetimeReason) {
-	if action, reason, ok := analysis.collection.label(instruction); ok {
-		return action, reason
-	}
-	if action, reason, ok := analysis.resultGuardedLabel(instruction); ok {
-		return action, reason
-	}
-	if analysis.compressionOutputAbandoned(instruction) {
-		return actionUnknown, resourceReasonCompressionOutputMayBeAbandoned
-	}
-	parent := proveSQLParentCleanupWithin(analysis.acquisition, instruction, analysis.budget(proofs.SummaryBudget))
-	if parent.State != proofs.EvidenceDisproven {
-		return actionUnknown, parent.Reason
-	}
-	if cancelsTransactionContext(analysis.acquisition, instruction) {
-		return actionUnknown, resourceReasonTransactionContextCanceled
-	}
-	if action, reason := analysis.releasesResource(instruction); action != actionNone {
-		return action, reason
-	}
-	common := ssaflow.InstructionCall(instruction)
-	ambiguous := analysis.proveAmbiguousCleanupWithin(instruction, common, analysis.budget(releaseSearchBudget))
-	if ambiguous.State != proofs.EvidenceDisproven {
-		return actionUnknown, ambiguous.Reason
-	}
+	return classifyResource(analysis, instruction)
+}
 
-	paired := analysis.provePairedErrorCleanupWithin(instruction, common, analysis.budget(releaseSearchBudget))
-	if paired.State != proofs.EvidenceDisproven {
-		return actionUnknown, paired.Reason
-	}
-	loopRelease := analysis.proveImportedLoopReleaseWithin(instruction, common, analysis.budget(proofs.SummaryBudget))
-	if loopRelease.State != proofs.EvidenceDisproven {
-		return actionUnknown, loopRelease.Reason
-	}
-	if boundary, opaque := analysis.opaqueConsumption(instruction); opaque {
-		return actionUnknown, boundary
-	}
-	return actionNone, resourceReasonUntouched
+// Classifier queries keep the existing allowance owner, query limit and exact
+// instruction. They run only when the ordered rules reach that evidence family.
+type resourceClassifySignature func(*resourceAnalysis, ssa.Instruction) (resourceAction, resourceLifetimeReason)
+
+var _ resourceClassifySignature = classifyResource
+
+const (
+	resourceProven    = proofs.EvidenceProven
+	resourceDisproven = proofs.EvidenceDisproven
+	resourceUnknown   = proofs.EvidenceUnknown
+)
+
+func (analysis *resourceAnalysis) parentCleanup(instruction ssa.Instruction) resourceProof {
+	return proveSQLParentCleanupWithin(analysis.acquisition, instruction, analysis.budget(proofs.SummaryBudget))
+}
+
+func (analysis *resourceAnalysis) ambiguousCleanup(instruction ssa.Instruction) resourceProof {
+	return analysis.proveAmbiguousCleanupWithin(instruction, ssaflow.InstructionCall(instruction), analysis.budget(releaseSearchBudget))
+}
+
+func (analysis *resourceAnalysis) pairedCleanup(instruction ssa.Instruction) resourceProof {
+	return analysis.provePairedErrorCleanupWithin(instruction, ssaflow.InstructionCall(instruction), analysis.budget(releaseSearchBudget))
+}
+
+func (analysis *resourceAnalysis) loopCleanup(instruction ssa.Instruction) resourceProof {
+	return analysis.proveImportedLoopReleaseWithin(instruction, ssaflow.InstructionCall(instruction), analysis.budget(proofs.SummaryBudget))
 }
 
 // releaseLabel preserves the distinction between cleanup and an abandoned
@@ -329,4 +322,23 @@ func (analysis *resourceAnalysis) opaqueFunctionCall(instruction ssa.Instruction
 	// through the completion proof already consulted; without either, the
 	// callee is a boundary.
 	return resourceReasonUnsummarizedCallee, !analysis.evidence.CalleeSummarized(instruction) && len(callee.Blocks) == 0
+}
+
+// SQL parent cleanup supplies uncertainty rather than synchronous release. Both
+// classification and prior-defer evidence use the same exact relationship proof.
+func proveSQLParentCleanupWithin(acquisition *ssa.Call, instruction ssa.Instruction, budget *proofs.SearchBudget) resourceProof {
+	parent := sqlparents.ProveWithin(acquisition, instruction, budget)
+	if parent.State == proofs.EvidenceUnknown {
+		return resourceProof{State: parent.State, Reason: resourceReasonBudgetExhausted}
+	}
+	reason := resourceReasonUntouched
+	switch parent.Kind {
+	case sqlparents.Unrelated:
+		reason = resourceReasonUntouched
+	case sqlparents.DatabaseClosed:
+		reason = resourceReasonStatementParentClosed
+	case sqlparents.TransactionFinished:
+		reason = resourceReasonRowsTransactionFinished
+	}
+	return resourceProof{State: parent.State, Reason: reason}
 }

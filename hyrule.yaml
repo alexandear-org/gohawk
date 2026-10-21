@@ -1,5 +1,12 @@
 version: 1
 targets:
+  - name: resource_classification
+    package: internal/analysis/analyzers/resources/resourcelifetime
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/classify.go
+    signature: resourceClassifySignature
+    function: classifyResource
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/classify.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/classify_gen.go
   - name: process_action_entry
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/ownership.go

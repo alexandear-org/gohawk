@@ -48,7 +48,7 @@ path is removed; generator support and examples alone do not qualify.
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
-| Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
+| Resource lifetime classification and acquisition-boundary patterns | Generated ordered instruction classification; acquisition-boundary patterns remain; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Handwritten; migration remains for substantial pattern/decision families |
@@ -262,3 +262,29 @@ on compiled SSA, including early uncertainty and late positive evidence. Separat
 remainder cases distinguish a truly exhausted handle query from an empty unused
 allowance and check fallback retention. Existing action-cache and analyzer tests
 retain command identity, fresh-candidate and flow controls.
+
+## Resource lifetime instruction classification
+
+`resourcelifetime/classify.rules` owns the ordered instruction policy. Collection
+and result-guard labels stop the chain even when they select no action. Compressor
+abandonment, SQL parent cleanup and transaction cancellation precede release
+recognition; ambiguous cleanup, paired-error cleanup, loop-only release and opaque
+consumption retain their later positions. Each reached evidence query runs once
+with its original child allowance and candidate pool. Unknown is never promoted
+to settlement, and exhausted evidence cannot fall through as an absent cleanup.
+
+Selections can share an answer across complete evidence variants with
+`select (or (Proven reason:$reason) (Unknown reason:$reason))`. A named selection
+retains the exact native release tuple, so the action/reason pair needs no new
+adapter record. Bindings continue to delegate to existing proofs, caches and flow.
+
+The analyzer-owned `sqlparents` helper owns exact SQL parent relationships and
+storage child limits. The enclosing analyzer maps those relationships onto its
+existing reason vocabulary and uncertain-lifetime policy. Prior-defer discovery
+and instruction classification consume that same proof. No parent-close contract
+becomes a synchronous child-release guarantee.
+
+`classify_order_test.go` pins cleanup, observation, conditional cleanup, loop-only
+cleanup and early collection precedence against the handwritten classifier's
+baseline. Existing budget-observer, SQL identity, result-guard, ownership and
+wrapper regressions continue to guard the underlying proof boundaries.

@@ -1065,7 +1065,7 @@ cutoff, fresh recovery and full-flow leak/release controls using actual SSA.
 
 ### SQL parent identity allowance
 
-`sql_parents.go` owns one exact parent-cleanup proof consumed by prior deferred
+`sqlparents/cleanup.go` owns one exact parent-cleanup proof consumed by prior deferred
 cleanup and ordinary classification. DB-prepared statements and rows on the
 exact finished transaction retain their uncertainty policy. A transaction-
 prepared statement must resolve to that exact constructor before its rows can
@@ -1418,3 +1418,26 @@ and matching/wrong SQL receivers. It checks zero and intermediate cutoffs,
 fresh completion and child cutoff propagation through the final flow.
 Graph construction/alias internals, type work and rendering retain their own
 cost boundaries; this request allowance does not bound elapsed time.
+
+
+## Generated instruction classification
+
+The ordered classifier is generated from `classify.rules`. It selects the same
+native action and reason returned by the original classifier. Recognized
+collection and guarded-result answers remain terminal, including no-action
+answers. Parent cleanup and cancellation retain priority over ordinary release;
+ambiguous, paired-error and loop-only cleanup retain priority over opaque use.
+Proof queries retain their original child caps, candidate pool and observers.
+
+The analyzer-owned `sqlparents` helper proves only exact standard SQL parent
+relationships. The analyzer maps its state and parent kind to existing resource
+reason codes; positive parent evidence remains uncertain child lifetime. The
+prior-defer path uses the same helper, including storage-child cutoffs and
+mixed/reassigned-parent declines. The extraction preserves the nearby pinned
+rationale links.
+
+`classify_order_test.go` records baseline complete and interrupted labels and
+checks that an early collection answer bypasses later queries. Existing
+`budget_test.go`, `sql_parents_test.go`, result-guard and ownership tests retain
+observer, reason, identity and precision controls. The instruction cache and the
+single resource-flow verdict remain the authoritative production paths.
