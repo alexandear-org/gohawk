@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockpolicy"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -69,44 +70,11 @@ func (flow lockFlowContext) proveMissingRelease(
 	function *ssa.Function, heldAt map[*ssa.Return]lockReturnState, callers conditionalCallerSet,
 	identity string, returns []token.Pos, query lockReturnQueries,
 ) lockDiagnosticProof {
-	unknown := lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonLockStateBudgetExhausted}
-	if !query.budget.Spend() {
-		return unknown
-	}
-	if flow.uncertainGuards[identity] {
-		return lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonLoadedAcquisitionGuardUnknown}
-	}
-	values := flow.lockValues[identity]
-	private := slices.ContainsFunc(values, func(value ssa.Value) bool {
-		return query.budget.Spend() && privateMutexOnly(value, query.budget)
+	proof := lockpolicy.MissingRelease(missingReleaseQueries{
+		flow: flow, function: function, heldAt: heldAt, callers: callers,
+		identity: identity, returns: returns, query: query,
 	})
-	if query.budget.Exhausted() {
-		return unknown
-	}
-	if private {
-		return lockDiagnosticProof{proofs.EvidenceDisproven, lockReasonPrivateMutexOnly}
-	}
-	if !flow.released[identity] {
-		return lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonReleaseOwnershipUnknown}
-	}
-	held := query.acquiresForCaller(function, flow.acquisitions[identity], heldAt, identity)
-	if query.budget.Exhausted() {
-		return unknown
-	}
-	if held.proven {
-		return lockDiagnosticProof{proofs.EvidenceDisproven, held.reason}
-	}
-	caller := query.conditionalCallerRelease(function, values, heldAt, identity, callers)
-	if query.budget.Exhausted() {
-		return unknown
-	}
-	if caller.proven {
-		return lockDiagnosticProof{proofs.EvidenceDisproven, caller.reason}
-	}
-	if len(returns) == 0 {
-		return lockDiagnosticProof{proofs.EvidenceDisproven, lockReasonNone}
-	}
-	return lockDiagnosticProof{proofs.EvidenceProven, lockReasonUnreleasedReturn}
+	return lockDiagnosticProof{state: proof.State, reason: proof.Reason}
 }
 
 // A missing release is found at a return, but the calls that might have
@@ -308,3 +276,35 @@ func privateMutexOnly(value ssa.Value, budget *proofs.SearchBudget) bool {
 	}
 	return true
 }
+
+// Missing-release queries retain bounded censuses and caller contracts. Each
+// answer snapshots availability after the search, before policy uses a witness.
+type missingReleaseQueries struct {
+	flow     lockFlowContext
+	function *ssa.Function
+	heldAt   map[*ssa.Return]lockReturnState
+	callers  conditionalCallerSet
+	identity string
+	returns  []token.Pos
+	query    lockReturnQueries
+}
+
+func (q missingReleaseQueries) Spend() bool     { return q.query.budget.Spend() }
+func (q missingReleaseQueries) Uncertain() bool { return q.flow.uncertainGuards[q.identity] }
+func (q missingReleaseQueries) Private() lockpolicy.Answer {
+	found := slices.ContainsFunc(q.flow.lockValues[q.identity], func(value ssa.Value) bool {
+		return q.query.budget.Spend() && privateMutexOnly(value, q.query.budget)
+	})
+	return lockpolicy.Answer{Proven: found, Exhausted: q.query.budget.Exhausted()}
+}
+func (q missingReleaseQueries) Released() bool { return q.flow.released[q.identity] }
+func (q missingReleaseQueries) Held() lockpolicy.Answer {
+	held := q.query.acquiresForCaller(q.function, q.flow.acquisitions[q.identity], q.heldAt, q.identity)
+	return lockpolicy.Answer{Proven: held.proven, Reason: held.reason, Exhausted: q.query.budget.Exhausted()}
+}
+
+func (q missingReleaseQueries) Caller() lockpolicy.Answer {
+	caller := q.query.conditionalCallerRelease(q.function, q.flow.lockValues[q.identity], q.heldAt, q.identity, q.callers)
+	return lockpolicy.Answer{Proven: caller.proven, Reason: caller.reason, Exhausted: q.query.budget.Exhausted()}
+}
+func (q missingReleaseQueries) Returns() bool { return len(q.returns) > 0 }

@@ -164,9 +164,78 @@ func writerBudgetPackage(t *testing.T) *ssa.Package {
 	return ssaflowtest.BuildPackage(t, "writerbudget", `package writerbudget
 import "sync"
 type owner struct { mu sync.RWMutex; writer sync.Mutex; count int }
+
 func subject(o *owner){o.mu.RLock();defer o.writer.Unlock();o.count++}
+
 func released(o *owner){defer o.writer.Unlock();o.writer.Unlock();o.count++}
+
 func later(o *owner){o.count++;defer o.writer.Unlock()}
+
 func branched(o *owner,yes bool){defer o.writer.Unlock();if yes{o.count++}}
 `)
+}
+
+func TestReadLockCandidateIterationAndCutoff(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "readcandidates", `package readcandidates
+ import "sync"
+ type owner struct{first,second sync.RWMutex;value int}
+ func mutate(o *owner){o.first.RLock();o.second.RLock();o.value++}
+ `)
+	function := pkg.Func("mutate")
+	calls := ssaflow.InstructionsOf[*ssa.Call](function)
+	store := ssaflow.InstructionsOf[*ssa.Store](function)[0]
+	values := map[string][]ssa.Value{
+		"first":  {ssaflow.CallReceiver(calls[0].Common())},
+		"second": {ssaflow.CallReceiver(calls[1].Common())},
+	}
+	for _, test := range []struct {
+		name       string
+		held, read []string
+		cutoff     bool
+		identity   string
+		state      proofs.EvidenceState
+		reason     lockReason
+	}{
+		{"report first", []string{"first", "second"}, []string{"first", "second"}, false, "first", proofs.EvidenceProven, lockReasonReadLockWrite},
+		{
+			"unknown retains last",
+			[]string{"first", "second", "writer"},
+			[]string{"first", "second"},
+			false,
+			"second", proofs.EvidenceUnknown, lockReasonExclusiveWriterUnknown,
+		},
+		{
+			"unknown follows reverse order",
+			[]string{"first", "second", "writer"},
+			[]string{"second", "first"},
+			false,
+			"first", proofs.EvidenceUnknown, lockReasonExclusiveWriterUnknown,
+		},
+		{
+			"cutoff stops first",
+			[]string{"first", "second"},
+			[]string{"first", "second"},
+			true,
+			"first", proofs.EvidenceUnknown, lockReasonLockStateBudgetExhausted,
+		},
+		{
+			"released reader is skipped",
+			[]string{"second"},
+			[]string{"first", "second"},
+			false,
+			"second", proofs.EvidenceProven, lockReasonReadLockWrite,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			budget := proofs.NewSearchBudget(lockStateWorkBudget)
+			if test.cutoff {
+				budget = proofs.NewSearchBudget(0)
+				budget.Spend()
+			}
+			got := proveReadLockWrite(store, test.held, test.read, values, nil, calls, readLockFieldEvidence{}, budget)
+			if got.state != test.state || got.reason != test.reason || got.identity != test.identity {
+				t.Fatalf("proof=%+v, want %v/%v identity=%s", got, test.state, test.reason, test.identity)
+			}
+		})
+	}
 }

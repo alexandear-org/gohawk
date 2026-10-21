@@ -1,0 +1,25 @@
+union Proof = Proof tag State {
+  Accepted = disprovenState {
+    reason: Reason;
+  };
+  Unknown = unknownState {
+    reason: Reason;
+  };
+  Reported = provenState {
+    reason: Reason;
+  };
+};
+union Step = Step tag Stop {
+  Continue = false {
+    proof: Proof;
+  };
+  Stop = true {
+    proof: Proof;
+  };
+};
+union Writer = WriterEvidence tag State {
+  WriterFound = provenState;
+  WriterAbsent = disprovenState;
+  WriterUnavailable = unknownState;
+};
+const LockStateBudgetExhausted;

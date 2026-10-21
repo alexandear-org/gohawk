@@ -1,86 +1,44 @@
 package lockorder
 
-// lockReason explains lock identity, release, and ordering evidence.
-type lockReason uint8
+import "github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockpolicy"
+
+// lockReason retains the analyzer's policy and trace vocabulary.
+type lockReason = lockpolicy.Reason
 
 const (
-	lockReasonNone lockReason = iota
-	lockReasonCarriedConstantBranchInfeasible
-	lockReasonConditionalCallerReleaseProven
-	lockReasonConditionalCallerReleaseUnknown
-	lockReasonCrossOwnerClassUnknown
-	lockReasonDeferredReleaseProven
-	lockReasonCycleOrderRecorded
-	lockReasonExclusiveObjectBeforePublication
-	lockReasonExclusiveParameterFromFreshCallers
-	lockReasonFreshBoundOwnerIdentityUnknown
-	lockReasonFreshFieldIdentityUnknown
-	lockReasonImportedWriterGuardUnknown
-	lockReasonLoadedAcquisitionGuardUnknown
-	lockReasonLockStateBudgetExhausted
-	lockReasonHelperReleaseUnproven
-	lockReasonHeldForCallerProven
-	lockReasonHeldForCallerUnknown
-	lockReasonMutexActionObserved
-	lockReasonReleaseIdentityUnknown
-	lockReasonNoFreshBoundOwner
-	lockReasonNoFreshFieldWitness
-	lockReasonOppositeOrderRecorded
-	lockReasonPredecessorConstantBranchInfeasible
-	lockReasonRepeatedConditionInfeasible
-	lockReasonStableParameterBranchInfeasible
-	lockReasonPrivateMutexOnly
-	lockReasonReleaseOwnershipUnknown
-	lockReasonUnreleasedReturn
-	lockReasonReadLockWrite
-	lockReasonExclusiveWriterUnknown
-	lockReasonPrivateWriteStorage
-	lockReasonFieldGuardUnknown
-	lockReasonInitialPublicationUnknown
-	lockReasonExclusiveOwnershipUnknown
-	lockReasonCount
+	lockReasonNone                                = lockpolicy.None
+	lockReasonCarriedConstantBranchInfeasible     = lockpolicy.CarriedConstantBranchInfeasible
+	lockReasonConditionalCallerReleaseProven      = lockpolicy.ConditionalCallerReleaseProven
+	lockReasonConditionalCallerReleaseUnknown     = lockpolicy.ConditionalCallerReleaseUnknown
+	lockReasonCrossOwnerClassUnknown              = lockpolicy.CrossOwnerClassUnknown
+	lockReasonDeferredReleaseProven               = lockpolicy.DeferredReleaseProven
+	lockReasonCycleOrderRecorded                  = lockpolicy.CycleOrderRecorded
+	lockReasonExclusiveObjectBeforePublication    = lockpolicy.ExclusiveObjectBeforePublication
+	lockReasonExclusiveParameterFromFreshCallers  = lockpolicy.ExclusiveParameterFromFreshCallers
+	lockReasonFreshBoundOwnerIdentityUnknown      = lockpolicy.FreshBoundOwnerIdentityUnknown
+	lockReasonFreshFieldIdentityUnknown           = lockpolicy.FreshFieldIdentityUnknown
+	lockReasonImportedWriterGuardUnknown          = lockpolicy.ImportedWriterGuardUnknown
+	lockReasonLoadedAcquisitionGuardUnknown       = lockpolicy.LoadedAcquisitionGuardUnknown
+	lockReasonLockStateBudgetExhausted            = lockpolicy.LockStateBudgetExhausted
+	lockReasonHelperReleaseUnproven               = lockpolicy.HelperReleaseUnproven
+	lockReasonHeldForCallerProven                 = lockpolicy.HeldForCallerProven
+	lockReasonHeldForCallerUnknown                = lockpolicy.HeldForCallerUnknown
+	lockReasonMutexActionObserved                 = lockpolicy.MutexActionObserved
+	lockReasonReleaseIdentityUnknown              = lockpolicy.ReleaseIdentityUnknown
+	lockReasonNoFreshBoundOwner                   = lockpolicy.NoFreshBoundOwner
+	lockReasonNoFreshFieldWitness                 = lockpolicy.NoFreshFieldWitness
+	lockReasonOppositeOrderRecorded               = lockpolicy.OppositeOrderRecorded
+	lockReasonPredecessorConstantBranchInfeasible = lockpolicy.PredecessorConstantBranchInfeasible
+	lockReasonRepeatedConditionInfeasible         = lockpolicy.RepeatedConditionInfeasible
+	lockReasonStableParameterBranchInfeasible     = lockpolicy.StableParameterBranchInfeasible
+	lockReasonPrivateMutexOnly                    = lockpolicy.PrivateMutexOnly
+	lockReasonReleaseOwnershipUnknown             = lockpolicy.ReleaseOwnershipUnknown
+	lockReasonUnreleasedReturn                    = lockpolicy.UnreleasedReturn
+	lockReasonReadLockWrite                       = lockpolicy.ReadLockWrite
+	lockReasonExclusiveWriterUnknown              = lockpolicy.ExclusiveWriterUnknown
+	lockReasonPrivateWriteStorage                 = lockpolicy.PrivateWriteStorage
+	lockReasonFieldGuardUnknown                   = lockpolicy.FieldGuardUnknown
+	lockReasonInitialPublicationUnknown           = lockpolicy.InitialPublicationUnknown
+	lockReasonExclusiveOwnershipUnknown           = lockpolicy.ExclusiveOwnershipUnknown
+	lockReasonCount                               = lockpolicy.Count
 )
-
-var lockReasonCodes = [...]string{
-	lockReasonExclusiveOwnershipUnknown:           "exclusive-ownership-unknown",
-	lockReasonInitialPublicationUnknown:           "initial-publication-order-unknown",
-	lockReasonFieldGuardUnknown:                   "field-guard-unknown",
-	lockReasonPrivateWriteStorage:                 "private-write-storage",
-	lockReasonPrivateMutexOnly:                    "private-mutex-only",
-	lockReasonReleaseOwnershipUnknown:             "release-ownership-unknown",
-	lockReasonUnreleasedReturn:                    "unreleased-return",
-	lockReasonReadLockWrite:                       "read-lock-write",
-	lockReasonExclusiveWriterUnknown:              "exclusive-writer-guard-unknown",
-	lockReasonNone:                                "",
-	lockReasonCarriedConstantBranchInfeasible:     "carried-constant-branch-infeasible",
-	lockReasonConditionalCallerReleaseProven:      "conditional-caller-release-proven",
-	lockReasonConditionalCallerReleaseUnknown:     "conditional-caller-release-unknown",
-	lockReasonCrossOwnerClassUnknown:              "cross-owner-class-unknown",
-	lockReasonDeferredReleaseProven:               "deferred-release-proven",
-	lockReasonCycleOrderRecorded:                  "cycle-order-recorded",
-	lockReasonExclusiveObjectBeforePublication:    "exclusive-object-before-publication",
-	lockReasonExclusiveParameterFromFreshCallers:  "exclusive-parameter-from-fresh-callers",
-	lockReasonFreshBoundOwnerIdentityUnknown:      "fresh-bound-owner-identity-unknown",
-	lockReasonFreshFieldIdentityUnknown:           "fresh-field-identity-unknown",
-	lockReasonImportedWriterGuardUnknown:          "imported-writer-guard-unknown",
-	lockReasonLoadedAcquisitionGuardUnknown:       "loaded-acquisition-guard-unknown",
-	lockReasonLockStateBudgetExhausted:            "lock-state-budget-exhausted",
-	lockReasonHelperReleaseUnproven:               "helper-release-unproven",
-	lockReasonHeldForCallerProven:                 "held-for-caller-proven",
-	lockReasonHeldForCallerUnknown:                "held-for-caller-unknown",
-	lockReasonMutexActionObserved:                 "mutex-action-observed",
-	lockReasonReleaseIdentityUnknown:              "release-identity-unknown",
-	lockReasonNoFreshBoundOwner:                   "no-fresh-bound-owner",
-	lockReasonNoFreshFieldWitness:                 "no-fresh-field-witness",
-	lockReasonOppositeOrderRecorded:               "opposite-order-recorded",
-	lockReasonPredecessorConstantBranchInfeasible: "predecessor-constant-branch-infeasible",
-	lockReasonRepeatedConditionInfeasible:         "repeated-condition-infeasible",
-	lockReasonStableParameterBranchInfeasible:     "stable-parameter-branch-infeasible",
-}
-
-func (reason lockReason) String() string {
-	if int(reason) >= len(lockReasonCodes) {
-		return "invalid-lock-reason"
-	}
-	return lockReasonCodes[reason]
-}

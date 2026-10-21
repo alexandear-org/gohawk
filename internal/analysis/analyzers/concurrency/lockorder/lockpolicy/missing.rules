@@ -1,0 +1,43 @@
+signature total fallback outputs (Unknown reason:LockStateBudgetExhausted);
+query spend = MissingQueries.Spend;
+query uncertain = MissingQueries.Uncertain;
+query private = MissingQueries.Private;
+query released = MissingQueries.Released;
+query held = MissingQueries.Held;
+query caller = MissingQueries.Caller;
+query returns = MissingQueries.Returns;
+query unavailable = Answer.Unavailable;
+query holds = Answer.Holds;
+const LoadedAcquisitionGuardUnknown, PrivateMutexOnly, ReleaseOwnershipUnknown, None, UnreleasedReturn;
+
+// A possible acquisition or unwitnessed local release leaves ownership unknown.
+// Complete caller-transfer contracts retain precedence over a missing release;
+// cutoff takes precedence over every positive contract witness.
+rule Missing:
+  inputs $queries
+  => do {
+       true <- query spend $queries
+         else outputs (Unknown reason:LockStateBudgetExhausted);
+       false <- query uncertain $queries
+         else outputs (Unknown reason:LoadedAcquisitionGuardUnknown);
+       $private <- query private $queries;
+       false <- query unavailable $private
+         else outputs (Unknown reason:LockStateBudgetExhausted);
+       false <- query holds $private
+         else outputs (Accepted reason:PrivateMutexOnly);
+       true <- query released $queries
+         else outputs (Unknown reason:ReleaseOwnershipUnknown);
+       $held <- query held $queries;
+       false <- query unavailable $held
+         else outputs (Unknown reason:LockStateBudgetExhausted);
+       false <- query holds $held
+         else outputs (Accepted reason:$held.Reason);
+       $caller <- query caller $queries;
+       false <- query unavailable $caller
+         else outputs (Unknown reason:LockStateBudgetExhausted);
+       false <- query holds $caller
+         else outputs (Accepted reason:$caller.Reason);
+       true <- query returns $queries
+         else outputs (Accepted reason:None);
+       pure outputs (Reported reason:UnreleasedReturn);
+     };

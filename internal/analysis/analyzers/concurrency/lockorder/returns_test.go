@@ -177,6 +177,7 @@ func lockReturnPackage(t *testing.T) *ssa.Package {
 func TestLockReturnGuardAllowance(t *testing.T) {
 	pkg := ssaflowtest.BuildPackage(t, "returnguard", `package returnguard
 func guarded(err error) error { if err != nil { return nil }; return err }
+
 func unrelated(err, other error) error { if other != nil { return nil }; return err }
 `)
 	for _, name := range []string{"guarded", "unrelated"} {
@@ -338,8 +339,11 @@ func lockRetentionPackage(t *testing.T) *ssa.Package {
 func TestReturnedSuccessCellSharesAllowance(t *testing.T) {
 	pkg := ssaflowtest.BuildPackage(t, "returnstorage", `package returnstorage
 func cleanup() {}
+
 func subject() (ok bool) { defer cleanup(); return true }
+
 func declined() (ok bool) { defer cleanup(); return false }
+
 func plain() bool { return true }
 `)
 	for _, name := range []string{"subject", "declined", "plain"} {
@@ -375,5 +379,21 @@ func plain() bool { return true }
 				}
 			}
 		})
+	}
+}
+
+func TestMissingReleaseInitialCutoffPrecedesGuardUncertainty(t *testing.T) {
+	flow := lockFlowContext{uncertainGuards: map[string]bool{"lock": true}}
+	var callers conditionalCallerSet
+	for _, limit := range []int{0, 1} {
+		budget := proofs.NewSearchBudget(limit)
+		got := flow.proveMissingRelease(nil, nil, callers, "lock", nil, lockReturnQueries{budget: budget})
+		want := lockReasonLoadedAcquisitionGuardUnknown
+		if limit == 0 {
+			want = lockReasonLockStateBudgetExhausted
+		}
+		if got.state != proofs.EvidenceUnknown || got.reason != want || budget.Exhausted() != (limit == 0) {
+			t.Fatalf("limit=%d proof=%+v exhausted=%v", limit, got, budget.Exhausted())
+		}
 	}
 }

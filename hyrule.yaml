@@ -861,3 +861,17 @@ targets:
     function: PrepareFlow
     rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation_gen.go
+  - name: lock_missing_release_policy
+    package: internal/analysis/analyzers/concurrency/lockorder/lockpolicy
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/model.go
+    signature: missingSignature
+    function: MissingRelease
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/schema.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing_gen.go
+  - name: lock_read_write_policy
+    package: internal/analysis/analyzers/concurrency/lockorder/lockpolicy
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/model.go
+    signature: readWriteSignature
+    function: ReadWrite
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/schema.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write_gen.go

@@ -765,3 +765,18 @@ collection/guarded-defer initialization and prior cleanup before the path walk.
 A positive prior-cleanup observation commits immediately in its Go query; the
 rules then return uncertainty. Partial owner discovery supplies no classifier
 inputs, and guarded-defer uncertainty stops before prior-cleanup evidence.
+
+## Lock final proof selection
+
+`lockorder/lockpolicy` sequences missing-release evidence and the decisions for
+one matched read-lock/write owner. The analyzer retains bounded private-lock and
+caller-contract queries, field/destination evidence, possible-writer searches and
+candidate iteration. Census and contract packets retain availability alongside
+their exact reason; a shortened search cannot override cutoff with a witness.
+
+Read-lock decisions return an explicit continue/stop step together with the
+proof. Ordinary uncertainty can be replaced by a later candidate; writer cutoff
+and reportable evidence end the search at the current identity. When no candidate
+reports, the last matching candidate's proof and identity survive. The root's
+reason aliases retain all original numeric values and trace strings; reporting,
+held-state flow and diagnostic evidence buffering remain unchanged.

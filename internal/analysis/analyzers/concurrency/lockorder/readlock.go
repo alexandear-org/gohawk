@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockforms"
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockpolicy"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/syntax"
@@ -96,37 +97,14 @@ func proveReadLockWrite(
 			if !ok || !writeTargetsOwner(instruction, owner) {
 				continue
 			}
-			// A field-only method exposes caller-supplied synchronization or separate
-			// ownership that same-owner matching cannot resolve. This is uncertainty,
-			// not proof that the setter is safe or that it uses a different mutex.
-			// https://github.com/apache/skywalking-rover/blob/e83d5925500a7e63dd55c080a9b1542d6cedaefb/pkg/tools/buffer/buffer.go#L629-L649
-			if guard := fields.guard(instruction); guard.state == proofs.EvidenceUnknown {
-				proof = readLockWriteProof{guard, identity}
-				continue
+			step := lockpolicy.ReadWrite(readWriteQueries{
+				instruction: instruction, held: held, readHeld: readHeld,
+				possibleWriters: possibleWriters, calls: calls, fields: fields, budget: budget,
+			})
+			proof = readLockWriteProof{lockDiagnosticProof: lockDiagnosticProof{state: step.Proof.State, reason: step.Proof.Reason}, identity: identity}
+			if step.Stop {
+				return proof
 			}
-			// A fresh wrapper can carry a borrowed map or slice. Exclusivity must
-			// belong to the actual destination, not merely the lock's receiver.
-			if storage, known := heapmodel.ExclusiveAt(readLockWriteDestination(instruction), instruction); known && storage.Local {
-				proof = readLockWriteProof{lockDiagnosticProof{proofs.EvidenceDisproven, lockReasonPrivateWriteStorage}, identity}
-				continue
-			}
-			// A writer guard may be owned by another object. Without guard
-			// inference, any held exclusive lock makes the claim that only
-			// readers serialize this write unknown, not proven safe.
-			// https://github.com/rfjakob/gocryptfs/blob/842af4463989ee6808d397433e9aba8517e49c89/internal/fusefrontend/file.go#L409-L430
-			if writeLockHeld(held, readHeld) {
-				proof = readLockWriteProof{lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonExclusiveWriterUnknown}, identity}
-				continue
-			}
-			writer := provePossibleWriterAt(possibleWriters, instruction, calls, budget)
-			if !writer.Known() {
-				return readLockWriteProof{lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonLockStateBudgetExhausted}, identity}
-			}
-			if writer.Proven() {
-				proof = readLockWriteProof{lockDiagnosticProof{proofs.EvidenceUnknown, lockReasonImportedWriterGuardUnknown}, identity}
-				continue
-			}
-			return readLockWriteProof{lockDiagnosticProof{proofs.EvidenceProven, lockReasonReadLockWrite}, identity}
 		}
 	}
 	return proof
@@ -263,4 +241,29 @@ func storedField(store *ssa.Store) *types.Var {
 		return nil
 	}
 	return structure.Field(address.Field)
+}
+
+// One matched owner is decided at a time. The caller retains candidate order,
+// accumulated fallback evidence, identity binding and the stop/continue action.
+type readWriteQueries struct {
+	instruction     ssa.Instruction
+	held, readHeld  []string
+	possibleWriters []*ssa.Defer
+	calls           []*ssa.Call
+	fields          readLockFieldEvidence
+	budget          *proofs.SearchBudget
+}
+
+func (q readWriteQueries) Guard() lockpolicy.Proof {
+	guard := q.fields.guard(q.instruction)
+	return lockpolicy.Proof{State: guard.state, Reason: guard.reason}
+}
+
+func (q readWriteQueries) PrivateStorage() bool {
+	storage, known := heapmodel.ExclusiveAt(readLockWriteDestination(q.instruction), q.instruction)
+	return known && storage.Local
+}
+func (q readWriteQueries) HeldWriter() bool { return writeLockHeld(q.held, q.readHeld) }
+func (q readWriteQueries) Writer() lockpolicy.WriterEvidence {
+	return provePossibleWriterAt(q.possibleWriters, q.instruction, q.calls, q.budget)
 }

@@ -1,0 +1,32 @@
+signature total fallback outputs (Stop proof:(Unknown reason:LockStateBudgetExhausted));
+query guard = ReadWriteQueries.Guard;
+query unknown = Proof.Unknown;
+query private = ReadWriteQueries.PrivateStorage;
+query held = ReadWriteQueries.HeldWriter;
+query writer = ReadWriteQueries.Writer;
+const PrivateWriteStorage, ExclusiveWriterUnknown, ImportedWriterGuardUnknown, ReadLockWrite;
+
+// A field-only method exposes caller synchronization or separate ownership;
+// same-owner matching cannot decide which. Keep the candidate unknown.
+// https://github.com/apache/skywalking-rover/blob/e83d5925500a7e63dd55c080a9b1542d6cedaefb/pkg/tools/buffer/buffer.go#L629-L649
+// Exclusivity must belong to the actual destination: a fresh wrapper may carry
+// a borrowed map or slice. Another held writer also leaves the field's guard
+// unknown; this does not establish that it is protected by that mutex.
+// https://github.com/rfjakob/gocryptfs/blob/842af4463989ee6808d397433e9aba8517e49c89/internal/fusefrontend/file.go#L409-L430
+rule Write:
+  inputs $queries
+  => do {
+       $guard <- query guard $queries;
+       false <- query unknown $guard
+         else outputs (Continue proof:$guard);
+       false <- query private $queries
+         else outputs (Continue proof:(Accepted reason:PrivateWriteStorage));
+       false <- query held $queries
+         else outputs (Continue proof:(Unknown reason:ExclusiveWriterUnknown));
+       WriterAbsent <- query writer $queries
+         else {
+           WriterUnavailable => outputs (Stop proof:(Unknown reason:LockStateBudgetExhausted));
+           WriterFound => outputs (Continue proof:(Unknown reason:ImportedWriterGuardUnknown));
+         };
+       pure outputs (Stop proof:(Reported reason:ReadLockWrite));
+     };

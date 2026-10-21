@@ -28,6 +28,25 @@ Boolean or tagged outcome and early result. `flow_test.go` pins interruption,
 independent successors, empty storage, deferred timing and admission behavior.
 The existing lock/read-mode fixtures retain acquisition and release coverage.
 
+## Final diagnostic decisions
+
+`lockpolicy` owns the shared reason vocabulary and the missing-release and
+per-owner read-lock-write decisions. The root retains its private reason aliases
+and diagnostic presentation. Missing-release queries preserve the initial charge,
+uncertain-guard boundary, private-lock census, release witness and caller-contract
+order. Each census/contract answer snapshots its exhausted state after the search;
+cutoff wins over a positive witness. Only uncovered returns remaining after these
+checks permit a missing-release diagnostic.
+
+Read-lock-write candidate iteration stays in Go, including the exact lock identity
+and the last non-terminal proof. The rules return an explicit continue/stop step:
+field contracts, private destination storage and possible writer guards continue;
+writer-query cutoff and a reportable write stop immediately. Released readers are
+skipped before owner matching. This preserves both the first reportable candidate
+and the final uncertain candidate when none reports. Query-order tests and actual
+SSA multi-lock tests pin these boundaries, while existing fixtures retain guard,
+private-owner, caller-release and allowance behavior.
+
 ## Rationale in detail
 
 ### Deferred cleanup through a captured owner
