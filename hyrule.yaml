@@ -336,3 +336,52 @@ targets:
     function: EscapeAlias
     rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias_gen.go
+  - name: http_head_acquisition
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head.go
+    signature: headSignature
+    function: decideHead
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head_gen.go
+  - name: http_local_acquisition
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint.go
+    signature: localSignature
+    function: decideLocal
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint_gen.go
+  - name: http_acquisition_effects
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects.go
+    signature: effectsSignature
+    function: decideEffects
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects_gen.go
+  - name: completion_launch
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/launch.go
+    signature: launchSignature
+    function: RecognizeLaunch
+    rules: [internal/engine/lifecycle/completionpolicy/launch.rules]
+    out: internal/engine/lifecycle/completionpolicy/launch_gen.go
+  - name: completion_callback_origin
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/callback.go
+    signature: callbackSignature
+    function: RecognizeCallback
+    rules: [internal/engine/lifecycle/completionpolicy/callback.rules]
+    out: internal/engine/lifecycle/completionpolicy/callback_gen.go
+  - name: resource_acquisition_success
+    package: internal/analysis/analyzers/resources/resourcelifetime
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/acquisition_errors.go
+    signature: successBranchSignature
+    function: decideResourceSuccessBranch
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch_gen.go
+  - name: resource_acquisition_absence
+    package: internal/analysis/analyzers/resources/resourcelifetime
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/acquisition_errors.go
+    signature: absentAcquisitionSignature
+    function: decideAbsentAcquisition
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence_gen.go

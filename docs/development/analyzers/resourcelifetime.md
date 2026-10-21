@@ -1168,14 +1168,14 @@ sole diagnostic proof; graph/type/alias internals retain separate cost scope.
 
 ### HEAD request and client allowance
 
-`http_head_request.go` shares exact constructor/rebinding mechanics between the
+`httpacquire/requests.go` shares exact constructor/rebinding mechanics between the
 origin-only and immutable-use questions. Shared reaching folds own recursion
 and cycle handling; backward origins and forward uses keep distinct visited
 sets under the same allowance. Only direct call/extract roots and receivers
 qualify. Phi requests, opaque parameters, helper escapes, method mutation and
 unrecognized header-map use retain the former declines.
 
-`http_head_client.go` keeps fresh allocation, stable local cell and captured
+`httpacquire/requests.go` keeps fresh allocation, stable local cell and captured
 client-use checks together. Referrer, capture and header-use visits charge the
 candidate child. Exact default clients also ask the shared mutation engine
 through its existing 4,000-step child. Exhaustion of that child is budget unknown
@@ -1195,14 +1195,14 @@ an availability regression boundary, not a production-audit FP correction.
 
 ### Local HTTP endpoint and writer allowance
 
-`http_local_server.go` keeps exact local URL/server/client provenance together.
+`httpacquire/endpoint.go` keeps exact local URL/server/client provenance together.
 Server/client referrers and handler reaching-value resolution charge the
 candidate allowance while preserving the existing transparent forms and exact
 server identity. Completed protocol declines continue ordinary resource flow;
 shortened provenance returns budget unknown. Exact bodyless protocol evidence
 remains distinct from HEAD acquisition uncertainty.
 
-`http_writer_effects.go` owns visible writer/helper/header framing evidence.
+`httpacquire/effects.go` owns visible writer/helper/header framing evidence.
 Instruction, operand, alias-dispatch, binding and header-use visits share the
 existing 4,000-step effect child with default-client/transport checks. Child
 exhaustion remains unknown even with an available parent, so a partial effect
@@ -1441,3 +1441,22 @@ checks that an early collection answer bypasses later queries. Existing
 `budget_test.go`, `sql_parents_test.go`, result-guard and ownership tests retain
 observer, reason, identity and precision controls. The instruction cache and the
 single resource-flow verdict remain the authoritative production paths.
+
+## Generated acquisition policy
+
+`httpacquire/head.rules`, `endpoint.rules` and `effects.rules` select outcomes
+over the same exact HEAD/local-endpoint evidence and effect searches. The helper
+owns those bounded searches and their protocol vocabulary; the analyzer maps
+that vocabulary onto its existing resource reasons at one boundary. Every
+caller/effect-child fence remains authoritative. Partial effects cannot become
+complete protocol declines, and HEAD acquisition uncertainty remains distinct
+from a positively header-only local protocol.
+
+`acquisition_absence.rules` owns the ordered error-evidence alternatives, retaining
+terminal predicate cutoffs and allowing unavailable predicates to continue to
+legacy contracts. `acquisition_branch.rules` selects the success edge and a trace
+plan after the initial absence query. Budget spending, guard provenance,
+optional-diamond correlation and trace emission remain in Go. Existing
+`http_test.go`, acquisition allowance/flow tests and accepted/diagnostic fixtures
+continue to exercise the consuming proof; no acquisition or cleanup semantics
+are broadened by this migration.

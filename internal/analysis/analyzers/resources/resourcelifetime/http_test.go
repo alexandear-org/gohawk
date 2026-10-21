@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/resources/resourcelifetime/httpacquire"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -29,10 +30,10 @@ func TestHTTPDefaultOverridePolicies(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			fn := pkg.Func(test.name)
-			if got := !proveDefaultClientUnmodifiedWithin(fn, nil).Proven(); got != test.root {
+			if got := httpacquire.DefaultClientUnmodified(fn, nil).State != proofs.EvidenceProven; got != test.root {
 				t.Fatalf("HEAD root override=%v, want %v; SSA:\n%s", got, test.root, carriedSSA(t, fn))
 			}
-			if got := newHTTPWriterEffects().overrides.Function(fn, proofs.NewSearchBudget(httpEffectsBudget)); got != test.strict {
+			if got := httpacquire.NewEffects().Overrides(fn, proofs.NewSearchBudget(httpacquire.EffectsBudget)); got != test.strict {
 				t.Fatalf("strict override=%v, want %v; SSA:\n%s", got, test.strict, carriedSSA(t, fn))
 			}
 		})
@@ -41,14 +42,14 @@ func TestHTTPDefaultOverridePolicies(t *testing.T) {
 
 func TestHTTPDefaultOverrideRootPolicyDoesNotChangeMemo(t *testing.T) {
 	fn := httpDefaultEffectsFixture(t).Func("directDo")
-	effects := newHTTPWriterEffects()
-	if !effects.overrides.Function(fn, proofs.NewSearchBudget(httpEffectsBudget)) {
+	effects := httpacquire.NewEffects()
+	if !effects.Overrides(fn, proofs.NewSearchBudget(httpacquire.EffectsBudget)) {
 		t.Fatal("strict default-effect summary lost the default-client load")
 	}
-	if effects.scanDefaultOverrides(fn, proofs.NewSearchBudget(httpEffectsBudget), true) {
+	if effects.ScanOverrides(fn, proofs.NewSearchBudget(httpacquire.EffectsBudget), true) {
 		t.Fatal("cached strict summary intercepted the root-only Do allowance")
 	}
-	if !effects.overrides.Function(fn, proofs.NewSearchBudget(httpEffectsBudget)) {
+	if !effects.Overrides(fn, proofs.NewSearchBudget(httpacquire.EffectsBudget)) {
 		t.Fatal("root-only allowance replaced the strict declaration summary")
 	}
 }
@@ -59,7 +60,7 @@ func TestHTTPDefaultOverrideAllowance(t *testing.T) {
 		completed := false
 		for limit := 0; limit <= proofs.SummaryBudget; limit++ {
 			budget := proofs.NewSearchBudget(limit)
-			got := newHTTPWriterEffects().scanDefaultOverrides(fn, budget, root)
+			got := httpacquire.NewEffects().ScanOverrides(fn, budget, root)
 			if resourceFlowExhausted(budget) {
 				if !got {
 					t.Fatalf("interrupted default-effect scan established no override at %d", limit)
@@ -80,14 +81,14 @@ func TestHTTPDefaultOverrideAllowance(t *testing.T) {
 
 func TestHTTPDefaultOverrideFreshMemo(t *testing.T) {
 	fn := httpDefaultEffectsFixture(t).Func("harmlessHelper")
-	effects := newHTTPWriterEffects()
-	pool := proofs.NewSearchBudget(httpEffectsBudget)
+	effects := httpacquire.NewEffects()
+	pool := proofs.NewSearchBudget(httpacquire.EffectsBudget)
 	child := pool.Within(2)
-	if !effects.overrides.Function(fn, child) || !child.Exhausted() || pool.Exhausted() {
+	if !effects.Overrides(fn, child) || !child.Exhausted() || pool.Exhausted() {
 		t.Fatal("child cutoff must retain possible modification and parent availability")
 	}
-	fresh := pool.Within(httpEffectsBudget)
-	if effects.overrides.Function(fn, fresh) || fresh.Exhausted() {
+	fresh := pool.Within(httpacquire.EffectsBudget)
+	if effects.Overrides(fn, fresh) || fresh.Exhausted() {
 		t.Fatal("fresh allowance must recover harmless effects without cached cutoff")
 	}
 }
@@ -177,7 +178,7 @@ func TestHEADDefaultEffectsChildCutoff(t *testing.T) {
 func headDoCall(t *testing.T, fn *ssa.Function) *ssa.Call {
 	t.Helper()
 	for _, call := range ssaflow.InstructionsOf[*ssa.Call](fn) {
-		if ssacall.CallMatchesSymbol(call.Common(), httpClientDo) {
+		if ssacall.CallMatchesSymbol(call.Common(), httpacquire.ClientDo) {
 			return call
 		}
 	}
@@ -304,14 +305,14 @@ func TestLocalHTTPAcquisitionChildCutoff(t *testing.T) {
 
 func TestLocalHTTPWriterMemoFreshAllowance(t *testing.T) {
 	fn := localHTTPAllowanceFixture(t, false).Func("headerHelper")
-	effects := newHTTPWriterEffects()
+	effects := httpacquire.NewEffects()
 	pool := proofs.NewSearchBudget(resourcePoolBudget)
 	child := pool.Within(2)
-	if effects.headerOnly(fn.Params[0], child) || !child.Exhausted() || pool.Exhausted() {
+	if effects.HeaderOnly(fn.Params[0], child) || !child.Exhausted() || pool.Exhausted() {
 		t.Fatal("writer cutoff must leave parent available")
 	}
-	fresh := pool.Within(httpEffectsBudget)
-	if !effects.headerOnly(fn.Params[0], fresh) || fresh.Exhausted() {
+	fresh := pool.Within(httpacquire.EffectsBudget)
+	if !effects.HeaderOnly(fn.Params[0], fresh) || fresh.Exhausted() {
 		t.Fatal("fresh writer proof retained a cached cutoff")
 	}
 }
@@ -326,7 +327,7 @@ func TestLocalHTTPEffectsChildCutoffFlow(t *testing.T) {
 func localHTTPGetCall(t *testing.T, fn *ssa.Function) *ssa.Call {
 	t.Helper()
 	for _, call := range ssaflow.InstructionsOf[*ssa.Call](fn) {
-		if ssacall.CallMatchesAnySymbol(call.Common(), httpGet, httpClientGet) {
+		if ssacall.CallMatchesAnySymbol(call.Common(), httpacquire.Get, httpacquire.ClientGet) {
 			return call
 		}
 	}
@@ -427,7 +428,7 @@ func buildHTTPAllowanceFixture(t *testing.T, path, prefix, suffix string, oversi
 	var source strings.Builder
 	source.WriteString(prefix)
 	if oversized {
-		for range httpEffectsBudget + 10 {
+		for range httpacquire.EffectsBudget + 10 {
 			source.WriteString("mark();")
 		}
 	}

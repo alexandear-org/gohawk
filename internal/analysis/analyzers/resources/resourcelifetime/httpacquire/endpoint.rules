@@ -1,0 +1,46 @@
+signature total fallback outputs (Unknown reason:None);
+match localURL;
+query spend;
+query server = localServer;
+query client = matchesClient;
+query handler = localHandler;
+query framing = localEffects;
+union Server = (*ssa.Call, bool) tag 1 {
+  FoundServer = true {
+    server: 0;
+  };
+  NoServer = false;
+};
+union Handler = (*ssa.Function, bool) tag 1 {
+  FoundHandler = true {
+    function: 0;
+  };
+  NoHandler = false;
+};
+
+rule Endpoint:
+  inputs $call:(localURL $url) $budget
+  => do {
+       true <- query spend $budget
+         else {
+           false => outputs (Unknown reason:BudgetExhausted);
+         };
+       FoundServer server:$server <- query server $url $budget
+         else {
+           NoServer => outputs (Disproven reason:ServerIdentityUnavailable);
+         };
+       true <- query client $call $server
+         else {
+           false => outputs (Disproven reason:ServerIdentityUnavailable);
+         };
+       FoundHandler function:$handler <- query handler $server $budget
+         else {
+           NoHandler => outputs (Disproven reason:HandlerUnavailable);
+         };
+       Proven reason:$reason <- query framing $call $handler $budget
+         else {
+           Unknown reason:$unknownReason => outputs (Unknown reason:$unknownReason);
+           Disproven reason:$disprovenReason => outputs (Disproven reason:$disprovenReason);
+         };
+       pure outputs (Proven reason:$reason);
+     };

@@ -40,7 +40,7 @@ type completionAnswer struct {
 func (answer completionAnswer) proof(method string) proofs.CompletionProof {
 	return proofs.CompletionProof{
 		Proof: proofs.Proof{
-			State: proofs.EvidenceProven, Reason: answer.launch.reason(), Method: method, Provenance: proofs.EvidenceFromLocalSSA,
+			State: proofs.EvidenceProven, Reason: answer.launch.Reason(), Method: method, Provenance: proofs.EvidenceFromLocalSSA,
 		},
 		Path: answer.paths.path, PathKnown: answer.paths.known(),
 	}

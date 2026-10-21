@@ -8,11 +8,8 @@ import (
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
-	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
-
-var syncOnceFunc = syntax.PackageFunction("sync", "OnceFunc")
 
 // Deferred bindings are observed when the deferred callee runs, after any
 // assignment that follows the defer. These helpers recover the one value an

@@ -1,0 +1,14 @@
+union Evidence = Proof tag State {
+  Unknown = unknown {
+    reason: Reason;
+  };
+  Disproven = disproven {
+    reason: Reason;
+  };
+  Proven = proven {
+    reason: Reason;
+  };
+};
+const unknown, disproven, proven;
+const None, BudgetExhausted, HeadAcquisition, HeadClientNotUnconfigured, HeadRequestModified;
+const ClientOverrideUnresolved, HandlerUnavailable, HeaderOnlyEffects, ServerIdentityUnavailable, WriterEffectsUnavailable;

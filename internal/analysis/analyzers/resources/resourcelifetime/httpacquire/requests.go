@@ -1,4 +1,4 @@
-package resourcelifetime
+package httpacquire
 
 import (
 	"go/token"
@@ -14,25 +14,25 @@ import (
 // or unchanged package defaults. Referrer and capture visits share the request
 // allowance; shortened default-effect children retain explicit uncertainty.
 
-func proveHeadClientUnconfiguredWithin(client ssa.Value, function *ssa.Function, budget *proofs.SearchBudget) resourceProof {
+func proveHeadClientUnconfiguredWithin(client ssa.Value, function *ssa.Function, budget *proofs.SearchBudget) Proof {
 	if !budget.Spend() {
-		return carriedValueProof(false, resourceReasonUntouched, budget)
+		return carriedProof(false, budget)
 	}
 	if local, ok := client.(*ssa.Alloc); ok {
-		return carriedValueProof(onlyHTTPDoUsesWithin(local, budget), resourceReasonUntouched, budget)
+		return carriedProof(onlyHTTPDoUsesWithin(local, budget), budget)
 	}
 	load, ok := client.(*ssa.UnOp)
 	if !ok || load.Op != token.MUL {
-		return carriedValueProof(false, resourceReasonUntouched, budget)
+		return carriedProof(false, budget)
 	}
 	if ssacall.ValueMatchesSymbol(load.X, httpDefaultClient) {
 		if !onlyHTTPDoUsesWithin(load, budget) {
-			return carriedValueProof(false, resourceReasonUntouched, budget)
+			return carriedProof(false, budget)
 		}
-		return proveDefaultClientUnmodifiedWithin(function, budget)
+		return DefaultClientUnmodified(function, budget)
 	}
 	cell, ok := load.X.(*ssa.Alloc)
-	return carriedValueProof(ok && zeroClientCellWithin(cell, budget), resourceReasonUntouched, budget)
+	return carriedProof(ok && zeroClientCellWithin(cell, budget), budget)
 }
 
 // zeroClientCell accepts a local variable that holds one fresh zero-value
@@ -134,7 +134,7 @@ func onlyHTTPDoUsesWithin(value ssa.Value, budget *proofs.SearchBudget) bool {
 			return false
 		}
 		call, ok := ref.(*ssa.Call)
-		if !ok || !ssacall.CallMatchesSymbol(call.Common(), httpClientDo) {
+		if !ok || !ssacall.CallMatchesSymbol(call.Common(), ClientDo) {
 			return false
 		}
 	}
@@ -223,7 +223,7 @@ func (query headRequestQuery) uses(walk ssaflow.ReachingWalk, request ssa.Value)
 		case *ssa.DebugRef:
 		case *ssa.Call:
 			common := typed.Common()
-			if ssacall.CallMatchesSymbol(common, httpClientDo) && len(common.Args) == 2 && common.Args[1] == request {
+			if ssacall.CallMatchesSymbol(common, ClientDo) && len(common.Args) == 2 && common.Args[1] == request {
 				continue
 			}
 			if ssacall.CallMatchesAnySymbol(common, httpRequestWithContext, httpRequestClone) &&
@@ -284,24 +284,27 @@ func headerUsesAreEditsWithin(field *ssa.FieldAddr, budget *proofs.SearchBudget)
 // Only visible bodies are expanded; recursive or shortened evidence cannot
 // establish absence of visible changes. Hidden package effects stay opaque.
 
-// httpEffectsBudget bounds visible-body effect queries. Both HTTP acquisition
+// EffectsBudget bounds visible-body effect queries. Both HTTP acquisition
 // families retain this quota; exhaustion supplies the conservative may-modify
 // answer rather than evidence that a global default is unchanged.
-const httpEffectsBudget = 4000
+const EffectsBudget = 4000
 
-// Default mutation keeps its existing child cap while sharing the caller's
+// DefaultClientUnmodified keeps its existing child cap while sharing the caller's
 // allowance. A shortened child is unavailable even when the caller can continue.
-func proveDefaultClientUnmodifiedWithin(function *ssa.Function, budget *proofs.SearchBudget) resourceProof {
-	child := budget.Within(httpEffectsBudget)
-	modified := newHTTPWriterEffects().scanDefaultOverrides(function, child, true)
-	return carriedValueProof(!modified, resourceReasonUntouched, child)
+// DefaultClientUnmodified permits only the root's direct Do uses of the default client.
+func DefaultClientUnmodified(function *ssa.Function, budget *proofs.SearchBudget) Proof {
+	child := budget.Within(EffectsBudget)
+	modified := NewEffects().ScanOverrides(function, child, true)
+	return carriedProof(!modified, child)
 }
 
-func (effects *httpWriterEffects) visibleOverrides(function *ssa.Function, budget *proofs.SearchBudget) bool {
-	return effects.scanDefaultOverrides(function, budget, false)
+func (effects *Effects) visibleOverrides(function *ssa.Function, budget *proofs.SearchBudget) bool {
+	return effects.ScanOverrides(function, budget, false)
 }
 
-func (effects *httpWriterEffects) scanDefaultOverrides(function *ssa.Function, budget *proofs.SearchBudget, allowRootDo bool) bool {
+// ScanOverrides inspects visible defaults, allowing root Do reads only when selected.
+// Nested helper summaries always retain the strict policy.
+func (effects *Effects) ScanOverrides(function *ssa.Function, budget *proofs.SearchBudget, allowRootDo bool) bool {
 	for instruction := range ssaflow.InstructionsWithin(function, budget) {
 		if allowRootDo {
 			if load, ok := instruction.(*ssa.UnOp); ok && load.Op == token.MUL &&
@@ -322,5 +325,5 @@ func (effects *httpWriterEffects) scanDefaultOverrides(function *ssa.Function, b
 			return true
 		}
 	}
-	return resourceFlowExhausted(budget)
+	return exhausted(budget)
 }

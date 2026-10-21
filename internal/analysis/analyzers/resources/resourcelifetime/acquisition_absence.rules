@@ -1,0 +1,51 @@
+signature total fallback outputs (unknownBranch);
+view Call = *ssa.Call {
+};
+query equality = equalitySentinel;
+query assertion = errorTypeAssertionSucceeded;
+query errorsIs = errorsIsNonNilSentinel;
+query errorsAs = exactErrorsAs;
+query predicate = predicateWitness;
+query legacy = legacyErrorPredicate;
+build result = carriedValueProof;
+build unknownBranch;
+union Witness = (resourceLifetimeReason, bool) tag 1 {
+  Witness = true {
+    reason: 0;
+  };
+  NoWitness = false;
+};
+union Predicate = (resourceProof, bool) tag 1 {
+  Decided = true {
+    proof: 0;
+  };
+  Undecided = false;
+};
+const resourceReasonNone, resourceReasonErrorTypeAssertionSucceeded;
+const resourceReasonExactErrorEqualsNonNilFilesystemSentinel, resourceReasonErrorsAsExactAcquisitionError;
+
+// A call cannot be an equality expression. The remaining evidence families
+// retain their order, including terminal predicate cutoffs before legacy APIs.
+rule Call:
+  inputs $knowledge $call:(Call) $error $budget
+  => query assertion $call $error $budget
+           select true => outputs (result true resourceReasonErrorTypeAssertionSucceeded $budget)
+     <|> query errorsIs $call $error $budget
+           select Witness reason:$reason => outputs (result true $reason $budget)
+     <|> query errorsAs $call $error
+           select true => outputs (result true resourceReasonErrorsAsExactAcquisitionError $budget)
+     <|> query predicate $knowledge $call $error $budget
+           select Decided proof:$proof => outputs $proof
+     <|> query legacy $call $error $budget
+           select Witness reason:$reason => outputs (result true $reason $budget)
+     <|> pure outputs (result false resourceReasonNone $budget);
+
+rule Other:
+  inputs _ $condition $error $budget
+  => query equality $condition $error $budget
+           select true => outputs (result true resourceReasonExactErrorEqualsNonNilFilesystemSentinel $budget)
+     <|> query assertion $condition $error $budget
+           select true => outputs (result true resourceReasonErrorTypeAssertionSucceeded $budget)
+     <|> query errorsIs $condition $error $budget
+           select Witness reason:$reason => outputs (result true $reason $budget)
+     <|> pure outputs (result false resourceReasonNone $budget);

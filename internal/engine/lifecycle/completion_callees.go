@@ -2,9 +2,9 @@ package lifecycle
 
 import (
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
-	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -21,22 +21,14 @@ func resolveCallees(instruction ssa.Instruction, budget *proofs.SearchBudget) ([
 	if !budget.Spend() {
 		return nil, false
 	}
-	switch typed := instruction.(type) {
-	case *ssa.Defer:
-		return calleesOf(typed.Common(), launchDeferred, instruction, true, budget)
-	case *ssa.Go:
-		return calleesOf(typed.Common(), launchStarted, instruction, false, budget)
-	case *ssa.Call:
-		common := typed.Common()
-		if ssacall.CallMatchesSymbol(common, waitGroupGoMethod) && len(common.Args) == 2 {
-			return closureCallees(common.Args[1], launchStarted, budget)
-		}
-		if ssacall.HasLibraryContract(common, ssacall.ContractTestingCleanup) && len(common.Args) > 0 {
-			// testing.TB guarantees that Cleanup callbacks run when the test
-			// and its subtests complete, so a registered callback is deferred.
-			return closureCallees(common.Args[len(common.Args)-1], launchDeferred, budget)
-		}
-		return calleesOf(common, launchCalled, instruction, false, budget)
+	plan := completionpolicy.RecognizeLaunch(instruction)
+	switch plan.Kind {
+	case completionpolicy.CalleeCommon:
+		return calleesOf(plan.Common, plan.Launch, instruction, plan.AllowOnceFunc, budget)
+	case completionpolicy.CalleeCallback:
+		return closureCallees(plan.Callback, plan.Launch, budget)
+	case completionpolicy.CalleeAbsent:
+		return nil, false
 	}
 	return nil, false
 }
@@ -92,23 +84,18 @@ func exactCallbacks(value ssa.Value, invocation ssa.Instruction, allowOnceFunc b
 	var result []*ssa.MakeClosure
 	var resolve func(ssaflow.ReachingWalk, ssa.Value) bool
 	resolve = func(walk ssaflow.ReachingWalk, value ssa.Value) bool {
-		switch typed := value.(type) {
-		case *ssa.MakeClosure:
-			result = append(result, typed)
+		plan := completionpolicy.RecognizeCallback(value, allowOnceFunc)
+		switch plan.Kind {
+		case completionpolicy.CallbackExact:
+			result = append(result, plan.Closure)
 			return true
-		case *ssa.Call:
-			common := typed.Common()
-			if allowOnceFunc && ssacall.CallMatchesSymbol(common, syncOnceFunc) && len(common.Args) == 1 {
-				return walk.Every(common.Args[0], resolve)
-			}
-		case *ssa.UnOp:
-			if stored := heapmodel.NewStorage(budget).StableContent(typed.X, invocation); stored.Proven() {
+		case completionpolicy.CallbackFollow:
+			return walk.Every(plan.Source, resolve)
+		case completionpolicy.CallbackStorage:
+			if stored := heapmodel.NewStorage(budget).StableContent(plan.Source, invocation); stored.Proven() {
 				return walk.Every(stored.Value, resolve)
 			}
-		case *ssa.Alloc:
-			if stored := heapmodel.NewStorage(budget).StableContent(typed, invocation); stored.Proven() {
-				return walk.Every(stored.Value, resolve)
-			}
+		case completionpolicy.CallbackAbsent:
 		}
 		return false
 	}

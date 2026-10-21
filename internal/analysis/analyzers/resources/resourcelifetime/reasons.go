@@ -214,13 +214,3 @@ type resourceProof struct {
 }
 
 func (proof resourceProof) Proven() bool { return proof.State == proofs.EvidenceProven }
-
-// within discards query evidence if its child allowance or shared pool ran out.
-// Apply it after the authoritative query; an early witness is not a completed
-// proof when later work was cut. Available proofs keep their domain meaning.
-func (proof resourceProof) within(budget *proofs.SearchBudget) resourceProof {
-	if resourceFlowExhausted(budget) {
-		return resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonBudgetExhausted}
-	}
-	return proof
-}

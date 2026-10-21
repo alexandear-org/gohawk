@@ -1,0 +1,42 @@
+signature total fallback outputs (branchProof (unknownBranch) false) false;
+view Evidence = resourceProof {
+  state: State;
+};
+build branchProof, testifyResult, flowResult;
+build unknownBranch;
+query testify = testifyNoErrorSuccessBranch;
+query available = branchAvailable;
+query flow = resourceSuccessEdge;
+const resourceUnknown, resourceProven;
+union Guard = (bool, bool) tag 1 {
+  GuardFound = true {
+    success: 0;
+  };
+  NoGuard = false;
+};
+
+rule Unavailable:
+  inputs $proof:(Evidence state:resourceUnknown) _ _ _ _ _
+  => outputs (branchProof $proof false) false;
+
+// A true documented nonnil-error guard excludes acquisition on this edge.
+rule FailedAcquisition:
+  inputs $proof:(Evidence state:resourceProven) true _ _ _ _
+  => outputs (branchProof $proof false) true;
+
+rule OtherBranch:
+  inputs _ _ $branch $successor $error $budget
+  => do {
+           GuardFound success:$success <- query testify $branch $successor $error $budget
+             else {
+               NoGuard => decline;
+             };
+           true <- query available $budget
+             else {
+               false => decline;
+             };
+           pure outputs (testifyResult $success $budget) $success;
+         }
+     <|> query flow $branch $successor $error $budget
+           select GuardFound success:$flowSuccess => outputs (flowResult $flowSuccess true $budget) false
+     <|> pure outputs (flowResult false false $budget) false;

@@ -24,6 +24,25 @@ standalone GoHawk module, including its supported Go floor. The manifest
 records generated-file ownership and hashes. Edit rules or bindings and
 regenerate, never patch generated Go.
 
+## Query sequencing and schema maintenance
+
+The HTTP acquisition policies use `do` blocks for dependent, stateful queries.
+The success-branch policy combines `do` with ordered alternatives: explicit
+`decline` tries ordinary flow after an unavailable assertion strategy, without
+repeating its queries or refunding its allowance.
+Each step selects a complete outcome and explicitly returns on every other
+outcome. Reached queries retain their original order and budget charges; the
+public Go entry points still discard evidence if the child or shared allowance
+is exhausted. CI pins the compiler revision supporting this syntax.
+
+Hyrule also supports schema-derived copying, keys, equality, visits and transforms
+over existing Go records. These do not introduce new host types. A useful next
+candidate is concurrency summary cloning, whose nested collections currently
+have explicit copying and borrowing policies in `cloneEffects`. Migration must
+preserve those policies, including retained immutable evidence, rather than
+assuming every nested value needs a deep clone. Budgeted state copying and
+fixpoint equality remain separate domain contracts.
+
 ## Migration scope
 
 A strong fit is a substantial ordered structural recognizer, a decision over
@@ -44,11 +63,11 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
-| Lifecycle completion/transfer recognition and outcome selection | Generated unproven-completion outcomes; completion/transfer recognition remains; recursive searches stay in Go |
+| Lifecycle completion/transfer recognition and outcome selection | Generated launch/callback recognition and unproven-completion outcomes; recursive coverage, path mapping and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
-| Resource lifetime classification and acquisition-boundary patterns | Generated ordered instruction classification; acquisition-boundary patterns remain; catalog collection stays a table |
+| Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps and dynamic-index leaves; main held-state transition policy remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
@@ -412,3 +431,54 @@ value itself is not publication. Unrecognized uses retain the original escape
 fallback, while unsupported retention instructions retain no witness. Recursive
 use walks, budgets, memoization and strict/loose imported-summary interpretation
 remain in Go, preserving the opposite proof polarities of those two queries.
+
+## HTTP acquisition evidence
+
+The analyzer-owned `resourcelifetime/httpacquire` helper owns exact HEAD request
+provenance, local endpoint/client identity and bounded writer/default-effect
+searches. Its three rulesets select HEAD outcomes, endpoint admission and empty
+framing effects. HEAD recognition checks construction before mutation and client
+evidence. Local endpoints spend their existing visit before server and handler
+resolution; caller defaults, handler defaults and writer framing retain that
+order under one effect-child quota. The final allowance fence remains outside
+the generated policy, so an interrupted decline cannot become normal leak flow.
+
+The parent analyzer projects the helper's protocol reasons once onto the existing
+resource reasons. Its trace positions, considered/evidence outcomes and cleanup
+flow remain unchanged. Existing HTTP controls continue to test both the extracted
+memos and the complete consuming flow, including root-only default Do allowances,
+strict helper memo isolation, child cutoff and fresh recovery. These searches
+retain all existing form masks, identities, visit charges and rationale links.
+
+## Acquisition error decisions
+
+`acquisition_absence.rules` orders exact sentinel equality, successful type
+assertion, `errors.Is`, exact `errors.As`, inferred error predicates and the
+existing legacy API table. An inferred predicate's budget cutoff is terminal;
+an unavailable predicate may continue to the legacy contract. This distinction
+is explicit in the native recognized/unrecognized query outcome. The structural
+call rule skips only the equality test that cannot apply to a call.
+
+`acquisition_branch.rules` consumes the absence proof before testing Testify's
+NoError contract or the ordinary success-edge query. Unknown remains terminal.
+A recognized NoError answer requires the same availability fence; otherwise the
+ordinary edge query retains its conservative cutoff behavior. The generated
+function returns a trace flag beside the existing branch proof. Go emits a trace
+only for the same accepted guards, after selection, and still owns the initial
+visit, branch admission and proof's success-bit availability.
+
+## Completion launch and callback recognition
+
+`completionpolicy/launch.rules` selects synchronous calls, defers, goroutine
+launches, exact WaitGroup.Go callbacks and testing Cleanup registrations. The
+plan carries the original call/callback and launch kind into the existing body
+resolver. Only an actual defer permits OnceFunc unwrapping: an immediate call
+could already have consumed the wrapper. Merely storing or constructing a
+callback does not create a launch.
+
+`callback.rules` supplies exact closures, permitted OnceFunc sources or a storage
+query address. The existing reaching fold, stable-content observation point,
+child allowance and complete-callee requirement remain in Go. The launch kind's
+reason projection moves with that vocabulary and keeps the same evidence codes.
+Existing completion boundaries, callback replacement, body coverage, case/memo
+isolation and all-allowance regressions remain the behavioral contract.

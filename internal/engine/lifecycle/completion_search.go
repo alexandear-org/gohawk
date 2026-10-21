@@ -5,12 +5,12 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	ssapath "github.com/kojah/gohawk/internal/engine/ssaflow/path"
-	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -58,39 +58,16 @@ func methodCallCoverageAssuming(
 	return proveMethodCallCoverageAssumingWithin(function, calls, coverage, assumptions, nil).Proven()
 }
 
-// launchKind is how an instruction runs its callee.
-type launchKind uint8
+// launchKind retains the completion policy's launch vocabulary.
+type launchKind = completionpolicy.LaunchKind
 
 const (
-	launchNone launchKind = iota
-	// launchDeferred covers defer statements and testing Cleanup
-	// registrations: the callee runs when the parent returns.
-	launchDeferred
-	// launchCalled is a synchronous call whose callee returns to the parent.
-	launchCalled
-	// launchStarted covers go statements and sync.WaitGroup.Go: the callee
-	// runs on its own goroutine.
-	launchStarted
-	// launchCallback is a body examined independently of its launch; when
-	// it runs is the caller's concern. It is never resolved from an
-	// instruction, so merely creating or storing a literal proves nothing.
-	launchCallback
+	launchNone     = completionpolicy.LaunchNone
+	launchDeferred = completionpolicy.LaunchDeferred
+	launchCalled   = completionpolicy.LaunchCalled
+	launchStarted  = completionpolicy.LaunchStarted
+	launchCallback = completionpolicy.LaunchCallback
 )
-
-func (launch launchKind) reason() proofs.EvidenceReason {
-	switch launch {
-	case launchDeferred:
-		return proofs.EvidenceDeferredCompletion
-	case launchCalled:
-		return proofs.EvidenceCalledCompletion
-	case launchStarted:
-		return proofs.EvidenceStartedCompletion
-	case launchCallback:
-		return proofs.EvidenceCallbackCompletion
-	case launchNone:
-	}
-	return proofs.EvidenceNone
-}
 
 // completionCallee is one resolved body to search. A callee reached through a
 // closure value maps the caller's target through its bindings; a callee
@@ -103,8 +80,6 @@ type completionCallee struct {
 	closure     *ssa.MakeClosure
 	function    *ssa.Function
 }
-
-var waitGroupGoMethod = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "WaitGroup", Name: "Go"})
 
 // mappedLocal is one callee parameter or captured variable that stands for
 // the caller's target, together with the caller value supplied to it.

@@ -1,5 +1,5 @@
-// Package completionpolicy selects the outcome of a completed or abandoned
-// completion search. It does not traverse SSA or spend the search allowance.
+// Package completionpolicy selects structural invocation plans and completion
+// outcomes. It does not traverse SSA, resolve storage or spend search allowance.
 package completionpolicy
 
 import proofs "github.com/kojah/gohawk/internal/engine/proof"

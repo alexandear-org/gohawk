@@ -21,7 +21,8 @@ import (
 // Acquisition-error guards establish when the exact error paired with a
 // resource excludes ownership on one successor. Visible predicates and captured
 // callbacks use bounded shared flow and storage evidence; opaque or mutable
-// dispatch cannot establish this implication.
+// dispatch cannot establish this implication. Query hooks stay beside this
+// evidence so all paired-error decisions use one availability policy.
 
 type acquisitionErrorResultProof struct {
 	proof resourceProof
@@ -81,22 +82,11 @@ func proveResourceSuccessBranch(
 	// https://github.com/prometheus/node_exporter/blob/a4e08d1d9a152f67ef781469eade6b0bf431994d/collector/ethtool_linux_test.go#L62-L74
 	// https://github.com/pocketbase/pocketbase/blob/bc8ffed4e7265a70a6e8de76c0b0b48b945e19ef/tools/filesystem/internal/fileblob/fileblob.go#L428-L436
 	proof := resourceAbsentErrorCheck(knowledge, branch.Cond, errorValue, budget)
-	if proof.State == proofs.EvidenceUnknown {
-		return resourceBranchProof{resourceProof: proof}
+	decision, trace := decideResourceSuccessBranch(proof, successor == block.Succs[0], branch, successor, errorValue, budget)
+	if trace {
+		traceAcquisitionErrorProof(pass, branch, decision.Reason, candidate)
 	}
-	if proof.Proven() && successor == block.Succs[0] {
-		traceAcquisitionErrorProof(pass, branch, proof.Reason, candidate)
-		return resourceBranchProof{resourceProof: proof}
-	}
-	if success, ok := testifyNoErrorSuccessBranch(branch, successor, errorValue, budget); ok && !resourceFlowExhausted(budget) {
-		if success {
-			traceAcquisitionErrorProof(pass, branch, resourceReasonTestifyNoErrorGuard, candidate)
-		}
-		return resourceBranchProof{resourceProof: carriedValueProof(true, resourceReasonTestifyNoErrorGuard, budget), success: success}
-	}
-	success, known := ssapath.SuccessBranchWithin(block, successor, errorValue, budget)
-	proof = carriedValueProof(known, resourceReasonNone, budget)
-	return resourceBranchProof{resourceProof: proof, success: proof.Proven() && success}
+	return decision
 }
 
 func testifyNoErrorSuccessBranch(branch *ssa.If, successor *ssa.BasicBlock, errorValue ssa.Value, budget *proofs.SearchBudget) (bool, bool) {
@@ -116,61 +106,7 @@ func testifyNoErrorSuccessBranch(branch *ssa.If, successor *ssa.BasicBlock, erro
 func resourceAbsentErrorCheck(
 	knowledge *summaries.Provider, condition, errorValue ssa.Value, budget *proofs.SearchBudget,
 ) resourceProof {
-	// Equality to a documented non-nil sentinel excludes successful acquisition.
-	// Require the exact error: an unrelated or derived error can compare equal
-	// even when this acquisition succeeded. Arbitrary error variables may be nil.
-	// https://github.com/life4/enc/blob/853bf70379f698b65e4415876c014378be90e021/cmd/helpers.go#L29-L38
-	if comparison, ok := condition.(*ssa.BinOp); ok && comparison.Op == token.EQL {
-		if comparison.X == errorValue && isNonNilFilesystemSentinel(comparison.Y, budget) ||
-			comparison.Y == errorValue && isNonNilFilesystemSentinel(comparison.X, budget) {
-			return carriedValueProof(true, resourceReasonExactErrorEqualsNonNilFilesystemSentinel, budget)
-		}
-	}
-	if errorTypeAssertionSucceeded(condition, errorValue, budget) {
-		return carriedValueProof(true, resourceReasonErrorTypeAssertionSucceeded, budget)
-	}
-	if reason, proven := errorsIsNonNilSentinel(condition, errorValue, budget); proven {
-		return carriedValueProof(true, reason, budget)
-	}
-	call, ok := condition.(*ssa.Call)
-	if !ok {
-		return carriedValueProof(false, resourceReasonNone, budget)
-	}
-	common := call.Common()
-	// errors.As returns false for nil, including custom As implementations:
-	// they are called only after that nil check. Require the exact acquisition
-	// error; a joined or wrapped error can be non-nil even when acquisition succeeds.
-	// https://github.com/bluesky-social/indigo/blob/41278964ec8e3253e70d4e919dfb8e34211c543d/atproto/identity/did.go#L108-L121
-	if ssacall.CallMatchesSymbol(common, syntax.PackageFunction("errors", "As")) &&
-		len(common.Args) == 2 && common.Args[0] == errorValue {
-		return carriedValueProof(true, resourceReasonErrorsAsExactAcquisitionError, budget)
-	}
-	if proof := errorPredicateAcquisition(knowledge, call, errorValue, budget); proof.Proven() || proof.Reason == resourceReasonBudgetExhausted {
-		return proof
-	}
-	// os.IsNotExist and os.IsExist are the legacy equivalents of errors.Is with
-	// the corresponding filesystem sentinel. Their true branches prove that
-	// the acquisition returned a non-nil error and no owned file.
-	// https://github.com/Kampe/Herdforge/blob/198b704aed6a18b68e7eeb50ba8e97d37855f6b2/pkg/feedback/send.go#L124
-	if len(common.Args) != 1 || !heapmodel.ValueDerivesFromWithin(common.Args[0], errorValue, budget) {
-		return carriedValueProof(false, resourceReasonNone, budget)
-	}
-	// os.IsPermission and os.IsTimeout are documented to report false for a
-	// nil error, so their true branches carry the same proof.
-	for _, predicate := range []struct {
-		symbol syntax.Symbol
-		reason resourceLifetimeReason
-	}{
-		{syntax.PackageFunction("os", "IsNotExist"), resourceReasonOSIsNotExist},
-		{syntax.PackageFunction("os", "IsExist"), resourceReasonOSIsExist},
-		{syntax.PackageFunction("os", "IsPermission"), resourceReasonOSIsPermission},
-		{syntax.PackageFunction("os", "IsTimeout"), resourceReasonOSIsTimeout},
-	} {
-		if ssacall.CallMatchesSymbol(common, predicate.symbol) {
-			return carriedValueProof(true, predicate.reason, budget)
-		}
-	}
-	return carriedValueProof(false, resourceReasonNone, budget)
+	return decideAbsentAcquisition(knowledge, condition, errorValue, budget)
 }
 
 // A predicate may observe the error without changing its nil meaning. The
@@ -384,4 +320,97 @@ func traceAcquisitionErrorProof(pass *analysis.Pass, branch *ssa.If, proof resou
 		Function: branch.Parent().String(),
 		Details:  map[string]string{"proof": proof.String()},
 	})
+}
+
+// The initial absence query precedes this policy. A trace plan is applied only
+// after selection; the rules cannot emit a trace or change the search allowance.
+type successBranchSignature func(resourceProof, bool, *ssa.If, *ssa.BasicBlock, ssa.Value, *proofs.SearchBudget) (resourceBranchProof, bool)
+
+var _ successBranchSignature = decideResourceSuccessBranch
+
+func branchProof(proof resourceProof, success bool) resourceBranchProof {
+	return resourceBranchProof{resourceProof: proof, success: success}
+}
+func branchAvailable(budget *proofs.SearchBudget) bool { return !resourceFlowExhausted(budget) }
+func testifyResult(success bool, budget *proofs.SearchBudget) resourceBranchProof {
+	return branchProof(carriedValueProof(true, resourceReasonTestifyNoErrorGuard, budget), success)
+}
+
+func flowResult(success, known bool, budget *proofs.SearchBudget) resourceBranchProof {
+	proof := carriedValueProof(known, resourceReasonNone, budget)
+	return branchProof(proof, proof.Proven() && success)
+}
+
+func unknownBranch() resourceProof {
+	return resourceProof{State: proofs.EvidenceUnknown, Reason: resourceReasonBudgetExhausted}
+}
+
+type absentAcquisitionSignature func(*summaries.Provider, ssa.Value, ssa.Value, *proofs.SearchBudget) resourceProof
+
+var _ absentAcquisitionSignature = decideAbsentAcquisition
+
+func equalitySentinel(condition, errorValue ssa.Value, budget *proofs.SearchBudget) bool {
+	// Equality to a documented non-nil sentinel excludes successful acquisition.
+	// Require the exact error: an unrelated or derived error can compare equal
+	// even when this acquisition succeeded. Arbitrary error variables may be nil.
+	// https://github.com/life4/enc/blob/853bf70379f698b65e4415876c014378be90e021/cmd/helpers.go#L29-L38
+	if comparison, ok := condition.(*ssa.BinOp); ok && comparison.Op == token.EQL {
+		if comparison.X == errorValue && isNonNilFilesystemSentinel(comparison.Y, budget) ||
+			comparison.Y == errorValue && isNonNilFilesystemSentinel(comparison.X, budget) {
+			return true
+		}
+	}
+	return false
+}
+
+func exactErrorsAs(call *ssa.Call, errorValue ssa.Value) bool {
+	common := call.Common()
+	// errors.As returns false for nil, including custom As implementations:
+	// they are called only after that nil check. Require the exact acquisition
+	// error; a joined or wrapped error can be non-nil even when acquisition succeeds.
+	// https://github.com/bluesky-social/indigo/blob/41278964ec8e3253e70d4e919dfb8e34211c543d/atproto/identity/did.go#L108-L121
+	if ssacall.CallMatchesSymbol(common, syntax.PackageFunction("errors", "As")) &&
+		len(common.Args) == 2 && common.Args[0] == errorValue {
+		return true
+	}
+	return false
+}
+
+func predicateWitness(knowledge *summaries.Provider, call *ssa.Call, errorValue ssa.Value, budget *proofs.SearchBudget) (resourceProof, bool) {
+	proof := errorPredicateAcquisition(knowledge, call, errorValue, budget)
+	if proof.Proven() || proof.Reason == resourceReasonBudgetExhausted {
+		return proof, true
+	}
+	return resourceProof{}, false
+}
+
+func legacyErrorPredicate(call *ssa.Call, errorValue ssa.Value, budget *proofs.SearchBudget) (resourceLifetimeReason, bool) {
+	common := call.Common()
+	// os.IsNotExist and os.IsExist are the legacy equivalents of errors.Is with
+	// the corresponding filesystem sentinel. Their true branches prove that
+	// the acquisition returned a non-nil error and no owned file.
+	// https://github.com/Kampe/Herdforge/blob/198b704aed6a18b68e7eeb50ba8e97d37855f6b2/pkg/feedback/send.go#L124
+	if len(common.Args) != 1 || !heapmodel.ValueDerivesFromWithin(common.Args[0], errorValue, budget) {
+		return resourceReasonNone, false
+	}
+	// os.IsPermission and os.IsTimeout are documented to report false for a
+	// nil error, so their true branches carry the same proof.
+	for _, predicate := range []struct {
+		symbol syntax.Symbol
+		reason resourceLifetimeReason
+	}{
+		{syntax.PackageFunction("os", "IsNotExist"), resourceReasonOSIsNotExist},
+		{syntax.PackageFunction("os", "IsExist"), resourceReasonOSIsExist},
+		{syntax.PackageFunction("os", "IsPermission"), resourceReasonOSIsPermission},
+		{syntax.PackageFunction("os", "IsTimeout"), resourceReasonOSIsTimeout},
+	} {
+		if ssacall.CallMatchesSymbol(common, predicate.symbol) {
+			return predicate.reason, true
+		}
+	}
+	return resourceReasonNone, false
+}
+
+func resourceSuccessEdge(branch *ssa.If, successor *ssa.BasicBlock, errorValue ssa.Value, budget *proofs.SearchBudget) (bool, bool) {
+	return ssapath.SuccessBranchWithin(branch.Block(), successor, errorValue, budget)
 }
