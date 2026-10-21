@@ -41,12 +41,10 @@ rule Settled:
 // https://github.com/coder/acp-go-sdk/blob/0845a3bb9eddda5bfc22a94dd3598c90cb842451/example/agent/main.go#L401-L423
 rule UncoveredReturn:
   $request
-  => query $use = commandUse $request
-     decide $use {
+  => query commandUse $request {
        Uncertain => Decision state:decisionUnknown reason:reasonCommandUseCutoff;
        Unused => Decision state:decisionUnknown reason:reasonUnusedCommandOwnershipUnknown;
-       Used => query $entry = entryLifetime $request
-       decide $entry {
+       Used => query entryLifetime $request {
          ProgramLifetime => Decision state:decisionUnknown reason:reasonProgramLifetimeOwnershipUnknown;
          OrdinaryLifetime => Decision state:decisionProven reason:reasonUnownedReturn;
        };
