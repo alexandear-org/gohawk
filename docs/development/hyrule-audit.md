@@ -116,6 +116,47 @@ These operations retain their native Go orchestration. Exact path metadata was
 clean; the scope's only graph gaps were the two ignored generated outputs,
 confirmed as generated files and covered by the generation check.
 
+## Resource and call infrastructure review
+
+The next bounded review read all 29 authored Go files in `engine/resourcemodel`,
+`engine/ssaflow/cfg`, `engine/ssaflow/calls` (including `synchronization`) and
+`analysis/passes/testvariant`. Complete graph path queries and exact-path checks
+used generation `2026-10-21T23:33:45Z`. Authored paths had clean metadata; the
+five scope gaps were ignored generated call/synchronization outputs. Their
+headers and all five source rule files were inspected directly.
+
+| Files or family | Disposition |
+| --- | --- |
+| `resourcemodel/state.go`, `relations.go` | Three independent obligation flags have simple immutable setters and one conjunction. Relation proofs sequence identity and stored-path queries with allowance fences, then construct an owned path copy. No substantial independent classifier remains. |
+| `resourcemodel/conditional.go` | The external contract is one exact API/result combination. Forwarding requires a complete straight-line instruction census, at most one nested call, exact returned-call identity, an access-path walk and a caller relationship proof. The instruction switch collects that census; translating its few accepted forms would retain the same stateful collection and identity queries in Go. |
+| `ssaflow/cfg` | Instruction indexing/order, dominance/reachability, cycle detection, successor filtering and keyed work lists. State-transfer policy is supplied by consumers; this package owns traversal and allowance accounting. |
+| `testvariant/analyzer.go` | Prerequisite marker declaration and an analyzer copy with one added prerequisite. |
+| `calls/call_constants.go`, `call_conditions.go` | The substantial fixed-outcome recognizer already uses `fixed_outcome.rules`. Remaining code binds argument/capture metadata, validates type/position compatibility, builds bitsets, filters successors and interprets small outcome enums. Bound-condition evaluation unwraps negation, tests the two sides of a nil comparison under budget, and reads the binding map; its native queries and cutoff fences remain the work. |
+| `calls/call_effect_uses.go`, `call_field_effects.go`, `call_effects.go` | Direct-use and field-use policy already use rules. Go owns alias-use recursion, closure/call binding, effect-bit accumulation and memo completeness. Builtin effects are a compact name-to-bitset table; final proof construction interprets the unknown bit and budget state. |
+| `calls/call_bindings.go`, `callback_storage.go`, `call_goroutines.go`, `call_resolution.go` | Argument/capture iteration, exact result-slot lookup, readonly-use censuses and reaching walks. The small shape checks select inputs to those searches; capture-before-argument order and loaded-cell handling remain with the searches. |
+| `calls/call_graph_memo.go`, `call_summaries.go` | Recursion scopes, cache lifetime, dependent-answer invalidation and caller-supplied computation/fallback callbacks. These are query infrastructure, not analyzer proof policy. |
+| `calls/call_contracts.go`, `call_symbols.go` | The library registry dispatches explicit contract IDs to exact-symbol families, one documented structural registrar name, or provenance helpers. Most branches are already declaration lists; converting them would require native identity/provenance hooks around the same catalog. Symbol matching itself owns builtin, promoted-method and generic declaration identity. Neither family benefits from a second dispatch layer. |
+| `calls/call_uses.go`, `process_entry.go`, `interface_dispatch.go` | Complete body/use inventories, private caller-chain/cycle checks, and reaching-value/method-set resolution. Availability and identity remain attached to those bounded censuses rather than a separate rule decision. |
+| `calls/synchronization` | Operation recognition and mutex-effect admission already use rules. Native code declares exact symbols, extracts receivers/counts, validates integer constants and renders the event enum. |
+
+## Command and test infrastructure review
+
+All 18 authored Go files in `internal/cli` and all three authored files in
+`testsupport/analyzertest` and `testsupport/docexamples` were read. The bounded
+graph query returned exactly those 21 implementation paths. Exact-path metadata
+was clean at generation `2026-10-21T23:33:45Z`. The CLI scope also recorded a
+partial parse of a generic-method toolchain fixture at line 7; that source was
+read directly and is an illustrative input, not an implementation candidate.
+
+| Family | Disposition |
+| --- | --- |
+| `cli.go`, `selection*.go` | Flag parsing, request validation, selection-map construction, command routing and vet-tool handshake. Base selection has three actual construction strategies: all, selected groups, or defaults; the other switch arms establish an empty base. Precedence then comes from applying group/name/explicit/check-owner updates in order. A rule selector would preserve the same collection loops and map mutations in native hooks. The final per-check admission expression is small. |
+| `delegated_run.go`, `diagnostic_json.go` | Process execution, JSON document merging, normalized diagnostic construction, deduplication and sorting. Exit precedence is the compact error/findings/success case distinction. These are I/O and wire-format operations rather than analyzer evidence policy. |
+| `diagnostic_render.go`, `documentation.go`, `writer.go` | Terminal and catalog rendering, source snippet layout, flag/version/help output and best-effort writes. Range validation and presentation defaults stay beside the formatting they protect. |
+| `dump*.go`, `facts.go`, `heap.go`, `ssa.go` | Existing view table, package/analysis loading, graph/fact enumeration, deterministic ordering and rendering. Trace grouping/folding presents emitted records; it does not reconstruct proof policy. No second analyzer decision belongs in a dump view. |
+| `testsupport/analyzertest` | Installs diagnostic-contract assertions and the common analysistest harness. Independent assertions intentionally accumulate test errors before forwarding an unsuppressed report. |
+| `testsupport/docexamples` | Fixture-region scanning, package loading/checker execution, position translation, diagnostic attachment and timing. The marker scanner tracks one open region with two marker actions; the surrounding work is text/offset collection and error reporting. Its small kind table and metric setters need no rule adapter. |
+
 ## Remaining audit work
 
 The internal scope still needs a complete source review with per-family
