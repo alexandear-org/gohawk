@@ -23,5 +23,8 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
       - name: Replay reviewed cohort
         run: scripts/precision-regression.py benchmarks/precision/${{ inputs.cohort }}

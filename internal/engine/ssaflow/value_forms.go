@@ -3,6 +3,8 @@ package ssaflow
 import (
 	"go/token"
 
+	"github.com/kojah/gohawk/internal/engine/ssaflow/valueforms"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"golang.org/x/tools/go/ssa"
 )
@@ -16,7 +18,7 @@ import (
 // TransparentValueForm identifies an SSA wrapper that a caller has chosen to
 // treat as preserving the evidence it is following. Convert is deliberately
 // opt-in because it may change a value's representation or meaning.
-type TransparentValueForm uint8
+type TransparentValueForm = valueforms.Form
 
 // TransparentNone is the empty set of forms: it follows no wrapper. A proof
 // that must see a value exactly as it was written names it rather than
@@ -24,47 +26,23 @@ type TransparentValueForm uint8
 const TransparentNone TransparentValueForm = 0
 
 const (
-	TransparentChangeInterface TransparentValueForm = 1 << iota
-	TransparentChangeType
-	TransparentConvert
-	TransparentMakeInterface
+	TransparentChangeInterface = valueforms.ChangeInterface
+	TransparentChangeType      = valueforms.ChangeType
+	TransparentConvert         = valueforms.Convert
+	TransparentMakeInterface   = valueforms.MakeInterface
 	// TransparentTypeAssert unwraps a type assertion. The asserted value is
 	// the same object seen through a different static type, so a proof about
 	// identity or ownership may follow it. A proof about what a value can do,
 	// such as whether a method is reachable, must not: the assertion is the
 	// point where that changes.
-	TransparentTypeAssert
+	TransparentTypeAssert = valueforms.TypeAssert
 )
 
 // UnwrapTransparentValue returns the operand of value only when its concrete
 // SSA form is among forms. There is intentionally no catch-all form: each
 // analysis must select the transformations that preserve its own evidence.
 func UnwrapTransparentValue(value ssa.Value, forms TransparentValueForm) (ssa.Value, bool) {
-	switch typed := value.(type) {
-	case *ssa.ChangeInterface:
-		return transparentOperand(typed.X, forms, TransparentChangeInterface)
-	case *ssa.ChangeType:
-		return transparentOperand(typed.X, forms, TransparentChangeType)
-	case *ssa.Convert:
-		return transparentOperand(typed.X, forms, TransparentConvert)
-	case *ssa.MakeInterface:
-		return transparentOperand(typed.X, forms, TransparentMakeInterface)
-	case *ssa.TypeAssert:
-		if typed.CommaOk {
-			// The comma-ok form yields a tuple; the caller reaches the asserted
-			// value through the Extract that selects element zero.
-			return nil, false
-		}
-		return transparentOperand(typed.X, forms, TransparentTypeAssert)
-	case *ssa.Extract:
-		assertion, ok := typed.Tuple.(*ssa.TypeAssert)
-		if !ok || typed.Index != 0 {
-			return nil, false
-		}
-		return transparentOperand(assertion.X, forms, TransparentTypeAssert)
-	default:
-		return nil, false
-	}
+	return valueforms.Unwrap(value, forms)
 }
 
 // ForwardedValue reports the value a reference produces when it only carries
@@ -85,13 +63,6 @@ func ForwardedValue(reference ssa.Instruction) (ssa.Value, bool) {
 		return value, ok
 	}
 	return nil, false
-}
-
-func transparentOperand(operand ssa.Value, forms, form TransparentValueForm) (ssa.Value, bool) {
-	if forms&form == 0 {
-		return nil, false
-	}
-	return operand, true
 }
 
 // BooleanNegationSource returns the operand behind a chain of SSA Boolean NOT

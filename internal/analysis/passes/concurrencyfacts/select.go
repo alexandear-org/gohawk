@@ -1,10 +1,9 @@
 package concurrencyfacts
 
 import (
-	"go/constant"
-	"go/token"
 	"go/types"
 
+	selectcase "github.com/kojah/gohawk/internal/engine/ssaflow/selection"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -211,30 +210,14 @@ func selectSuccessor(block *ssa.BasicBlock, selection *ssa.Select, selected int)
 }
 
 func selectedIndexCondition(condition ssa.Value, selection *ssa.Select, selected int) (bool, bool) {
-	comparison, ok := condition.(*ssa.BinOp)
-	if !ok || comparison.Op != token.EQL && comparison.Op != token.NEQ {
-		return false, false
-	}
-	extract, number := comparison.X, comparison.Y
-	if _, ok := extract.(*ssa.Extract); !ok {
-		extract, number = number, extract
-	}
-	index, ok := extract.(*ssa.Extract)
-	if !ok || index.Tuple != selection || index.Index != 0 {
-		return false, false
-	}
-	literal, ok := number.(*ssa.Const)
-	if !ok || literal.Value == nil {
-		return false, false
-	}
-	want, exact := constant.Int64Val(literal.Value)
-	if !exact {
+	match, ok := selectcase.Recognize(condition)
+	if !ok || match.Select != selection {
 		return false, false
 	}
 	chosen := selected
 	if selected == len(selection.States) {
 		chosen = -1
 	}
-	equal := int64(chosen) == want
-	return equal == (comparison.Op == token.EQL), true
+	equal := int64(chosen) == match.Number
+	return equal == match.Equal, true
 }

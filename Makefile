@@ -14,7 +14,7 @@ BENCHMARK_ARGS ?=
 VERIFY_JOBS ?= 4
 VERIFY_TIMINGS ?= 1
 
-VERIFY_BASE_TARGETS := mod-verify fmt-check vet deadcode ci-policy-check
+VERIFY_BASE_TARGETS := hyrule-generated-check mod-verify fmt-check vet deadcode ci-policy-check
 # Local generation skips expensive analyzer example validation. CI checks both
 # ordinary generated content and live analyzer examples against committed pages.
 VERIFY_STATIC_TARGETS := $(strip $(VERIFY_BASE_TARGETS) lint dogfood $(if $(CI),generated-check))
@@ -22,7 +22,7 @@ VERIFY_STATIC_TARGETS := $(strip $(VERIFY_BASE_TARGETS) lint dogfood $(if $(CI),
 VERIFY_CI_FAST_TARGETS := $(VERIFY_BASE_TARGETS) generated-check
 # Coverage and race instrumentation run only in GitHub Actions. Local
 # verification uses ordinary tests to avoid expensive instrumented builds.
-VERIFY_TARGETS := $(VERIFY_STATIC_TARGETS) test
+VERIFY_TARGETS := $(VERIFY_STATIC_TARGETS) test hyrule-tool-test
 # GNU Make before 4.0, including the version shipped with macOS, does not
 # support grouped parallel output. Parallel scheduling itself remains required.
 VERIFY_OUTPUT_SYNC := $(if $(filter output-sync,$(.FEATURES)),--output-sync=target)
@@ -94,7 +94,7 @@ generate:
 generate-examples:
 	GOHAWK_DOC_TIMINGS=$(VERIFY_TIMINGS) $(GO) run ./tools/gendocs -examples
 
-generated-check:
+generated-check: hyrule-generated-check
 	GOHAWK_DOC_TIMINGS=$(VERIFY_TIMINGS) $(GO) run ./tools/gendocs -check -examples
 
 # Timed wrappers preserve each target's exit status and outer output grouping.
@@ -164,19 +164,19 @@ else
 generated-sync: generate
 endif
 else
-generated-sync:
+generated-sync: hyrule-generate
 endif
 
 verify-static: generated-sync
-	+$(MAKE) $(VERIFY_MAKE_ARGS) $(call verify_targets,$(if $(CI),$(VERIFY_CI_FAST_TARGETS),$(VERIFY_STATIC_TARGETS)))
+	+$(MAKE) HYRULE_READY=1 $(VERIFY_MAKE_ARGS) $(call verify_targets,$(if $(CI),$(VERIFY_CI_FAST_TARGETS),$(VERIFY_STATIC_TARGETS)))
 
 verify: generated-sync
-	+$(MAKE) $(VERIFY_MAKE_ARGS) $(call verify_targets,$(VERIFY_TARGETS))
+	+$(MAKE) HYRULE_READY=1 $(VERIFY_MAKE_ARGS) $(call verify_targets,$(VERIFY_TARGETS))
 
 # The CI-only aggregate adds coverage and race tests. Hosted CI and release
 # workflows run the custom golangci-lint plugin test as a separate gate.
 ci: generated-sync
-	+$(MAKE) $(VERIFY_MAKE_ARGS) $(call verify_targets,$(VERIFY_TARGETS) test-race coverage)
+	+$(MAKE) HYRULE_READY=1 $(VERIFY_MAKE_ARGS) $(call verify_targets,$(VERIFY_TARGETS) test-race coverage)
 
 benchmark:
 	./scripts/benchmark-dogfood.sh $(BENCHMARK_ARGS)
@@ -243,3 +243,19 @@ site-links-external: site-build
 
 site-review:
 	$(PNPM) --dir site dev:review
+
+.PHONY: hyrule-generate hyrule-generated-check hyrule-tool-test
+hyrule-generate:
+	sh scripts/hyrule.sh generate
+
+hyrule-generated-check:
+	sh scripts/hyrule.sh generate --check
+
+hyrule-tool-test:
+	cd -P tools/hyrule && GOWORK=off $(GO) test -p=1 -parallel=4 ./...
+
+# Direct Make invocations generate once before compilation. Verification exports
+# readiness to its recursive gates so parallel readers do not regenerate files.
+ifndef HYRULE_READY
+build test lint deadcode vet vuln test-exhaustive test-race coverage plugin-test generate-examples hyrule-generated-check: hyrule-generate
+endif

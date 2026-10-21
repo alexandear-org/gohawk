@@ -111,6 +111,9 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
       - name: Build release archive
         env:
           GOOS: ${{ matrix.goos }}

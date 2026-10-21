@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
+	"github.com/kojah/gohawk/internal/engine/ssaflow/calls/synchronization"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
@@ -525,29 +526,17 @@ func (graph *regionGraph) builtin(state *regionState, builtin *ssa.Builtin, comm
 	}
 }
 
-// Standard mutex operations mutate their receiver's internal state; they do
-// not retain a pointer to the enclosing user object after a synchronous call.
-// Forget only that storage, preserving sibling fields and their destinations.
-// A launched call still exposes the receiver to another goroutine, and an
-// interface call or RLocker adapter does not satisfy this direct-call contract.
-// https://go.dev/src/sync/mutex.go
-// https://go.dev/src/sync/rwmutex.go
-var synchronousMutexMethods = []syntax.Symbol{
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Mutex", Name: "Lock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Mutex", Name: "Unlock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Mutex", Name: "TryLock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "Lock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "Unlock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "TryLock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "RLock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "RUnlock"}),
-	syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "TryRLock"}),
-}
-
+// Standard mutex contracts come from the shared generated recognizer. Forget
+// only the exact receiver storage, preserving sibling fields and destinations.
+// A launched call still exposes its receiver to another goroutine.
 func (graph *regionGraph) definedMutexCall(state *regionState, common *ssa.CallCommon, instruction ssa.Instruction, started bool) bool {
-	if started || common.StaticCallee() == nil || len(common.Args) != 1 || !ssacall.CallMatchesAnySymbol(common, synchronousMutexMethods...) {
+	if started || common.StaticCallee() == nil || len(common.Args) != 1 {
 		return false
 	}
+	if _, known := synchronization.MutexEffect(common); !known {
+		return false
+	}
+
 	receiver := graph.pointees(common.Args[0])
 	if _, known := singleSlot(receiver); !known {
 		return false

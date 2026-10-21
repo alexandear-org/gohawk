@@ -944,16 +944,16 @@ referrers to budget. Cutoff supplies no possible identity evidence.
 
 ```go
 const (
-	TransparentChangeInterface	TransparentValueForm	= 1 << iota
-	TransparentChangeType
-	TransparentConvert
-	TransparentMakeInterface
+	TransparentChangeInterface	= valueforms.ChangeInterface
+	TransparentChangeType		= valueforms.ChangeType
+	TransparentConvert		= valueforms.Convert
+	TransparentMakeInterface	= valueforms.MakeInterface
 	// TransparentTypeAssert unwraps a type assertion. The asserted value is
 	// the same object seen through a different static type, so a proof about
 	// identity or ownership may follow it. A proof about what a value can do,
 	// such as whether a method is reachable, must not: the assertion is the
 	// point where that changes.
-	TransparentTypeAssert
+	TransparentTypeAssert	= valueforms.TypeAssert
 )
 ```
 
@@ -974,7 +974,7 @@ passing a bare zero.
 [Source](../../../../internal/engine/ssaflow/value_forms.go)
 
 ```go
-type TransparentValueForm uint8
+type TransparentValueForm = valueforms.Form
 ```
 
 TransparentValueForm identifies an SSA wrapper that a caller has chosen to

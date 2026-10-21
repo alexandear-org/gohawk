@@ -196,3 +196,33 @@ func TestWrittenOnceNestedReaderAllowance(t *testing.T) {
 		t.Fatalf("fresh nested reader=%v/%v", stored, ok)
 	}
 }
+
+func TestTransparentAssertionResults(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "assertions", `package assertions
+func assertion(value any) (int, bool) { result, ok := value.(int); return result, ok }
+func pair() (int, bool) { return 1, true }
+func unrelated() (int, bool) { result, ok := pair(); return result, ok }
+`)
+	fn := pkg.Func("assertion")
+	for _, assertion := range ssaflow.InstructionsOf[*ssa.TypeAssert](fn) {
+		if _, ok := ssaflow.UnwrapTransparentValue(assertion, ssaflow.TransparentTypeAssert); ok {
+			t.Fatal("assertion tuple treated as its asserted value")
+		}
+	}
+	for _, name := range []string{"assertion", "unrelated"} {
+		extracts := ssaflow.InstructionsOf[*ssa.Extract](pkg.Func(name))
+		if len(extracts) != 2 {
+			t.Fatalf("%s: got %d extractions", name, len(extracts))
+		}
+		for _, extract := range extracts {
+			value, ok := ssaflow.UnwrapTransparentValue(extract, ssaflow.TransparentTypeAssert)
+			want := name == "assertion" && extract.Index == 0
+			if ok != want || ok && value != fn.Params[0] {
+				t.Fatalf("%s[%d]: got %v, %t", name, extract.Index, value, ok)
+			}
+			if _, ok := ssaflow.UnwrapTransparentValue(extract, ssaflow.TransparentNone); ok {
+				t.Fatal("extraction ignored the caller's transparency mask")
+			}
+		}
+	}
+}

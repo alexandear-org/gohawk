@@ -27,8 +27,11 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
-      - name: Run fast static checks
-        run: make verify-static
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
+      - name: Run fast static checks and Hyrule contracts
+        run: make verify-static hyrule-tool-test
 
   lint:
     runs-on: ubuntu-latest
@@ -43,6 +46,9 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
 
       - name: Run golangci-lint
         run: make lint
@@ -61,6 +67,9 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
       - name: Check reachable dependencies for vulnerabilities
         run: make vuln
 
@@ -77,6 +86,9 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
 
       - name: Build and dogfood gohawk
         run: make dogfood
@@ -96,6 +108,9 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
       - name: Run race-enabled tests
         run: make test-race
 
@@ -113,6 +128,9 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
       - name: Test the golangci-lint plugin
         run: make plugin-test
 
@@ -129,6 +147,9 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
 
       - name: Collect coverage
         # Measure product analysis behavior, not CLI and documentation tooling.
@@ -170,6 +191,9 @@ jobs:
           go-version-file: .go-version
           cache-dependency-path: go.sum
 
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
+
       - name: Build compatibility binary
         run: go build -o "$RUNNER_TEMP/gohawk" .
 
@@ -195,6 +219,9 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+
+      - name: Generate Go sources
+        uses: ./.github/actions/prepare-hyrule
 
       - name: Run exhaustive CLI subprocess matrix
         run: make test-exhaustive

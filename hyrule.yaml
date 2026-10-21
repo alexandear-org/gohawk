@@ -1,0 +1,37 @@
+version: 1
+targets:
+  - name: select_comparison
+    package: internal/engine/ssaflow/selection
+    bindings: internal/engine/ssaflow/selection/comparison.go
+    signature: ComparisonSignature
+    function: Recognize
+    rules: [internal/engine/ssaflow/selection/comparison.rules]
+    out: internal/engine/ssaflow/selection/comparison_gen.go
+  - name: synchronization_primitives
+    package: internal/engine/ssaflow/calls/synchronization
+    bindings: internal/engine/ssaflow/calls/synchronization/primitives.go
+    signature: PrimitiveSignature
+    function: Recognize
+    rules: [internal/engine/ssaflow/calls/synchronization/primitives.rules]
+    out: internal/engine/ssaflow/calls/synchronization/primitives_gen.go
+  - name: mutex_storage_contract
+    package: internal/engine/ssaflow/calls/synchronization
+    bindings: internal/engine/ssaflow/calls/synchronization/mutex.go
+    signature: MutexEffectSignature
+    function: MutexEffect
+    rules: [internal/engine/ssaflow/calls/synchronization/mutex.rules]
+    out: internal/engine/ssaflow/calls/synchronization/mutex_gen.go
+  - name: process_return_decision
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/decision_bindings.go
+    signature: processReturnSignature
+    function: processReturnDecision
+    rules: [internal/analysis/analyzers/resources/processownership/decision.rules]
+    out: internal/analysis/analyzers/resources/processownership/decision_gen.go
+  - name: transparent_value_form
+    package: internal/engine/ssaflow/valueforms
+    bindings: internal/engine/ssaflow/valueforms/forms.go
+    signature: Signature
+    function: Unwrap
+    rules: [internal/engine/ssaflow/valueforms/forms.rules]
+    out: internal/engine/ssaflow/valueforms/forms_gen.go

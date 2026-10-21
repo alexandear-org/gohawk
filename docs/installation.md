@@ -11,26 +11,26 @@ are best effort.
 
 ## Install the CLI
 
-Install the latest release with Go:
+Download an archive for your platform from
+[GitHub Releases](https://github.com/kojah/gohawk/releases), extract the executable,
+and put it on your `PATH`. Archives cover Linux, macOS, and Windows on AMD64 and
+ARM64. Each release includes SHA-256 checksums. The prebuilt CLI still requires
+a supported Go command to analyze projects.
+
+Source builds require Go 1.27 for generation. Generated Go files are not stored
+in Git, so `go install github.com/kojah/gohawk@latest` cannot build a fresh source
+checkout. Clone the generator alongside GoHawk and build through Make:
 
 ```sh
-go install github.com/kojah/gohawk@latest
+git clone https://github.com/kojah/lockdoc.git
+git clone https://github.com/kojah/gohawk.git
+cd gohawk
+go work init . ../lockdoc
+make build
 ```
 
-For a reproducible toolchain or CI setup, replace `vX.Y.Z` with the release
-you want to pin:
-
-```sh
-go install github.com/kojah/gohawk@vX.Y.Z
-```
-
-Prebuilt archives for Linux, macOS, and Windows on AMD64 and ARM64 are also
-available from [GitHub Releases](https://github.com/kojah/gohawk/releases).
-Each release includes SHA-256 checksums for verifying the downloads. The
-prebuilt CLI still requires a supported Go command to analyze projects.
-
-Go writes the executable to `GOBIN`, or to `GOPATH/bin` when `GOBIN` is not
-set. Make sure that directory is included in your `PATH`.
+The executable is `.build/gohawk`. Copy it to a directory on your `PATH`.
+To build a particular revision, check it out before running `make build`.
 
 Verify the installation:
 

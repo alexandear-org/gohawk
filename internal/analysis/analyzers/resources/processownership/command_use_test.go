@@ -134,3 +134,21 @@ func TestProcessHandleArgumentAllowance(t *testing.T) {
 	}
 	t.Fatal("missing compiled argument consumer")
 }
+
+func TestSettledReturnDoesNotQueryCommandUse(t *testing.T) {
+	// No Start or command is provided: entering command-use discovery would be
+	// invalid. Settlement must win even when the shared search budget is empty.
+	for _, test := range []struct {
+		unknown bool
+		state   proofs.EvidenceState
+		reason  processReason
+	}{
+		{false, proofs.EvidenceDisproven, reasonWaitOwnershipProven},
+		{true, proofs.EvidenceUnknown, reasonAmbiguousWaitOwnership},
+	} {
+		got := decideProcessReturn(nil, nil, nil, test.unknown, proofs.NewSearchBudget(0))
+		if got.state != test.state || got.reason != test.reason {
+			t.Fatalf("unknown=%v: got %+v, want state=%v reason=%v", test.unknown, got, test.state, test.reason)
+		}
+	}
+}

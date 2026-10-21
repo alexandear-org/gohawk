@@ -1,0 +1,14 @@
+name: Generate Hyrule sources
+description: Generate ignored Go sources with the pinned compiler, then use standalone module dependencies.
+runs:
+  using: composite
+  steps:
+    - name: Prepare generator workspace
+      shell: bash
+      run: |
+        git init ../lockdoc
+        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git a9b83d39c6042b4c7fb119e59b64cd71a6b05691
+        git -C ../lockdoc checkout --detach FETCH_HEAD
+        GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
+        GOTOOLCHAIN=go1.27.0 make hyrule-generate
+        echo 'GOWORK=off' >> "$GITHUB_ENV"

@@ -1,0 +1,74 @@
+match lockCall, unlockCall, readLockCall, readUnlockCall, waitCall, doneCall, condCall, closeCall, addCall, integer;
+union Primitive = Primitive tag Kind {
+  Lock {
+    resource: Resource;
+  };
+  Unlock {
+    resource: Resource;
+  };
+  ReadLock {
+    resource: Resource;
+  };
+  ReadUnlock {
+    resource: Resource;
+  };
+  CondWait {
+    resource: Resource;
+  };
+  Close {
+    resource: Resource;
+  };
+  GroupDone {
+    resource: Resource;
+  };
+  GroupWait {
+    resource: Resource;
+  };
+  GroupAdd {
+    resource: Resource;
+    count: Count;
+    fixed: Fixed;
+  };
+};
+
+rule ConditionWait:
+  (condCall $receiver)
+  => (CondWait $receiver);
+
+rule WriterLock:
+  (lockCall $receiver)
+  => (Lock $receiver);
+
+rule WriterUnlock:
+  (unlockCall $receiver)
+  => (Unlock $receiver);
+
+rule ReaderLock:
+  (readLockCall $receiver)
+  => (ReadLock $receiver);
+
+rule ReaderUnlock:
+  (readUnlockCall $receiver)
+  => (ReadUnlock $receiver);
+
+rule ChannelClose:
+  (closeCall $channel)
+  => (Close $channel);
+
+rule GroupCompletion:
+  (doneCall $receiver)
+  => (GroupDone $receiver);
+
+rule GroupJoin:
+  (waitCall $receiver)
+  => (GroupWait $receiver);
+
+// Preserve the exact integer delta when available. The summary consumer still
+// admits only +1; other clients may model different counter transitions.
+rule KnownGroupCount:
+  (addCall $receiver (integer $delta))
+  => (GroupAdd $receiver $delta true);
+
+rule UnknownGroupCount:
+  (addCall $receiver _)
+  => (GroupAdd $receiver 0 false);

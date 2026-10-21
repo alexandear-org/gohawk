@@ -2,7 +2,6 @@ package processownership
 
 import (
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
-	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"github.com/kojah/gohawk/internal/reporting/check"
 	analysisTrace "github.com/kojah/gohawk/internal/reporting/trace"
 	"golang.org/x/tools/go/analysis"
@@ -19,32 +18,12 @@ type processDecision struct {
 }
 
 func decideProcessReturn(start *ssa.Call, command ssa.Value, witness *ssa.Return, unknown bool, budget *proofs.SearchBudget) processDecision {
-	if witness == nil {
-		if unknown {
-			return processDecision{proofs.EvidenceUnknown, reasonAmbiguousWaitOwnership}
-		}
-		return processDecision{proofs.EvidenceDisproven, reasonWaitOwnershipProven}
-	}
-	// Fire-and-forget alone cannot distinguish an intentional browser or
-	// daemon launch from a defect. Retiring the detached audit must not
-	// broaden missing-wait to report those same uncertain launches.
-	use := proveCommandUseAfterStart(start, command, budget)
-	if use.State == proofs.EvidenceUnknown {
+	decision, ok := processReturnDecision(processReturnRequest{start, command, witness, unknown, budget})
+	if !ok {
+		// Invalid host evidence cannot establish a violation.
 		return processDecision{proofs.EvidenceUnknown, reasonCommandUseCutoff}
 	}
-	if use.State == proofs.EvidenceDisproven {
-		return processDecision{proofs.EvidenceUnknown, reasonUnusedCommandOwnershipUnknown}
-	}
-	// A one-time start in the executable's entry may be owned until program
-	// exit. An uncovered entry return cannot distinguish that lifetime from
-	// missing reaping. This declines the report; it does not credit Kill as
-	// Wait or assert that parent exit terminates the child. Repeated starts,
-	// referenced entries and reusable callees remain ordinary wait obligations.
-	// https://github.com/coder/acp-go-sdk/blob/0845a3bb9eddda5bfc22a94dd3598c90cb842451/example/agent/main.go#L401-L423
-	if ssacall.RunsOnceInProgramEntry(start) {
-		return processDecision{proofs.EvidenceUnknown, reasonProgramLifetimeOwnershipUnknown}
-	}
-	return processDecision{proofs.EvidenceProven, reasonUnownedReturn}
+	return decision
 }
 
 func emitProcessDecision(pass *analysis.Pass, function *ssa.Function, start *ssa.Call, command ssa.Value, decision processDecision) {

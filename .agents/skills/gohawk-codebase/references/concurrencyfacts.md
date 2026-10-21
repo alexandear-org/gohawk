@@ -280,20 +280,10 @@ const (
 [Source](../../../../internal/analysis/passes/concurrencyfacts/summary.go)
 
 ```go
-type Kind uint8
+type Kind = synchronization.Kind
 ```
 
 Kind identifies a synchronization event with an exact resource.
-
-## Kind.String
-
-[Source](../../../../internal/analysis/passes/concurrencyfacts/describe.go)
-
-```go
-func (kind Kind) String() string
-```
-
-String names the synchronization event.
 
 ## MutexPointer
 
@@ -487,25 +477,19 @@ to use the prefix as a complete protocol proof.
 
 ```go
 const (
-	Send	Kind	= iota
-	Receive
-	Close
-	GroupAdd
-	GroupDone
-	GroupWait
-	Lock
-	Unlock
-	CondWait
-	// Cancel requests cancellation; it neither joins a worker nor proves that
-	// Done has closed before the call returns.
-	Cancel
-	ReadLock
-	ReadUnlock
-	// Invoke calls a function-typed input, or a method of an interface input,
-	// at this point. It is a hole, not an effect: binding replaces it with the
-	// supplied function's or concrete method's effects, and a summary that
-	// still contains one is incomplete (see callbacks.go).
-	Invoke
+	Send		= synchronization.Send
+	Receive		= synchronization.Receive
+	Close		= synchronization.Close
+	GroupAdd	= synchronization.GroupAdd
+	GroupDone	= synchronization.GroupDone
+	GroupWait	= synchronization.GroupWait
+	Lock		= synchronization.Lock
+	Unlock		= synchronization.Unlock
+	CondWait	= synchronization.CondWait
+	Cancel		= synchronization.Cancel
+	ReadLock	= synchronization.ReadLock
+	ReadUnlock	= synchronization.ReadUnlock
+	Invoke		= synchronization.Invoke
 )
 ```
 

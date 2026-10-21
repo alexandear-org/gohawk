@@ -1,31 +1,15 @@
 package concurrencyfacts
 
 import (
-	"go/constant"
-	"go/token"
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/engine/ssaflow/calls/synchronization"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
-	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
-)
-
-// Completion events retain their exact receiver and execution position. Only
-// the standard library's counter contract is recognized, never method names
-// on project types. Unknown counter changes cannot establish a waiting cycle.
-var (
-	groupAdd     = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "WaitGroup", Name: "Add"})
-	groupDone    = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "WaitGroup", Name: "Done"})
-	groupWait    = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "WaitGroup", Name: "Wait"})
-	mutexLock    = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Mutex", Name: "Lock"})
-	mutexUnlock  = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Mutex", Name: "Unlock"})
-	rwLock       = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "Lock"})
-	rwUnlock     = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "Unlock"})
-	rwReadLock   = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "RLock"})
-	rwReadUnlock = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "RWMutex", Name: "RUnlock"})
 )
 
 func (engine *Engine) callSummary(instruction ssa.CallInstruction) Summary {
@@ -36,49 +20,24 @@ func (engine *Engine) callSummary(instruction ssa.CallInstruction) Summary {
 		return hole
 	}
 	common := engine.resolvedCommon(instruction)
-	var kind Kind
-	var resource ssa.Value
-	// Keep RWMutex modes explicit. Sharing a resource identity does not make
-	// two readers mutually exclusive or turn RUnlock into an exclusive release.
-	switch {
-	case ssacall.CallMatchesSymbol(common, newCond):
+	if ssacall.CallMatchesSymbol(common, newCond) {
 		if _, ok := condLocker(instruction); ok {
 			return Summary{}
 		}
 		return Summary{Reason: ReasonCondLockerUnknown}
-	case ssacall.CallMatchesSymbol(common, condWait):
-		kind, resource = CondWait, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesAnySymbol(common, mutexLock, rwLock):
-		kind, resource = Lock, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesAnySymbol(common, mutexUnlock, rwUnlock):
-		kind, resource = Unlock, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesSymbol(common, rwReadLock):
-		kind, resource = ReadLock, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesSymbol(common, rwReadUnlock):
-		kind, resource = ReadUnlock, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesSymbol(common, syntax.Builtin("close")):
-		kind, resource = Close, common.Args[0]
-	case ssacall.CallMatchesSymbol(common, groupDone):
-		kind, resource = GroupDone, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesSymbol(common, groupWait):
-		kind, resource = GroupWait, ssaflow.CallReceiver(common)
-	case ssacall.CallMatchesSymbol(common, groupAdd):
-		if len(common.Args) != 2 {
-			return Summary{Reason: ReasonGroupCountUnknown}
-		}
-		count, ok := common.Args[1].(*ssa.Const)
-		if !ok || count.Value == nil || !constant.Compare(count.Value, token.EQL, constant.MakeInt64(1)) {
-			return Summary{Reason: ReasonGroupCountUnknown}
-		}
-		kind, resource = GroupAdd, ssaflow.CallReceiver(common)
-	case inertBuiltin(common), inertAtomic(common):
-		return Summary{}
-	default:
-		return engine.instantiate(instruction)
 	}
-	var result Summary
-	result.Reason = engine.appendOperation(&result, kind, resource, instruction.Pos())
-	return result
+	if operation, recognized := synchronization.Recognize(common); recognized {
+		if operation.Kind == GroupAdd && (!operation.Fixed || operation.Count != 1) {
+			return Summary{Reason: ReasonGroupCountUnknown}
+		}
+		var result Summary
+		result.Reason = engine.appendOperation(&result, operation.Kind, operation.Resource, instruction.Pos())
+		return result
+	}
+	if inertBuiltin(common) || inertAtomic(common) {
+		return Summary{}
+	}
+	return engine.instantiate(instruction)
 }
 
 func waitGroupPointer(value types.Type) bool {
@@ -141,10 +100,7 @@ func straightLineBody(function *ssa.Function) bool {
 // Conditions retain their own identity in summaries. The associated locker
 // can only be recovered from an exact NewCond call, never a mutable L field.
 
-var (
-	newCond  = syntax.PackageFunction("sync", "NewCond")
-	condWait = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "sync", Receiver: "Cond", Name: "Wait"})
-)
+var newCond = syntax.PackageFunction("sync", "NewCond")
 
 func condPointer(value types.Type) bool {
 	pointer, ok := value.Underlying().(*types.Pointer)

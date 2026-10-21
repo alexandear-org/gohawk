@@ -5,6 +5,8 @@ benchmark-results/
 .build/
 
 # Go tooling
+go.work
+go.work.sum
 *.test
 *.prof
 *.pprof
@@ -18,3 +20,8 @@ benchmark-results/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# Generated Go sources and local generator ownership receipts
+*_gen.go
+*.pb.go
+.hyrule-manifest.json

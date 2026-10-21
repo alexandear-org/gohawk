@@ -10,7 +10,8 @@ cd tools/codecbench
 GOMAXPROCS=4 go test -bench . -benchmem -count=3
 ```
 
-Generated with protoc 36.2 and protoc-gen-go 1.36.12. From this directory, with
+Generated Go files are ignored by Git. Before running the benchmarks in a fresh
+checkout, generate them with protoc 36.2 and protoc-gen-go 1.36.12. From this directory, with
 those executables on PATH:
 
 ```sh

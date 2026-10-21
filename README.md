@@ -24,10 +24,10 @@ again. This lets gohawk follow a resource through helpers and across packages.
 
 ## Quick Start
 
-```sh
-# Install.
-go install github.com/kojah/gohawk@latest
+Download a binary from [GitHub Releases](https://github.com/kojah/gohawk/releases)
+and put it on your `PATH`. For source builds, see [installation](docs/installation.md).
 
+```sh
 # Run the conservative default set.
 gohawk ./...
 

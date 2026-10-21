@@ -1,10 +1,9 @@
 package path
 
 import (
-	"go/constant"
-	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/engine/ssaflow/selection"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -30,23 +29,12 @@ func SelectedReceiveOnEdge(from, to *ssa.BasicBlock) (ssa.Value, bool) { //nolin
 	if !ok {
 		return nil, false
 	}
-	comparison, ok := branch.Cond.(*ssa.BinOp)
-	if !ok || comparison.Op != token.EQL {
+	// Preserve this query's canonical-equality boundary. The shared recognizer
+	// also serves summary dispatch, whose policy accepts reversed and != forms.
+	match, ok := selection.Recognize(branch.Cond)
+	if !ok || !match.Equal || match.Reversed || match.Number < 0 || match.Number >= int64(len(match.Select.States)) {
 		return nil, false
 	}
-	index, ok := comparison.X.(*ssa.Extract)
-	arm, constantArm := comparison.Y.(*ssa.Const)
-	if !ok || index.Index != 0 || !constantArm || arm.Value == nil {
-		return nil, false
-	}
-	selected, ok := index.Tuple.(*ssa.Select)
-	if !ok || arm.Value.Kind() != constant.Int {
-		return nil, false
-	}
-	number, valid := constant.Int64Val(arm.Value)
-	if !valid || number < 0 || number >= int64(len(selected.States)) {
-		return nil, false
-	}
-	state := selected.States[number]
+	state := match.Select.States[match.Number]
 	return state.Chan, state.Dir == types.RecvOnly
 }

@@ -344,3 +344,13 @@ creates no metadata. `guard_trace_allocations_test.go` checks that contract,
 and `process_guards.go` plus the enabled analyzer trace assert the accepted
 guard and its candidate association. Measurements live in
 [the performance investigation](../analysis-performance-2026-10-06.md).
+
+## Declarative return decision
+
+`decision.rules` owns the final post-Start policy. Settled and ambiguous returns
+short-circuit before command-use discovery. An uncovered return issues the
+budgeted command-use query once; unknown use keeps the cutoff reason and absent
+use keeps detached intent unknown. Only proven use asks whether the launch has
+program-entry lifetime. Each query outcome is handled exhaustively, with no
+fallthrough or repeated proof search. The Go wrapper conservatively declines an
+invalid generated result. Reporting and tracing consume the same decision.

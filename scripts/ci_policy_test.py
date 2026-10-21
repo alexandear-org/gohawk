@@ -20,6 +20,10 @@ class CIPolicyTest(unittest.TestCase):
         fake_go = self.root / "fake-go"
         fake_go.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> go-invoked\n')
         fake_go.chmod(0o700)
+        (self.root / "scripts").mkdir()
+        (self.root / "scripts/hyrule.sh").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" >> generation-invoked\n'
+        )
         self.environment = os.environ.copy()
         for name in ("CI", "GITHUB_ACTIONS", "MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES", "GOFLAGS"):
             self.environment.pop(name, None)
@@ -65,6 +69,7 @@ class CIPolicyTest(unittest.TestCase):
         result = self.run_make("test")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.marker.read_text(), "test ./...\n")
+        self.assertEqual((self.root / "generation-invoked").read_text(), "generate\n")
 
 
 if __name__ == "__main__":

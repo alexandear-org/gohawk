@@ -124,16 +124,3 @@ func (constant FactConstant) String() string {
 	}
 	return "?"
 }
-
-// String names the synchronization event.
-func (kind Kind) String() string {
-	names := [...]string{
-		Send: "send on", Receive: "receive from", Close: "close", GroupAdd: "WaitGroup.Add on", GroupDone: "WaitGroup.Done on",
-		GroupWait: "WaitGroup.Wait on", Lock: "Lock", Unlock: "Unlock", CondWait: "Cond.Wait on", Cancel: "cancel",
-		ReadLock: "RLock", ReadUnlock: "RUnlock", Invoke: "invoke",
-	}
-	if int(kind) < len(names) {
-		return names[kind]
-	}
-	return "effect " + strconv.Itoa(int(kind))
-}
