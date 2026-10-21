@@ -14,13 +14,13 @@ record Decision = processDecision {
   reason;
 };
 union Use = processUseEvidence tag state {
-  Used = decisionProven {};
-  Unused = decisionDisproven {};
-  Uncertain = decisionUnknown {};
+  Used = decisionProven;
+  Unused = decisionDisproven;
+  Uncertain = decisionUnknown;
 };
 union Entry = processEntryEvidence tag owned {
-  ProgramLifetime = entryOwned {};
-  OrdinaryLifetime = entryOrdinary {};
+  ProgramLifetime = entryOwned;
+  OrdinaryLifetime = entryOrdinary;
 };
 
 rule AmbiguousSettlement:
