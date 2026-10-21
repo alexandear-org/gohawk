@@ -143,42 +143,19 @@ func withCheckFilter(
 		report := pass.Report
 		var reportErr error
 		pass.Report = func(diagnostic analysis.Diagnostic) {
-			if delisted[diagnostic.Category] {
+			reason := check.DiagnosticAdmission(pass, diagnostic, analyzer.Name, checks, delisted, disabled)
+			if reason != check.ReportingEmitted {
+				outcome := analysisTrace.OutcomeAccepted
+				if reason == check.ReportingUnknownCheck {
+					outcome = analysisTrace.OutcomeRejected
+				}
 				analysisTrace.EmitDiagnostic(pass, analysisTrace.DiagnosticEvent{
-					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: check.ReportingDelisted.String(),
-					Outcome: analysisTrace.OutcomeAccepted, Diagnostic: diagnostic,
+					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: reason.String(),
+					Outcome: outcome, Diagnostic: diagnostic,
 				})
-				return
-			}
-			if !checks[diagnostic.Category] {
-				analysisTrace.EmitDiagnostic(pass, analysisTrace.DiagnosticEvent{
-					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: check.ReportingUnknownCheck.String(),
-					Outcome: analysisTrace.OutcomeRejected, Diagnostic: diagnostic,
-				})
-				reportErr = errors.Join(reportErr, fmt.Errorf("analyzer %q reported unknown check %q", analyzer.Name, diagnostic.Category))
-				return
-			}
-			if disabled[diagnostic.Category] {
-				analysisTrace.EmitDiagnostic(pass, analysisTrace.DiagnosticEvent{
-					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: check.ReportingNotSelected.String(),
-					Outcome:    analysisTrace.OutcomeAccepted,
-					Diagnostic: diagnostic,
-				})
-				return
-			}
-			if check.Suppressed(pass, diagnostic.Pos, analyzer.Name) {
-				analysisTrace.EmitDiagnostic(pass, analysisTrace.DiagnosticEvent{
-					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: check.ReportingSuppressed.String(),
-					Outcome: analysisTrace.OutcomeAccepted, Diagnostic: diagnostic,
-				})
-				return
-			}
-			if check.TestFilePosition(pass, diagnostic.Pos) {
-				// Test files are never reported; see internal/reporting/check/testfiles.go.
-				analysisTrace.EmitDiagnostic(pass, analysisTrace.DiagnosticEvent{
-					Analyzer: analyzer.Name, Phase: analysisTrace.PhaseDecision, Reason: check.ReportingTestFileSkipped.String(),
-					Outcome: analysisTrace.OutcomeAccepted, Diagnostic: diagnostic,
-				})
+				if reason == check.ReportingUnknownCheck {
+					reportErr = errors.Join(reportErr, fmt.Errorf("analyzer %q reported unknown check %q", analyzer.Name, diagnostic.Category))
+				}
 				return
 			}
 			// Editors show this as a link on the diagnostic's code.

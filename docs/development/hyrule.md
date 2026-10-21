@@ -55,6 +55,9 @@ fixed-point scheduling, budgets, caches, and effect application remain in Go.
 A trivial enum switch or an already-declarative lookup table is not a migration
 requirement merely because a rule could express it.
 
+The [completion audit](hyrule-audit.md) records reviewed scopes, remaining
+questions and the evidence needed to establish repository-wide completion.
+
 The repository-wide migration covers these families. Integration is complete
 only when the consuming production path uses the rules and the old decision
 path is removed; generator support and examples alone do not qualify.
@@ -79,6 +82,7 @@ path is removed; generator support and examples alone do not qualify.
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves, fixed argument outcomes, assumed leaves, conditional return decisions and branch comparisons, plus response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
 | Path guards and literal comparison | Generated stable-guard, loaded-condition, address-step and literal-operator decisions; traversal, cycle queries, rendering memos, invalidation and flow application stay in Go |
+| Diagnostic admission | Generated ordered withdrawn/unknown/selection/suppression/test-file decisions; trace emission, error accumulation, callback restoration and publishing stay in Go |
 
 ## Preserved boundaries
 

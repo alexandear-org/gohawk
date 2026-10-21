@@ -1,5 +1,12 @@
 version: 1
 targets:
+  - name: diagnostic_admission
+    package: internal/reporting/check
+    bindings: internal/reporting/check/report_admission.go
+    signature: admissionSignature
+    function: DiagnosticAdmission
+    rules: [internal/reporting/check/report_admission.rules]
+    out: internal/reporting/check/report_admission_gen.go
   - name: result_leaf
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/results.go
