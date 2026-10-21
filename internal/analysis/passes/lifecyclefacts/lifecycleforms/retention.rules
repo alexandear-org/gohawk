@@ -1,0 +1,62 @@
+signature total fallback outputs (Ignore);
+union Use = RetentionUse tag Kind {
+  Ignore = RetentionIgnore;
+  Store = RetentionStore {
+    store: Store;
+  };
+  Closure = RetentionClosure {
+    closure: Closure;
+  };
+  Value = RetentionValue {
+    value: Value;
+  };
+  Returned = RetentionReturn {
+    values: Values;
+  };
+  Called = RetentionCall {
+    instruction: Instruction;
+  };
+};
+view StoreValue = *ssa.Store {
+};
+view ClosureValue = *ssa.MakeClosure {
+};
+view Send = *ssa.Send {
+  value: X;
+};
+view MapUpdate = *ssa.MapUpdate {
+  value: Value;
+};
+view Return = *ssa.Return {
+  values: Results;
+};
+view Call = *ssa.Call {
+};
+view Defer = *ssa.Defer {
+};
+view Go = *ssa.Go {
+};
+
+rule Store:
+  inputs $store:(StoreValue) _ _
+  => outputs (Store store:$store);
+
+// Capture is not completed ownership transfer. Every-return claims require a
+// separate cleanup registration proof; conditional cleanup cannot settle it.
+rule Closure:
+  inputs $closure:(ClosureValue) _ false
+  => outputs (Closure closure:$closure);
+
+rule Published:
+  inputs (or (Send value:$value) (MapUpdate value:$value)) _ false
+  => outputs (Value value:$value);
+
+// Returning the value is described by returned-owner/view summaries. Strict
+// retention leaves it to those summaries instead of claiming a stored owner.
+rule Returned:
+  inputs (Return values:$values) false _
+  => outputs (Returned values:$values);
+
+rule Called:
+  inputs $instruction:(or (Call) (Defer) (Go)) _ _
+  => outputs (Called instruction:$instruction);

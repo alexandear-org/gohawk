@@ -1,0 +1,32 @@
+signature total fallback outputs (Mutation state:mutationUnknown reason:reasonNone);
+view Guard = lockGuardProof {
+  known;
+  guarded;
+  reason;
+};
+record Mutation = mutationProof {
+  state;
+  reason;
+};
+query worker = mutationHasWorkerGuard;
+query channel = mutationHasChannelGuard;
+const mutationUnknown, mutationProven, reasonNone, reasonLockFallbackUnknown;
+const reasonWorkerGuardUnknown, reasonChannelGuardUnknown, reasonUnguardedWrite;
+
+// A held lock is possible serialization, not proof that every worker uses the
+// same lock. Unknown effects retain the older syntax fallback.
+rule Held:
+  inputs _ _ _ _ _ (Guard known:true guarded:true reason:$reason)
+  => outputs (Mutation state:mutationUnknown reason:$reason);
+
+rule LockFallback:
+  inputs _ _ _ _ true (Guard known:false)
+  => outputs (Mutation state:mutationUnknown reason:reasonLockFallbackUnknown);
+
+rule SyntaxGuards:
+  inputs $pass $closure $mutation $varying _ _
+  => query worker $pass $closure $mutation $varying
+           select true => outputs (Mutation state:mutationUnknown reason:reasonWorkerGuardUnknown)
+     <|> query channel $pass $closure $mutation
+           select true => outputs (Mutation state:mutationUnknown reason:reasonChannelGuardUnknown)
+     <|> pure outputs (Mutation state:mutationProven reason:reasonUnguardedWrite);

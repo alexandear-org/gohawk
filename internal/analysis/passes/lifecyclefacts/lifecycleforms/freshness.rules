@@ -1,0 +1,62 @@
+signature total fallback outputs (Reject);
+union Use = FreshUse tag Kind {
+  Reject = FreshReject;
+  Ignore = FreshIgnore;
+  Follow = FreshFollow {
+    alias: Alias;
+  };
+  Return = FreshReturn {
+    returned: Return;
+  };
+  Cleanup = FreshCleanup {
+    call: Call;
+  };
+};
+view ReturnValue = *ssa.Return {
+};
+view Box = *ssa.MakeInterface {
+};
+view Interface = *ssa.ChangeInterface {
+};
+view Phi = *ssa.Phi {
+};
+view Binary = *ssa.BinOp {
+  op: Op;
+};
+view CallValue = *ssa.Call {
+};
+view Debug = *ssa.DebugRef {
+};
+const equalToken, notEqualToken;
+
+rule Return:
+  inputs $returned:(ReturnValue)
+  => outputs (Return returned:$returned);
+
+// Only these transparent return-feeding forms retain freshness. The host walk
+// retains its visited set and single-result-position agreement.
+rule Box:
+  inputs $alias:(Box)
+  => outputs (Follow alias:$alias);
+
+rule Interface:
+  inputs $alias:(Interface)
+  => outputs (Follow alias:$alias);
+
+rule Phi:
+  inputs $alias:(Phi)
+  => outputs (Follow alias:$alias);
+
+rule Comparison:
+  inputs (Binary op:(or equalToken notEqualToken))
+  => outputs (Ignore);
+
+// Recognizing a call does not accept it. The host still requires the exact
+// resource's cleanup contract and checks whether it can precede a return.
+rule Call:
+  inputs $call:(CallValue)
+  => outputs (Cleanup call:$call);
+
+rule Debug:
+  inputs (Debug)
+  => outputs (Ignore);

@@ -1,0 +1,26 @@
+signature total fallback outputs nil false;
+view Store = *ssa.Store {
+  destination: Addr;
+};
+view MapUpdate = *ssa.MapUpdate {
+  destination: Map;
+};
+view Call = *ssa.Call {
+  common: Call;
+};
+match builtinArguments;
+
+// Stores select the address directly. Containers require the caller's separate
+// loaded-owner evidence before a write can be attributed to that owner.
+rule Store:
+  inputs (Store destination:$destination)
+  => outputs $destination true;
+
+rule Map:
+  inputs (MapUpdate destination:$destination)
+  => outputs $destination false;
+
+// copy mutates its first argument; its source remains a permitted read.
+rule Builtin:
+  inputs (Call common:(builtinArguments (or "delete" "clear" "copy") $destination))
+  => outputs $destination false;

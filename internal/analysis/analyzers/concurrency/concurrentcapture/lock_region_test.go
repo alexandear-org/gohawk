@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
+	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -33,11 +34,32 @@ func TestLockRegionDeclinesUncertainRelease(t *testing.T) {
 		{Kind: concurrencyfacts.Unlock, Resource: concurrencyfacts.Reference{Value: new(ssa.Alloc)}},
 		{Kind: concurrencyfacts.Lock, Resource: concurrencyfacts.Reference{Value: new(ssa.Alloc), Indirect: true}},
 		{Kind: concurrencyfacts.CondWait},
+		{Kind: concurrencyfacts.ReadLock},
+		{Kind: concurrencyfacts.ReadUnlock},
+		{Kind: concurrencyfacts.Lock},
+		{Kind: concurrencyfacts.Unlock},
+		{Kind: concurrencyfacts.Send, Resource: concurrencyfacts.Reference{Projection: ssaflow.EmbeddedFieldPath{Depth: 1}}},
 	} {
 		var region lockRegion
 		region.apply([]concurrencyfacts.Operation{operation})
 		if _, known := region.heldState(); known {
 			t.Errorf("uncertain operation %+v produced a known region", operation)
 		}
+	}
+}
+
+// Later exact effects must not erase earlier uncertainty. They still update
+// the exact held set so an uncertain prefix does not invent a held mutex.
+func TestLockRegionUncertaintySurvivesExactEffects(t *testing.T) {
+	mutex := new(ssa.Alloc)
+	var region lockRegion
+	region.apply([]concurrencyfacts.Operation{
+		{Kind: concurrencyfacts.CondWait},
+		{Kind: concurrencyfacts.Lock, Resource: concurrencyfacts.Reference{Value: mutex}},
+		{Kind: concurrencyfacts.Send},
+		{Kind: concurrencyfacts.Unlock, Resource: concurrencyfacts.Reference{Value: mutex}},
+	})
+	if held, known := region.heldState(); held || known {
+		t.Fatalf("uncertain prefix with settled mutex = (%v, %v), want (false, false)", held, known)
 	}
 }

@@ -53,3 +53,17 @@ statement positions and pending-send state. Neither ruleset adds a guard proof
 or broadens the diagnostic. `mutation_roots.go` pairs parenthesized and nested
 map diagnostics with the existing array, slice and selector gaps. Channel guard
 fixtures retain same-channel, unrelated-channel and already-ended controls.
+
+## Generated guard and lock transition policy
+
+`mutation.rules` consumes the same lock proof before querying worker and channel
+guards in order. Held guards and the unknown-lock fallback remain terminal;
+worker/channel queries are reached only after both decline. Outcomes retain the
+existing state and reason used by both tracing and reporting.
+
+`lock_transition.rules` selects exact acquire/release, ignore or unknown before
+Go updates the region. Only an exact unlock queries held state. Projection,
+indirect, nil, unmatched-unlock, wait and read-lock boundaries remain unknown.
+The held set still evolves after uncertainty, but uncertainty cannot be erased.
+The lock-region tests exercise exact-set updates, unsupported forms and a prefix
+that stays unknown after a later exact acquire/release pair.

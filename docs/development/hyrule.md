@@ -50,10 +50,10 @@ path is removed; generator support and examples alone do not qualify.
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated ordered instruction classification; acquisition-boundary patterns remain; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
-| Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
-| Concurrent capture syntax and guard decisions | Generated mutation-root steps and channel statement recognition; guard decisions and other substantial patterns remain |
+| Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps and dynamic-index leaves; main held-state transition policy remains; identity and cycle search stay in Go |
+| Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
-| Result and lifecycle summary leaf recognition | Generated static result leaves; lifecycle leaf recognition remains; summary inference stays in Go |
+| Result and lifecycle summary leaf recognition | Generated static result leaves, response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
 
 ## Preserved boundaries
 
@@ -352,3 +352,63 @@ states. Helper outcomes retain their count, uncertainty and reason intact, and
 alias queries execute only for reached receive forms. Select counting retains
 the existing may-alias policy. Block traversal, partial-count accumulation,
 cycle uncertainty and shared helper allowances remain unchanged.
+
+## Capture guards and exclusive-lock transitions
+
+`concurrentcapture/mutation.rules` owns the authoritative guard order after the
+existing ordered lock proof. A known held guard precedes the unknown-lock syntax
+fallback; worker and channel queries remain lazy in that order. The rules return
+the existing mutation proof, so reporting and tracing keep one decision path.
+
+`lock_transition.rules` selects a complete transition before the enclosing region
+changes its held set. Projections, indirect resources, absent mutex identities,
+unmatched releases, condition waits and read locking retain uncertainty. Only a
+reached exact unlock asks whether its resource is held. Unknown remains sticky
+while later exact effects still update the held set. Prefix completeness, summary
+queries and all map updates remain in Go.
+
+## Lock write and index recognition
+
+`lockorder/lockforms` selects the exact destination of a store, map update or
+supported builtin. Copy selects only its destination, and application-defined
+lookalikes cannot pass the SSA builtin matcher. Store destinations are direct;
+container destinations retain the caller's separate loaded-owner evidence.
+
+Owner-address rules admit fields and constant index addresses. The existing
+identity/alias walk remains in Go, and dynamic indices retain their conservative
+stop. Only a slice source may expose its backing array through a load; a loaded
+pointer stays another object. Dynamic mutex-index rules return either a terminal
+answer or one source for the existing reaching walk, preserving its form mask,
+allowance and termination state.
+
+## Lifecycle structural leaves
+
+`lifecyclefacts/lifecycleforms` supplies exact response Body field addresses and
+freshness-use plans. A Body match requires the original load form, exact Response
+type and Body field contract; it establishes neither acquisition nor unchanged
+contents. Freshness recognition permits only the original box/interface/phi
+forms and equality comparisons. Calls request the existing cleanup proof rather
+than becoming accepted uses by recognition alone. Unsupported casts, stores and
+captures retain the conservative rejection.
+
+The enclosing pass retains result-position agreement, visited state, cleanup
+ordering, imported facts and ownership publication. Existing owned-result tests
+now also pin comparisons and a deliberately opaque retyping, alongside fresh,
+borrowed, retained, previously closed and callback-owned results.
+
+## Lifecycle retention and escape uses
+
+Lifecycle retention rules distinguish loose retention, strict storage and
+coverage on every return. Captures, sends and map updates cannot establish an
+every-return handoff. Strict retention leaves returned owners to their own
+summaries. Recognized stores, closures and calls request the existing proofs;
+the mode gate is part of the generated classification rather than a parallel
+handwritten structural policy.
+
+Escape-use rules distinguish in-place invocation/defer from passing the value
+to another callee, follow exactly the existing conversion/projection forms and
+leave store destinations to the host's local-storage proof. A store into the
+value itself is not publication. Unrecognized uses retain the original escape
+fallback, while unsupported retention instructions retain no witness. Recursive
+use walks, budgets, memoization and strict/loose imported-summary interpretation
+remain in Go, preserving the opposite proof polarities of those two queries.

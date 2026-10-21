@@ -5,6 +5,7 @@ import (
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockforms"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/syntax"
@@ -149,11 +150,11 @@ func lockOwner(value ssa.Value) (ssa.Value, bool) { //nolint:ireturn // SSA valu
 }
 
 func writeTargetsOwner(instruction ssa.Instruction, owner ssa.Value) bool {
-	destination := readLockWriteDestination(instruction)
+	destination, direct := lockforms.Destination(instruction)
 	if destination == nil {
 		return false
 	}
-	if _, store := instruction.(*ssa.Store); store {
+	if direct {
 		return addressWithinOwner(destination, owner)
 	}
 	// Containers loaded out of the owner's field retain their storage path.
@@ -165,23 +166,8 @@ func writeTargetsOwner(instruction ssa.Instruction, owner ssa.Value) bool {
 // builtin mutates. Owner matching and exclusivity consume this same selection.
 // copy writes only its first argument; its source remains a permitted read.
 func readLockWriteDestination(instruction ssa.Instruction) ssa.Value { //nolint:ireturn // Preserve the exact SSA storage identity.
-	switch operation := instruction.(type) {
-	case *ssa.Store:
-		return operation.Addr
-	case *ssa.MapUpdate:
-		return operation.Map
-	case *ssa.Call:
-		common := operation.Common()
-		builtin, ok := common.Value.(*ssa.Builtin)
-		if !ok || len(common.Args) == 0 {
-			return nil
-		}
-		switch builtin.Name() {
-		case "delete", "clear", "copy":
-			return common.Args[0]
-		}
-	}
-	return nil
+	destination, _ := lockforms.Destination(instruction)
+	return destination
 }
 
 // addressWithinOwner reports whether address selects a field or a constant
@@ -192,38 +178,11 @@ func addressWithinOwner(address, owner ssa.Value) bool {
 		if heapmodel.MayAlias(address, owner) {
 			return true
 		}
-		switch typed := address.(type) {
-		case *ssa.FieldAddr:
-			address = typed.X
-		case *ssa.IndexAddr:
-			// A read lock is shared, so two readers race only where they write
-			// the SAME cell. Distinct elements are distinct memory, so an
-			// element write at a caller-supplied index races only if two
-			// readers can pass the same index -- which this analysis cannot
-			// establish, and which a per-consumer cursor deliberately never
-			// does. pyroscope's Tee hands each consumer its own index and
-			// advances that cursor under the read lock:
-			// https://github.com/grafana/pyroscope/blob/d1212251265e7dab4b03ef0d80af565f6d519e1b/pkg/iter/tee.go#L68-L76
-			//
-			// A constant index names one cell every reader shares, so it stays
-			// reportable, as does a map update, which races whatever the key,
-			// and a store to the field itself.
-			if _, constant := typed.Index.(*ssa.Const); !constant {
-				return false
-			}
-			// A slice header loaded out of the owner shares the owner's backing
-			// array, so writing through it writes the owner. A pointer loaded
-			// out of the owner is a different object, which is why only the
-			// slice case peels its load.
-			address = typed.X
-			if _, slice := address.Type().Underlying().(*types.Slice); slice {
-				if source, ok := ssaflow.IdentitySource(address); ok {
-					address = source
-				}
-			}
-		default:
+		next, known := lockforms.OwnerStep(address)
+		if !known {
 			return false
 		}
+		address = next
 	}
 	return false
 }

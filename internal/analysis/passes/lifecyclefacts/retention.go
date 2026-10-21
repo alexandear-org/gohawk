@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts/lifecycleforms"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -157,32 +158,25 @@ func (search *retention) searchWithin(function *ssa.Function, parameter ssa.Valu
 }
 
 func (search *retention) instructionRetains(function *ssa.Function, instruction ssa.Instruction, derives func(ssa.Value) bool) bool {
-	switch typed := instruction.(type) {
-	case *ssa.Store:
-		return search.storeRetains(function, typed, derives)
-	case *ssa.MakeClosure:
-		// Capturing a resource for later work is not a completed ownership
-		// handoff. Cleanup registrations need their separate completion proof;
-		// a callback that only conditionally closes must not settle its input.
-		if search.everyReturn {
-			return false
-		}
-		if !slices.ContainsFunc(typed.Bindings, func(binding ssa.Value) bool {
+	plan := lifecycleforms.Retains(instruction, search.strict, search.everyReturn)
+	switch plan.Kind {
+	case lifecycleforms.RetentionStore:
+		return search.storeRetains(function, plan.Store, derives)
+	case lifecycleforms.RetentionClosure:
+		if !slices.ContainsFunc(plan.Closure.Bindings, func(binding ssa.Value) bool {
 			return derives(binding) || derives(ssaflow.CapturedBindingValue(binding))
 		}) {
 			return false
 		}
-		return !search.strict || search.closureEscapes(typed)
-	case *ssa.Send:
-		return !search.everyReturn && derives(typed.X)
-	case *ssa.MapUpdate:
-		return !search.everyReturn && derives(typed.Value)
-	case *ssa.Return:
-		// Returning the value hands it to the caller, which the returned-owner
-		// and view summaries describe; strict retention leaves it to them.
-		return !search.strict && slices.ContainsFunc(typed.Results, derives)
-	case *ssa.Call, *ssa.Defer, *ssa.Go:
-		return search.callRetains(ssaflow.InstructionCall(instruction), instruction, derives)
+		return !search.strict || search.closureEscapes(plan.Closure)
+	case lifecycleforms.RetentionValue:
+		return derives(plan.Value)
+	case lifecycleforms.RetentionReturn:
+		return slices.ContainsFunc(plan.Values, derives)
+	case lifecycleforms.RetentionCall:
+		return search.callRetains(ssaflow.InstructionCall(plan.Instruction), plan.Instruction, derives)
+	case lifecycleforms.RetentionIgnore:
+		return false
 	}
 	return false
 }
@@ -258,36 +252,23 @@ func (search *retention) valueEscapes(value ssa.Value, seen map[ssa.Value]bool) 
 
 func (search *retention) referenceEscapes(value ssa.Value, reference ssa.Instruction, seen map[ssa.Value]bool) bool {
 	isValue := func(candidate ssa.Value) bool { return candidate == value }
-	switch typed := reference.(type) {
-	case *ssa.Defer:
-		return typed.Common().Value != value && search.callRetains(typed.Common(), typed, isValue)
-	case *ssa.Call:
-		return typed.Common().Value != value && search.callRetains(typed.Common(), typed, isValue)
-	case *ssa.Return:
-		return !search.strict
-	case *ssa.ChangeType, *ssa.Convert, *ssa.MakeInterface, *ssa.ChangeInterface, *ssa.FieldAddr, *ssa.IndexAddr, *ssa.Slice:
-		// Conversions and projections of an aggregate escape when they do.
-		converted, _ := typed.(ssa.Value)
-		return search.valueEscapes(converted, seen)
-	case *ssa.Store:
-		// Storing into the value is not an escape of the value. Storing the
-		// value into a local cell escapes only if that cell does; storing it
-		// anywhere else is an escape.
-		if typed.Addr == value {
-			return false
-		}
-		if local, ok := localStorage(typed.Addr, typed.Parent()); ok {
+	plan := lifecycleforms.Escapes(value, reference, search.strict)
+	switch plan.Kind {
+	case lifecycleforms.EscapeIgnored:
+		return false
+	case lifecycleforms.EscapeDefinite:
+		return true
+	case lifecycleforms.EscapeFollow:
+		return search.valueEscapes(plan.Source, seen)
+	case lifecycleforms.EscapeStore:
+		if local, ok := localStorage(plan.Store.Addr, plan.Store.Parent()); ok {
 			return search.valueEscapes(local, seen)
 		}
 		return true
-	case *ssa.MakeClosure:
-		// A cell captured by a literal escapes only if the literal does.
-		return search.valueEscapes(typed, seen)
-	case *ssa.UnOp, *ssa.DebugRef:
-		return false
-	default:
-		return true
+	case lifecycleforms.EscapeCall:
+		return search.callRetains(ssaflow.InstructionCall(plan.Instruction), plan.Instruction, isValue)
 	}
+	return false
 }
 
 // callRetains treats a summarized callee as retaining what its summary marks

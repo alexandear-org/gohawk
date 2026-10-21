@@ -1,0 +1,44 @@
+signature total fallback outputs lockEffectIgnore nil;
+view Operation = concurrencyfacts.Operation {
+  kind: Kind;
+  resource: Resource;
+};
+view Resource = concurrencyfacts.Reference {
+  value: Value;
+  indirect: Indirect;
+};
+guard projected;
+query held = lockRegion.holds;
+const lockEffectIgnore, lockEffectUnknown, lockEffectAcquire, lockEffectRelease;
+const lock, unlock, readLock, readUnlock, condWait;
+
+// An unresolved projection makes even an otherwise ignored effect uncertain.
+rule Projected:
+  inputs $operation _
+  && projected $operation
+  => outputs lockEffectUnknown nil;
+
+rule Indirect:
+  inputs (Operation kind:(or lock unlock) resource:(Resource indirect:true)) _
+  => outputs lockEffectUnknown nil;
+
+rule Absent:
+  inputs (Operation kind:(or lock unlock) resource:(Resource value:nil)) _
+  => outputs lockEffectUnknown nil;
+
+rule Acquire:
+  inputs (Operation kind:lock resource:(Resource value:$value)) _
+  => outputs lockEffectAcquire $value;
+
+rule Release:
+  inputs (Operation kind:unlock resource:(Resource value:$value)) $region
+  => query held $region $value {
+       true => outputs lockEffectRelease $value;
+       false => outputs lockEffectUnknown nil;
+     };
+
+// Wait temporarily releases a Locker. Read locking is not an exclusive guard;
+// this query declines both instead of claiming the write has no guard.
+rule Unsupported:
+  inputs (Operation kind:(or condWait readLock readUnlock)) _
+  => outputs lockEffectUnknown nil;

@@ -696,3 +696,14 @@ recovery. Constructor controls distinguish fresh, borrowed and mixed returns.
 Existing `constructor_slot_bindings.go` and `escaped_fresh_field.go` fixtures
 retain value/pointer fields, exact slot/whole-owner/helper replacements and
 publication uncertainty.
+
+## Generated write and receiver-index recognition
+
+The analyzer-owned `lockforms` package selects write destinations, one owner
+address step and one dynamic-index step. The read-lock proof and receiver walk
+consume those same selections; their handwritten structural branches are removed.
+Exact SSA identity is retained. Copy's source is not a destination, dynamic owner
+indices stop, and only slice loads may expose an owner's backing array. Alias
+queries, field-contract uncertainty, writer witnesses, budgets and held-state
+updates remain in the existing proof and flow. Existing read-lock, private-owner,
+constant/dynamic-index and allowance regressions retain the behavioral boundary.

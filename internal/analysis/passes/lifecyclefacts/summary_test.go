@@ -329,8 +329,7 @@ func CloseOthers(files [2]*os.File, others []*os.File) {
 // and neither is a caller's own resource handed back or a type the caller
 // cannot release. A resource forwarded from an unsummarized private helper
 // has no trusted acquisition and makes no claim.
-func TestLifecycleSummaryOwnedResults(t *testing.T) {
-	pkg := buildLifecycleTestSSA(t, `
+const ownedResultFixture = `
 package lifecyclefactstest
 
 import (
@@ -393,15 +392,32 @@ func OpenMaybeClosed(path string, flush bool) (*os.File, error) {
 	}
 	return f, nil
 }
+func OpenCompared(path string, other *os.File) (*os.File, error) {
+ f, err := os.Open(path)
+ _ = f == other
+ _ = f != nil
+ return f, err
+}
+type fileLayout os.File
+func OpenRetyped(path string) (*os.File, error) {
+ f, err := os.Open(path)
+ layout := (*fileLayout)(f)
+ return (*os.File)(layout), err
+}
 func OpenView(file *os.File) *os.File { return file }
 func OpenPlain(path string) (io.Reader, error) { return os.Open(path) }
 func openIndirectly(path string) (*os.File, error) { return os.Open(path) }
 func OpenForwarded(path string) (*os.File, error) { return openIndirectly(path) }
 func OpenFromFD(fd uintptr) *os.File { return os.NewFile(fd, "fd") }
-`)
+`
+
+func TestLifecycleSummaryOwnedResults(t *testing.T) {
+	pkg := buildLifecycleTestSSA(t, ownedResultFixture)
 	pass := &analysis.Pass{ImportObjectFact: func(types.Object, analysis.Fact) bool { return false }}
 	for name, want := range map[string]ResultMask{
 		"OpenFresh":           resultMaskFor(0),
+		"OpenCompared":        resultMaskFor(0),
+		"OpenRetyped":         0,
 		"OpenReader":          resultMaskFor(0),
 		"OpenClosedOnFailure": resultMaskFor(0),
 		"OpenRegistered":      0,

@@ -27,22 +27,7 @@ type mutationProof struct {
 func (evidence captureEvidence) proveMutation(
 	pass *analysis.Pass, closure *ast.FuncLit, mutation ast.Node, varying []types.Object, fallbackLock bool,
 ) mutationProof {
-	guard := evidence.lockGuard(closure, mutation)
-	// A held lock is evidence of possible serialization, not proof that
-	// every worker uses the same lock. Unknown effects retain the older
-	// syntax fallback rather than claiming the write is unguarded.
-	switch {
-	case guard.known && guard.guarded:
-		return mutationProof{proofs.EvidenceUnknown, guard.reason}
-	case !guard.known && fallbackLock:
-		return mutationProof{proofs.EvidenceUnknown, reasonLockFallbackUnknown}
-	case mutationHasWorkerGuard(pass, closure, mutation, varying):
-		return mutationProof{proofs.EvidenceUnknown, reasonWorkerGuardUnknown}
-	case mutationHasChannelGuard(pass, closure, mutation):
-		return mutationProof{proofs.EvidenceUnknown, reasonChannelGuardUnknown}
-	default:
-		return mutationProof{proofs.EvidenceProven, reasonUnguardedWrite}
-	}
+	return decideMutationGuard(pass, closure, mutation, varying, fallbackLock, evidence.lockGuard(closure, mutation))
 }
 
 // lockGuard asks the broker for complete effects along one worker's ordered
@@ -119,3 +104,13 @@ func mutationInstruction(block *ssa.BasicBlock, mutation ast.Node) (int, bool) {
 	}
 	return target, target >= 0
 }
+
+// Guard evidence is computed before selection; later syntax queries remain lazy.
+type mutationSignature func(*analysis.Pass, *ast.FuncLit, ast.Node, []types.Object, bool, lockGuardProof) mutationProof
+
+var _ mutationSignature = decideMutationGuard
+
+const (
+	mutationUnknown = proofs.EvidenceUnknown
+	mutationProven  = proofs.EvidenceProven
+)

@@ -1,0 +1,32 @@
+signature total fallback outputs IndexStopped nil;
+view IndexAddress = *ssa.IndexAddr {
+  index: Index;
+};
+view Constant = *ssa.Const {
+};
+view Index = *ssa.Index {
+};
+view Lookup = *ssa.Lookup {
+};
+view Extract = *ssa.Extract {
+  source: Tuple;
+};
+view Field = *ssa.FieldAddr {
+  source: X;
+};
+view Unary = *ssa.UnOp {
+  source: X;
+};
+const IndexStopped, IndexDynamic, IndexFollow;
+
+rule ConstantAddress:
+  inputs (IndexAddress index:(Constant))
+  => outputs IndexStopped nil;
+
+rule Dynamic:
+  inputs (or (IndexAddress) (Index) (Lookup))
+  => outputs IndexDynamic nil;
+
+rule Follow:
+  inputs (or (Extract source:$source) (Field source:$source) (Unary source:$source))
+  => outputs IndexFollow $source;

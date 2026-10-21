@@ -266,3 +266,73 @@ targets:
     function: instructionReceives
     rules: [internal/analysis/analyzers/concurrency/producerlifecycle/receive.rules]
     out: internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go
+  - name: capture_mutation_guard
+    package: internal/analysis/analyzers/concurrency/concurrentcapture
+    bindings: internal/analysis/analyzers/concurrency/concurrentcapture/guard.go
+    signature: mutationSignature
+    function: decideMutationGuard
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/mutation.rules]
+    out: internal/analysis/analyzers/concurrency/concurrentcapture/mutation_gen.go
+  - name: capture_lock_transition
+    package: internal/analysis/analyzers/concurrency/concurrentcapture
+    bindings: internal/analysis/analyzers/concurrency/concurrentcapture/lock_region.go
+    signature: lockTransitionSignature
+    function: lockTransition
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition.rules]
+    out: internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition_gen.go
+  - name: lock_write_destination
+    package: internal/analysis/analyzers/concurrency/lockorder/lockforms
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/writes.go
+    signature: destinationSignature
+    function: Destination
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/destination.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockforms/destination_gen.go
+  - name: lock_owner_address_step
+    package: internal/analysis/analyzers/concurrency/lockorder/lockforms
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/writes.go
+    signature: ownerStepSignature
+    function: OwnerStep
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step_gen.go
+  - name: lock_dynamic_index_step
+    package: internal/analysis/analyzers/concurrency/lockorder/lockforms
+    bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/index.go
+    signature: indexSignature
+    function: DynamicIndex
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/index.rules]
+    out: internal/analysis/analyzers/concurrency/lockorder/lockforms/index_gen.go
+  - name: lifecycle_response_body_leaf
+    package: internal/analysis/passes/lifecyclefacts/lifecycleforms
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/response.go
+    signature: responseSignature
+    function: ResponseBody
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/response.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go
+  - name: lifecycle_freshness_use
+    package: internal/analysis/passes/lifecyclefacts/lifecycleforms
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness.go
+    signature: freshSignature
+    function: Freshness
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness_gen.go
+  - name: lifecycle_retention_use
+    package: internal/analysis/passes/lifecyclefacts/lifecycleforms
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
+    signature: retentionSignature
+    function: Retains
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention_gen.go
+  - name: lifecycle_escape_use
+    package: internal/analysis/passes/lifecyclefacts/lifecycleforms
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
+    signature: escapeSignature
+    function: Escapes
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/escape.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_gen.go
+  - name: lifecycle_escape_alias
+    package: internal/analysis/passes/lifecyclefacts/lifecycleforms
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
+    signature: escapeAliasSignature
+    function: EscapeAlias
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias_gen.go

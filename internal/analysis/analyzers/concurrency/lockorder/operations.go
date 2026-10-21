@@ -4,6 +4,7 @@ import (
 	"go/token"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/lockorder/lockforms"
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/syntax"
@@ -103,18 +104,14 @@ func dynamicIndexedMutex(value ssa.Value) bool {
 }
 
 func dynamicIndexedMutexLeaf(walk ssaflow.ReachingWalk, value ssa.Value) bool {
-	switch typed := value.(type) {
-	case *ssa.IndexAddr:
-		_, constant := typed.Index.(*ssa.Const)
-		return !constant
-	case *ssa.Index, *ssa.Lookup:
+	kind, source := lockforms.DynamicIndex(value)
+	switch kind {
+	case lockforms.IndexDynamic:
 		return true
-	case *ssa.Extract:
-		return walk.Any(typed.Tuple, dynamicIndexedMutexLeaf)
-	case *ssa.FieldAddr:
-		return walk.Any(typed.X, dynamicIndexedMutexLeaf)
-	case *ssa.UnOp:
-		return walk.Any(typed.X, dynamicIndexedMutexLeaf)
+	case lockforms.IndexFollow:
+		return walk.Any(source, dynamicIndexedMutexLeaf)
+	case lockforms.IndexStopped:
+		return false
 	}
 	return false
 }

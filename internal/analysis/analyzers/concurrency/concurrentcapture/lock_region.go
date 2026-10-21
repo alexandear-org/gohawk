@@ -18,32 +18,18 @@ type lockRegion struct {
 // from an empty sequence: the caller must have established prefix completeness.
 func (region *lockRegion) apply(operations []concurrencyfacts.Operation) {
 	for _, operation := range operations {
-		if operation.Resource.Projection.Depth != 0 {
+		effect, value := lockTransition(operation, region)
+		switch effect {
+		case lockEffectUnknown:
 			region.unknown = true
-			continue
-		}
-		switch operation.Kind {
-		case concurrencyfacts.Lock:
-			if operation.Resource.Indirect || operation.Resource.Value == nil {
-				region.unknown = true
-				continue
-			}
+		case lockEffectAcquire:
 			if region.held == nil {
 				region.held = make(map[ssa.Value]bool)
 			}
-			region.held[operation.Resource.Value] = true
-		case concurrencyfacts.Unlock:
-			if operation.Resource.Indirect || operation.Resource.Value == nil || !region.held[operation.Resource.Value] {
-				region.unknown = true
-				continue
-			}
-			delete(region.held, operation.Resource.Value)
-		case concurrencyfacts.CondWait, concurrencyfacts.ReadLock, concurrencyfacts.ReadUnlock:
-			// Wait temporarily releases a Locker. Read locking is not an
-			// exclusive guard either; this query deliberately declines both.
-			region.unknown = true
-		default:
-			// Other synchronization effects do not change mutex ownership.
+			region.held[value] = true
+		case lockEffectRelease:
+			delete(region.held, value)
+		case lockEffectIgnore:
 		}
 	}
 }
@@ -53,3 +39,32 @@ func (region *lockRegion) apply(operations []concurrencyfacts.Operation) {
 func (region *lockRegion) heldState() (held bool, known bool) {
 	return len(region.held) != 0, !region.unknown
 }
+
+// A transition is selected before the caller changes the held set. Uncertainty
+// remains sticky in lockRegion even when later exact operations can be applied.
+type lockEffect uint8
+
+const (
+	lockEffectIgnore lockEffect = iota
+	lockEffectUnknown
+	lockEffectAcquire
+	lockEffectRelease
+)
+
+type lockTransitionSignature func(concurrencyfacts.Operation, *lockRegion) (lockEffect, ssa.Value)
+
+var _ lockTransitionSignature = lockTransition
+
+const (
+	lock       = concurrencyfacts.Lock
+	unlock     = concurrencyfacts.Unlock
+	readLock   = concurrencyfacts.ReadLock
+	readUnlock = concurrencyfacts.ReadUnlock
+	condWait   = concurrencyfacts.CondWait
+)
+
+func projected(operation concurrencyfacts.Operation) bool {
+	return operation.Resource.Projection.Depth != 0
+}
+
+func (region *lockRegion) holds(value ssa.Value) bool { return region.held[value] }

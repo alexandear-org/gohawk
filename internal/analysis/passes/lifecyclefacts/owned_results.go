@@ -1,10 +1,10 @@
 package lifecyclefacts
 
 import (
-	"go/token"
 	"go/types"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts/lifecycleforms"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 
@@ -160,22 +160,23 @@ func (walk *freshnessWalk) feedsReturn(value ssa.Value) bool {
 }
 
 func (walk *freshnessWalk) useFeedsReturn(value ssa.Value, use ssa.Instruction) bool {
-	switch typed := use.(type) {
-	case *ssa.Return:
-		position := returnedPosition(typed, value)
+	plan := lifecycleforms.Freshness(use)
+	switch plan.Kind {
+	case lifecycleforms.FreshReturn:
+		position := returnedPosition(plan.Return, value)
 		if position < 0 || walk.index >= 0 && walk.index != position {
 			return false
 		}
 		walk.index = position
 		return true
-	case *ssa.MakeInterface, *ssa.ChangeInterface, *ssa.Phi:
-		return walk.feedsReturn(typed.(ssa.Value))
-	case *ssa.BinOp:
-		return typed.Op == token.EQL || typed.Op == token.NEQ
-	case *ssa.Call:
-		return cleanupCallOn(typed.Common(), value)
-	case *ssa.DebugRef:
+	case lifecycleforms.FreshFollow:
+		return walk.feedsReturn(plan.Alias)
+	case lifecycleforms.FreshCleanup:
+		return cleanupCallOn(plan.Call.Common(), value)
+	case lifecycleforms.FreshIgnore:
 		return true
+	case lifecycleforms.FreshReject:
+		return false
 	}
 	return false
 }

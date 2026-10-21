@@ -1,0 +1,80 @@
+signature total fallback outputs (Escaped);
+union Use = EscapeUse tag Kind {
+  Ignore = EscapeIgnored;
+  Escaped = EscapeDefinite;
+  Follow = EscapeFollow {
+    source: Source;
+  };
+  Store = EscapeStore {
+    store: Store;
+  };
+  Called = EscapeCall {
+    instruction: Instruction;
+  };
+};
+view Call = *ssa.Call {
+  common: Call;
+};
+view Defer = *ssa.Defer {
+  common: Call;
+};
+view Common = ssa.CallCommon {
+  value: Value;
+};
+view Return = *ssa.Return {
+};
+view StoreValue = *ssa.Store {
+  address: Addr;
+};
+view Closure = *ssa.MakeClosure {
+};
+view Unary = *ssa.UnOp {
+};
+view Debug = *ssa.DebugRef {
+};
+match EscapeAlias;
+guard sameValue;
+
+// A literal only called or deferred in place does not escape. Passing it to a
+// different callee still asks that callee's retention proof.
+rule InPlace:
+  inputs $value (or (Call common:(Common value:$called)) (Defer common:(Common value:$called))) _
+  && sameValue $value $called
+  => outputs (Ignore);
+
+rule Called:
+  inputs _ $instruction:(or (Call) (Defer)) _
+  => outputs (Called instruction:$instruction);
+
+rule ReturnedStrict:
+  inputs _ (Return) true
+  => outputs (Ignore);
+
+rule ReturnedLoose:
+  inputs _ (Return) false
+  => outputs (Escaped);
+
+// Converted and projected aggregates escape only when the derived value does.
+rule Alias:
+  inputs _ (EscapeAlias $source) _
+  => outputs (Follow source:$source);
+
+// Storing into a value is not publication of the value itself.
+rule StoreIntoSelf:
+  inputs $value (StoreValue address:$address) _
+  && sameValue $value $address
+  => outputs (Ignore);
+
+// Local storage must itself escape; a nonlocal destination is an escape.
+// The caller retains this storage search and the shared visited set.
+rule Stored:
+  inputs _ $store:(StoreValue) _
+  => outputs (Store store:$store);
+
+rule Captured:
+  inputs _ $source:(Closure) _
+  => outputs (Follow source:$source);
+
+rule Ignored:
+  inputs _ (or (Unary) (Debug)) _
+  => outputs (Ignore);

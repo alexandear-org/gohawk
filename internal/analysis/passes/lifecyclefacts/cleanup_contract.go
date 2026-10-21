@@ -2,12 +2,12 @@ package lifecyclefacts
 
 import (
 	"fmt"
-	"go/token"
 	"go/types"
 	"slices"
 	"strings"
 
 	"github.com/kojah/gohawk/internal/analysis/factcodec"
+	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts/lifecycleforms"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/ssa"
@@ -198,19 +198,7 @@ func resourceTypes() []resourceType {
 // is what makes the load evidence. Whether the response is the one a caller
 // acquired, and whether its Body was replaced, is the caller's policy.
 func ResponseBodyField(value ssa.Value) *ssa.FieldAddr {
-	load, ok := value.(*ssa.UnOp)
-	if !ok || load.Op != token.MUL {
-		return nil
-	}
-	field, ok := load.X.(*ssa.FieldAddr)
-	if !ok || !syntax.NamedType(field.X.Type(), "net/http", "Response") {
-		return nil
-	}
-	structure := syntax.PointerStruct(field.X.Type())
-	if structure == nil || structure.Field(field.Field).Name() != "Body" {
-		return nil
-	}
-	return field
+	return lifecycleforms.ResponseBody(value)
 }
 
 // ResourceCleanup returns the cleanup methods of a resource type, or false
