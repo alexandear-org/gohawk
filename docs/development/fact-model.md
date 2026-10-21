@@ -1074,6 +1074,21 @@ completion mapping/binding and storage tests exercise their SSA and cutoff
 boundaries; the child package's public tests pin failure payloads and committed
 capture alternatives.
 
+Completion-path translation uses the same mapping vocabulary. Contained exact
+mappings require the selected field; strict projections reject further child
+paths. A nil owner path denotes an already-matched direct receiver and spends
+no new allowance, while a nonnil empty path is a nested answer that still asks
+for mirrored-owner identity. Unknown paths never become published claims.
+Projection fallback retains both the query's path payload and availability.
+
+Conditional-return rules first select the requested result, resolve only
+Boolean spills, and exclude a known contradictory outcome. Earlier completion
+is accepted only after these steps. Error interface boxes remain intact, so a
+typed nil error cannot become a nil error result. A forwarding plan retains the
+exact call and result index; the enclosing search still copies the result
+predicate and searches exact mapped locals in their original order. An absent
+result is uncovered even when an earlier instruction completed the target.
+
 ### Concurrency spill paths and canonical-load availability
 
 Concurrency field paths retain the read time of a spilled parameter. A unique

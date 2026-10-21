@@ -2,7 +2,7 @@ package lifecycle
 
 import (
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
-	"github.com/kojah/gohawk/internal/engine/ssaflow"
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -60,7 +60,7 @@ func (paths *completionPaths) known() bool {
 // requiresNestedPath identifies mappings where completing the local as a whole
 // is insufficient: the nested answer must name the caller's exact field.
 func (local mappedLocal) requiresNestedPath() bool {
-	return local.Kind == localOwner || local.Kind == localExact && len(local.Path) > 0
+	return completionmapping.Local(local).RequiresNestedPath()
 }
 
 // receiverPath names the path beneath the target of a completing call's
@@ -78,45 +78,5 @@ func (search *completionSearch) receiverPath(local mappedLocal, receiver, target
 // relation to the target decides the translation, and any relation the
 // search cannot express as a static path leaves the result unknown.
 func (search *completionSearch) mappedPath(local mappedLocal, target ssa.Value, actual []string, known bool) (string, bool) {
-	if !known {
-		return "", false
-	}
-	switch local.Kind {
-	case localExact:
-		if len(local.Path) > 0 {
-			// The local holds the target at local.Path; a call there is on
-			// the target itself, and a call on the local or elsewhere is
-			// on the aggregate around it.
-			return "", ssaflow.JoinAccessPath(actual) == ssaflow.JoinAccessPath(local.Path)
-		}
-		supplied, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
-		if !ok {
-			return "", false
-		}
-		return ssaflow.JoinAccessPath(append(append([]string(nil), supplied...), actual...)), true
-	case localProjection:
-		// The local is a proper projection of the target, and a
-		// completion is a call on the local itself.
-		if len(actual) > 0 {
-			return "", false
-		}
-		if len(local.Path) > 0 {
-			return ssaflow.JoinAccessPath(local.Path), true
-		}
-		supplied, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
-		return ssaflow.JoinAccessPath(supplied), ok
-	case localOwner:
-		// A direct call was already matched to the path beneath the local
-		// that mirrors the target's path beneath the supplied owner, so it is
-		// on the target itself. A nested completion names the path it
-		// settled, which must be that mirrored path: settling c.rpc is not
-		// settling the caller's c.monitors.
-		if actual == nil {
-			return "", true
-		}
-		mirrored, ok := ssaflow.AccessPathStepsWithin(local.Supplied, target, search.budget)
-		return "", ok && ssaflow.JoinAccessPath(actual) == ssaflow.JoinAccessPath(mirrored)
-	case localCallback:
-	}
-	return "", false
+	return completionmapping.TranslatePath(completionmapping.Local(local), target, actual, known, search.budget)
 }

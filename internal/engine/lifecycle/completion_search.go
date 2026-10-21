@@ -89,7 +89,6 @@ type mappedLocal completionmapping.Local
 const (
 	localExact      = completionmapping.Exact
 	localProjection = completionmapping.Projection
-	localOwner      = completionmapping.Owner
 	localCallback   = completionmapping.Callback
 )
 

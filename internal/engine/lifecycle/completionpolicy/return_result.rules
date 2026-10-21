@@ -1,0 +1,12 @@
+signature total fallback outputs (Uncovered);
+match source = ssacall.CallResultSource;
+
+rule Completed:
+  inputs _ true
+  => outputs (Covered);
+
+// Forward the same result predicate to the nested callee. Its coverage and
+// exact-local iteration remain with the consuming completion search.
+rule Forward:
+  inputs (source $call $result) false
+  => outputs (Forward call:$call result:$result);

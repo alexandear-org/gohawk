@@ -686,3 +686,31 @@ targets:
     function: Receives
     rules: [internal/engine/lifecycle/completionmapping/receiver.rules, internal/engine/lifecycle/completionmapping/schema.rules]
     out: internal/engine/lifecycle/completionmapping/receiver_gen.go
+  - name: lifecycle_completion_path
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/mapping.go
+    signature: pathSignature
+    function: TranslatePath
+    rules: [internal/engine/lifecycle/completionmapping/path.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    out: internal/engine/lifecycle/completionmapping/path_gen.go
+  - name: lifecycle_return_value
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/return.go
+    signature: returnedValueSignature
+    function: ResolveReturnValue
+    rules: [internal/engine/lifecycle/completionpolicy/return_value.rules]
+    out: internal/engine/lifecycle/completionpolicy/return_value_gen.go
+  - name: lifecycle_return_result
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/return.go
+    signature: returnedResultSignature
+    function: ReturnResult
+    rules: [internal/engine/lifecycle/completionpolicy/return_result.rules, internal/engine/lifecycle/completionpolicy/return_schema.rules]
+    out: internal/engine/lifecycle/completionpolicy/return_result_gen.go
+  - name: lifecycle_conditional_return
+    package: internal/engine/lifecycle/completionpolicy
+    bindings: internal/engine/lifecycle/completionpolicy/return.go
+    signature: returnedSignature
+    function: RecognizeReturn
+    rules: [internal/engine/lifecycle/completionpolicy/return.rules, internal/engine/lifecycle/completionpolicy/return_schema.rules]
+    out: internal/engine/lifecycle/completionpolicy/return_gen.go

@@ -1,0 +1,9 @@
+union Return = ReturnPlan tag Kind {
+  Uncovered = ReturnUncovered;
+  Irrelevant = ReturnIrrelevant;
+  Covered = ReturnCovered;
+  Forward = ReturnForward {
+    call: Call;
+    result: Result;
+  };
+};

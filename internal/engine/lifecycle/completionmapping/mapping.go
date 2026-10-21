@@ -58,6 +58,7 @@ type Context struct {
 }
 
 type (
+	pathSignature         func(Local, ssa.Value, pathList, bool, *proofs.SearchBudget) (string, bool)
 	captureSignature      func(Context, ssa.Value, ssa.Value, ssa.Value, ssa.Instruction) (Local, bool)
 	relationSignature     func(Context, ssa.Value, ssa.Value, ssa.Value, ssa.Value, bool, bool, ssa.Instruction) (Local, bool)
 	argumentSignature     func(Context, ssa.Value, ssa.Value, ssa.Value, ssa.Instruction) (Local, bool)
@@ -69,6 +70,7 @@ type (
 )
 
 var (
+	_ pathSignature                                   = TranslatePath
 	_ func(ssa.Value, *proofs.SearchBudget) ssa.Value = ssaflow.CapturedBindingValueWithin
 	_ captureSignature                                = Captured
 	_ relationSignature                               = CaptureRelation

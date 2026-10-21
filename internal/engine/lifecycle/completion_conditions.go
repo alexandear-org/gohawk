@@ -1,10 +1,8 @@
 package lifecycle
 
 import (
-	"go/token"
 	"go/types"
 
-	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle/completionpolicy"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
@@ -121,35 +119,21 @@ func (search *completionSearch) conditionalCoverage(
 func (search *completionSearch) conditionalReturn(
 	returned *ssa.Return, locals []mappedLocal, condition ssacall.CallCondition, completed bool,
 ) (covered, relevant bool) {
-	if condition.Result >= len(returned.Results) {
+	plan := completionpolicy.RecognizeReturn(returned, condition, completed, search.budget)
+	switch plan.Kind {
+	case completionpolicy.ReturnUncovered:
 		return false, true
-	}
-	value := returned.Results[condition.Result]
-	// Resolve compiler-spilled Boolean results, but do not peel an error's
-	// interface box: a typed nil error is not the nil error result.
-	boolean := condition.Outcome == ssacall.OutcomeTrue || condition.Outcome == ssacall.OutcomeFalse
-	if load, ok := value.(*ssa.UnOp); ok && load.Op == token.MUL && boolean {
-		if resolved := heapmodel.NewStorage(search.budget).Resolve(value); resolved.Proven() {
-			value = resolved.Value
-		}
-	}
-	if holds, known := ssacall.OutcomeOf(condition.Outcome, value); known && !holds {
+	case completionpolicy.ReturnIrrelevant:
 		return true, false
-	}
-	if completed {
+	case completionpolicy.ReturnCovered:
 		return true, true
-	}
-	call, index, ok := ssacall.CallResultSource(value)
-	if !ok {
-		return false, true
-	}
-	// A forwarding return composes the same result predicate with the nested
-	// callee. Ordinary calls above were searched without this predicate.
-	nested := *search
-	nested.condition = ssacall.CallCondition{Result: index, Outcome: condition.Outcome}
-	for _, local := range locals {
-		if local.Kind == localExact {
-			if nested.completes(call, local.Local).proven {
+	case completionpolicy.ReturnForward:
+		// Ordinary calls were searched without this result predicate. A forwarding
+		// return composes it with the nested callee for exact mapped locals only.
+		nested := *search
+		nested.condition = ssacall.CallCondition{Result: plan.Result, Outcome: condition.Outcome}
+		for _, local := range locals {
+			if local.Kind == localExact && nested.completes(plan.Call, local.Local).proven {
 				return true, true
 			}
 		}

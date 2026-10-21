@@ -30,8 +30,10 @@ The HTTP acquisition policies use `do` blocks for dependent, stateful queries.
 The success-branch policy combines `do` with ordered alternatives: explicit
 `decline` tries ordinary flow after an unavailable assertion strategy, without
 repeating its queries or refunding its allowance.
-Each step selects a complete outcome and explicitly returns on every other
-outcome. Boolean steps may write `false <- query ... else result;` (or `true`)
+Conditional steps select a complete outcome and explicitly return on every
+other outcome. An unconditional `$value <- query operation ...;` binds the
+complete result without inventing a success tag; reached calls still execute
+once in order, and declared union results retain validation. Boolean steps may write `false <- query ... else result;` (or `true`)
 to handle the complementary literal without a one-arm block. Tagged outcomes
 retain explicit named arms. Reached queries retain their original order and budget charges; the
 public Go entry points still discard evidence if the child or shared allowance
@@ -63,16 +65,16 @@ path is removed; generator support and examples alone do not qualify.
 | Standard synchronization primitives | Generated shared recognition used by concurrency call summaries and heap mutex effects; count acceptance remains summary policy |
 | Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
 | Concurrency snapshot maintenance | Generated complete-record copies for summaries, workers and select choices; nested list hooks retain the original copying depth |
-| Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
+| Concurrency context/callback and resource recognition | Generated context calls/origins, callback inputs/calls, resource references and identity-root forms; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
-| Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions; recursive coverage, storage, environment mapping and the existing transfer table stay in Go |
+| Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
-| Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves and identity/loop-origin cases; storage/reaching searches, held-state updates and cycle queries stay in Go |
+| Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves, identity/loop-origin cases, budgeted copy sequencing and mutex-transfer sequencing; storage/reaching searches, collection mutation and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves, fixed argument outcomes, assumed leaves, conditional return decisions and branch comparisons, plus response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
@@ -141,7 +143,8 @@ allowances, plus root/callee allocation with no search charge.
 
 ## Context and callback recognition
 
-The `concurrencyfacts/recognition` package owns four native recognizers. Context
+The `concurrencyfacts/recognition` package owns four native context/callback
+recognizers. Context
 calls return their operation kind and exact parent, receiver or cancellation
 value. Context origins distinguish a Done call from either constructor result.
 These are symbolic operations: the enclosing engine still resolves the parent,
@@ -635,3 +638,50 @@ it is not constant, and either select error nilness or return a Boolean operand
 for the existing recursive decoder. The exact operand identity is covered by a
 regression; callback, enclosing-frame, field/element and cutoff fixtures remain
 the consuming tests for these generated policies.
+
+
+## Lock-state copy and transfer sequencing
+
+`lockorder/copy.rules` sequences the existing charged slice, guard and origin
+copies. An exhausted copy exposes no partial successor; nil and nonnil empty
+slices remain distinct, and copied maps are writable even from nil inputs.
+`transfer.rules` distinguishes direct/deferred release, deferred acquisition,
+and acquisition. Registration precedes dynamic-receiver and caller-ownership
+checks. Preparation precedes ordering proof, and a cutoff cannot publish the
+new held lock or origin. Alias searches and collection updates remain Go queries.
+
+## Concurrency resource-reference policy
+
+`concurrencyfacts/recognition/reference.rules` selects storage-resolved symbolic
+resources, standard condition constructors and mutex addresses. Cancellation
+provenance is still queried first; an unrecognized call retains its SSA value
+alongside false availability. Root-binding, fixed-load and embedded-path rules
+keep their distinct unary and global-address contracts. Fixed loads require
+dereference, while global channel contents never inherit mutex-address identity.
+The inert-builtin rules require SSA builtin identity and retain the original
+operand checks; ordinary functions with matching names cannot enter that table.
+
+## Completion mapping and result forwarding
+
+`lifecycle/completionmapping` owns capture, argument, deferred-cell, receiver and
+path-translation policies. The enclosing search supplies callback/containment
+queries, invocation environments, memo effects and binding iteration. All phases
+share one mapping representation for exact values, projections, owners and
+callbacks. Failed exact mappings retain their original payload. A selected
+captured-owner case that fails storage proof cannot retry aggregate containment.
+Alias uncertainty and independent child cutoffs retain their different memo
+behavior, and deferred cells are read at invocation time.
+
+Receiver and translation rules reject sibling paths and further projections of
+strict projections. A nil owner path is an already-matched direct receiver and
+needs no new query; a nonnil empty path remains a nested answer requiring mirrored
+identity. Possible derivation after an unavailable receiver path supplies only
+uncertainty, never must-complete coverage.
+
+The conditional-return targets select a result, resolve only Boolean spills,
+and exclude contradictory outcomes before accepting earlier completion. Error
+interface boxes remain intact, including typed nils. Forwarding plans preserve
+the original call and result slot; recursive exact-local coverage stays in Go.
+An absent result remains uncovered even when earlier completion was recorded.
+The mapping and return tests pin these ordering, payload and cutoff boundaries;
+existing consumer fixtures retain the end-to-end checks.

@@ -90,3 +90,40 @@ func TestCaptureRelationCommitsItsSelectedEvidence(t *testing.T) {
 		})
 	}
 }
+
+func TestPathTranslationPreservesAvailabilityAndNilOwnerPaths(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "translation", `package translation
+ func input(value *int){}
+ `)
+	value := pkg.Func("input").Params[0]
+	for _, test := range []struct {
+		name                 string
+		kind                 completionmapping.Kind
+		expected, actual     []string
+		known                bool
+		allowance            int
+		path                 string
+		available, exhausted bool
+	}{
+		{"direct-owner", completionmapping.Owner, nil, nil, true, 0, "", true, false},
+		{"empty-nested-owner", completionmapping.Owner, nil, []string{}, true, 0, "", false, true},
+		{"known-empty-owner", completionmapping.Owner, nil, []string{}, true, proofs.QueryBudget, "", true, false},
+		{"unknown-owner", completionmapping.Owner, nil, nil, false, 0, "", false, false},
+		{"contained-exact", completionmapping.Exact, []string{"field:0"}, []string{"field:0"}, true, 0, "", true, false},
+		{"sibling-exact", completionmapping.Exact, []string{"field:0"}, []string{"field:1"}, true, 0, "", false, false},
+		{"exact-forward", completionmapping.Exact, nil, []string{"field:0"}, true, proofs.QueryBudget, "field:0", true, false},
+		{"projection", completionmapping.Projection, []string{"field:0"}, nil, true, 0, "field:0", true, false},
+		{"projection-child", completionmapping.Projection, []string{"field:0"}, []string{"field:0"}, true, 0, "", false, false},
+		{"projection-cutoff", completionmapping.Projection, nil, nil, true, 0, "", false, true},
+		{"callback", completionmapping.Callback, nil, nil, true, 0, "", false, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			local := completionmapping.Local{Kind: test.kind, Supplied: value, Path: test.expected}
+			budget := proofs.NewSearchBudget(test.allowance)
+			path, available := completionmapping.TranslatePath(local, value, test.actual, test.known, budget)
+			if path != test.path || available != test.available || budget.Exhausted() != test.exhausted {
+				t.Fatalf("got %q/%v exhausted=%v; want %q/%v exhausted=%v", path, available, budget.Exhausted(), test.path, test.available, test.exhausted)
+			}
+		})
+	}
+}
