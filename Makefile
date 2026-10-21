@@ -52,6 +52,7 @@ help:
 		'Common targets:' \
 		'  make fmt             Format tracked Go source files' \
 		'  make generate        Regenerate analyzer documentation without rerunning examples' \
+		'  make generated-markdown  Regenerate ignored Markdown without changing tracked pages' \
 		'  make generate-examples  Validate analyzer examples and regenerate their pages' \
 		'  make lint            Run the golangci-lint suite and the dead-code gate' \
 		'  make deadcode        Fail on internal functions unreachable from any entry point' \
@@ -94,7 +95,11 @@ generate:
 generate-examples:
 	GOHAWK_DOC_TIMINGS=$(VERIFY_TIMINGS) $(GO) run ./tools/gendocs -examples
 
-generated-check: hyrule-generated-check
+.PHONY: generated-markdown
+generated-markdown:
+	$(GO) run ./tools/gendocs -generated-markdown
+
+generated-check: hyrule-generated-check generated-markdown
 	GOHAWK_DOC_TIMINGS=$(VERIFY_TIMINGS) $(GO) run ./tools/gendocs -check -examples
 
 # Timed wrappers preserve each target's exit status and outer output grouping.
@@ -164,7 +169,7 @@ else
 generated-sync: generate
 endif
 else
-generated-sync: hyrule-generate
+generated-sync: generated-markdown
 endif
 
 verify-static: generated-sync
@@ -257,5 +262,8 @@ hyrule-tool-test:
 # Direct Make invocations generate once before compilation. Verification exports
 # readiness to its recursive gates so parallel readers do not regenerate files.
 ifndef HYRULE_READY
-build test lint deadcode vet vuln test-exhaustive test-race coverage plugin-test generate-examples hyrule-generated-check: hyrule-generate
+build test lint deadcode vet vuln test-exhaustive test-race coverage plugin-test generate-examples generated-markdown hyrule-generated-check: hyrule-generate
 endif
+
+# Documentation contract tests read the ignored references from disk.
+test test-exhaustive test-race coverage: generated-markdown

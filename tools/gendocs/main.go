@@ -54,14 +54,18 @@ func main() {
 	check := flag.Bool("check", false, "fail if generated documentation is stale")
 	examples := flag.Bool("examples", false, "validate analyzer fixtures and refresh generated examples")
 	helpersCheck := flag.Bool("helpers-check", false, "check only generated shared-helper references")
+	generatedMarkdown := flag.Bool("generated-markdown", false, "regenerate only ignored Markdown outputs, leaving tracked pages unchanged")
 	timings := flag.Bool("timings", os.Getenv("GOHAWK_DOC_TIMINGS") != "0", "print documentation generation phase timings")
 	flag.Parse()
 
 	root, err := repositoryRoot()
 	if err == nil {
-		if *helpersCheck {
+		switch {
+		case *generatedMarkdown:
+			err = generateMarkdown(root)
+		case *helpersCheck:
 			err = checkHelperReferences(root)
-		} else {
+		default:
 			err = synchronize(root, *check, *examples, *timings)
 		}
 	}

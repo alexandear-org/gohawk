@@ -14,6 +14,10 @@ already provides. Read this before writing any traversal or ownership code.
 
 ## Read the map first
 
+The per-package API references are generated and ignored by Git. On a fresh
+checkout, run `make generated-markdown` before following their links. The
+curated routing guide remains tracked.
+
 - [Codebase layout](../../../docs/architecture.md): the layers and how a run
   works; [Architecture in detail](../../../docs/development/architecture.md)
   adds the shared engine and the invariants the architecture tests enforce.

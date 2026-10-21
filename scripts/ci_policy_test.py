@@ -68,7 +68,7 @@ class CIPolicyTest(unittest.TestCase):
     def test_ordinary_local_tests_remain_available(self):
         result = self.run_make("test")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.marker.read_text(), "test ./...\n")
+        self.assertEqual(self.marker.read_text(), "run ./tools/gendocs -generated-markdown\ntest ./...\n")
         self.assertEqual((self.root / "generation-invoked").read_text(), "generate\n")
 
 

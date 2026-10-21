@@ -43,6 +43,7 @@ jobs:
         with:
           go-version-file: .go-version
           cache-dependency-path: go.sum
+      - uses: ./.github/actions/prepare-hyrule
       - uses: pnpm/action-setup@v4
         with:
           version: 11.24.0

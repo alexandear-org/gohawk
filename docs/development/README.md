@@ -43,6 +43,12 @@ Start with [Understanding SSA](../understanding-ssa.md) and the public
 
 ## Working on a change
 
+The analyzer index and per-package API references are generated Markdown and
+are ignored by Git. Run `make generated-markdown` to recreate them without
+changing tracked pages, or `make generate` to refresh all generated content.
+CI and site commands recreate ignored pages before checking or building;
+pages containing handwritten prose and generated sections remain tracked.
+
 - [Performance workflow](performance-workflow.md) — reuse caches and keep
   disposable Go writes off the shared disk while profiling and validating.
 - [Debugging reference](debugging-reference.md) — the SSA, fact, and

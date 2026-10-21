@@ -25,3 +25,8 @@ go.work.sum
 *_gen.go
 *.pb.go
 .hyrule-manifest.json
+
+# Fully generated Markdown; curated pages with generated sections stay tracked.
+/docs/analyzers/index.md
+/.agents/skills/gohawk-codebase/references/*.md
+!/.agents/skills/gohawk-codebase/references/shared-helpers.md

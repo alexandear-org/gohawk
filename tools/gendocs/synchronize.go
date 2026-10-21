@@ -71,6 +71,33 @@ func synchronize(root string, check, includeExamples, showTimings bool) error {
 	return nil
 }
 
+// generateMarkdown bootstraps ignored pages before checks or site builds.
+// It must not repair tracked pages: doing so would hide drift from CI checks.
+func generateMarkdown(root string) error {
+	data, err := collectManifest(root, false, nil)
+	if err != nil {
+		return err
+	}
+	updates := map[string][]byte{
+		filepath.Join(root, "docs", "analyzers", "index.md"): []byte(analyzerIndex(data)),
+	}
+	if err := generateHelperReferences(root, updates); err != nil {
+		return err
+	}
+	delete(updates, filepath.Join(root, helperIndexPage))
+	paths := make([]string, 0, len(updates))
+	for path := range updates {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+	for _, path := range paths {
+		if err := updateFile(root, path, updates[path], false); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func analyzerPage(root, page string, analyzer analyzer, includeExamples bool) ([]byte, error) {
 	contents, err := os.ReadFile(page)
 	if err != nil {

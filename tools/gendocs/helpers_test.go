@@ -38,7 +38,9 @@ func (box Box[T]) Get() T { return box.Value }
 func hidden() {}
 `)
 	}
-	write(helperIndexPage, "# Routing\n\n"+generatedHelpersStart+"\n"+generatedHelpersEnd+"\n")
+	routing := "# Routing\n\n" + generatedHelpersStart + "\n" + generatedHelpersEnd + "\n"
+	write(helperIndexPage, routing)
+	checkMarkdownBootstrap(t, root, routing)
 	updates := make(map[string][]byte)
 	if err := generateHelperReferences(root, updates); err != nil {
 		t.Fatal(err)
@@ -79,5 +81,23 @@ func hidden() {}
 	unchanged, err := os.ReadFile(page)
 	if err != nil || string(unchanged) != text {
 		t.Fatalf("freshness check changed the reference: %v", err)
+	}
+}
+
+// checkMarkdownBootstrap exercises a fresh checkout with no generated pages
+// and stale routing links, which must remain visible to the freshness check.
+func checkMarkdownBootstrap(t *testing.T, root, routing string) {
+	t.Helper()
+	if err := generateMarkdown(root); err != nil {
+		t.Fatalf("bootstrap missing Markdown: %v", err)
+	}
+	if contents, err := os.ReadFile(filepath.Join(root, helperIndexPage)); err != nil || string(contents) != routing {
+		t.Fatalf("bootstrap changed the tracked routing guide: %v", err)
+	}
+	if contents, err := os.ReadFile(filepath.Join(root, "docs/analyzers/index.md")); err != nil || !strings.Contains(string(contents), "goroutineownership") {
+		t.Fatalf("bootstrap did not generate the analyzer index: %v", err)
+	}
+	if contents, err := os.ReadFile(filepath.Join(root, helperReferenceDirectory, "newfacts.md")); err != nil || !strings.Contains(string(contents), "NewBox") {
+		t.Fatalf("bootstrap did not generate the helper reference: %v", err)
 	}
 }
