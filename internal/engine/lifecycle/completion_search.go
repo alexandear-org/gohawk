@@ -243,41 +243,8 @@ func (search *completionSearch) instructionCompletes(candidate ssa.Instruction, 
 		return true
 	}
 	for _, local := range locals {
-		// A callback bound to the method on the target, such as rows.Close,
-		// completes when the callee invokes that exact local, directly or in
-		// a nested launch. crabbox hands cmd.Wait to a helper that invokes it
-		// on a waiter goroutine:
-		// https://github.com/openclaw/crabbox/blob/3ef3f98cbe27e6ddc814c11fde15b89c1639bcbe/internal/cli/ssh_forward_startup.go#L15-L22
-		if local.Kind == localCallback {
-			if called != nil && invokesLocal(called.Value, local.Local) {
-				search.paths.record("", false)
-				return true
-			}
-			if search.forCallback().completes(candidate, local.Local).proven {
-				search.paths.record("", false)
-				return true
-			}
-			continue
-		}
-		if search.invokeTarget && local.Kind == localExact && called != nil && search.invokesTargetLocal(called.Value, local.Local) {
-			search.paths.record("", false)
-			return true
-		}
-		if answer := search.completes(candidate, local.Local); answer.proven {
-			// The nested answer's path is beneath the local; translate it
-			// onto the target through the local's mapping.
-			path, known := search.mappedPath(local, target, ssaflow.SplitAccessPath(answer.paths.path), answer.paths.known())
-			if !known && local.requiresNestedPath() {
-				// The local owns the target at a path, so completing the local
-				// is not completing the target unless the nested answer names
-				// that path. libovsdb's monitor locks and unlocks rpc while its
-				// caller holds monitors, beneath the same client:
-				// https://github.com/ovn-kubernetes/libovsdb/blob/6acd868996b9393b932a1eeeec1ea4e6c722ebe8/client/client.go#L286-L299
-				// A contained field target likewise needs that exact path:
-				// forwarding cleanup of a sibling does not settle the target.
-				continue
-			}
-			search.paths.record(path, known)
+		if path, known, complete := recognizeLocalCompletion(search, candidate, local, target, called); complete {
+			search.paths.Record(path, known)
 			return true
 		}
 	}
@@ -302,7 +269,7 @@ func (search *completionSearch) methodCompletes(candidate ssa.Instruction, calle
 			if cfg.BlockInCycle(candidate.Block()) {
 				*search.inCycle = true
 			}
-			search.paths.record(search.receiverPath(local, receiver, target))
+			search.paths.Record(search.receiverPath(local, receiver, target))
 			return true
 		}
 	}
@@ -324,4 +291,21 @@ func (search *completionSearch) startsTarget(candidate ssa.Instruction, locals [
 	return ok && slices.ContainsFunc(locals, func(local mappedLocal) bool {
 		return search.invokesTargetLocal(started.Common().Value, local.Local)
 	})
+}
+
+// completionPaths retains the mapping package's path evidence representation.
+type completionPaths = completionmapping.Paths
+
+// localCompletionSignature keeps the ordered local evidence policy native to
+// this search. Recursive calls, allowances and path recording stay in Go.
+type localCompletionSignature func(*completionSearch, ssa.Instruction, mappedLocal, ssa.Value, *ssa.CallCommon) (string, bool, bool)
+
+var _ localCompletionSignature = recognizeLocalCompletion
+
+func callbackInvoked(called *ssa.CallCommon, local ssa.Value) bool {
+	return called != nil && invokesLocal(called.Value, local)
+}
+
+func (search *completionSearch) exactLocalInvoked(called *ssa.CallCommon, local mappedLocal) bool {
+	return search.invokeTarget && local.Kind == localExact && called != nil && search.invokesTargetLocal(called.Value, local.Local)
 }

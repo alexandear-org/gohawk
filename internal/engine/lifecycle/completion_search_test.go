@@ -3,6 +3,8 @@ package lifecycle
 import (
 	"testing"
 
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -408,5 +410,38 @@ func TestCompletionAssumedCoverageAllowance(t *testing.T) {
 		if !completed {
 			t.Fatal("assumed query never completed")
 		}
+	}
+}
+
+func TestLocalCompletionStrategyKeepsSearchAllowance(t *testing.T) {
+	pkg := buildTestSSA(t, `package ssaflowtest
+ func invoke(callback func()) { callback() }
+ `)
+	function := pkg.Func("invoke")
+	candidate := findLaunch(t, function)
+	called := ssaflow.InstructionCall(candidate)
+	for _, test := range []struct {
+		name   string
+		kind   completionmapping.Kind
+		invoke bool
+		common *ssa.CallCommon
+		want   bool
+	}{
+		{"callback is direct", localCallback, false, called, true},
+		{"exact invocation is direct", localExact, true, called, true},
+		{"method search cannot invoke target", localExact, false, called, false},
+		{"projection is not exact invocation", localProjection, true, called, false},
+		{"callback without call evidence needs search", localCallback, false, nil, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			budget := proofs.NewSearchBudget(0)
+			search := newCompletionSearch("Close", CoverageEveryReturn, budget)
+			search.invokeTarget = test.invoke
+			local := mappedLocal{Kind: test.kind, Local: function.Params[0]}
+			path, known, complete := recognizeLocalCompletion(search, candidate, local, function.Params[0], test.common)
+			if complete != test.want || path != "" || known || budget.Exhausted() == test.want {
+				t.Fatalf("path=%q known=%v complete=%v exhausted=%v", path, known, complete, budget.Exhausted())
+			}
+		})
 	}
 }

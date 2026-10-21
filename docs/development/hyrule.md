@@ -68,7 +68,7 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency context/callback and resource recognition | Generated context calls/origins, callback inputs/calls, resource references and identity-root forms; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
-| Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
+| Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation/agreement, local completion strategy and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
@@ -701,3 +701,19 @@ reused; cutoff packets retain their exact child allowance for the original
 observation phase. No trace-only result list is constructed when tracing is off.
 Caller-lifetime enumeration remains its existing declarative Go table, and all
 instruction classification, cache, traversal and reporting boundaries remain.
+
+## Local completion evidence and path agreement
+
+`lifecycle/completion_local.rules` selects direct callback invocation, nested
+callback completion, exact target invocation, and ordinary nested completion in
+that order for each mapped local. Callback failure never falls through to the
+ordinary target search. A nested owner or contained target must name the exact
+path; an unknown path may settle an ordinary exact/projection mapping but cannot
+settle a sibling field. The caller retains the ordered local loop, instruction
+budget charge, incomplete flags, memo invalidation and final path observation.
+
+`completionmapping.Paths` owns path agreement across completing instructions and
+callees. Its generated fold preserves the first path payload and marks conflicting
+or unnamed evidence inexact. Later matching observations cannot restore lost
+exactness. An unseen callee adds no observation; a nil collector records none.
+The existing translation rules map nested paths before they reach this fold.

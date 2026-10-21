@@ -1,6 +1,7 @@
 package lifecycle
 
 import (
+	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
@@ -33,8 +34,8 @@ type completionAnswer struct {
 	proven    bool
 	available bool
 	// paths says where beneath the target a proven completion settled; see
-	// completionPaths. It is meaningful only when proven.
-	paths completionPaths
+	// completionmapping.Paths. It is meaningful only when proven.
+	paths completionmapping.Paths
 }
 
 func (answer completionAnswer) proof(method string) proofs.CompletionProof {
@@ -42,7 +43,7 @@ func (answer completionAnswer) proof(method string) proofs.CompletionProof {
 		Proof: proofs.Proof{
 			State: proofs.EvidenceProven, Reason: answer.launch.Reason(), Method: method, Provenance: proofs.EvidenceFromLocalSSA,
 		},
-		Path: answer.paths.path, PathKnown: answer.paths.known(),
+		Path: answer.paths.Path, PathKnown: answer.paths.Known(),
 	}
 }
 
@@ -77,7 +78,7 @@ func (search *completionSearch) searchCompletes(instruction ssa.Instruction, tar
 		return completionAnswer{launch: launchNone}
 	}
 	searched := false
-	var paths completionPaths
+	var paths completionmapping.Paths
 	for _, callee := range callees {
 		callee.invocation = instruction
 		if callee.environment == nil {
@@ -88,7 +89,7 @@ func (search *completionSearch) searchCompletes(instruction ssa.Instruction, tar
 				search.summarized(instruction, target, search.method, search.invokeTarget, search.queryAt(instruction)) {
 				// A summary settles the target as a whole; where it did so
 				// beneath the target is not part of its claim.
-				paths.record("", false)
+				paths.Record("", false)
 				continue
 			}
 			return completionAnswer{launch: callee.launch, available: searched}
@@ -101,7 +102,7 @@ func (search *completionSearch) searchCompletes(instruction ssa.Instruction, tar
 		if !answer.proven {
 			return completionAnswer{launch: callee.launch, available: true}
 		}
-		paths.merge(answer.paths)
+		paths.Merge(answer.paths)
 	}
 	return completionAnswer{launch: callees[0].launch, proven: true, available: true, paths: paths}
 }
@@ -113,7 +114,7 @@ func (search *completionSearch) calleeCompletes(callee completionCallee, target 
 		// nested body's paths do not bleed into the enclosing answer
 		// except through the mapping that translates them.
 		previous := search.paths
-		search.paths = &completionPaths{}
+		search.paths = &completionmapping.Paths{}
 		answer.proven = search.calleeCoverage(callee, target, invocation)
 		answer.paths = *search.paths
 		search.paths = previous
@@ -177,7 +178,7 @@ func ProveCompletionForCase(function *ssa.Function, condition ssacall.CallCondit
 		search.returnedSummaries = request.ReturnedSummaries
 		search.constants = constants
 		proven := false
-		paths := completionPaths{}
+		paths := completionmapping.Paths{}
 		search.paths = &paths
 		search.memo.WithFunction(function, func() {
 			if resultTest.Outcome == ssacall.OutcomeAny {
@@ -193,7 +194,7 @@ func ProveCompletionForCase(function *ssa.Function, condition ssacall.CallCondit
 				Proof: proofs.Proof{
 					State: proofs.EvidenceProven, Reason: proofs.EvidenceCalledCompletion, Method: method, Provenance: proofs.EvidenceFromLocalSSA,
 				},
-				Path: paths.path, PathKnown: paths.known(),
+				Path: paths.Path, PathKnown: paths.Known(),
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle/completionmapping"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
+	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
 )
@@ -109,4 +110,32 @@ func (search *completionSearch) deferredBindingValue(binding, target ssa.Value, 
 		*search.incomplete = true
 	}
 	return stored
+}
+
+// requiresNestedPath identifies mappings where completing the local as a whole
+// is insufficient: the nested answer must name the caller's exact field.
+func (local mappedLocal) requiresNestedPath() bool {
+	return completionmapping.Local(local).RequiresNestedPath()
+}
+
+// receiverPath names the path beneath the target of a completing call's
+// receiver, which receives established stands for the target through local.
+func (search *completionSearch) receiverPath(local mappedLocal, receiver, target ssa.Value) (string, bool) {
+	if search.exactTarget {
+		return search.mappedPath(local, target, nil, true)
+	}
+	actual, ok := heapmodel.AccessPathFromParameterWithin(receiver, local.Local, search.budget)
+	return search.mappedPath(local, target, actual, ok)
+}
+
+// mappedPath translates a path beneath the local, on which a completing
+// call was made, onto the target the local stands for. The local's own
+// relation to the target decides the translation, and any relation the
+// search cannot express as a static path leaves the result unknown.
+func (search *completionSearch) mappedPath(local mappedLocal, target ssa.Value, actual []string, known bool) (string, bool) {
+	return completionmapping.TranslatePath(completionmapping.Local(local), target, actual, known, search.budget)
+}
+
+func (search *completionSearch) mappedCompletionPath(local mappedLocal, target ssa.Value, paths completionPaths) (string, bool) {
+	return search.mappedPath(local, target, ssaflow.SplitAccessPath(paths.Path), paths.Known())
 }

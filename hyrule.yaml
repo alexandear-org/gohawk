@@ -735,3 +735,17 @@ targets:
     function: Lifecycle
     rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle_gen.go
+  - name: lifecycle_local_completion
+    package: internal/engine/lifecycle
+    bindings: internal/engine/lifecycle/completion_search.go
+    signature: localCompletionSignature
+    function: recognizeLocalCompletion
+    rules: [internal/engine/lifecycle/completion_local.rules]
+    out: internal/engine/lifecycle/completion_local_gen.go
+  - name: lifecycle_completion_path_fold
+    package: internal/engine/lifecycle/completionmapping
+    bindings: internal/engine/lifecycle/completionmapping/accumulation.go
+    signature: foldPathSignature
+    function: FoldPath
+    rules: [internal/engine/lifecycle/completionmapping/accumulation.rules]
+    out: internal/engine/lifecycle/completionmapping/accumulation_gen.go

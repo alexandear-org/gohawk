@@ -1,0 +1,29 @@
+record Paths = Paths {
+  Path;
+  Seen;
+  Exact;
+};
+view Evidence = Paths {
+  path: Path;
+  seen: Seen;
+};
+guard differentPath;
+signature total fallback outputs (Paths Path:"" Seen:false Exact:false);
+
+rule Unnamed:
+  inputs $paths _ false
+  => outputs (update $paths Seen:true Exact:false);
+
+rule First:
+  inputs $paths:(Evidence seen:false) $path true
+  => outputs (update $paths Path:$path Seen:true Exact:true);
+
+rule Conflict:
+  inputs $paths:(Evidence path:$previous) $path true
+  && differentPath $previous $path
+  => outputs (update $paths Seen:true Exact:false);
+
+// Matching a path cannot restore exactness lost at an earlier call.
+rule Same:
+  inputs $paths _ true
+  => outputs (update $paths Seen:true);

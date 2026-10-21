@@ -1,0 +1,75 @@
+signature total fallback outputs "" false false;
+view Local = mappedLocal {
+  kind: Kind;
+  value: Local;
+};
+union Answer = completionAnswer tag proven {
+  Proven = true {
+    paths;
+  };
+  Unproven = false;
+};
+union Path = (string, bool) tag 1 {
+  Known = true {
+    path: 0;
+  };
+  Unknown = false {
+    path: 0;
+  };
+};
+const localCallback;
+query callbackInvoked;
+query exactInvoked = completionSearch.exactLocalInvoked;
+query forCallback = completionSearch.forCallback;
+query completes = completionSearch.completes;
+query mappedPath = completionSearch.mappedCompletionPath;
+query requiresNestedPath = mappedLocal.requiresNestedPath;
+
+// A callback bound to a method on the target completes when that exact local
+// is invoked directly or through a nested launch. A failed direct invocation
+// still permits the callback search, but never the ordinary local search.
+// https://github.com/openclaw/crabbox/blob/3ef3f98cbe27e6ddc814c11fde15b89c1639bcbe/internal/cli/ssh_forward_startup.go#L15-L22
+rule Callback:
+  inputs $search $candidate (Local kind:localCallback value:$local) _ $called
+  => do {
+           true <- query callbackInvoked $called $local
+             else decline;
+           pure outputs "" false true;
+         }
+     <|> do {
+           $nested <- query forCallback $search;
+           Proven <- query completes $nested $candidate $local
+             else {
+               Unproven => outputs "" false false;
+             };
+           pure outputs "" false true;
+         }
+     <|> pure outputs "" false false;
+
+// A nested path is beneath the local and must be translated onto the target.
+// An owner or contained target needs that exact path: cleaning a sibling does
+// not settle it. libovsdb locks rpc while its caller holds monitors.
+// https://github.com/ovn-kubernetes/libovsdb/blob/6acd868996b9393b932a1eeeec1ea4e6c722ebe8/client/client.go#L286-L299
+rule Nested:
+  inputs $search $candidate $local:(Local value:$value) $target $called
+  => do {
+           true <- query exactInvoked $search $called $local
+             else decline;
+           pure outputs "" false true;
+         }
+     <|> do {
+           Proven paths:$paths <- query completes $search $candidate $value
+             else {
+               Unproven => outputs "" false false;
+             };
+           Known path:$path <- query mappedPath $search $local $target $paths
+             else {
+               Unknown path:$path => do {
+                 false <- query requiresNestedPath $local
+                   else outputs "" false false;
+                 pure outputs $path false true;
+               };
+             };
+           pure outputs $path true true;
+         }
+     <|> pure outputs "" false false;
