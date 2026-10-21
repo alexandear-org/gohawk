@@ -364,3 +364,104 @@ func TestReturnedViewBindingPreservesStorageCutoff(t *testing.T) {
 		t.Fatalf("local storage cutoff lost availability: %+v, parent exhausted %v", got, budget.Exhausted())
 	}
 }
+
+func TestSharedHandoffKeepsDirectAndWrapperProofsSeparate(t *testing.T) {
+	value := &ssa.Alloc{}
+	returned := &ssa.Return{Results: []ssa.Value{value}}
+	fresh := freshnessWalk{index: -1}
+	if !fresh.useFeedsReturn(value, returned) || fresh.index != 0 {
+		t.Fatal("direct fresh result must retain its exact return slot")
+	}
+	retained := retentionWalk{index: -1}
+	if retained.useFeedsReturn(value, returned, 0) || retained.index != -1 {
+		t.Fatal("returning the resource itself must not count as a wrapper result")
+	}
+	if !retained.useFeedsReturn(value, returned, 1) || retained.index != 0 {
+		t.Fatal("returning an established wrapper must retain its exact return slot")
+	}
+	fresh.index, retained.index = 1, 1
+	if fresh.useFeedsReturn(value, returned) || retained.useFeedsReturn(value, returned, 1) {
+		t.Fatal("neither handoff mode may merge different result slots")
+	}
+
+	pkg := buildLifecycleTestSSA(t, `package lifecyclefactstest
+import "os"
+type holder struct { file *os.File }
+func hold(file *os.File) *holder { return &holder{file} }
+func relay(file *os.File) *holder { return hold(file) }
+func cleanup(file *os.File) { file.Close() }
+`)
+	pass := &analysis.Pass{ImportObjectFact: func(object types.Object, fact analysis.Fact) bool {
+		if object != pkg.Func("hold").Object() {
+			return false
+		}
+		published, ok := fact.(*publishedFact)
+		if !ok {
+			return false
+		}
+		*published = *publish(Fact{Heap: &heapmodel.HeapSummary{
+			Version: heapmodel.SummaryVersion,
+			Holds:   []heapmodel.HeapHold{{Result: 0, Parameter: 0, Must: true}},
+		}})
+		return true
+	}}
+	for name, wrapper := range map[string]bool{"relay": true, "cleanup": false} {
+		function := pkg.Func(name)
+		call := ssaflow.InstructionsOf[*ssa.Call](function)[0]
+		fresh := freshnessWalk{index: -1, seen: map[ssa.Value]bool{}}
+		retained := retentionWalk{pass: pass, index: -1, seen: map[ssa.Value]bool{}}
+		if got := fresh.useFeedsReturn(function.Params[0], call); got == wrapper {
+			t.Errorf("%s: fresh call acceptance = %v, want %v", name, got, !wrapper)
+		}
+		if got := retained.useFeedsReturn(function.Params[0], call, 0); got != wrapper {
+			t.Errorf("%s: wrapper call acceptance = %v, want %v", name, got, wrapper)
+		}
+		// At the bound, reject before consulting any imported evidence.
+		bounded := retentionWalk{index: -1}
+		if bounded.useFeedsReturn(function.Params[0], call, maxRetainingChain) {
+			t.Errorf("%s: a call at the wrapper-depth bound was admitted", name)
+		}
+	}
+}
+
+func TestReturnedViewTypeEvidencePrecedesUnknownMethods(t *testing.T) {
+	pkg := buildLifecycleTestSSA(t, `package lifecyclefactstest
+type Reader interface { Read([]byte) (int, error) }
+type Closer interface { Close() error }
+type ReadOwner struct { value Reader }
+func (*ReadOwner) Close() error { return nil }
+type CloseOwner struct { value Closer }
+func (*CloseOwner) Close() error { return nil }
+type View struct { value Closer }
+func unchanged(value Reader) Reader { return value }
+func asserted(value Reader) *ReadOwner {
+ if closer, ok := value.(Closer); ok { closer.Close() }
+ return &ReadOwner{value}
+}
+func weakInput(value Reader) *ReadOwner { return &ReadOwner{value} }
+func weakResult(value Closer) *View { return &View{value} }
+func field(value Closer) *CloseOwner { return &CloseOwner{value} }
+`)
+	for _, scenario := range []struct {
+		name     string
+		known    bool
+		released FieldMask
+		want     bool
+	}{
+		{"unchanged", false, 0, false},
+		{"asserted", false, 0, false},
+		{"weakInput", false, 0, true},
+		{"weakResult", false, 0, true},
+		{"field", false, 0, false},
+		{"field", true, 0, true},
+		{"field", true, fieldMaskFor(0), false},
+	} {
+		function := pkg.Func(scenario.name)
+		structure, _, _ := returnedStruct(function)
+		result := function.Signature.Results().At(0).Type()
+		got := parameterIsView(function, function.Params[0], result, structure, scenario.released, scenario.known)
+		if got != scenario.want {
+			t.Errorf("%s (known=%v, released=%v): view=%v, want %v", scenario.name, scenario.known, scenario.released, got, scenario.want)
+		}
+	}
+}

@@ -1,0 +1,36 @@
+signature total fallback outputs false;
+query unchanged = parameterReturnedUnchangedOnEveryReturn;
+query released = parameterMayBeReleased;
+query capable = typeCanRelease;
+query parameterCapable = parameterCanRelease;
+query fields = unreleasedStoredField;
+
+rule View:
+  inputs $function $parameter $result $structure $released $methodsKnown
+  => do {
+       // Returning the same value under the same static type preserves the
+       // caller-visible owner rather than hiding it behind a view. This is the
+       // common status-checking shape: an error response may be closed locally,
+       // while a successful response is handed back unchanged. Requiring every
+       // normal return and the same type keeps wrappers and interface erasure out
+       // of this exception.
+       false <- query unchanged $function $parameter
+         else outputs false;
+       // A constructor that released the argument itself leaves the caller
+       // nothing to keep, whatever becomes of the field afterwards.
+       false <- query released $function $parameter
+         else outputs false;
+       // A callee cannot release what it was handed if the parameter's own type
+       // offers no way to. compress/gzip takes an io.Reader and documents that
+       // its Close does not close it, which is the standard convention: a wrapper
+       // closes what it constructed, never what it was given, and taking a plain
+       // reader rather than a ReadCloser is the API saying so. Asking the
+       // returned type instead gets that case wrong, because *gzip.Reader has a
+       // Close that closes its own decompressor.
+       true <- query parameterCapable $parameter
+         else outputs true;
+       true <- query capable $result
+         else outputs true;
+       $view <- query fields $parameter $structure $released $methodsKnown;
+       pure outputs $view;
+     };

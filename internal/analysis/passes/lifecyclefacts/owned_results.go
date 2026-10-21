@@ -160,22 +160,22 @@ func (walk *freshnessWalk) feedsReturn(value ssa.Value) bool {
 }
 
 func (walk *freshnessWalk) useFeedsReturn(value ssa.Value, use ssa.Instruction) bool {
-	plan := lifecycleforms.Freshness(use)
+	plan := lifecycleforms.Handoff(use)
 	switch plan.Kind {
-	case lifecycleforms.FreshReturn:
+	case lifecycleforms.HandoffReturn:
 		position := returnedPosition(plan.Return, value)
 		if position < 0 || walk.index >= 0 && walk.index != position {
 			return false
 		}
 		walk.index = position
 		return true
-	case lifecycleforms.FreshFollow:
+	case lifecycleforms.HandoffFollow:
 		return walk.feedsReturn(plan.Alias)
-	case lifecycleforms.FreshCleanup:
+	case lifecycleforms.HandoffCall:
 		return cleanupCallOn(plan.Call.Common(), value)
-	case lifecycleforms.FreshIgnore:
+	case lifecycleforms.HandoffIgnore:
 		return true
-	case lifecycleforms.FreshReject:
+	case lifecycleforms.HandoffReject:
 		return false
 	}
 	return false

@@ -414,17 +414,26 @@ allowance and termination state.
 ## Lifecycle structural leaves
 
 `lifecyclefacts/lifecycleforms` supplies exact response Body field addresses and
-freshness-use plans. A Body match requires the original load form, exact Response
-type and Body field contract; it establishes neither acquisition nor unchanged
-contents. Freshness recognition permits only the original box/interface/phi
-forms and equality comparisons. Calls request the existing cleanup proof rather
-than becoming accepted uses by recognition alone. Unsupported casts, stores and
-captures retain the conservative rejection.
+shared handoff-use plans for direct and wrapped results. A Body match requires
+the original load form, exact Response type and Body field contract; it establishes
+neither acquisition nor unchanged contents. Handoff recognition permits only the
+original box/interface/phi forms and equality comparisons. Calls request cleanup
+evidence in the walk for direct results and exact wrapper evidence in the walk
+for retained results. The latter still
+requires positive wrapper depth at a return and rejects calls at its depth bound.
+Unsupported casts, stores and captures retain the conservative rejection.
 
 The enclosing pass retains result-position agreement, visited state, cleanup
 ordering, imported facts and ownership publication. Existing owned-result tests
 now also pin comparisons and a deliberately opaque retyping, alongside fresh,
 borrowed, retained, previously closed and callback-owned results.
+
+`lifecyclefacts/returned_view.rules` sequences unchanged-return, possible-release
+and parameter/result cleanup-capability queries in their original order. Type-only
+view evidence wins before receiver-method completeness is needed. The final
+stored-field query requires complete method knowledge before scanning; an
+unavailable method cannot establish that a field is never released. Field
+collection and lifecycle/type searches stay in Go.
 
 ## Lifecycle retention and escape uses
 

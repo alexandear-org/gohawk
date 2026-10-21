@@ -388,6 +388,10 @@ constructor, returning that wrapper is a handover only when the constructor's
 own summary makes the claim; a proven chain without the claim, including every
 unexported constructor, is an uncertain boundary.
 
+Direct and wrapped results share generated handoff-use recognition. Their Go
+walks retain separate cleanup and wrapper proofs, result-slot agreement, visited
+state and the wrapper-depth bound; recognizing a call proves neither contract.
+
 A constructor storing the acquired value in an already external map or owner
 also leaves fresh-result ownership unknown. A returned wrapper can share its
 resource with a manager; its cleanup capability does not establish a separate

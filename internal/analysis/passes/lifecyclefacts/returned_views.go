@@ -157,44 +157,16 @@ func returnedViews(pass *analysis.Pass, function *ssa.Function, fact Fact, summa
 // releases nothing" would turn a wrapper that does close its argument into a
 // view. When the type can release, the answer depends on which field this is,
 // so an unreadable store stays conservative and claims no view.
-func parameterIsView(
-	function *ssa.Function,
-	parameter ssa.Value,
-	result types.Type,
-	structure *types.Struct,
-	released FieldMask,
-	methodsKnown bool,
-) bool {
-	// Returning the same value under the same static type preserves the
-	// caller-visible owner rather than hiding it behind a view. This is the
-	// common status-checking shape: an error response may be closed locally,
-	// while a successful response is handed back unchanged. Requiring every
-	// normal return and the same type keeps wrappers and interface erasure out
-	// of this exception.
-	if parameterReturnedUnchangedOnEveryReturn(function, parameter) {
-		return false
-	}
-	// A constructor that released the argument itself leaves the caller
-	// nothing to keep, whatever becomes of the field afterwards.
-	if parameterMayBeReleased(function, parameter) {
-		return false
-	}
-	// A callee cannot release what it was handed if the parameter's own type
-	// offers no way to. compress/gzip takes an io.Reader and documents that
-	// its Close does not close it, which is the standard convention: a wrapper
-	// closes what it constructed, never what it was given, and taking a plain
-	// reader rather than a ReadCloser is the API saying so. Asking the
-	// returned type instead gets that case wrong, because *gzip.Reader has a
-	// Close that closes its own decompressor.
-	if !typeCanRelease(parameter.Type()) {
-		return true
-	}
-	if !typeCanRelease(result) {
-		return true
-	}
-	// A missing receiver-method summary cannot prove that a stored field is
-	// never released. Type-only view evidence above does not depend on that
-	// field census; the field-based claim requires complete method knowledge.
+type parameterViewSignature func(*ssa.Function, ssa.Value, types.Type, *types.Struct, FieldMask, bool) bool
+
+var _ parameterViewSignature = parameterIsView
+
+func parameterCanRelease(parameter ssa.Value) bool { return typeCanRelease(parameter.Type()) }
+
+// A missing receiver-method summary cannot prove that a stored field is
+// never released. Type-only view evidence does not depend on this census;
+// the field-based query requires complete method knowledge before scanning.
+func unreleasedStoredField(parameter ssa.Value, structure *types.Struct, released FieldMask, methodsKnown bool) bool {
 	if !methodsKnown {
 		return false
 	}

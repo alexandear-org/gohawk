@@ -157,6 +157,67 @@ read directly and is an illustrative input, not an implementation candidate.
 | `testsupport/analyzertest` | Installs diagnostic-contract assertions and the common analysistest harness. Independent assertions intentionally accumulate test errors before forwarding an unsuppressed report. |
 | `testsupport/docexamples` | Fixture-region scanning, package loading/checker execution, position translation, diagnostic attachment and timing. The marker scanner tracks one open region with two marker actions; the surrounding work is text/offset collection and error reporting. Its small kind table and metric setters need no rule adapter. |
 
+## Result and lifecycle fact review
+
+All six result-fact files and the 23 lifecycle-fact files present at the start
+of this pass were read, including the three structural-recognition binding
+files. Complete path queries and exact-source coverage checks used generations
+`2026-10-21T23:33:45Z` and `2026-10-21T23:37:20Z`; authored paths had clean
+metadata. The eight recorded gaps were generated outputs. All eight source
+policies were inspected directly, including the renamed handoff policy.
+
+This review found two missed fits now integrated, and an evidence-composition
+family still awaiting migration. The lifecycle scope is therefore not closed.
+
+| Family | Finding |
+| --- | --- |
+| `resultfacts` | Static leaves, assumption fallback and paired-return decisions already use rules. Remaining code owns result/parameter enumeration, reaching/storage queries, every-return agreement, summary availability/publication, schema bounds and rendering. Small outcome projections and literal checks stay in Go. |
+| Direct and retained results | The retained-result walk duplicated the fresh-result walk's structural switch. Both now consume `lifecycleforms.Handoff`. The existing direct cleanup and imported wrapper checks, exact result-slot agreement and depth bound remain separate. Focused tests distinguish cleanup calls from wrapper calls, direct returns from wrapper returns, and accepted aliases from opaque casts/loads/captures. |
+| Returned-view policy | `returned_view.rules` now owns the ordered unchanged-return, possible-release and cleanup-capability decisions. Its final stored-field query retains the method-completeness fence and field census. Overlapping evidence tests pin unchanged/released precedence, type-only acceptance despite unknown methods, and field-based acceptance only with complete method knowledge. |
+| Fact vocabulary and publication | Masks, compact claims, package markers, immutable publication and signature attachment. The separate `Reason` file slot was reclaimed by moving unchanged proof carriers beside evidence requests and their codes/rendering beside fact descriptions; the generated view policy keeps the package within its file limit. |
+| Field/cleanup, capture and discharge inference | Constructor/method and argument/capture censuses, exact stored paths, local/imported lookup, conditional-case enumeration and shared completion/flow queries. Resource/cleanup vocabularies remain tables. The small Boolean-use admission set in conditional export is a type-set predicate, not an independent decision pipeline. |
+| Retention/escape and response leaves | Existing generated policies own instruction admission, mode gates, escape aliases and exact response Body recognition. Native code applies plans through storage/reaching/use searches, memoization and effect collection. |
+| Lifecycle evidence composition | **Pending strong fit:** `selectedMaskProof` orders direct discharge, ordinary arguments, immutable captures, strict projections, argument cases and possible-alias uncertainty. `localProof` and `importedProof` also contain source-precedence policy. They require a cohesive native binding design that preserves partial-proof payloads, cutoff precedence, provenance and reached-query order. They remain an explicit migration item. |
+
+## Fixed completion checklist
+
+The inventory is frozen at `4abb415f` plus this batch on 2026-10-22: 363
+current authored production Go files, 129 reviewed and 234 awaiting review.
+Reviewed source is tracked by content fingerprint. Review each remaining scope
+once; reopen only the portion affected by a subsequent change. A review may
+close with no migration when the existing Go is clearer. Target count is not a
+completion criterion, and marginal conversions do not extend this checklist.
+
+| Remaining source scope | Authored files | Status |
+| --- | ---: | --- |
+| `analyzers/concurrency/concurrentcapture` | 5 | Pending review |
+| `analyzers/concurrency/goroutineownership` | 23 | Pending review |
+| `analyzers/concurrency/lockorder` | 24 | Pending review |
+| `analyzers/concurrency/producerlifecycle` | 4 | Pending review |
+| `analyzers/resources/cancellationownership` | 11 | Pending review |
+| `analyzers/resources/deferinloop` | 6 | Pending review |
+| `analyzers/resources/processownership` | 13 | Pending review |
+| `analyzers/resources/resourcelifetime` | 28 | Pending review |
+| `passes/concurrencyfacts` | 25 | Pending review |
+| `engine/heapmodel` | 22 | Pending review |
+| `engine/lifecycle` | 33 | Pending review |
+| `engine/ssaflow` root, `path` and `valueforms` | 40 | Pending review |
+
+Analyzer and pass paths above are relative to `internal/analysis`; engine paths
+are relative to `internal`. Counts include native bindings beside existing
+rules, which need review rather than automatic conversion.
+
+The remaining completion steps are finite:
+
+- Close each of the 12 source scopes above with a disposition per policy family.
+- Migrate the confirmed lifecycle evidence-composition family. Record any other
+  confirmed fit under its existing scope and close it with that scope.
+- Review generation/build/CI configuration and non-Go tooling for integration
+  gaps, without treating language translation itself as a goal.
+- Run final integration validation after the remaining cohesive migrations,
+  record the outcome and close the audit. Unchanged reviewed scopes and
+  compiler contracts reuse their existing evidence.
+
 ## Remaining audit work
 
 The internal scope still needs a complete source review with per-family
@@ -165,6 +226,8 @@ positive integrations, but do not establish that every remaining strong fit
 has been found. In particular:
 
 - Review smaller recognizers and remaining mixed policy/traversal functions.
+- Migrate the confirmed lifecycle evidence-composition family above before
+  closing the lifecycle-fact scope.
 - Resolve conditional candidates against existing generated policies before
   introducing new interfaces. Parent cancellation, for example, requires result
   zero and same-function provenance; the context-origin recognizer admits a

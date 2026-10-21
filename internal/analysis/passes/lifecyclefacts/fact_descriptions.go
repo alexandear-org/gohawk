@@ -8,7 +8,7 @@ import (
 	"github.com/kojah/gohawk/internal/engine/syntax"
 )
 
-// Fact descriptions render existing claims for dumps and evidence tracing.
+// Fact descriptions render existing claims and stable summary reasons for dumps and evidence tracing.
 // Parameter, field and result masks keep distinct index spaces; text labels
 // describe guarantees but never participate in their inference.
 
@@ -256,4 +256,59 @@ var fieldMasks = []struct {
 }{
 	{name: "OwnedFields", field: func(fact *Fact) *FieldMask { return &fact.Must.OwnedFields }},
 	{name: "ReleasedFields", field: func(fact *Fact) *FieldMask { return &fact.Must.ReleasedFields }},
+}
+
+// Reason classifies summary evidence, independently of local SSA evidence.
+type Reason uint8
+
+const (
+	reasonNone Reason = iota
+	reasonLifecycleSummary
+	reasonLifecycleSummaryProjectedArgument
+	reasonLifecycleSummaryCapturedArgument
+	reasonReceiverStoreTransfer
+	reasonReceiverDoesNotEscape
+	reasonOwnedResultContract
+	reasonOwnedResultUnreleasable
+	reasonRetainingResultContract
+	reasonStoredByCallee
+	reasonConditionalSummary
+	reasonArgumentCase
+	reasonRetentionBudget
+	reasonSummarizingFunction
+	reasonFunctionSummarized
+	reasonCount
+)
+
+var reasonCodes = [...]string{
+	reasonNone:                              "",
+	reasonLifecycleSummary:                  "lifecycle-summary",
+	reasonLifecycleSummaryProjectedArgument: "lifecycle-summary-projected-argument",
+	reasonLifecycleSummaryCapturedArgument:  "lifecycle-summary-captured-argument",
+	reasonReceiverStoreTransfer:             "receiver-store-transfer",
+	reasonReceiverDoesNotEscape:             "receiver-does-not-escape",
+	reasonOwnedResultContract:               "owned-result-contract",
+	reasonOwnedResultUnreleasable:           "owned-result-unreleasable",
+	reasonRetainingResultContract:           "retaining-result-contract",
+	reasonStoredByCallee:                    "stored-by-callee",
+	reasonConditionalSummary:                "conditional-lifecycle-summary",
+	reasonArgumentCase:                      "argument-case-summary",
+	reasonRetentionBudget:                   "retention-budget-exhausted",
+	reasonSummarizingFunction:               "summarizing-function",
+	reasonFunctionSummarized:                "function-summarized",
+}
+
+// String renders the stable trace code at the output boundary.
+func (reason Reason) String() string {
+	if int(reason) >= len(reasonCodes) {
+		return "invalid-lifecycle-summary-reason"
+	}
+	return reasonCodes[reason]
+}
+
+func (proof Proof) traceReason() string {
+	if proof.SummaryReason != reasonNone {
+		return proof.SummaryReason.String()
+	}
+	return proof.Reason.String()
 }

@@ -315,13 +315,13 @@ targets:
     function: ResponseBody
     rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/response.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go
-  - name: lifecycle_freshness_use
+  - name: lifecycle_handoff_use
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
-    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness.go
-    signature: freshSignature
-    function: Freshness
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness.rules]
-    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/freshness_gen.go
+    bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff.go
+    signature: handoffSignature
+    function: Handoff
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff.rules]
+    out: internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff_gen.go
   - name: lifecycle_retention_use
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
@@ -896,3 +896,10 @@ targets:
     function: Tail
     rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail_gen.go
+  - name: lifecycle_returned_view_policy
+    package: internal/analysis/passes/lifecyclefacts
+    bindings: internal/analysis/passes/lifecyclefacts/returned_views.go
+    signature: parameterViewSignature
+    function: parameterIsView
+    rules: [internal/analysis/passes/lifecyclefacts/returned_view.rules]
+    out: internal/analysis/passes/lifecyclefacts/returned_view_gen.go

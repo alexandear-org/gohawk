@@ -1,14 +1,14 @@
 signature total fallback outputs (Reject);
-union Use = FreshUse tag Kind {
-  Reject = FreshReject;
-  Ignore = FreshIgnore;
-  Follow = FreshFollow {
+union Use = HandoffUse tag Kind {
+  Reject = HandoffReject;
+  Ignore = HandoffIgnore;
+  Follow = HandoffFollow {
     alias: Alias;
   };
-  Return = FreshReturn {
+  Return = HandoffReturn {
     returned: Return;
   };
-  Cleanup = FreshCleanup {
+  Call = HandoffCall {
     call: Call;
   };
 };
@@ -33,8 +33,8 @@ rule Return:
   inputs $returned:(ReturnValue)
   => outputs (Return returned:$returned);
 
-// Only these transparent return-feeding forms retain freshness. The host walk
-// retains its visited set and single-result-position agreement.
+// These are the transparent forms shared by fresh and retained results.
+// The host keeps visited state, wrapper depth and result-position agreement.
 rule Box:
   inputs $alias:(Box)
   => outputs (Follow alias:$alias);
@@ -51,11 +51,11 @@ rule Comparison:
   inputs (Binary op:(or equalToken notEqualToken))
   => outputs (Ignore);
 
-// Recognizing a call does not accept it. The host still requires the exact
-// resource's cleanup contract and checks whether it can precede a return.
+// A call is only a request: fresh results require cleanup evidence; retained
+// results require an exact wrapper contract and remain within their depth bound.
 rule Call:
   inputs $call:(CallValue)
-  => outputs (Cleanup call:$call);
+  => outputs (Call call:$call);
 
 rule Debug:
   inputs (Debug)

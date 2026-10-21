@@ -1,9 +1,9 @@
 package lifecyclefacts
 
 import (
-	"go/token"
 	"go/types"
 
+	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts/lifecycleforms"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/ssa"
@@ -87,24 +87,25 @@ func (walk *retentionWalk) feedsReturn(value ssa.Value, depth int) bool {
 }
 
 func (walk *retentionWalk) useFeedsReturn(value ssa.Value, use ssa.Instruction, depth int) bool {
-	switch typed := use.(type) {
-	case *ssa.Return:
+	plan := lifecycleforms.Handoff(use)
+	switch plan.Kind {
+	case lifecycleforms.HandoffReturn:
 		// The resource itself returned is an owned result, not a retained
 		// one; only a wrapper may reach the return here.
-		position := returnedPosition(typed, value)
+		position := returnedPosition(plan.Return, value)
 		if depth == 0 || position < 0 || walk.index >= 0 && walk.index != position {
 			return false
 		}
 		walk.index = position
 		return true
-	case *ssa.MakeInterface, *ssa.ChangeInterface, *ssa.Phi:
-		return walk.feedsReturn(typed.(ssa.Value), depth)
-	case *ssa.BinOp:
-		return typed.Op == token.EQL || typed.Op == token.NEQ
-	case *ssa.Call:
-		return depth < maxRetainingChain && walk.wrapperHolds(typed, value) && walk.feedsReturn(typed, depth+1)
-	case *ssa.DebugRef:
+	case lifecycleforms.HandoffFollow:
+		return walk.feedsReturn(plan.Alias, depth)
+	case lifecycleforms.HandoffCall:
+		return depth < maxRetainingChain && walk.wrapperHolds(plan.Call, value) && walk.feedsReturn(plan.Call, depth+1)
+	case lifecycleforms.HandoffIgnore:
 		return true
+	case lifecycleforms.HandoffReject:
+		return false
 	}
 	return false
 }

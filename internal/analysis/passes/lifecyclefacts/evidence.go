@@ -15,6 +15,19 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
+// Proof retains the underlying evidence and the summary rule, when applicable.
+// SummaryReason never replaces an SSA reason with a string from another domain.
+type Proof struct {
+	proofs.Proof
+	SummaryReason Reason
+}
+
+// CompletionProof retains path coverage along with its summary explanation.
+type CompletionProof struct {
+	proofs.CompletionProof
+	SummaryReason Reason
+}
+
 // LifecycleEvidence combines memoized local SSA evidence with lifecycle summaries
 // imported through the prerequisite analyzer. One evidence context belongs to one source
 // function and is not safe for concurrent use.
