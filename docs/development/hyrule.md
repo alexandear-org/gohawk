@@ -47,7 +47,7 @@ path is removed; generator support and examples alone do not qualify.
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
-| Process ownership decision selection | Generated post-Start return policy with ordered command-use and entry-lifetime queries; instruction classification remains |
+| Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Handwritten; migration remains; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Handwritten; migration remains; identity and cycle search stay in Go |
@@ -235,3 +235,30 @@ Compiled-SSA label tests cover launched builtins, append, other builtins, possib
 group receivers and direct waits. Contract tests pin terminal `none` for group
 bookkeeping and testing cleanup. Existing summary and retained-owner tests keep
 candidate attribution, cutoff precedence and fresh-cache recovery controls.
+
+## Process ownership actions
+
+`action_entry.rules` asks possible-handoff and deferred-wait queries first.
+Uncertainty there stops the action, preserving the original early boundary.
+`action_settlement.rules` recognizes direct waits and process release before the
+lifecycle completion/transfer query. Go prepares the same completion allowance
+between these stages; direct-witness identity queries retain their independently
+owned allowances and do not spend the prepared completion budget.
+
+An unfinished lifecycle search supplies a provisional unknown fallback rather
+than ending the action. `action_remainder.rules` permits an exact external-field
+transfer, handle completion or process exit to override it, in the original
+order. A handle cutoff remains unknown unless the later exit witness wins.
+An absent handle preserves the earlier fallback. Non-budget lifecycle uncertainty
+retains its original distinction from an abandoned search.
+
+The existing lifecycle request still owns completion, transfer modes, selected
+summary masks and receiver-store evidence. Native function signatures carry the
+state, recognition flag, allowance and provisional fallback directly. Handle
+argument scans and the instruction/command cache remain the same Go paths.
+
+`action_order_test.go` pins baseline outcomes at zero, small and full allowances
+on compiled SSA, including early uncertainty and late positive evidence. Separate
+remainder cases distinguish a truly exhausted handle query from an empty unused
+allowance and check fallback retention. Existing action-cache and analyzer tests
+retain command identity, fresh-candidate and flow controls.

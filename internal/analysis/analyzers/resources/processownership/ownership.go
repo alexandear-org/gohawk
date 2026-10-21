@@ -43,19 +43,62 @@ func abandoned(result lifecyclefacts.Proof) bool {
 	return result.Reason == proofs.EvidenceBudgetExhausted
 }
 
+// The generated stages preserve early handoff cutoffs, cheap settlement, and
+// late exact witnesses. The same cache surrounds the complete instruction action.
 func processOwnershipAction(proof *commandProof, instruction ssa.Instruction, command ssa.Value) proofs.EvidenceState {
-	if handoff := provePossibleWaitHandoff(instruction, command, proof.budget()); handoff.State == proofs.EvidenceUnknown {
-		return proofs.EvidenceUnknown
+	state, decided := recognizeProcessAction(proof, instruction, command)
+	if decided {
+		return state
 	}
-	if deferred := deferredClosureWaitsForCommand(instruction, command, proof.budget()); deferred != proofs.EvidenceDisproven {
-		return deferred
+	// Allocate the original completion allowance after early queries and before
+	// cheap settlement; only the lifecycle evidence query may spend it.
+	settled, fallback := recognizeProcessSettlement(proof, instruction, command, proof.budget())
+	if settled {
+		return proofs.EvidenceProven
 	}
+	return decideProcessRemainder(proof, instruction, command, fallback)
+}
+
+type (
+	processActionPrefixSignature func(proof *commandProof, instruction ssa.Instruction, command ssa.Value) (proofs.EvidenceState, bool)
+	processSettlementSignature   func(
+		proof *commandProof, instruction ssa.Instruction, command ssa.Value, budget *proofs.SearchBudget,
+	) (bool, proofs.EvidenceState)
+	processRemainderSignature func(proof *commandProof, instruction ssa.Instruction, command ssa.Value, fallback proofs.EvidenceState) proofs.EvidenceState
+)
+
+var (
+	_ processActionPrefixSignature = recognizeProcessAction
+	_ processSettlementSignature   = recognizeProcessSettlement
+	_ processRemainderSignature    = decideProcessRemainder
+)
+
+func (proof *commandProof) possibleWaitHandoff(instruction ssa.Instruction, command ssa.Value) bool {
+	return provePossibleWaitHandoff(instruction, command, proof.budget()).State == proofs.EvidenceUnknown
+}
+
+func (proof *commandProof) deferredWait(instruction ssa.Instruction, command ssa.Value) proofs.Proof {
+	return proofs.Proof{State: deferredClosureWaitsForCommand(instruction, command, proof.budget())}
+}
+
+// os.Process.Release explicitly relinquishes the parent's wait/reap
+// obligation for deliberately detached daemons:
+// https://github.com/drn/argus/blob/9b4bb7e71217e22557f72531909bf803354d3ab4/internal/daemon/client/autostart_fork.go#L41-L45
+func releasedProcess(instruction ssa.Instruction, command ssa.Value) bool {
 	common := ssaflow.InstructionCall(instruction)
+	return ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "os", Receiver: "Process", Name: "Release"})) &&
+		heapmodel.ValueDerivesFrom(ssaflow.CallReceiver(common), command)
+}
+
+func exitedProcess(instruction ssa.Instruction) bool {
+	return ssacall.CallMatchesSymbol(ssaflow.InstructionCall(instruction), syntax.PackageFunction("os", "Exit"))
+}
+
+// commandOwnership forwards the original evidence request and exposes its
+// provisional fallback. Later exact witnesses may still override that fallback.
+func (proof *commandProof) commandOwnership(instruction ssa.Instruction, command ssa.Value, budget *proofs.SearchBudget) (bool, proofs.EvidenceState) {
 	completion := lifecycle.CompletionRequest{
-		Instruction: instruction,
-		Target:      command,
-		Methods:     []string{"Wait"},
-		Budget:      proof.budget(),
+		Instruction: instruction, Target: command, Methods: []string{"Wait"}, Budget: budget,
 	}
 	// A command stored into a package variable, or into a map this function
 	// does not own, belongs to that registry: another function looks it up and
@@ -73,45 +116,26 @@ func processOwnershipAction(proof *commandProof, instruction ssa.Instruction, co
 	// waiters for deliberately longer-lived commands:
 	// https://github.com/stephrobert/feint/blob/270aeb83c264ad109af885bb4e52f598265c5e1f/internal/cli/lifecycle.go#L183-L206
 	// https://github.com/stephrobert/feint/blob/270aeb83c264ad109af885bb4e52f598265c5e1f/internal/core/machine/incus_watch.go#L51-L61
-	// os.Process.Release explicitly relinquishes the parent's wait/reap
-	// obligation for deliberately detached daemons:
-	// https://github.com/drn/argus/blob/9b4bb7e71217e22557f72531909bf803354d3ab4/internal/daemon/client/autostart_fork.go#L41-L45
-	// The questions are asked in the order of the disjunction, so a cheap
-	// syntactic witness is never charged for a search it did not need, and
-	// the results of the searched ones are kept to tell an abandoned search
-	// from a disproof.
-	var ownership lifecyclefacts.Proof
-	owns := func() bool {
-		ownership = proof.evidence.Prove(lifecyclefacts.EvidenceRequest{
-			Instruction: instruction,
-			Target:      command,
-			Completion:  &completion,
-			Transfer:    &transfer,
-			SelectMask: func(fact lifecyclefacts.Fact) lifecyclefacts.ParameterMask {
-				return fact.ReturnedOwner() | fact.MethodMask("Wait")
-			},
-			ReceiverStore: true,
-		})
-		return ownership.Proven()
+	// The caller asks this only after cheap Wait/Release witnesses fail. Keep
+	// an abandoned search as a provisional fallback; later exact handle or
+	// process-exit evidence may still prove settlement.
+
+	result := proof.evidence.Prove(lifecyclefacts.EvidenceRequest{
+		Instruction: instruction, Target: command, Completion: &completion, Transfer: &transfer,
+		SelectMask: func(fact lifecyclefacts.Fact) lifecyclefacts.ParameterMask {
+			return fact.ReturnedOwner() | fact.MethodMask("Wait")
+		},
+		ReceiverStore: true,
+	})
+	fallback := proofs.EvidenceDisproven
+	if abandoned(result) {
+		fallback = proofs.EvidenceUnknown
 	}
-	handle := proofs.EvidenceDisproven
-	handles := func() bool {
-		handle = processHandleOwnershipAction(proof, instruction, command)
-		return handle == proofs.EvidenceProven
-	}
-	if waitsForCommand(instruction, command) ||
-		ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "os", Receiver: "Process", Name: "Release"})) &&
-			heapmodel.ValueDerivesFrom(ssaflow.CallReceiver(common), command) ||
-		owns() ||
-		storesProcessHandleInExternalField(instruction, command) ||
-		handles() ||
-		ssacall.CallMatchesSymbol(common, syntax.PackageFunction("os", "Exit")) {
-		return proofs.EvidenceProven
-	}
-	if abandoned(ownership) || handle == proofs.EvidenceUnknown {
-		return proofs.EvidenceUnknown
-	}
-	return proofs.EvidenceDisproven
+	return result.Proven(), fallback
+}
+
+func (proof *commandProof) handleOwnership(instruction ssa.Instruction, command ssa.Value) proofs.Proof {
+	return proofs.Proof{State: processHandleOwnershipAction(proof, instruction, command)}
 }
 
 func storesProcessHandleInExternalField(instruction ssa.Instruction, command ssa.Value) bool {

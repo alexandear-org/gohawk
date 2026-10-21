@@ -363,3 +363,28 @@ owns the conservative invalid-outcome fallback previously applied by its Go
 wrapper. Settled returns still short-circuit before command-use discovery;
 `command_use_test.go` and `program_entry_test.go` retain the cutoff, unused-handle
 and entry-lifetime controls.
+
+## Generated instruction ownership policy
+
+The same candidate cache wraps three generated stages. Early possible-wait and
+deferred-closure queries stop on their existing uncertainty. Direct Wait/Release
+recognition then precedes the shared lifecycle completion/transfer request. Its
+completion allowance is drawn at the same point and passed into that request;
+transfer modes, returned-owner/Wait masks and receiver-store evidence are unchanged.
+
+A lifecycle cutoff is provisional. External process-handle storage, handle-based
+completion and process exit can still provide exact positive evidence afterward.
+The remainder stage asks them in the original order: exit follows the handle
+query, and an absent handle retains the lifecycle fallback. A handle cutoff keeps
+unknown unless the final exit witness proves settlement. Earlier handoff and
+deferred uncertainty remain terminal. Non-budget lifecycle uncertainty is still
+distinct from an abandoned search.
+
+`action_order_test.go` records the baseline state matrix at zero, one, five and
+full candidate allowances. It covers direct/deferred waits, Release, external
+fields, lower-level handles, Exit, unrelated operations and merged receivers.
+Additional stage tests pin exact evidence after cutoff, provisional fallback
+retention and absence of unnecessary handle queries for field transfers.
+`action_cache_test.go` continues to distinguish repeated instructions, different
+commands and fresh candidates. The ordinary flow query and reporting policy are
+unchanged.

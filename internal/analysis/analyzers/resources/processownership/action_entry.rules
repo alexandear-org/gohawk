@@ -1,0 +1,16 @@
+signature total fallback outputs decisionUnknown true;
+query handoff = commandProof.possibleWaitHandoff;
+query deferred = commandProof.deferredWait;
+
+// Possible handoffs and unfinished deferred-wait searches stop the action.
+// Only an absent deferred wait proceeds to ordinary settlement evidence.
+rule Entry:
+  inputs $proof $instruction $command
+  => query handoff $proof $instruction $command {
+       true => outputs decisionUnknown true;
+       false => query deferred $proof $instruction $command {
+         Completed => outputs decisionProven true;
+         Indeterminate => outputs decisionUnknown true;
+         Incomplete => outputs decisionDisproven false;
+       };
+     };

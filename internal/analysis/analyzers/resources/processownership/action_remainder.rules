@@ -1,0 +1,23 @@
+signature total fallback outputs decisionUnknown;
+query stored = storesProcessHandleInExternalField;
+query handle = commandProof.handleOwnership;
+query exited = exitedProcess;
+
+// Exact lower-level transfer wins even when earlier evidence stopped. Process
+// exit follows the handle query and can override either provisional cutoff.
+rule Remaining:
+  inputs $proof $instruction $command $fallback
+  => query stored $instruction $command {
+       true => outputs decisionProven;
+       false => query handle $proof $instruction $command {
+         Completed => outputs decisionProven;
+         Indeterminate => query exited $instruction {
+           true => outputs decisionProven;
+           false => outputs decisionUnknown;
+         };
+         Incomplete => query exited $instruction {
+           true => outputs decisionProven;
+           false => outputs $fallback;
+         };
+       };
+     };

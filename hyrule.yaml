@@ -1,5 +1,26 @@
 version: 1
 targets:
+  - name: process_action_entry
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/ownership.go
+    signature: processActionPrefixSignature
+    function: recognizeProcessAction
+    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_entry.rules]
+    out: internal/analysis/analyzers/resources/processownership/action_entry_gen.go
+  - name: process_action_settlement
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/ownership.go
+    signature: processSettlementSignature
+    function: recognizeProcessSettlement
+    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_settlement.rules]
+    out: internal/analysis/analyzers/resources/processownership/action_settlement_gen.go
+  - name: process_action_remainder
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/ownership.go
+    signature: processRemainderSignature
+    function: decideProcessRemainder
+    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_remainder.rules]
+    out: internal/analysis/analyzers/resources/processownership/action_remainder_gen.go
   - name: goroutine_call_recognition
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go

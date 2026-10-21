@@ -1,0 +1,20 @@
+signature total fallback outputs false decisionUnknown;
+query waits = waitsForCommand;
+query released = releasedProcess;
+query ownership = commandProof.commandOwnership;
+
+// Direct witnesses precede the lifecycle query. Their existing identity checks
+// retain their own allowances and do not spend the prepared completion budget.
+rule Settlement:
+  inputs $proof $instruction $command $budget
+  => query waits $instruction $command {
+       true => outputs true decisionDisproven;
+       false => query released $instruction $command {
+         true => outputs true decisionDisproven;
+         false => query $answer = ownership $proof $instruction $command $budget
+         decide $answer {
+           Settled => $answer;
+           Unsettled => $answer;
+         };
+       };
+     };
