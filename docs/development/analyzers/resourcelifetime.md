@@ -1460,3 +1460,11 @@ optional-diamond correlation and trace emission remain in Go. Existing
 `http_test.go`, acquisition allowance/flow tests and accepted/diagnostic fixtures
 continue to exercise the consuming proof; no acquisition or cleanup semantics
 are broadened by this migration.
+
+The HTTP use policies also select the existing request/client/server and writer
+forms before their bounded Go queries. Request origin recursion still precedes
+independent immutable-use checking; writer status rejection remains terminal,
+and root-only default-client reads never weaken helper summaries. Referrer,
+operand, binding and reaching-fold visits retain their original allowance
+charges. The existing HTTP allowance and flow controls cover these generated
+consumer paths together with acquisition outcome selection.

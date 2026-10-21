@@ -49,32 +49,20 @@ func (effects *Effects) HeaderOnly(writer *ssa.Parameter, budget *proofs.SearchB
 }
 
 func (effects *Effects) writerUse(instruction ssa.Instruction, writer ssa.Value, budget *proofs.SearchBudget) bool {
-	if _, ok := instruction.(*ssa.ChangeInterface); ok {
-		return true
-	}
-	call, ok := instruction.(*ssa.Call)
-	if !ok {
+	return decideWriterUse(effects, instruction, writer, budget)
+}
+
+func writerStatus(call *ssa.Call) bool {
+	code, ok := call.Common().Args[0].(*ssa.Const)
+	if !ok || code.Value == nil || code.Value.Kind() != constant.Int {
 		return false
 	}
+	n, exact := constant.Int64Val(code.Value)
+	return exact && n >= 200 && n <= 599 && (n < 300 || n >= 400)
+}
+
+func (effects *Effects) writerHelper(call *ssa.Call, writer ssa.Value, budget *proofs.SearchBudget) bool {
 	common := call.Common()
-	if ssacall.CallMatchesSymbol(common, syntax.PackageFunction("net/http", "SetCookie")) {
-		return true
-	}
-	if ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{
-		PackagePath: "net/http", Receiver: "ResponseWriter", Name: "Header",
-	})) {
-		return benignHTTPHeaders(call, budget)
-	}
-	if ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{
-		PackagePath: "net/http", Receiver: "ResponseWriter", Name: "WriteHeader",
-	})) {
-		code, ok := common.Args[0].(*ssa.Const)
-		if !ok || code.Value == nil || code.Value.Kind() != constant.Int {
-			return false
-		}
-		n, exact := constant.Int64Val(code.Value)
-		return exact && n >= 200 && n <= 599 && (n < 300 || n >= 400)
-	}
 	callee, closure := ssacall.DirectCallee(common)
 	// A visible helper must preserve the same restriction for every parameter
 	// receiving the writer. Missing bodies or captured/dynamic dispatch are not

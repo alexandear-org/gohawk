@@ -235,11 +235,21 @@ func isGlobal(address ssa.Value) bool {
 
 // Passive decisions retain the original instruction/root/allowance boundary.
 type (
-	passiveSignature func(instruction ssa.Instruction, root bool, budget *proofs.SearchBudget) Reason
-	passiveValue     = ssa.Value
+	passiveSignature      func(instruction ssa.Instruction, root bool, budget *proofs.SearchBudget) Reason
+	cloneSummarySignature func(Summary) Summary
+	cloneWorkerSignature  func(WorkerSummary) WorkerSummary
+	cloneChoiceSignature  func(SelectChoice) SelectChoice
+	cloneArmSignature     func(SelectArm) SelectArm
+	passiveValue          = ssa.Value
 )
 
-var _ passiveSignature = passiveInstruction
+var (
+	_ passiveSignature      = passiveInstruction
+	_ cloneSummarySignature = cloneEffects
+	_ cloneWorkerSignature  = cloneWorker
+	_ cloneChoiceSignature  = cloneChoice
+	_ cloneArmSignature     = cloneArm
+)
 
 func passiveFieldWithin(field *ssa.FieldAddr, budget *proofs.SearchBudget) bool {
 	_, exact := embeddedPathWithin(field, budget)

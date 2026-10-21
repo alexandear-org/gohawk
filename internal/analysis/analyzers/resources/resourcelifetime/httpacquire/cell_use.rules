@@ -1,0 +1,32 @@
+signature total fallback outputs false false;
+guard sameValue;
+query stored = onlyStoredIntoWithin;
+query direct = onlyHTTPDoUsesWithin;
+query closure = closureLoadsCellForDoWithin;
+
+rule Debug:
+  inputs (Debug) _ $stored _
+  => outputs true $stored;
+
+// Exactly one store of one unmodified fresh allocation establishes zero state.
+rule Store:
+  inputs $store:(Store address:$address value:$fresh:(Allocation)) $cell false $budget
+  && sameValue $address $cell
+  => query stored $fresh $store $budget {
+       true => outputs true true;
+       false => outputs false false;
+     };
+
+rule Load:
+  inputs $load:(Unary op:loadToken) _ $stored $budget
+  => query direct $load $budget {
+       true => outputs true $stored;
+       false => outputs false false;
+     };
+
+rule Captured:
+  inputs $closure:(Closure) $cell $stored $budget
+  => query closure $closure $cell $budget {
+       true => outputs true $stored;
+       false => outputs false false;
+     };

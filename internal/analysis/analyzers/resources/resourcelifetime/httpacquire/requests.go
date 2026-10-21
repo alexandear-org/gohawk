@@ -18,21 +18,7 @@ func proveHeadClientUnconfiguredWithin(client ssa.Value, function *ssa.Function,
 	if !budget.Spend() {
 		return carriedProof(false, budget)
 	}
-	if local, ok := client.(*ssa.Alloc); ok {
-		return carriedProof(onlyHTTPDoUsesWithin(local, budget), budget)
-	}
-	load, ok := client.(*ssa.UnOp)
-	if !ok || load.Op != token.MUL {
-		return carriedProof(false, budget)
-	}
-	if ssacall.ValueMatchesSymbol(load.X, httpDefaultClient) {
-		if !onlyHTTPDoUsesWithin(load, budget) {
-			return carriedProof(false, budget)
-		}
-		return DefaultClientUnmodified(function, budget)
-	}
-	cell, ok := load.X.(*ssa.Alloc)
-	return carriedProof(ok && zeroClientCellWithin(cell, budget), budget)
+	return decideHeadClient(client, function, budget)
 }
 
 // zeroClientCell accepts a local variable that holds one fresh zero-value
@@ -50,25 +36,11 @@ func zeroClientCellWithin(cell *ssa.Alloc, budget *proofs.SearchBudget) bool {
 		if !budget.Spend() {
 			return false
 		}
-		switch typed := use.(type) {
-		case *ssa.DebugRef:
-		case *ssa.Store:
-			fresh, ok := typed.Val.(*ssa.Alloc)
-			if stored || typed.Addr != cell || !ok || !onlyStoredIntoWithin(fresh, typed, budget) {
-				return false
-			}
-			stored = true
-		case *ssa.UnOp:
-			if typed.Op != token.MUL || !onlyHTTPDoUsesWithin(typed, budget) {
-				return false
-			}
-		case *ssa.MakeClosure:
-			if !closureLoadsCellForDoWithin(typed, cell, budget) {
-				return false
-			}
-		default:
+		accepted, next := decideClientCellUse(use, cell, stored, budget)
+		if !accepted {
 			return false
 		}
+		stored = next
 	}
 	return stored
 }
@@ -175,23 +147,14 @@ func (query headRequestQuery) prove(request ssa.Value) bool {
 }
 
 func (query headRequestQuery) origin(walk ssaflow.ReachingWalk, value ssa.Value) bool {
-	switch typed := value.(type) {
-	case *ssa.Extract:
-		constructor, ok := typed.Tuple.(*ssa.Call)
-		if !ok || typed.Index != 0 || !headConstructor(constructor.Common()) {
-			return false
-		}
-	case *ssa.Call:
-		if !ssacall.CallMatchesAnySymbol(typed.Common(), httpRequestWithContext, httpRequestClone) {
-			return false
-		}
-		receiver := ssaflow.CallReceiver(typed.Common())
-		if !directHEADRequestValue(receiver) || !walk.Every(receiver, query.origin) {
-			return false
-		}
-	default:
-		return false
-	}
+	return decideRequestOrigin(query, walk, value)
+}
+
+func (query headRequestQuery) followOrigin(walk ssaflow.ReachingWalk, value ssa.Value) bool {
+	return walk.Every(value, query.origin)
+}
+
+func (query headRequestQuery) preserve(value ssa.Value) bool {
 	return !query.preserveUses || ssaflow.NewReachingWalk(ssaflow.TransparentNone).Within(query.budget).Every(value, query.uses)
 }
 
@@ -210,36 +173,20 @@ func headConstructor(common *ssa.CallCommon) bool {
 // mutation or escape. Reusing the origin fold's visited set would discard valid
 // rebinding evidence; sharing the allowance still bounds both directions.
 func (query headRequestQuery) uses(walk ssaflow.ReachingWalk, request ssa.Value) bool {
-	budget := query.budget
 	refs := request.Referrers()
 	if refs == nil || len(*refs) == 0 {
 		return false
 	}
 	for _, ref := range *refs {
-		if !budget.Spend() {
-			return false
-		}
-		switch typed := ref.(type) {
-		case *ssa.DebugRef:
-		case *ssa.Call:
-			common := typed.Common()
-			if ssacall.CallMatchesSymbol(common, ClientDo) && len(common.Args) == 2 && common.Args[1] == request {
-				continue
-			}
-			if ssacall.CallMatchesAnySymbol(common, httpRequestWithContext, httpRequestClone) &&
-				ssaflow.CallReceiver(common) == request && walk.Every(typed, query.uses) {
-				continue
-			}
-			return false
-		case *ssa.FieldAddr:
-			if requestFieldName(typed) != "Header" || !headerUsesAreEditsWithin(typed, budget) {
-				return false
-			}
-		default:
+		if !query.budget.Spend() || !decideRequestUse(query, walk, request, ref) {
 			return false
 		}
 	}
 	return true
+}
+
+func (query headRequestQuery) followUses(walk ssaflow.ReachingWalk, request ssa.Value) bool {
+	return walk.Every(request, query.uses)
 }
 
 func requestFieldName(field *ssa.FieldAddr) string {
@@ -306,24 +253,26 @@ func (effects *Effects) visibleOverrides(function *ssa.Function, budget *proofs.
 // Nested helper summaries always retain the strict policy.
 func (effects *Effects) ScanOverrides(function *ssa.Function, budget *proofs.SearchBudget, allowRootDo bool) bool {
 	for instruction := range ssaflow.InstructionsWithin(function, budget) {
-		if allowRootDo {
-			if load, ok := instruction.(*ssa.UnOp); ok && load.Op == token.MUL &&
-				ssacall.ValueMatchesSymbol(load.X, httpDefaultClient) && onlyHTTPDoUsesWithin(load, budget) {
-				continue
-			}
-		}
-		for _, operand := range instruction.Operands(nil) {
-			if !budget.Spend() {
-				return true
-			}
-			if operand != nil && ssacall.ValueMatchesAnySymbol(*operand, httpDefaultClient, httpDefaultTransport) {
-				return true
-			}
-		}
-		callee, _ := ssacall.DirectCallee(ssaflow.InstructionCall(instruction))
-		if callee != nil && len(callee.Blocks) != 0 && effects.overrides.Function(callee, budget) {
+		if decideDefaultUse(effects, instruction, allowRootDo, budget) {
 			return true
 		}
 	}
 	return exhausted(budget)
+}
+
+func defaultOperands(instruction ssa.Instruction, budget *proofs.SearchBudget) bool {
+	for _, operand := range instruction.Operands(nil) {
+		if !budget.Spend() {
+			return true
+		}
+		if operand != nil && ssacall.ValueMatchesAnySymbol(*operand, httpDefaultClient, httpDefaultTransport) {
+			return true
+		}
+	}
+	return false
+}
+
+func (effects *Effects) helperOverrides(instruction ssa.Instruction, budget *proofs.SearchBudget) bool {
+	callee, _ := ssacall.DirectCallee(ssaflow.InstructionCall(instruction))
+	return callee != nil && len(callee.Blocks) != 0 && effects.overrides.Function(callee, budget)
 }

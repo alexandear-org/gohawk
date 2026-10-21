@@ -158,29 +158,39 @@ func sameEffects(first, second Summary) bool {
 		slices.EqualFunc(first.deferred, second.deferred, sameOperation)
 }
 
-func cloneEffects(summary Summary) Summary {
-	summary.CancellationInputs = slices.Clone(summary.CancellationInputs)
-	summary.Conditions = slices.Clone(summary.Conditions)
-	summary.Returned = slices.Clone(summary.Returned)
-	summary.Operations = slices.Clone(summary.Operations)
-	summary.Workers = slices.Clone(summary.Workers)
-	for index := range summary.Workers {
-		summary.Workers[index].Operations = slices.Clone(summary.Workers[index].Operations)
-		summary.Workers[index].Alternatives = slices.Clone(summary.Workers[index].Alternatives)
-		summary.Workers[index].AlternativeConditions = slices.Clone(summary.Workers[index].AlternativeConditions)
-		for arm := range summary.Workers[index].Alternatives {
-			summary.Workers[index].Alternatives[arm] = slices.Clone(summary.Workers[index].Alternatives[arm])
-		}
+// Nested summary lists detach the collections a branch may extend. Leaf SSA
+// references, path summaries and condition evidence remain immutable borrowed
+// values, as declared by the complete representation schemas.
+func cloneWorkers(workers []WorkerSummary) []WorkerSummary {
+	workers = slices.Clone(workers)
+	for index := range workers {
+		workers[index] = cloneWorker(workers[index])
 	}
-	summary.deferred = slices.Clone(summary.deferred)
-	summary.Choices = slices.Clone(summary.Choices)
-	for index := range summary.Choices {
-		summary.Choices[index].Arms = slices.Clone(summary.Choices[index].Arms)
-		for arm := range summary.Choices[index].Arms {
-			summary.Choices[index].Arms[arm].Sequence = slices.Clone(summary.Choices[index].Arms[arm].Sequence)
-		}
+	return workers
+}
+
+func cloneOperationAlternatives(alternatives [][]Operation) [][]Operation {
+	alternatives = slices.Clone(alternatives)
+	for index := range alternatives {
+		alternatives[index] = slices.Clone(alternatives[index])
 	}
-	return summary
+	return alternatives
+}
+
+func cloneChoices(choices []SelectChoice) []SelectChoice {
+	choices = slices.Clone(choices)
+	for index := range choices {
+		choices[index] = cloneChoice(choices[index])
+	}
+	return choices
+}
+
+func cloneArms(arms []SelectArm) []SelectArm {
+	arms = slices.Clone(arms)
+	for index := range arms {
+		arms[index] = cloneArm(arms[index])
+	}
+	return arms
 }
 
 // foldSources keeps the positions of an equal branch that is being merged

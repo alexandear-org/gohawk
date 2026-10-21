@@ -37,12 +37,12 @@ retain explicit named arms. Reached queries retain their original order and budg
 public Go entry points still discard evidence if the child or shared allowance
 is exhausted. CI pins the compiler revision supporting this syntax.
 
-Hyrule also supports schema-derived copying, keys, equality, visits and transforms
-over existing Go records. These do not introduce new host types. A useful next
-candidate is concurrency summary cloning, whose nested collections currently
-have explicit copying and borrowing policies in `cloneEffects`. Migration must
-preserve those policies, including retained immutable evidence, rather than
-assuming every nested value needs a deep clone. Budgeted state copying and
+Concurrency summary snapshots use schema-derived copying over existing Go
+records. `snapshots.rules` declares complete Summary, WorkerSummary, SelectChoice
+and SelectArm storage, with explicit copying or borrowing for every field.
+Branch-mutable lists are detached; immutable SSA references, path summaries and
+condition evidence retain their existing sharing. Adding a representation field
+requires updating its schema and freeze policy. Budgeted state copying and
 fixpoint equality remain separate domain contracts.
 
 ## Migration scope
@@ -62,6 +62,7 @@ path is removed; generator support and examples alone do not qualify.
 | Select-index comparison recognition | Generated shared recognition used by summary dispatch and selected-receive edge evidence |
 | Standard synchronization primitives | Generated shared recognition used by concurrency call summaries and heap mutex effects; count acceptance remains summary policy |
 | Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
+| Concurrency snapshot maintenance | Generated complete-record copies for summaries, workers and select choices; nested list hooks retain the original copying depth |
 | Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
@@ -69,7 +70,7 @@ path is removed; generator support and examples alone do not qualify.
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication and ordered call contracts; return/store proofs, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
-| Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
+| Resource lifetime classification and acquisition-boundary patterns | Generated instruction classification, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps and dynamic-index leaves; main held-state transition policy remains; identity and cycle search stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
@@ -484,3 +485,37 @@ child allowance and complete-callee requirement remain in Go. The launch kind's
 reason projection moves with that vocabulary and keeps the same evidence codes.
 Existing completion boundaries, callback replacement, body coverage, case/memo
 isolation and all-allowance regressions remain the behavioral contract.
+
+## HTTP use contracts
+
+Seven companion policies own client provenance, zero-client-cell uses, request
+origins and uses, local server uses, writer uses and visible default effects.
+The consuming Go loops still charge each referrer, operand and instruction visit;
+reaching folds own recursive request state and memoized helper queries retain
+all child quotas. Pure symbol and shape hooks cannot spend those budgets.
+
+Client-cell state accepts one fresh stored allocation, direct Do loads and
+verified captures; debug uses preserve the current stored flag. Request origins
+admit only result zero of exact constructors and recognized rebinding calls.
+Origin recursion precedes immutable-use checking, and the two folds never share
+a visited set. Request Header edits, local URL loads and exact server clients
+retain their existing separate use searches.
+
+Writer status decisions are terminal even when a status is rejected; they never
+fall through to helper inference. Root-only default-client Do reads can skip the
+operand scan only after the original use proof succeeds. Failed use proofs still
+charge the operand scan, while helper summaries stay strict. Existing HTTP
+allowance, child-cutoff, memo-isolation and complete-flow tests exercise these
+production paths.
+
+## Concurrency summary representation
+
+Effect collection support generates both passive admission and schema-derived
+branch snapshots in one mechanical output; the policy and snapshot schemas stay
+in separate source files. `cloneEffects` remains the single branch-copy API.
+Nested hooks apply generated worker/choice/arm copies to detached lists, while
+operation alternatives retain their original outer-and-inner copying depth.
+The operation metadata, condition contexts, worker condition arms and pre-proven
+path summaries remain borrowed exactly as before. Nil and non-nil empty lists
+remain distinct. Collection, cutoff tracking, source folding and branch joins
+remain Go responsibilities; derived copying does not define summary equality.

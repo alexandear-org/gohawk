@@ -1,0 +1,38 @@
+signature total fallback outputs (Unknown reason:None);
+guard defaultClientValue;
+query direct = onlyHTTPDoUsesWithin;
+query unmodified = DefaultClientUnmodified;
+query cell = zeroClientCellWithin;
+build result = carriedProof;
+
+rule Allocation:
+  inputs $client:(Allocation) _ $budget
+  => query direct $client $budget {
+       true => outputs (result true $budget);
+       false => outputs (result false $budget);
+     };
+
+// The default root's Do-only allowance must not enter strict helper memos.
+rule Default:
+  inputs $client:(Unary source:$source op:loadToken) $function $budget
+  && defaultClientValue $source
+  => query direct $client $budget {
+       false => outputs (result false $budget);
+       true => query $proof = unmodified $function $budget
+       decide $proof {
+         Unknown => outputs $proof;
+         Disproven => outputs $proof;
+         Proven => outputs $proof;
+       };
+     };
+
+rule LocalCell:
+  inputs (Unary source:$cell:(Allocation) op:loadToken) _ $budget
+  => query cell $cell $budget {
+       true => outputs (result true $budget);
+       false => outputs (result false $budget);
+     };
+
+rule Other:
+  inputs _ _ $budget
+  => outputs (result false $budget);

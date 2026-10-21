@@ -112,13 +112,13 @@ targets:
     function: DataInstruction
     rules: [internal/analysis/passes/concurrencyfacts/admission/data.rules]
     out: internal/analysis/passes/concurrencyfacts/admission/data_gen.go
-  - name: concurrency_passive_instruction
+  - name: concurrency_effect_support
     package: internal/analysis/passes/concurrencyfacts
     bindings: internal/analysis/passes/concurrencyfacts/effects.go
     signature: passiveSignature
     function: passiveInstruction
-    rules: [internal/analysis/passes/concurrencyfacts/passive.rules]
-    out: internal/analysis/passes/concurrencyfacts/passive_gen.go
+    rules: [internal/analysis/passes/concurrencyfacts/passive.rules, internal/analysis/passes/concurrencyfacts/snapshots.rules]
+    out: internal/analysis/passes/concurrencyfacts/effect_support_gen.go
   - name: select_comparison
     package: internal/engine/ssaflow/selection
     bindings: internal/engine/ssaflow/selection/comparison.go
@@ -385,3 +385,52 @@ targets:
     function: decideAbsentAcquisition
     rules: [internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence_gen.go
+  - name: http_client
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: headClientSignature
+    function: decideHeadClient
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client_gen.go
+  - name: http_cell_use
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: clientCellUseSignature
+    function: decideClientCellUse
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use_gen.go
+  - name: http_request_origin
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: requestOriginSignature
+    function: decideRequestOrigin
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin_gen.go
+  - name: http_request_use
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: requestUseSignature
+    function: decideRequestUse
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use_gen.go
+  - name: http_server_use
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: serverUseSignature
+    function: decideServerUse
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use_gen.go
+  - name: http_writer_use
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: writerUseSignature
+    function: decideWriterUse
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use_gen.go
+  - name: http_default_use
+    package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
+    bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
+    signature: defaultUseSignature
+    function: decideDefaultUse
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use_gen.go

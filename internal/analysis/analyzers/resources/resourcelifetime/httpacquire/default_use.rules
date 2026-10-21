@@ -1,0 +1,28 @@
+signature total fallback outputs true;
+guard defaultClientValue;
+query direct = onlyHTTPDoUsesWithin;
+query operands = defaultOperands;
+query helper = Effects.helperOverrides;
+
+// The direct root may read the default only for Do. When that use check fails,
+// retain the original charged operand scan; the load has no callee to expand.
+rule RootDo:
+  inputs _ $load:(Unary source:$source op:loadToken) true $budget
+  && defaultClientValue $source
+  => query direct $load $budget {
+       true => outputs false;
+       false => query operands $load $budget {
+         true => outputs true;
+         false => outputs false;
+       };
+     };
+
+rule Other:
+  inputs $effects $instruction _ $budget
+  => do {
+       false <- query operands $instruction $budget
+         else outputs true;
+       false <- query helper $effects $instruction $budget
+         else outputs true;
+       pure outputs false;
+     };

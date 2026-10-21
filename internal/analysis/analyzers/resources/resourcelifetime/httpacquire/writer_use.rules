@@ -1,0 +1,36 @@
+signature total fallback outputs false;
+guard cookieCall, writerHeaderCall, writerStatusCall;
+query header = benignHTTPHeaders;
+query helper = Effects.writerHelper;
+build status = writerStatus;
+
+rule InterfaceChange:
+  inputs _ (InterfaceChange) _ _
+  => outputs true;
+
+rule Cookie:
+  inputs _ $call:(Call) _ _
+  && cookieCall $call
+  => outputs true;
+
+rule Header:
+  inputs _ $call:(Call) _ $budget
+  && writerHeaderCall $call
+  => query header $call $budget {
+       true => outputs true;
+       false => outputs false;
+     };
+
+// Nonredirect final statuses preserve empty framing; a failed status check is
+// terminal, so it never falls through to visible-helper inference.
+rule Status:
+  inputs _ $call:(Call) _ _
+  && writerStatusCall $call
+  => outputs (status $call);
+
+rule Helper:
+  inputs $effects $call:(Call) $writer $budget
+  => query helper $effects $call $writer $budget {
+       true => outputs true;
+       false => outputs false;
+     };

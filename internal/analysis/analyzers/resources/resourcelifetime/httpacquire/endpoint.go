@@ -137,31 +137,20 @@ func unmodifiedHTTPServerWithin(server *ssa.Call, budget *proofs.SearchBudget) b
 		return false
 	}
 	for _, ref := range *server.Referrers() {
+		if !budget.Spend() || !decideServerUse(ref, budget) {
+			return false
+		}
+	}
+	return true
+}
+
+func urlFieldLoads(field *ssa.FieldAddr, budget *proofs.SearchBudget) bool {
+	for _, use := range *field.Referrers() {
 		if !budget.Spend() {
 			return false
 		}
-		if field, ok := ref.(*ssa.FieldAddr); ok && field.Field == 0 && field.Referrers() != nil {
-			for _, use := range *field.Referrers() {
-				if !budget.Spend() {
-					return false
-				}
-				load, loaded := use.(*ssa.UnOp)
-				if !loaded || load.Op != token.MUL {
-					return false
-				}
-			}
-			continue
-		}
-		common := ssaflow.InstructionCall(ref)
-		if client, ok := ref.(*ssa.Call); ok && ssacall.CallMatchesSymbol(common, httptestServerClient) {
-			if !onlyClientGetUsesWithin(client, budget) {
-				return false
-			}
-			continue
-		}
-		if !ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{
-			PackagePath: "net/http/httptest", Receiver: "Server", Name: "Close",
-		})) {
+		load, loaded := use.(*ssa.UnOp)
+		if !loaded || load.Op != token.MUL {
 			return false
 		}
 	}
