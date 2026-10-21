@@ -30,11 +30,9 @@ rule Argument:
          true => outputs (Release reasonLabelSummaryRelease) true;
          false => outputs (Opaque reasonLabelHelperUndecided) true;
        };
-       Incomplete => query mayInvoke $instruction {
-         true => outputs (Opaque reasonLabelHelperMayInvoke) true;
-         false => query returnsCleanup $instruction {
-           true => outputs (Opaque reasonLabelReturnsDeferredCleanup) true;
-           false => outputs (NoAction reasonCancellationNone) false;
-         };
-       };
+       Incomplete => query mayInvoke $instruction
+             select true => outputs (Opaque reasonLabelHelperMayInvoke) true
+       <|> query returnsCleanup $instruction
+             select true => outputs (Opaque reasonLabelReturnsDeferredCleanup) true
+       <|> pure outputs (NoAction reasonCancellationNone) false;
      };

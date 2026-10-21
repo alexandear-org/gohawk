@@ -253,3 +253,21 @@ owner cache, instruction cache, tracing and feasible-path flow retain their Go
 implementations. `classify_rules_test.go` checks closure admission and exact,
 launched and exhausted-helper labels on actual SSA. Existing owner, deferred
 capture, callback, summary and result-guard fixtures remain the boundary tests.
+
+## Ordered classifier alternatives
+
+Instruction admission, call-contract selection and deferred-use selection use
+lazy `<|>` chains. Each explicit query selects one complete outcome; another
+valid outcome continues within the same rule. The first selected label stops
+the chain, including a recognized `none` label. The final `pure` answer is
+constructed only when no query supplies a label. Exact-argument completion
+keeps its exhaustive three-way decision and uses a chain only in its incomplete
+branch, where the remaining questions are independent alternatives.
+
+This changes layout rather than evidence policy: query order, candidate budget,
+owner cache and flow classification remain the same. Invalid active outcomes
+terminate with the target's conservative fallback, even when their tag would
+not have been selected. Compiler runtime tests cover lazy construction, sibling
+capture scopes, nested payload validation and chains inside exhaustive arms;
+the analyzer's SSA cutoff controls and accepted/diagnostic fixtures remain the
+behavior checks.

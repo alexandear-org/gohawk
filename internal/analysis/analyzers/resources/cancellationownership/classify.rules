@@ -24,28 +24,20 @@ rule ClosureCreation:
 
 rule Instruction:
   inputs $instruction $classifier
-  => query deferredStore $classifier $instruction {
-       Decided label:$label => outputs $label;
-       Unrecognized => query ownerHolds $classifier $instruction {
-         true => outputs (NoAction reasonCancellationNone);
-         false => query recognized $classifier $instruction {
-           Decided label:$label => outputs $label;
-           Unrecognized => query ownerAvailable $classifier {
-             false => outputs (Opaque reasonLabelOwnerUnavailable);
-             true => query processReturn $classifier $instruction {
-               true => outputs (Opaque reasonLabelProcessLifetimeContext);
-               false => query references $instruction {
-                 false => outputs (NoAction reasonCancellationNone);
-                 true => query localStorageOnly $instruction {
-                   true => outputs (NoAction reasonCancellationNone);
-                   false => query localObserves $instruction {
-                     true => outputs (NoAction reasonCancellationNone);
-                     false => outputs (Opaque (opaqueReference $instruction));
-                   };
-                 };
-               };
-             };
-           };
-         };
-       };
-     };
+  => query deferredStore $classifier $instruction
+           select Decided label:$label => outputs $label
+     <|> query ownerHolds $classifier $instruction
+           select true => outputs (NoAction reasonCancellationNone)
+     <|> query recognized $classifier $instruction
+           select Decided label:$label => outputs $label
+     <|> query ownerAvailable $classifier
+           select false => outputs (Opaque reasonLabelOwnerUnavailable)
+     <|> query processReturn $classifier $instruction
+           select true => outputs (Opaque reasonLabelProcessLifetimeContext)
+     <|> query references $instruction
+           select false => outputs (NoAction reasonCancellationNone)
+     <|> query localStorageOnly $instruction
+           select true => outputs (NoAction reasonCancellationNone)
+     <|> query localObserves $instruction
+           select true => outputs (NoAction reasonCancellationNone)
+     <|> pure outputs (Opaque (opaqueReference $instruction));

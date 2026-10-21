@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         git init ../lockdoc
-        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git f8d9527d7f1463a1d64be288ff20be24ac801675
+        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git d43a01f7807528721629c15eed7585fd84777207
         git -C ../lockdoc checkout --detach FETCH_HEAD
         GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         GOTOOLCHAIN=go1.27.0 make hyrule-generate

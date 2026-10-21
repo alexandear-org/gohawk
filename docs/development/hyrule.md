@@ -107,3 +107,11 @@ the original `*ssa.Defer` without a conversion adapter. Completion's request and
 spent child allowance travel together into summary fallback. The existing action
 cache remains the sole cache and trace boundary, and parent/return combination
 continues to feed the same obligation-flow query.
+
+First-answer policies use `query ... select Pattern => answer <|> ... <|>
+pure fallback`. Each query is explicit and lazy; unselected valid outcomes
+continue inside the committed rule. Answers and captures stay local to their
+alternative. Invalid tags or active payloads stop with the declared conservative
+fallback. Cancellation instruction, call and deferred-use chains preserve their
+previous short-circuit order; completion retains an exhaustive decision where
+its outcomes require different follow-up evidence.

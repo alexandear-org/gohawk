@@ -7,19 +7,14 @@ query captured($common) = capturedCancellationArgument $common $classifier.cance
 
 rule Call:
   inputs $instruction $classifier $common
-  => query returnedCallback $classifier $instruction $common {
-       true => outputs (Release reasonLabelReturnedCallback) true;
-       false => query testingCleanup $common {
-         true => outputs (Transfer reasonLabelTestingCleanup) true;
-         false => query registered $instruction $common {
-           true => outputs (Opaque reasonLabelRegisteredCallback) true;
-           false => query exactArgument $classifier $instruction $common {
-             Decided label:$label => outputs $label true;
-             Unrecognized => query captured $common {
-               true => outputs (Opaque reasonLabelCapturedByCallback) true;
-               false => outputs (NoAction reasonCancellationNone) false;
-             };
-           };
-         };
-       };
-     };
+  => query returnedCallback $classifier $instruction $common
+           select true => outputs (Release reasonLabelReturnedCallback) true
+     <|> query testingCleanup $common
+           select true => outputs (Transfer reasonLabelTestingCleanup) true
+     <|> query registered $instruction $common
+           select true => outputs (Opaque reasonLabelRegisteredCallback) true
+     <|> query exactArgument $classifier $instruction $common
+           select Decided label:$label => outputs $label true
+     <|> query captured $common
+           select true => outputs (Opaque reasonLabelCapturedByCallback) true
+     <|> pure outputs (NoAction reasonCancellationNone) false;
