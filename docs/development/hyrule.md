@@ -41,7 +41,7 @@ path is removed; generator support and examples alone do not qualify.
 | Select-index comparison recognition | Generated shared recognition used by summary dispatch and selected-receive edge evidence |
 | Standard synchronization primitives | Generated shared recognition used by concurrency call summaries and heap mutex effects; count acceptance remains summary policy |
 | Concurrency inert-data and passive-instruction admission | Generated admission over inert-data contracts and budgeted field-path evidence; collection stays in Go |
-| Concurrency context/callback operation recognition | Handwritten; migration remains |
+| Concurrency context/callback operation recognition | Generated context calls/origins and callback input/call recognition; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
 | Call-use and heap-operation classification | Handwritten; migration remains; state application stays in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Handwritten; migration remains; recursive searches stay in Go |
@@ -115,6 +115,27 @@ resource-bearing writes, pointer spills and root-only channel allocations.
 Unknown forms retain `ReasonEffectUnknown`. `effects_test.go` keeps adjacent
 accepted/rejected summaries and checks complete, exhausted and fresh field-path
 allowances, plus root/callee allocation with no search charge.
+
+## Context and callback recognition
+
+The `concurrencyfacts/recognition` package owns four native recognizers. Context
+calls return their operation kind and exact parent, receiver or cancellation
+value. Context origins distinguish a Done call from either constructor result.
+These are symbolic operations: the enclosing engine still resolves the parent,
+requires Background/TODO, binds cancellation identity and constructs the summary.
+Library symbol contracts have one declaration shared by recognition and binding.
+
+Callback inputs are exact parameters or captures holding function values or
+non-context interfaces. Callback calls admit only synchronous dynamic calls with
+inert arguments; static callees, opaque loads, resource arguments, launches and
+defers stay outside that recognizer. The engine retains callback substitution,
+concrete method lookup, supplied-body analysis and ordered effect construction.
+No inferred binding or search moves into a pure matcher.
+
+`recognition_test.go` checks exact SSA operands, constructor projections, nil
+inputs, misleading API names and callback scope on compiled SSA. Existing
+`cancellation_test.go` and `callbacks_test.go` retain the parent, identity,
+interface, capture, imported-summary and uncertainty controls.
 
 ## Cancellation labels
 

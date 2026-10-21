@@ -1,0 +1,34 @@
+signature total fallback outputs ContextUnknown nil;
+guard empty = EmptyContext;
+guard fresh = CancelConstructor;
+guard observes = DoneCall;
+guard cancellation = cancelTarget;
+build parent = parentArgument;
+build receiver = ssaflow.CallReceiver;
+const ContextUnknown, ContextEmpty, ContextFresh, ContextObserve, ContextRequest;
+
+rule Missing:
+  inputs nil
+  => outputs ContextUnknown nil;
+
+rule NonCanceling:
+  inputs $common
+  && empty $common
+  => outputs ContextEmpty nil;
+
+rule Constructor:
+  inputs $common
+  && fresh $common
+  => outputs ContextFresh (parent $common);
+
+rule Observation:
+  inputs $common
+  && observes $common
+  => outputs ContextObserve (receiver $common);
+
+// A typed cancellation call is a symbolic request until its exact origin is
+// bound. Context and CancelFunc types alone cannot establish a standard origin.
+rule Request:
+  inputs $common
+  && cancellation $common
+  => outputs ContextRequest $common.Value;

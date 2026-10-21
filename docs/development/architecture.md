@@ -78,7 +78,9 @@ Synchronization evidence contracts and completeness live in
 queries, cache policy and collection retries; `effects.go` accounts for ordered
 instruction effects. `passive.rules` owns passive admission, while the
 `concurrencyfacts/admission` implementation package owns inert data and resource
-type contracts. Prerequisite analyzers remain registered at `passes/<name>`;
+type contracts. The sibling `recognition` package identifies context operations
+and callback inputs without binding identities or constructing summaries.
+Prerequisite analyzers remain registered at `passes/<name>`;
 nested implementation packages require that registered owner and cannot declare
 an `Analyzer` entry point. Linear fact publication and
 rich local queries retain their separate caches and shared evidence contract.

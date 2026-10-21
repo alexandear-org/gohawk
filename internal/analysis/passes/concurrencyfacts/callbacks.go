@@ -4,7 +4,7 @@ import (
 	"go/types"
 	"slices"
 
-	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
 	"golang.org/x/tools/go/ssa"
@@ -37,40 +37,12 @@ import (
 // callbackHole records a call through a function-typed or interface-typed
 // parameter or capture.
 func callbackHole(instruction ssa.CallInstruction) (Summary, bool) {
-	call, ok := instruction.(*ssa.Call)
-	if !ok {
+	value, method, recognized := recognition.CallbackCall(instruction)
+	if !recognized {
 		return Summary{}, false
 	}
-	common := call.Common()
-	switch {
-	case common.IsInvoke() && holeInput(common.Value, common.Method):
-	case !common.IsInvoke() && common.StaticCallee() == nil && holeInput(common.Value, nil):
-	default:
-		return Summary{}, false
-	}
-	for _, argument := range common.Args {
-		if !admission.Value(argument.Type()) {
-			return Summary{}, false
-		}
-	}
-	hole := Operation{Kind: Invoke, Resource: Reference{Value: common.Value}, Method: common.Method, Source: call.Pos(), Site: call.Pos()}
+	hole := Operation{Kind: Invoke, Resource: Reference{Value: value}, Method: method, Source: instruction.Pos(), Site: instruction.Pos()}
 	return Summary{Operations: []Operation{hole}}, true
-}
-
-// holeInput accepts only values a caller supplies directly: a parameter or a
-// capture holding a function value, or, for a method hole, an interface value
-// other than a context.
-func holeInput(value ssa.Value, method *types.Func) bool {
-	switch value.(type) {
-	case *ssa.Parameter, *ssa.FreeVar:
-	default:
-		return false
-	}
-	if method != nil {
-		return types.IsInterface(value.Type()) && !admission.CancellationType(value.Type())
-	}
-	_, function := value.Type().Underlying().(*types.Signature)
-	return function
 }
 
 // CallbacksBound reports whether every callback hole has been filled. Like
@@ -106,7 +78,7 @@ func (engine *Engine) bindCallback(result *Summary, hole Operation, supplied ssa
 			supplied = inner
 		}
 	}
-	if holeInput(supplied, hole.Method) {
+	if recognition.CallbackInput(supplied, hole.Method) {
 		hole.Resource, hole.Site = Reference{Value: supplied}, instruction.Pos()
 		result.Operations = append(result.Operations, hole)
 		return ReasonNone

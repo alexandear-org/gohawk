@@ -1,5 +1,33 @@
 version: 1
 targets:
+  - name: concurrency_context_call
+    package: internal/analysis/passes/concurrencyfacts/recognition
+    bindings: internal/analysis/passes/concurrencyfacts/recognition/context.go
+    signature: ContextSignature
+    function: ContextCall
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/context.rules]
+    out: internal/analysis/passes/concurrencyfacts/recognition/context_gen.go
+  - name: concurrency_context_origin
+    package: internal/analysis/passes/concurrencyfacts/recognition
+    bindings: internal/analysis/passes/concurrencyfacts/recognition/context.go
+    signature: OriginSignature
+    function: ContextOrigin
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/origin.rules]
+    out: internal/analysis/passes/concurrencyfacts/recognition/origin_gen.go
+  - name: concurrency_callback_input
+    package: internal/analysis/passes/concurrencyfacts/recognition
+    bindings: internal/analysis/passes/concurrencyfacts/recognition/callbacks.go
+    signature: InputSignature
+    function: CallbackInput
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/callback_input.rules]
+    out: internal/analysis/passes/concurrencyfacts/recognition/callback_input_gen.go
+  - name: concurrency_callback_call
+    package: internal/analysis/passes/concurrencyfacts/recognition
+    bindings: internal/analysis/passes/concurrencyfacts/recognition/callbacks.go
+    signature: CallbackSignature
+    function: CallbackCall
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/callback_call.rules]
+    out: internal/analysis/passes/concurrencyfacts/recognition/callback_call_gen.go
   - name: concurrency_inert_data
     package: internal/analysis/passes/concurrencyfacts/admission
     bindings: internal/analysis/passes/concurrencyfacts/admission/data.go

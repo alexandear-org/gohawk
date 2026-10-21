@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"golang.org/x/tools/go/ssa"
@@ -87,7 +88,7 @@ func (engine *Engine) instructionEffects(result *Summary, instruction ssa.Instru
 	case *ssa.Select:
 		return engine.appendSelect(result, instruction)
 	case *ssa.Call:
-		if isCancelConstructor(instruction.Common()) && !root {
+		if recognition.CancelConstructor(instruction.Common()) && !root {
 			return ReasonLocalContextUnknown
 		}
 		return engine.appendCall(result, instruction)
@@ -101,7 +102,7 @@ func (engine *Engine) instructionEffects(result *Summary, instruction ssa.Instru
 	case *ssa.Go:
 		return engine.appendGo(result, instruction)
 	case *ssa.Extract:
-		if call, ok := instruction.Tuple.(*ssa.Call); ok && isCancelConstructor(call.Common()) {
+		if call, ok := instruction.Tuple.(*ssa.Call); ok && recognition.CancelConstructor(call.Common()) {
 			return ReasonNone
 		}
 		return passiveInstruction(instruction, root, engine.budget)

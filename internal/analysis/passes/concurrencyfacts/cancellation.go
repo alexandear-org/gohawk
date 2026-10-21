@@ -7,44 +7,29 @@ package concurrencyfacts
 import (
 	"slices"
 
-	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
-	"github.com/kojah/gohawk/internal/engine/ssaflow"
+	"github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/recognition"
+
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
-	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
 
-var (
-	withCancel      = syntax.PackageFunction("context", "WithCancel")
-	withCancelCause = syntax.PackageFunction("context", "WithCancelCause")
-	background      = syntax.PackageFunction("context", "Background")
-	todoContext     = syntax.PackageFunction("context", "TODO")
-	contextDone     = syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "context", Receiver: "Context", Name: "Done"})
-)
-
-func isCancelConstructor(common *ssa.CallCommon) bool {
-	return ssacall.CallMatchesAnySymbol(common, withCancel, withCancelCause)
-}
-
 func (engine *Engine) cancellationCall(call ssa.CallInstruction) (Summary, bool) {
-	common := call.Common()
-	switch {
-	case ssacall.CallMatchesAnySymbol(common, background, todoContext):
+	kind, value := recognition.ContextCall(call.Common())
+	switch kind {
+	case recognition.ContextEmpty:
 		return Summary{}, true
-	case isCancelConstructor(common):
+	case recognition.ContextFresh:
 		// Restrict fresh signals to non-canceling, known parents for now.
 		// Timers, parent propagation, custom Context hooks, and AfterFunc
 		// callbacks must not disappear into an effect-free constructor.
-		parent := engine.storage.Resolve(common.Args[0])
-		value, ok := parent.Value.(*ssa.Call)
-		if !parent.Proven() || !ok || !ssacall.CallMatchesAnySymbol(value.Common(), background, todoContext) {
+		parent := engine.storage.Resolve(value)
+		origin, ok := parent.Value.(*ssa.Call)
+		if !parent.Proven() || !ok || !recognition.EmptyContext(origin.Common()) {
 			return Summary{Reason: ReasonContextParentUnknown}, true
 		}
 		return Summary{}, true
-	case ssacall.CallMatchesSymbol(common, contextDone):
-		return engine.cancellationOperation(call, ssaflow.CallReceiver(common), false), true
-	case !common.IsInvoke() && common.Value != nil && admission.CancelFunctionType(common.Value.Type()):
-		return engine.cancellationOperation(call, common.Value, true), true
+	case recognition.ContextObserve, recognition.ContextRequest:
+		return engine.cancellationOperation(call, value, kind == recognition.ContextRequest), true
 	default:
 		return Summary{}, false
 	}
@@ -63,26 +48,23 @@ func (engine *Engine) cancellationOperation(call ssa.CallInstruction, value ssa.
 }
 
 func (engine *Engine) cancellationReference(value ssa.Value) (Reference, bool) {
-	if call, ok := value.(*ssa.Call); ok && ssacall.CallMatchesSymbol(call.Common(), contextDone) {
-		return engine.reference(ssaflow.CallReceiver(call.Common()))
-	}
-	extract, ok := value.(*ssa.Extract)
-	if !ok || extract.Index > 1 {
+	kind, call, observed := recognition.ContextOrigin(value)
+	switch kind {
+	case recognition.OriginUnknown:
 		return Reference{}, false
+	case recognition.OriginObserved:
+		return engine.reference(observed)
+	case recognition.OriginFresh:
+		if origin, _ := engine.cancellationCall(call); origin.Complete() {
+			return Reference{Value: call, Cancellation: true}, true
+		}
 	}
-	call, ok := extract.Tuple.(*ssa.Call)
-	if !ok || !isCancelConstructor(call.Common()) {
-		return Reference{}, false
-	}
-	if origin, _ := engine.cancellationCall(call); !origin.Complete() {
-		return Reference{}, false
-	}
-	return Reference{Value: call, Cancellation: true}, true
+	return Reference{}, false
 }
 
 func cancellationBound(reference Reference) bool {
 	call, ok := reference.Value.(*ssa.Call)
-	return reference.Cancellation && !reference.Indirect && ok && isCancelConstructor(call.Common())
+	return reference.Cancellation && !reference.Indirect && ok && recognition.CancelConstructor(call.Common())
 }
 
 // Requirements stay attached to conditional select summaries too. They must
