@@ -1,0 +1,22 @@
+record Answer = evidenceAnswer {
+  proof;
+  decided;
+};
+query suppliedEvidence;
+query completion = LifecycleEvidence.completionEvidence;
+query captured = LifecycleEvidence.capturedCompletionEvidence;
+query transfer = LifecycleEvidence.transferEvidence;
+query proven = Proof.Proven;
+query known = Proof.Known;
+query abandonedSearch, selectedEvidenceMask, ordinaryEvidenceMask, requestedMethod;
+query observer = evidenceProbe.Observer;
+query directDischargeEvidence, factOwnsArgument, factOwnsImmutableCapturedArgument;
+query projectedArgumentEvidence;
+query conditional = LifecycleEvidence.argumentCaseCompletes;
+query possibleArgumentEvidence, selectedEvidenceRequested;
+query selected = LifecycleEvidence.selectedMaskProof;
+query receiverStoreEvidence, receiverEscapes, importedEvidenceRequested;
+build unavailableEvidence, unmatchedImportedEvidence, unescapedReceiverEvidence, emptyEvidence, importedProof;
+const localEvidenceStage, importedEvidenceStage;
+const reasonLifecycleSummary, reasonLifecycleSummaryCapturedArgument;
+const reasonLifecycleSummaryProjectedArgument, reasonArgumentCase, reasonReceiverStoreTransfer;

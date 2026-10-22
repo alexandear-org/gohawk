@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
+	"github.com/kojah/gohawk/internal/engine/ssaflow"
+	"golang.org/x/tools/go/ssa"
 
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"golang.org/x/tools/go/analysis"
@@ -129,5 +131,72 @@ func run(c *command, n int) { helper(c, n) }
 	})
 	if proof.State == proofs.EvidenceDisproven || proof.Reason != proofs.EvidenceBudgetExhausted {
 		t.Errorf("abandoned completion = %#v, want an undecided budget-exhausted proof", proof)
+	}
+}
+
+// Positive supplied evidence must stop before a completion walk or imported
+// lookup. An abandoned local search likewise cannot become a summary disproof.
+func TestEvidenceCompositionPreservesEarlyProofPayloads(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		state  proofs.EvidenceState
+		reason proofs.EvidenceReason
+	}{
+		{"supplied positive", proofs.EvidenceProven, proofs.EvidenceSameValue},
+		{"budget cutoff", proofs.EvidenceUnknown, proofs.EvidenceBudgetExhausted},
+		{"completion in cycle", proofs.EvidenceUnknown, proofs.EvidenceCompletionInCycle},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			local := proofs.Proof{
+				State: test.state, Reason: test.reason, Method: "Close", Provenance: proofs.EvidenceFromImportedFact,
+			}
+			request := EvidenceRequest{Local: &local, SelectMask: func(Fact) ParameterMask {
+				t.Fatal("early local answer must not select an imported mask")
+				return 0
+			}}
+			if test.state == proofs.EvidenceProven {
+				// No valid instruction or allowance: evaluating this request is
+				// both unnecessary and incapable of proving completion.
+				request.Completion = &lifecycle.CompletionRequest{}
+			}
+			// No analysis pass: an imported lookup would also fail this test.
+			got := (&LifecycleEvidence{}).Prove(request)
+			if got != (Proof{Proof: local}) {
+				t.Fatalf("proof = %+v, want exact supplied payload %+v", got, local)
+			}
+		})
+	}
+}
+
+func TestLocalEvidenceKeepsDisproofWithoutAnotherRequest(t *testing.T) {
+	local := proofs.Proof{
+		State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound,
+		Method: "Close", Provenance: proofs.EvidenceFromImportedFact,
+	}
+	if got := (&LifecycleEvidence{}).localProof(EvidenceRequest{Local: &local}); got != (Proof{Proof: local}) {
+		t.Fatalf("proof = %+v, want exact supplied disproof %+v", got, local)
+	}
+}
+
+// A positive transfer is independent evidence and can settle an abandoned
+// completion. Only a failed or unknown transfer must preserve that cutoff.
+func TestPositiveTransferPrecedesAbandonedCompletion(t *testing.T) {
+	pkg := buildLifecycleTestSSA(t, `package lifecyclefactstest
+type resource struct{}
+var saved *resource
+func run(value *resource) { saved = value }
+`)
+	function := pkg.Func("run")
+	store := ssaflow.InstructionsOf[*ssa.Store](function)[0]
+	local := proofs.Proof{Reason: proofs.EvidenceBudgetExhausted, Method: "Close"}
+	evidence := &LifecycleEvidence{}
+	got := evidence.localProof(EvidenceRequest{
+		Local: &local,
+		Transfer: &lifecycle.OwnershipTransferRequest{
+			Instruction: store, Value: function.Params[0], Modes: lifecycle.TransferStoredInGlobal,
+		},
+	})
+	if !got.Proven() || got.Reason != proofs.EvidenceStoredInGlobal || got.SummaryReason != reasonNone {
+		t.Fatalf("proof = %+v, want exact global transfer despite completion cutoff", got)
 	}
 }

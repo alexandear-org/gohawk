@@ -973,3 +973,17 @@ targets:
     function: parameterIsView
     rules: [internal/analysis/passes/lifecyclefacts/returned_view.rules]
     out: internal/analysis/passes/lifecyclefacts/returned_view_gen.go
+  - name: lifecycle_evidence_policy
+    package: internal/analysis/passes/lifecyclefacts
+    bindings: internal/analysis/passes/lifecyclefacts/evidence.go
+    signature: evidencePolicySignature
+    function: decideLifecycleEvidence
+    rules: [internal/analysis/passes/lifecyclefacts/evidence.rules, internal/analysis/passes/lifecyclefacts/evidence_schema.rules]
+    out: internal/analysis/passes/lifecyclefacts/evidence_gen.go
+  - name: lifecycle_selected_mask_policy
+    package: internal/analysis/passes/lifecyclefacts
+    bindings: internal/analysis/passes/lifecyclefacts/evidence.go
+    signature: selectedMaskSignature
+    function: decideSelectedMaskEvidence
+    rules: [internal/analysis/passes/lifecyclefacts/selected_mask.rules, internal/analysis/passes/lifecyclefacts/evidence_schema.rules]
+    out: internal/analysis/passes/lifecyclefacts/selected_mask_gen.go

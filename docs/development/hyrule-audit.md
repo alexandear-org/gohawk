@@ -166,8 +166,8 @@ files. Complete path queries and exact-source coverage checks used generations
 metadata. The eight recorded gaps were generated outputs. All eight source
 policies were inspected directly, including the renamed handoff policy.
 
-This review found two missed fits now integrated, and an evidence-composition
-family still awaiting migration. The lifecycle scope is therefore not closed.
+This review found two structural fits and one evidence-composition family.
+All three are now integrated, and the lifecycle-fact source scope is closed.
 
 | Family | Finding |
 | --- | --- |
@@ -177,7 +177,7 @@ family still awaiting migration. The lifecycle scope is therefore not closed.
 | Fact vocabulary and publication | Masks, compact claims, package markers, immutable publication and signature attachment. The separate `Reason` file slot was reclaimed by moving unchanged proof carriers beside evidence requests and their codes/rendering beside fact descriptions; the generated view policy keeps the package within its file limit. |
 | Field/cleanup, capture and discharge inference | Constructor/method and argument/capture censuses, exact stored paths, local/imported lookup, conditional-case enumeration and shared completion/flow queries. Resource/cleanup vocabularies remain tables. The small Boolean-use admission set in conditional export is a type-set predicate, not an independent decision pipeline. |
 | Retention/escape and response leaves | Existing generated policies own instruction admission, mode gates, escape aliases and exact response Body recognition. Native code applies plans through storage/reaching/use searches, memoization and effect collection. |
-| Lifecycle evidence composition | **Pending strong fit:** `selectedMaskProof` orders direct discharge, ordinary arguments, immutable captures, strict projections, argument cases and possible-alias uncertainty. `localProof` and `importedProof` also contain source-precedence policy. They require a cohesive native binding design that preserves partial-proof payloads, cutoff precedence, provenance and reached-query order. They remain an explicit migration item. |
+| Lifecycle evidence composition | `evidence.rules` owns local/imported precedence and `selected_mask.rules` owns mask selection. The existing facades call generated policies; native adapters bind optional requests, perform the original searches and construct proofs. Whole partial proofs retain method, provenance and cutoff reasons. Positive local evidence skips imported lookup; an abandoned completion survives a failed transfer, while an independent positive transfer can settle it. Fresh direct/retained result searches share `result_handoffs.go`, and invocation/complete summary inference share `summarize.go`, leaving room for both generated outputs within the package's file limit. |
 
 ## Shared value and path review
 
@@ -298,6 +298,21 @@ exact source establishes parent-frame identity and reached-query order.
 The cancellation source review and both confirmed policy migrations are
 complete. Other families are not reopened without an affecting change.
 
+## Goroutine ownership helper review
+
+Seven of the scope's 23 authored Go files are reviewed: both containment files,
+both proof-policy files, and the origins, receives and completion-step bindings.
+All seven exact paths had clean coverage metadata at generation
+`2026-10-22T00:33:39Z`. Their 14 rule/schema files were read directly. The 16 root
+implementation files still await review; this does not close the whole scope.
+
+| Family | Disposition |
+| --- | --- |
+| `proofpolicy`, `completionsteps` | Existing rules own final proof, lifecycle/fallback precedence and terminal/tail instruction plans. Native files hold proof/query carriers, reason rendering, signatures and one exact builtin-close query. Preserve this division. |
+| `containment` | Existing leaf, stored-use and escape rules select native recursive queries. Native code owns reaching/referrer walks, sibling address enumeration and callback/argument/select/result censuses. Its two-form sibling selector supplies a closure to that enumeration; extracting it would add an adapter around the same walk. Possible containment remains uncertainty rather than exact handoff. |
+| `origins` | Signal/group factory evidence is a bounded storage/reaching search with explicit transparent forms, allocation snapshots and result/call leaves. The small final cutoff/found/missing projection stays with the search. No independent substantial decision pipeline remains in these bindings. |
+| `receives` | Existing rules recognize receive/range/select forms and guaranteed-arm precedence. Native code retains per-arm allowance charges, channel predicates and selected-entry lookup. These collection and query mechanics stay in Go. |
+
 ## Non-Go integration inventory
 
 The tracked non-Go code inventory outside fixtures/skills contains eight Python
@@ -345,7 +360,7 @@ completion criterion, and marginal conversions do not extend this checklist.
 | Remaining source scope | Authored files | Status |
 | --- | ---: | --- |
 | `analyzers/concurrency/concurrentcapture` | 5 | Reviewed; existing rules cover substantial policies |
-| `analyzers/concurrency/goroutineownership` | 23 | Pending review |
+| `analyzers/concurrency/goroutineownership` | 23 | Seven helper files reviewed; 16 root files pending |
 | `analyzers/concurrency/lockorder` | 24 | Pending review |
 | `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing migrated |
 | `analyzers/resources/cancellationownership` | 11 | Reviewed; parent-origin and deferred-literal policies migrated |
@@ -363,15 +378,14 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. Current source totals are 362 authored files: 207 reviewed and 155 still
-awaiting review across 6 source scopes. Lifecycle evidence composition remains
-a migration item separately.
+policy. Current source totals are 360 authored files: 212 reviewed and 148 still
+awaiting review across 6 source scopes. All previously confirmed migrations
+are integrated; remaining candidates must come from those unreviewed scopes.
 
 The remaining completion steps are finite:
 
 - Close each remaining source scope above with a disposition per policy family.
-- Migrate lifecycle evidence composition above. Record any other confirmed fit under its existing scope and
-  close it with that scope.
+- Migrate any confirmed fit under its existing scope and close it with that scope.
 - Preserve the completed source-build/pre-commit integration corrections above
   during the remaining migrations; reuse their current validation.
 - Run final integration validation after the remaining cohesive migrations,
@@ -386,8 +400,6 @@ positive integrations, but do not establish that every remaining strong fit
 has been found. In particular:
 
 - Review smaller recognizers and remaining mixed policy/traversal functions.
-- Migrate the confirmed lifecycle evidence-composition family above before
-  closing the lifecycle-fact scope.
 - Resolve conditional candidates against existing generated policies before
   introducing new interfaces. Parent cancellation, for example, requires result
   zero and same-function provenance; the context-origin recognizer admits a

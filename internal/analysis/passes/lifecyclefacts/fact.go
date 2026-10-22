@@ -59,11 +59,11 @@ type MustClaims struct {
 	ReleasedFields FieldMask
 	// OwnedResults is indexed by result position: the function hands back a
 	// fresh resource it acquired itself, and the caller owes its cleanup.
-	// See owned_results.go for the freshness the proof requires.
+	// See result_handoffs.go for the freshness the proof requires.
 	OwnedResults ResultMask
 	// RetainingResults is indexed by result position: the function hands
 	// back a wrapper that holds a fresh resource it acquired, and the caller
-	// must keep, hand over, or return that wrapper. See retaining_results.go.
+	// must keep, hand over, or return that wrapper. See result_handoffs.go.
 	RetainingResults ResultMask
 }
 

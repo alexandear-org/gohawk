@@ -477,6 +477,30 @@ stored-field query requires complete method knowledge before scanning; an
 unavailable method cannot establish that a field is never released. Field
 collection and lifecycle/type searches stay in Go.
 
+`lifecyclefacts/evidence.rules` keeps local and imported source precedence
+together; `selected_mask.rules` owns mask selection. Native facades retain their
+original signatures. The generated policies return the selected whole proof
+with a decision flag; optional-request binding, local searches and fact lookup
+remain native. Supplied positive proofs stop before later queries. A positive
+transfer can settle an abandoned completion; failed or unknown transfer cannot
+erase that completion's cutoff. Imported masks still order direct discharge,
+ordinary identity/containment, immutable capture, opt-in projection, conditional
+cases and possible-alias uncertainty. The wrapper emits the existing event once.
+
+The native evidence file stays cohesive around request binding, proof carriers,
+query adapters and observation, slightly above the 400-line review threshold.
+Direct and wrapped fresh-result searches share `result_handoffs.go`; their
+independent cleanup, wrapper, depth and result-slot checks remain unchanged.
+Invocation-only and complete summary inference also share their existing
+pass-owned callback engine in `summarize.go`. Both file consolidations preserve
+the original bodies and rationale comments. This leaves the root package at
+20 production files including generated code.
+
+Mask selection has a separate generated entry point so the imported policy
+does not call back into its own dispatcher. During dogfooding, that static
+cycle caused heap-region construction to wait for its own in-progress graph.
+The separate entry point preserves reached-query behavior and avoids the cycle.
+
 ## Lifecycle retention and escape uses
 
 Lifecycle retention rules distinguish loose retention, strict storage and

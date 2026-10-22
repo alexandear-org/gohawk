@@ -117,70 +117,14 @@ func (evidence *LifecycleEvidence) Prove(request EvidenceRequest) Proof {
 }
 
 func (evidence *LifecycleEvidence) importedProof(request EvidenceRequest) (Proof, bool) {
-	// Imported summaries are consulted only after local source-visible evidence
-	// fails, and each accepted mask must map back to the exact caller value.
-	// Projection matching is a stricter opt-in because a field selected from an
-	// owner can be reassigned or exposed independently.
 	fact, summarized := factFor(evidence.pass, request.Instruction)
-	if request.SelectMask != nil && summarized {
-		if proof, decided := evidence.selectedMaskProof(request, fact); decided {
-			return proof, true
-		}
-	}
-	if request.ReceiverStore && summarized && factOwnsArgument(request.Instruction, request.Target, fact.ReceiverStore(), evidence.probe.Observer()) {
-		receiver := ssaflow.CallReceiver(ssaflow.InstructionCall(request.Instruction))
-		if receiver != nil && (ssaflow.ExternallyOwnedValue(receiver) || lifecycle.ValueHasTransferUse(receiver)) {
-			return importedProof(reasonReceiverStoreTransfer, requestedMethod(request)), true
-		}
-		return Proof{Proof: proofs.Proof{
-			State: proofs.EvidenceDisproven, Provenance: proofs.EvidenceFromImportedFact,
-		}, SummaryReason: reasonReceiverDoesNotEscape}, true
-	}
-
-	importedRequested := request.SelectMask != nil || request.ReceiverStore
-	if importedRequested && !summarized {
-		return Proof{Proof: proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnavailable}}, true
-	}
-	if importedRequested && summarized {
-		return Proof{Proof: proofs.Proof{
-			State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound,
-			Provenance: proofs.EvidenceFromImportedFact,
-		}}, true
-	}
-	return Proof{}, false
+	answer := decideLifecycleEvidence(importedEvidenceStage, evidence, request, fact, summarized)
+	return answer.proof, answer.decided
 }
 
-// selectedMaskProof answers a request that selected a mask: a cleanup method
-// is matched by its discharge path, other masks by identity or containment,
-// an immutable capture or a strict projection by their own rules, and a
-// possible alias by uncertainty. It reports false when nothing matched.
 func (evidence *LifecycleEvidence) selectedMaskProof(request EvidenceRequest, fact Fact) (Proof, bool) {
-	mask := request.SelectMask(fact)
-	// A cleanup method is matched by its discharge path: the target must
-	// be what the caller stored where the callee cleans up. Other masks
-	// keep their identity-or-containment policy.
-	method := requestedMethod(request)
-	if method != "" && fact.dischargesArgument(request.Instruction, request.Target, method, evidence.probe.Observer()) {
-		return importedProof(reasonLifecycleSummary, method), true
-	}
-	if factOwnsArgument(request.Instruction, request.Target, mask&^fact.MethodMask(method), evidence.probe.Observer()) {
-		return importedProof(reasonLifecycleSummary, method), true
-	}
-	if factOwnsImmutableCapturedArgument(request.Instruction, request.Target, mask, evidence.probe.Observer()) {
-		return importedProof(reasonLifecycleSummaryCapturedArgument, requestedMethod(request)), true
-	}
-	if request.StrictImportedProjection && factOwnsProjectedArgument(request.Instruction, request.Target, mask, evidence.probe.Observer()) {
-		return importedProof(reasonLifecycleSummaryProjectedArgument, requestedMethod(request)), true
-	}
-	if evidence.argumentCaseCompletes(request, fact) {
-		return importedProof(reasonArgumentCase, requestedMethod(request)), true
-	}
-	if factArgumentMatches(request.Instruction, request.Target, mask, heapmodel.MayAlias) {
-		// The summary is known, but which value receives its guarantee is
-		// not. This is neither completion nor evidence of missing cleanup.
-		return Proof{Proof: proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnavailable}}, true
-	}
-	return Proof{}, false
+	answer := decideSelectedMaskEvidence(evidence, request, fact)
+	return answer.proof, answer.decided
 }
 
 // argumentCaseCompletes reports whether a case of the callee's summary, one
@@ -208,42 +152,7 @@ func (evidence *LifecycleEvidence) argumentCaseCompletes(request EvidenceRequest
 }
 
 func (evidence *LifecycleEvidence) localProof(request EvidenceRequest) Proof {
-	proof := Proof{Proof: proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnavailable}}
-	if request.Local != nil {
-		proof.Proof = *request.Local
-		if proof.Proven() {
-			return proof
-		}
-	}
-	if request.Completion != nil {
-		completion := evidence.local.Completion(*request.Completion)
-		proof.Proof = completion.Proof
-		if proof.Proven() {
-			return proof
-		}
-		if captured := evidence.capturedImportedCompletion(request); captured.Proven() {
-			return captured
-		}
-	}
-	if request.Transfer != nil {
-		transfer := evidence.local.OwnershipTransfer(*request.Transfer)
-		if transfer.Proven() {
-			return Proof{Proof: transfer.Proof}
-		}
-		// A completion search abandoned before it could decide stays the
-		// answer: finding no transfer does not turn it into a disproof. Prove
-		// applies the same rule to imported summaries.
-		if abandonedSearch(proof) {
-			return proof
-		}
-		if !transfer.Known() {
-			return Proof{Proof: transfer.Proof}
-		}
-		if !proof.Known() {
-			return Proof{Proof: transfer.Proof}
-		}
-	}
-	return proof
+	return decideLifecycleEvidence(localEvidenceStage, evidence, request, Fact{}, false).proof
 }
 
 // abandonedSearch reports whether a local walk gave up before deciding: it ran
@@ -384,3 +293,117 @@ func (evidence *LifecycleEvidence) CallEffectsWithin(
 	})
 	return proof
 }
+
+// evidencePolicyStage keeps local and imported source precedence together.
+// Mask selection has its own generated entry point, so importing a mask never
+// creates a recursive dispatcher call graph while this package is analyzed.
+type evidencePolicyStage uint8
+
+type evidenceProbe = analysisTrace.Probe
+
+const (
+	localEvidenceStage evidencePolicyStage = iota
+	importedEvidenceStage
+)
+
+type evidenceAnswer struct {
+	proof   Proof
+	decided bool
+}
+
+type evidencePolicySignature func(evidencePolicyStage, *LifecycleEvidence, EvidenceRequest, Fact, bool) evidenceAnswer
+
+type selectedMaskSignature func(*LifecycleEvidence, EvidenceRequest, Fact) evidenceAnswer
+
+var (
+	_ evidencePolicySignature = decideLifecycleEvidence
+	_ selectedMaskSignature   = decideSelectedMaskEvidence
+)
+
+func suppliedEvidence(request EvidenceRequest) Proof {
+	if request.Local != nil {
+		return Proof{Proof: *request.Local}
+	}
+	return unavailableEvidence()
+}
+
+// Optional request binding stays native; each reached query still uses the
+// original request and allowance. The rules own precedence between its answer
+// and the other local/imported evidence.
+func (evidence *LifecycleEvidence) completionEvidence(request EvidenceRequest, prior Proof) Proof {
+	if request.Completion == nil {
+		return prior
+	}
+	return Proof{Proof: evidence.local.Completion(*request.Completion).Proof}
+}
+
+func (evidence *LifecycleEvidence) capturedCompletionEvidence(request EvidenceRequest) Proof {
+	if request.Completion == nil {
+		return Proof{}
+	}
+	return evidence.capturedImportedCompletion(request)
+}
+
+func (evidence *LifecycleEvidence) transferEvidence(request EvidenceRequest) (Proof, bool) {
+	if request.Transfer == nil {
+		return Proof{}, false
+	}
+	return Proof{Proof: evidence.local.OwnershipTransfer(*request.Transfer).Proof}, true
+}
+
+func selectedEvidenceMask(request EvidenceRequest, fact Fact) ParameterMask {
+	return request.SelectMask(fact)
+}
+
+func ordinaryEvidenceMask(fact Fact, mask ParameterMask, method string) ParameterMask {
+	return mask &^ fact.MethodMask(method)
+}
+
+func directDischargeEvidence(fact Fact, request EvidenceRequest, method string, observer proofs.Observer) bool {
+	return method != "" && fact.dischargesArgument(request.Instruction, request.Target, method, observer)
+}
+
+func projectedArgumentEvidence(request EvidenceRequest, mask ParameterMask, observer proofs.Observer) bool {
+	return request.StrictImportedProjection && factOwnsProjectedArgument(request.Instruction, request.Target, mask, observer)
+}
+
+func possibleArgumentEvidence(request EvidenceRequest, mask ParameterMask) bool {
+	return factArgumentMatches(request.Instruction, request.Target, mask, heapmodel.MayAlias)
+}
+
+func selectedEvidenceRequested(request EvidenceRequest) bool {
+	return request.SelectMask != nil
+}
+
+func receiverStoreEvidence(evidence *LifecycleEvidence, request EvidenceRequest, fact Fact) bool {
+	return request.ReceiverStore &&
+		factOwnsArgument(request.Instruction, request.Target, fact.ReceiverStore(), evidence.probe.Observer())
+}
+
+func receiverEscapes(request EvidenceRequest) bool {
+	receiver := ssaflow.CallReceiver(ssaflow.InstructionCall(request.Instruction))
+	return receiver != nil && (ssaflow.ExternallyOwnedValue(receiver) || lifecycle.ValueHasTransferUse(receiver))
+}
+
+func importedEvidenceRequested(request EvidenceRequest) bool {
+	return request.SelectMask != nil || request.ReceiverStore
+}
+
+func unavailableEvidence() Proof {
+	return Proof{Proof: proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnavailable}}
+}
+
+func unmatchedImportedEvidence() Proof {
+	return Proof{Proof: proofs.Proof{
+		State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound,
+		Provenance: proofs.EvidenceFromImportedFact,
+	}}
+}
+
+func unescapedReceiverEvidence() Proof {
+	return Proof{Proof: proofs.Proof{
+		State: proofs.EvidenceDisproven, Provenance: proofs.EvidenceFromImportedFact,
+	}, SummaryReason: reasonReceiverDoesNotEscape}
+}
+
+func emptyEvidence() Proof { return Proof{} }
