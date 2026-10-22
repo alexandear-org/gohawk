@@ -497,6 +497,16 @@ correction, focused tests and lint passed, and a CLI comparison preserved all
 117 diagnostics and 3,332 trace records. The commits that follow change only
 this document, so that evidence is the final integration validation.
 
+The marginal candidates were rechecked after the equation frontend landed
+(`ec55c4da`): aggregate-owner escape, `loadEffect`, `foldLoops`, `Storage.Same`
+and `lockComparisonKey`. Equation bodies cost about as much as the Go guards
+they would replace, but the host declarations and query adapters remain. Each
+owning root, and `resourcepolicy`, already holds 20 production files, so each
+policy would also need a new package interface or an unrelated shared target.
+Moving `loadEffect` into the passive target would also place loads behind its
+effect-free and data-instruction admission, changing precedence. The
+dispositions stand.
+
 The source-build and pre-commit integration corrections and the non-Go
 inventory remain as reviewed. Future changes to a reviewed family reopen only
 that family.
