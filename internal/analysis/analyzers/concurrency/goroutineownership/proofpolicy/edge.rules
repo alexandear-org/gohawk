@@ -1,0 +1,26 @@
+signature total fallback outputs edgeNone;
+query selected = EdgeQueries.Selected;
+query drain = EdgeQueries.Drain;
+query possible = EdgeQueries.Possible;
+query ownership = EdgeQueries.Ownership;
+const edgeNone, edgeExact, edgeUnknown;
+// Exact selected receives precede counted drains. A drain's unknown answer is
+// terminal too; later possible receive/context evidence cannot replace it.
+union DrainEvidence = (ssapath.ObligationAction, bool) tag 1 {
+  Drained = true {
+    action: 0;
+  };
+  Unproven = false;
+};
+
+rule Edge:
+  inputs $queries
+  => query selected $queries
+           select true => outputs edgeExact
+     <|> query drain $queries
+           select Drained action:$action => outputs $action
+     <|> query possible $queries
+           select true => outputs edgeUnknown
+     <|> query ownership $queries
+           select true => outputs edgeUnknown
+     <|> pure outputs edgeNone;

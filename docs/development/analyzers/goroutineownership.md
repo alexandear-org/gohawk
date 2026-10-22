@@ -27,7 +27,13 @@ failed considered reason immediately, before the next query. Discovery cutoff
 and absent obligations stop before lifetime queries; guarded exact flow precedes
 opaque flow, and signal-census interruption stops before process-entry evidence.
 A decided unknown proof is an answer, never permission to try another strategy.
-The existing caller-lifetime query table and flow traversal remain in Go.
+`caller_lifetime.rules` orders stop-channel, caller-context, local-cancellation
+and receiver-context queries. Each observation records its witness and post-query
+availability under one shared allowance; cutoff precedes a positive witness.
+`edge.rules` orders exact selected receives, counted drains, possible receives
+and retained-context ownership. A counted drain's unknown answer stops the
+chain too. Native queries record their edge reasons at the original point.
+The flow traversal remains in Go.
 
 `completionsteps` owns the structural plans used by the terminal-completion and
 opaque-call suffix walks. Terminal completion admits only return, jump and
@@ -37,6 +43,10 @@ The root keeps the CFG work list, cycle checks, original allowance charges and
 the deferred-operation census. RunDefers is a request to check that census, not
 proof of completion: terminal completion still requires the originating Done
 contract. The real-SSA suffix tests pin those mode and cutoff boundaries.
+`notification.rules` owns send/close notification recognition for direct, nested
+and return-coverage discovery. Only sends query terminal coverage; detached
+notifications are excluded, ordinary closes in cycles are per-item cleanup, and
+deferred closes retain their separate registration-coverage requirement.
 
 The policy's public tests pin lazy query order, positive/unknown answers, and
 independent relay/census allowances. The root proof regression pins considered
@@ -47,9 +57,15 @@ fixtures retain the actual SSA, acceptance, diagnostic and cutoff controls.
 `completion_coverage.go` owns terminal-work and return-coverage requirements.
 The remaining finder is cohesive despite exceeding the size review trigger:
 channel and group promises share discovery, nil-actual exclusion and exact
-parent mapping. Its notification predicates remain authoritative for direct
-and nested discovery. Unknown channel capacity supplies possible buffering,
+parent mapping. Its facade delegates notification recognition to the same
+generated policy for direct and nested discovery. Unknown channel capacity supplies possible buffering,
 not a proof that an unbuffered join obligation exists.
+
+`containment/aggregate.rules` selects the load, field, index and map source
+operand. The native root walk still peels its selected transparent wrappers
+and charges each step. It never follows a selection index, a receive, a slice
+or an unrelated tuple result. Real-SSA tests retain copied-parameter roots and
+cutoff behavior.
 
 Callback-target resolution uses `ResolveReachingValue` with opaque phis and
 explicit wrapper forms. Static functions and exact closure bindings remain

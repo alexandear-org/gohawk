@@ -1,12 +1,14 @@
-// Package completionsteps recognizes the structural instructions permitted after
-// worker completion or opaque work. The analyzer owns CFG traversal, cycle
+// Package completionsteps recognizes worker completion notifications and the
+// structural instructions permitted after completion or opaque work. The analyzer owns CFG traversal, cycle
 // rejection, allowance charges and validation of deferred completion operations.
 package completionsteps
 
 import (
 	"go/token"
 
+	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	ssacall "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
+	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	"github.com/kojah/gohawk/internal/engine/syntax"
 	"golang.org/x/tools/go/ssa"
 )
@@ -46,4 +48,24 @@ const loadToken = token.MUL
 
 func closes(call *ssa.Call) bool {
 	return ssacall.CallMatchesSymbol(call.Common(), syntax.Builtin("close"))
+}
+
+type notificationSignature func(ssa.Instruction, func(ssa.Instruction) bool) ssa.Value
+
+var _ notificationSignature = Notification
+
+func notificationTerminal(coverage func(ssa.Instruction) bool, instruction ssa.Instruction) bool {
+	return coverage(instruction)
+}
+
+func notificationChannel(instruction ssa.Instruction) (ssa.Value, bool) {
+	common := ssaflow.InstructionCall(instruction)
+	if common == nil || !ssacall.CallMatchesSymbol(common, syntax.Builtin("close")) || len(common.Args) != 1 {
+		return nil, false
+	}
+	return common.Args[0], true
+}
+
+func notificationInCycle(instruction ssa.Instruction) bool {
+	return cfg.BlockInCycle(instruction.Block())
 }

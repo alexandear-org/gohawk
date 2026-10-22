@@ -114,3 +114,48 @@ var (
 )
 
 func emptyProof() Proof { return Proof{} }
+
+// CallerLifetimeQueries reports each lifetime search and its post-query cutoff.
+// One native allowance serves every reached search; Cutoff retains its trace.
+type CallerLifetimeQueries interface {
+	Stop() LifetimeObservation
+	Context() LifetimeObservation
+	Canceled() LifetimeObservation
+	Receiver() LifetimeObservation
+	Cutoff() Proof
+}
+
+// EdgeQueries selects one edge action. Native queries own identity searches,
+// count proofs and recording the selected reason before another query runs.
+type EdgeQueries interface {
+	Selected() bool
+	Drain() (ssapath.ObligationAction, bool)
+	Possible() bool
+	Ownership() bool
+}
+
+type (
+	callerLifetimeSignature func(CallerLifetimeQueries) (Proof, bool)
+	edgeSignature           func(EdgeQueries) ssapath.ObligationAction
+)
+
+var (
+	_ callerLifetimeSignature = CallerLifetime
+	_ edgeSignature           = Edge
+)
+
+const (
+	edgeNone    = ssapath.ObligationNone
+	edgeExact   = ssapath.ObligationExact
+	edgeUnknown = ssapath.ObligationUnknown
+)
+
+// LifetimeObservation retains both the witness and availability of a search.
+// The native adapter records post-query state; rules select its consequence.
+type LifetimeObservation struct {
+	Found       bool
+	Interrupted bool
+}
+
+func (observation LifetimeObservation) Available() bool { return !observation.Interrupted }
+func (observation LifetimeObservation) Matched() bool   { return observation.Found }

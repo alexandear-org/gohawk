@@ -298,20 +298,32 @@ exact source establishes parent-frame identity and reached-query order.
 The cancellation source review and both confirmed policy migrations are
 complete. Other families are not reopened without an affecting change.
 
-## Goroutine ownership helper review
+## Goroutine ownership source review
 
-Seven of the scope's 23 authored Go files are reviewed: both containment files,
-both proof-policy files, and the origins, receives and completion-step bindings.
-All seven exact paths had clean coverage metadata at generation
-`2026-10-22T00:33:39Z`. Their 14 rule/schema files were read directly. The 16 root
-implementation files still await review; this does not close the whole scope.
+All 23 authored Go files are reviewed: the seven helper files at generation
+`2026-10-22T00:33:39Z` and the 16 root files at `2026-10-22T00:38:13Z`.
+Exact-path metadata was clean; the 14 scope gaps were ignored generated
+outputs. All rule/schema sources were read directly, including the four new
+policies. Graph callers omit function-valued callbacks, so exact source also
+establishes edge-flow consumers and the three notification consumers.
 
 | Family | Disposition |
 | --- | --- |
-| `proofpolicy`, `completionsteps` | Existing rules own final proof, lifecycle/fallback precedence and terminal/tail instruction plans. Native files hold proof/query carriers, reason rendering, signatures and one exact builtin-close query. Preserve this division. |
-| `containment` | Existing leaf, stored-use and escape rules select native recursive queries. Native code owns reaching/referrer walks, sibling address enumeration and callback/argument/select/result censuses. Its two-form sibling selector supplies a closure to that enumeration; extracting it would add an adapter around the same walk. Possible containment remains uncertainty rather than exact handoff. |
-| `origins` | Signal/group factory evidence is a bounded storage/reaching search with explicit transparent forms, allocation snapshots and result/call leaves. The small final cutoff/found/missing projection stays with the search. No independent substantial decision pipeline remains in these bindings. |
-| `receives` | Existing rules recognize receive/range/select forms and guaranteed-arm precedence. Native code retains per-arm allowance charges, channel predicates and selected-entry lookup. These collection and query mechanics stay in Go. |
+| Proof and instruction precedence | Existing `proofpolicy`, entry, call-prefix/contract and classify rules own substantial admission, lifecycle/fallback and label choices. Native code keeps action caches, outcome/lattice projection, trace effects and concrete search dispatch. |
+| Caller lifetime | `caller_lifetime.rules` replaces the ordered query-closure table. One native allowance is bound once; each query records post-search availability before a witness can name a lifetime reason. Unknown remains a terminal answer. |
+| Edge actions | `edge.rules` orders exact receive, counted drain, possible receive and retained-context evidence. Drains forward both exact and unknown answers without later queries. Native hooks retain identity/count searches and the original reason-recording point. |
+| Aggregate projection | `containment/aggregate.rules` replaces the six-form source switch. The native walk retains explicit wrapper transparency and per-step charges. Index operands, receives, slices and tuple extracts are not silently followed; a copied struct parameter retains its own root. |
+| Completion notifications | `completionsteps/notification.rules` now selects notifications for direct, nested and every-return discovery. Detached notifications are excluded first; only sends request terminal coverage. An ordinary close in a cycle is per-item cleanup; deferred closes still require registration coverage from their caller. |
+| Discovery and binding | Channel/group/owner/pipe-peer inventories, exact capture-before-parameter mapping, stable captured cells, nil-actual exclusions, callback resolution and factory-result censuses remain native. Their small leaf gates select inputs to those searches. Constructor discovery applies evidence and observes cutoff while accumulating candidate state. |
+| Completion, helper and retained-owner searches | Terminal-work queues, return coverage, bounded helper/receive memoization, caller/context field-write censuses, retention reaching walks, cleanup-factory relation searches and summary-operation enumeration remain native. Call-form/receiver exits stay beside the binding scans that use them; another query-context adapter would retain those same mechanics. |
+| Counted drains and guarded joins | Exact sender/cell/closure-use censuses, known loop counts, correlated flag/counter stores and path queries remain with their algorithms. No rule guesses a loop's runtime count. Small selectors and final evidence projections do not need separate adapters. |
+| `containment`, `origins`, `receives` | Existing leaf/stored-use/escape and receive rules retain their structural policy. Reaching/referrer walks, sibling address enumeration, bounded origin storage, per-arm charges and caller channel predicates remain native. Their results describe possible ownership unless an exact query proves otherwise. |
+| Contracts and presentation | Exact API symbol tables, lifecycle name vocabulary, numeric reason spellings, source ranges, report construction and trace rendering remain Go declarations and projections. |
+
+The source review and all four confirmed migrations are complete. The scope is
+closed; unchanged families are not reopened. Ordered-policy tests pin lazy
+query order and partial-cutoff precedence; compiled-SSA and trace fixtures pin
+exact versus possible ownership, notification registration and root boundaries.
 
 ## Non-Go integration inventory
 
@@ -360,7 +372,7 @@ completion criterion, and marginal conversions do not extend this checklist.
 | Remaining source scope | Authored files | Status |
 | --- | ---: | --- |
 | `analyzers/concurrency/concurrentcapture` | 5 | Reviewed; existing rules cover substantial policies |
-| `analyzers/concurrency/goroutineownership` | 23 | Seven helper files reviewed; 16 root files pending |
+| `analyzers/concurrency/goroutineownership` | 23 | Reviewed; lifetime, edge, aggregate and notification policies migrated |
 | `analyzers/concurrency/lockorder` | 24 | Pending review |
 | `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing migrated |
 | `analyzers/resources/cancellationownership` | 11 | Reviewed; parent-origin and deferred-literal policies migrated |
@@ -378,8 +390,8 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. Current source totals are 360 authored files: 212 reviewed and 148 still
-awaiting review across 6 source scopes. All previously confirmed migrations
+policy. Current source totals are 360 authored files: 228 reviewed and 132 still
+awaiting review across 5 source scopes. All previously confirmed migrations
 are integrated; remaining candidates must come from those unreviewed scopes.
 
 The remaining completion steps are finite:

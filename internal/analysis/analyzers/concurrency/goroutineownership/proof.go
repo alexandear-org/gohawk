@@ -100,26 +100,38 @@ func (analysis *spawnAnalysis) lifecycleProof() (GoroutineProof, bool) {
 // Every lifetime query shares one allowance. Check availability before naming
 // its witness: cutoff in a field-write or callback scan is not a caller bound.
 func (analysis *spawnAnalysis) callerLifetimeProof() (GoroutineProof, bool) {
-	budget := analysis.budget()
-	queries := []struct {
-		reason goroutineOwnershipReason
-		find   func() bool
-	}{
-		{reasonStopLifecycle, func() bool { return goroutineReceivesCallerSignal(analysis.pass, analysis.spawn, budget) }},
-		{reasonContextLifecycle, func() bool { return goroutineReceivesCallerContext(analysis.pass, analysis.spawn, budget) }},
-		{reasonLocallyCanceledContext, func() bool { return goroutineReceivesLocallyCanceledContext(analysis.pass, analysis.spawn, budget) }},
-		{reasonReceiverContext, func() bool { return goroutineReceivesReceiverContext(analysis.pass, analysis.spawn, budget) }},
-	}
-	for _, query := range queries {
-		found := query.find()
-		if budget.Exhausted() {
-			return analysis.lifetimeCutoff(budget, queryCallerLifetime, reasonReceiveBudgetExhausted), true
-		}
-		if found {
-			return GoroutineProof{Outcome: GoroutineUnknown, Reason: query.reason}, true
-		}
-	}
-	return GoroutineProof{}, false
+	return proofpolicy.CallerLifetime(callerLifetimeQueries{analysis: analysis, budget: analysis.budget()})
+}
+
+// All four observations share one allowance. Read cutoff after the native
+// search returns; a partial witness cannot establish a caller lifetime bound.
+type callerLifetimeQueries struct {
+	analysis *spawnAnalysis
+	budget   *proofs.SearchBudget
+}
+
+func (queries callerLifetimeQueries) Stop() proofpolicy.LifetimeObservation {
+	found := goroutineReceivesCallerSignal(queries.analysis.pass, queries.analysis.spawn, queries.budget)
+	return proofpolicy.LifetimeObservation{Found: found, Interrupted: queries.budget.Exhausted()}
+}
+
+func (queries callerLifetimeQueries) Context() proofpolicy.LifetimeObservation {
+	found := goroutineReceivesCallerContext(queries.analysis.pass, queries.analysis.spawn, queries.budget)
+	return proofpolicy.LifetimeObservation{Found: found, Interrupted: queries.budget.Exhausted()}
+}
+
+func (queries callerLifetimeQueries) Canceled() proofpolicy.LifetimeObservation {
+	found := goroutineReceivesLocallyCanceledContext(queries.analysis.pass, queries.analysis.spawn, queries.budget)
+	return proofpolicy.LifetimeObservation{Found: found, Interrupted: queries.budget.Exhausted()}
+}
+
+func (queries callerLifetimeQueries) Receiver() proofpolicy.LifetimeObservation {
+	found := goroutineReceivesReceiverContext(queries.analysis.pass, queries.analysis.spawn, queries.budget)
+	return proofpolicy.LifetimeObservation{Found: found, Interrupted: queries.budget.Exhausted()}
+}
+
+func (queries callerLifetimeQueries) Cutoff() GoroutineProof {
+	return queries.analysis.lifetimeCutoff(queries.budget, queryCallerLifetime, reasonReceiveBudgetExhausted)
 }
 
 func (analysis *spawnAnalysis) lifetimeCutoff(

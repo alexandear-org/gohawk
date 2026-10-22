@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy"
 
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/receives"
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
@@ -70,20 +71,34 @@ func (analysis *spawnAnalysis) obligation(instruction ssa.Instruction) ssapath.O
 // context as an opaque observation on that arm alone. The exit of a counted
 // select drain is an exact join on that edge alone.
 func (analysis *spawnAnalysis) edgeObligation(from, to *ssa.BasicBlock) ssapath.ObligationAction {
-	if analysis.selectedJoinEdge(from, to) {
-		return ssapath.ObligationExact
+	return proofpolicy.Edge(edgeQueries{analysis: analysis, from: from, to: to})
+}
+
+type edgeQueries struct {
+	analysis *spawnAnalysis
+	from, to *ssa.BasicBlock
+}
+
+func (queries edgeQueries) Selected() bool {
+	return queries.analysis.selectedJoinEdge(queries.from, queries.to)
+}
+
+func (queries edgeQueries) Drain() (ssapath.ObligationAction, bool) {
+	action := queries.analysis.countedDrainAction(queries.from, queries.to)
+	return action, action != ssapath.ObligationNone
+}
+
+func (queries edgeQueries) Possible() bool {
+	channel, selected := ssapath.SelectedReceiveOnEdge(queries.from, queries.to)
+	if selected && queries.analysis.possibleSignal(channel) {
+		queries.analysis.recordEdge(queries.from, queries.to, reasonSelectedPossibleReceiveEdge, ssapath.ObligationUnknown)
+		return true
 	}
-	if drain := analysis.countedDrainAction(from, to); drain != ssapath.ObligationNone {
-		return drain
-	}
-	if channel, selected := ssapath.SelectedReceiveOnEdge(from, to); selected && analysis.possibleSignal(channel) {
-		analysis.recordEdge(from, to, reasonSelectedPossibleReceiveEdge, ssapath.ObligationUnknown)
-		return ssapath.ObligationUnknown
-	}
-	if analysis.selectedOwnershipEdge(from, to) {
-		return ssapath.ObligationUnknown
-	}
-	return ssapath.ObligationNone
+	return false
+}
+
+func (queries edgeQueries) Ownership() bool {
+	return queries.analysis.selectedOwnershipEdge(queries.from, queries.to)
 }
 
 // strongerAction merges the labels of several tracked values touched by one

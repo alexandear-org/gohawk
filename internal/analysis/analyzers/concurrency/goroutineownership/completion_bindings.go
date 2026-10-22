@@ -1,7 +1,7 @@
 package goroutineownership
 
 import (
-	"go/token"
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
 
 	"github.com/kojah/gohawk/internal/engine/heapmodel"
 	"github.com/kojah/gohawk/internal/engine/lifecycle"
@@ -101,25 +101,11 @@ func aggregateRootWithin(value ssa.Value, budget *proofs.SearchBudget) ssa.Value
 			value = inner
 			continue
 		}
-		switch typed := value.(type) {
-		case *ssa.UnOp:
-			if typed.Op != token.MUL {
-				return value
-			}
-			value = typed.X
-		case *ssa.IndexAddr:
-			value = typed.X
-		case *ssa.FieldAddr:
-			value = typed.X
-		case *ssa.Index:
-			value = typed.X
-		case *ssa.Field:
-			value = typed.X
-		case *ssa.Lookup:
-			value = typed.X
-		default:
+		source, projected := containment.AggregateSource(value)
+		if !projected {
 			return value
 		}
+		value = source
 	}
 }
 

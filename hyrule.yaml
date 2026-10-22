@@ -987,3 +987,31 @@ targets:
     function: decideSelectedMaskEvidence
     rules: [internal/analysis/passes/lifecyclefacts/selected_mask.rules, internal/analysis/passes/lifecyclefacts/evidence_schema.rules]
     out: internal/analysis/passes/lifecyclefacts/selected_mask_gen.go
+  - name: worker_caller_lifetime
+    package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
+    signature: callerLifetimeSignature
+    function: CallerLifetime
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime_gen.go
+  - name: worker_edge_precedence
+    package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
+    signature: edgeSignature
+    function: Edge
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge_gen.go
+  - name: worker_aggregate_source
+    package: internal/analysis/analyzers/concurrency/goroutineownership/containment
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
+    signature: aggregateSourceSignature
+    function: AggregateSource
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate_gen.go
+  - name: worker_completion_notification
+    package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
+    bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
+    signature: notificationSignature
+    function: Notification
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification_gen.go

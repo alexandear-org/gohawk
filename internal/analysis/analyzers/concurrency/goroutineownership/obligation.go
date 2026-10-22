@@ -4,6 +4,8 @@ import (
 	"go/constant"
 	"slices"
 
+	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/completionsteps"
+
 	"github.com/kojah/gohawk/internal/analysis/analyzers/concurrency/goroutineownership/containment"
 
 	"github.com/kojah/gohawk/internal/analysis/passes/lifecyclefacts"
@@ -226,29 +228,9 @@ func spawnedCompletionSignal(
 func completionNotification(
 	instruction ssa.Instruction, budget *proofs.SearchBudget,
 ) ssa.Value { //nolint:ireturn // Notifications retain their concrete SSA value types.
-	if _, launched := instruction.(*ssa.Go); launched {
-		return nil
-	}
-	if send, ok := instruction.(*ssa.Send); ok {
-		// A send followed by further work can announce readiness or progress,
-		// not completion. Blocking-producer checks use the full send lifecycle.
-		// https://github.com/kubernetes-sigs/cluster-proportional-autoscaler/blob/39dd2288da294e98d683c5619fc3556016df1e76/pkg/autoscaler/autoscaler_server.go#L109-L124
-		if terminalCompletion(send, budget) {
-			return send.Chan
-		}
-		return nil
-	}
-	common := ssaflow.InstructionCall(instruction)
-	if common == nil || !ssacall.CallMatchesSymbol(common, syntax.Builtin("close")) || len(common.Args) != 1 {
-		return nil
-	}
-	// Closing entries in a loop is per-item cleanup. A deferred close can
-	// announce completion, provided its registration covers every return.
-	// https://github.com/BurntSushi/wingo/blob/33b154361587e65ec35d4499f1cc487835d0ab48/event/ipc.go#L124-L157
-	if _, deferred := instruction.(*ssa.Defer); !deferred && cfg.BlockInCycle(instruction.Block()) {
-		return nil
-	}
-	return common.Args[0]
+	return completionsteps.Notification(instruction, func(candidate ssa.Instruction) bool {
+		return terminalCompletion(candidate, budget)
+	})
 }
 
 // An error-only notification is not a promise to signal every worker exit.

@@ -14,15 +14,17 @@ import (
 // ownership of their walk. Escape queries retain the caller's possible-value
 // predicate and helper-search state; an escape answer never proves a join.
 type (
-	containmentSignature func(ssaflow.ReachingWalk, ssa.Value, ssa.Value) bool
-	storedUseSignature   func(ssaflow.ReachingWalk, ssa.Instruction, ssa.Value, ssa.Value) bool
-	escapeSignature      func(ssa.Instruction, ssa.Value, func(ssa.Value) bool, func(ssa.Instruction) bool) bool
+	aggregateSourceSignature func(ssa.Value) (ssa.Value, bool)
+	containmentSignature     func(ssaflow.ReachingWalk, ssa.Value, ssa.Value) bool
+	storedUseSignature       func(ssaflow.ReachingWalk, ssa.Instruction, ssa.Value, ssa.Value) bool
+	escapeSignature          func(ssa.Instruction, ssa.Value, func(ssa.Value) bool, func(ssa.Instruction) bool) bool
 )
 
 var (
-	_ containmentSignature = decideContainment
-	_ storedUseSignature   = decideStoredUse
-	_ escapeSignature      = Escapes
+	_ aggregateSourceSignature = AggregateSource
+	_ containmentSignature     = decideContainment
+	_ storedUseSignature       = decideStoredUse
+	_ escapeSignature          = Escapes
 )
 
 const loadToken = token.MUL

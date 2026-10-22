@@ -11,3 +11,10 @@ view Unary = *ssa.UnOp {
 };
 view Call = *ssa.Call {
 };
+view Launch = *ssa.Go {
+};
+view Send = *ssa.Send {
+  channel: Chan;
+};
+view DeferCall = *ssa.Defer {
+};

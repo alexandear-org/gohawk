@@ -7,8 +7,10 @@ view Unary = *ssa.UnOp {
 view Allocation = *ssa.Alloc {
 };
 view FieldAddress = *ssa.FieldAddr {
+  source: X;
 };
 view IndexAddress = *ssa.IndexAddr {
+  source: X;
 };
 view Assertion = *ssa.TypeAssert {
 };
@@ -39,3 +41,12 @@ view Defer = *ssa.Defer {
 view Go = *ssa.Go {
 };
 const loadToken;
+view Field = *ssa.Field {
+  source: X;
+};
+view Index = *ssa.Index {
+  source: X;
+};
+view Lookup = *ssa.Lookup {
+  source: X;
+};

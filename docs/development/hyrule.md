@@ -280,14 +280,31 @@ Go queries. The instruction cache still surrounds the complete call decision.
 
 The analyzer-local `containment` package owns possible possession, including old
 stores and mixed choices; it never claims exact handoff. `origins` owns bounded
-factory/registry provenance. Candidate transfer and lifetime decisions consume
-those same queries in Go. Their moved searches and rationale comments retain the
+factory/registry provenance. Native transfer and lifetime searches consume
+those same identity and provenance queries. Their moved searches and rationale comments retain the
 same transparency, storage and cutoff rules.
 
 Compiled-SSA label tests cover launched builtins, append, other builtins, possible
 group receivers and direct waits. Contract tests pin terminal `none` for group
 bookkeeping and testing cleanup. Existing summary and retained-owner tests keep
 candidate attribution, cutoff precedence and fresh-cache recovery controls.
+
+`proofpolicy/caller_lifetime.rules` sequences the four caller-lifetime bounds
+under one native allowance. Each observation retains its witness and post-query
+cutoff; unavailable evidence returns the original attributed cutoff proof before
+considering a partial positive result. `proofpolicy/edge.rules` chooses exact
+selected receives, counted drains, possible receives and retained-context
+ownership in order. A counted drain's exact or unknown action is terminal.
+Native query methods retain the original trace timing and keyed edge evidence.
+
+`containment/aggregate.rules` extracts only the aggregate operand of the admitted
+load/field/index/lookup forms. Wrapper peeling, iteration and per-step charges
+stay in the native root walk. `completionsteps/notification.rules` selects send
+and close notification evidence for all three existing callers. Only sends ask
+the native terminal-coverage callback; a launched notification is excluded before
+any query, and an ordinary close in a cycle remains per-item cleanup. Deferred
+closes retain the caller's registration-coverage requirement. These policies
+reuse the existing analyzer-owned packages without adding root production files.
 
 ## Process ownership actions
 

@@ -60,3 +60,53 @@ func TestOnlyBuiltinCloseIsPassiveTailWork(t *testing.T) {
 		})
 	}
 }
+
+func TestNotificationQueriesOnlyTerminalSends(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "notifications", `package notifications
+func sent(done chan int) { done <- 1 }
+func detached(done chan int) { go close(done) }
+func immediate(done chan int) { close(done) }
+func repeated(done chan int, again bool) { for again { close(done) } }
+func deferred(done chan int, again bool) { for again { defer close(done) } }
+`)
+	for _, terminal := range []bool{false, true} {
+		function := pkg.Func("sent")
+		send := ssaflow.InstructionsOf[*ssa.Send](function)[0]
+		calls := 0
+		got := completionsteps.Notification(send, func(instruction ssa.Instruction) bool {
+			calls++
+			if instruction != send {
+				t.Fatal("coverage queried another instruction")
+			}
+			return terminal
+		})
+		if calls != 1 || (got == send.Chan) != terminal || !terminal && got != nil {
+			t.Fatalf("terminal=%t channel=%v calls=%d", terminal, got, calls)
+		}
+	}
+	for _, name := range []string{"detached", "immediate", "repeated", "deferred"} {
+		t.Run(name, func(t *testing.T) {
+			function := pkg.Func(name)
+			var instruction ssa.Instruction
+			switch name {
+			case "detached":
+				instruction = ssaflow.InstructionsOf[*ssa.Go](function)[0]
+			case "deferred":
+				instruction = ssaflow.InstructionsOf[*ssa.Defer](function)[0]
+			default:
+				instruction = ssaflow.InstructionsOf[*ssa.Call](function)[0]
+			}
+			got := completionsteps.Notification(instruction, func(ssa.Instruction) bool {
+				t.Fatal("close or detached notification queried terminal coverage")
+				return false
+			})
+			var want ssa.Value
+			if name == "immediate" || name == "deferred" {
+				want = function.Params[0]
+			}
+			if got != want {
+				t.Fatalf("notification=%v, want %v", got, want)
+			}
+		})
+	}
+}
