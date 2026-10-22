@@ -1,6 +1,7 @@
 package ssaflow
 
 import (
+	"go/token"
 	"iter"
 
 	"golang.org/x/tools/go/ssa"
@@ -46,7 +47,9 @@ func IdentitySource(value ssa.Value) (ssa.Value, bool) {
 	); ok {
 		return inner, true
 	}
-	if loaded, ok := value.(*ssa.UnOp); ok {
+	// Only a load names its operand's referent. A receive yields a new value
+	// on each execution, and arithmetic or logical operators compute one.
+	if loaded, ok := value.(*ssa.UnOp); ok && loaded.Op == token.MUL {
 		return loaded.X, true
 	}
 	return nil, false

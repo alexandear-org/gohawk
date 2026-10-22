@@ -221,3 +221,22 @@ func subject() int { n:=1; n=2; f:=func() int { return n }; return f() }
 		t.Fatal("default facade must share possible-value selection")
 	}
 }
+
+// A load names the referent of its operand, so it is an identity alias of the
+// pointer. A receive yields a distinct value on each execution, and arithmetic
+// or logical operators compute one: neither aliases its operand.
+func TestIdentitySourcePeelsOnlyLoads(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "aliases", `package aliases
+func operands(p *int, ch chan *int, b bool, n int) (int, *int, *int, bool, int) { return *p, <-ch, <-ch, !b, -n }
+`)
+	function := pkg.Func("operands")
+	results := InstructionsOf[*ssa.Return](function)[0].Results
+	if source, ok := IdentitySource(results[0]); !ok || source != function.Params[0] {
+		t.Fatal("a load must alias the pointer it reads through")
+	}
+	for index, value := range results[1:] {
+		if source, ok := IdentitySource(value); ok {
+			t.Fatalf("result %d (%s) aliased its operand %s", index+1, value, source)
+		}
+	}
+}
