@@ -50,43 +50,35 @@ func StructurallyIdenticalWithin(left, right ssa.Value, budget *proofs.SearchBud
 	})
 }
 
-// ProveIdentityWithin shares budget across structural identity, both path
-// searches and step comparison. Exhaustion is an unknown proof with the budget
-// reason, never differing paths. Roots must already be established as equivalent.
-func ProveIdentityWithin(left, right AccessPath, budget *proofs.SearchBudget) proofs.IdentityProof {
-	unknown := func() proofs.IdentityProof {
-		reason := proofs.EvidenceUnavailable
-		if budget.Exhausted() {
-			reason = proofs.EvidenceBudgetExhausted
-		}
-		return proofs.IdentityProof{Proof: proofs.Proof{State: proofs.EvidenceUnknown, Reason: reason}}
-	}
-	if left.Value == nil || right.Value == nil {
-		return unknown()
-	}
-	if StructurallyIdenticalWithin(left.Value, right.Value, budget) {
-		return proofs.IdentityProof{Proof: proofs.Proof{
-			State: proofs.EvidenceProven, Reason: proofs.EvidenceSameValue, Provenance: proofs.EvidenceFromLocalSSA,
-		}}
-	}
+type identitySteps = []string
+
+// identitySignature keeps ProveIdentityWithin's native inputs and proof. Roots
+// must already be equivalent. Structural identity, both path searches and step
+// comparison share budget; cutoff is unknown, never differing-path evidence.
+// Traversal remains native; identity.rules owns its order and proof selection.
+type identitySignature func(AccessPath, AccessPath, *proofs.SearchBudget) proofs.IdentityProof
+
+var _ identitySignature = ProveIdentityWithin
+
+func unknownIdentity(budget *proofs.SearchBudget) proofs.IdentityProof {
+	reason := proofs.EvidenceUnavailable
 	if budget.Exhausted() {
-		return unknown()
+		reason = proofs.EvidenceBudgetExhausted
 	}
-	leftPath, leftOK := AccessPathStepsWithin(left.Value, left.Root, budget)
-	if !leftOK || budget.Exhausted() {
-		return unknown()
-	}
-	rightPath, rightOK := AccessPathStepsWithin(right.Value, right.Root, budget)
-	if !rightOK || budget.Exhausted() {
-		return unknown()
-	}
-	if sameAccessPathSteps(leftPath, rightPath, budget) {
-		return proofs.IdentityProof{Proof: proofs.Proof{
-			State: proofs.EvidenceProven, Reason: proofs.EvidenceSameAccessPath, Provenance: proofs.EvidenceFromLocalSSA,
-		}}
-	}
-	if budget.Exhausted() {
-		return unknown()
-	}
-	return proofs.IdentityProof{Proof: proofs.Proof{State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound, Provenance: proofs.EvidenceFromLocalSSA}}
+	return identityEvidence(proofs.EvidenceUnknown, reason, 0)
 }
+
+func identityEvidence(state proofs.EvidenceState, reason proofs.EvidenceReason, provenance proofs.EvidenceProvenance) proofs.IdentityProof {
+	return proofs.IdentityProof{Proof: proofs.Proof{State: state, Reason: reason, Provenance: provenance}}
+}
+
+func identityBudgetExhausted(budget *proofs.SearchBudget) bool { return budget.Exhausted() }
+
+const (
+	identityProven    = proofs.EvidenceProven
+	identityDisproven = proofs.EvidenceDisproven
+	identitySameValue = proofs.EvidenceSameValue
+	identitySamePath  = proofs.EvidenceSameAccessPath
+	identityNotFound  = proofs.EvidenceNotFound
+	identityLocalSSA  = proofs.EvidenceFromLocalSSA
+)

@@ -127,6 +127,48 @@ func TestSameAccessPathWithinKeepsPathOnlyPolicy(t *testing.T) {
 	}
 }
 
+func TestIdentityMissingOperandsAndUnavailablePaths(t *testing.T) {
+	function, values := identityProjectionFixture(t)
+	value := values[0]
+	for _, test := range []struct {
+		name        string
+		left, right AccessPath
+		state       proofs.EvidenceState
+		reason      proofs.EvidenceReason
+	}{
+		{"missing left", AccessPath{}, AccessPath{Value: value}, proofs.EvidenceUnknown, proofs.EvidenceUnavailable},
+		{"missing right", AccessPath{Value: value}, AccessPath{}, proofs.EvidenceUnknown, proofs.EvidenceUnavailable},
+		{"both missing", AccessPath{}, AccessPath{}, proofs.EvidenceUnknown, proofs.EvidenceUnavailable},
+		{"same without roots", AccessPath{Value: value}, AccessPath{Value: value}, proofs.EvidenceProven, proofs.EvidenceSameValue},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got := ProveIdentityWithin(test.left, test.right, nil)
+			if got.State != test.state || got.Reason != test.reason {
+				t.Fatalf("identity = %+v, want state %v reason %v", got, test.state, test.reason)
+			}
+		})
+	}
+	spent := proofs.NewSearchBudget(0)
+	spent.Spend()
+	if got := ProveIdentityWithin(AccessPath{}, AccessPath{}, spent); got.Reason != proofs.EvidenceBudgetExhausted {
+		t.Fatalf("missing operands lost existing cutoff: %+v", got)
+	}
+	// An unavailable left path ends the query. Changing only the right root
+	// must not change the spent allowance by starting the right-path search.
+	var remaining int
+	for index, root := range []ssa.Value{nil, function.Params[1]} {
+		budget := proofs.NewSearchBudget(proofs.QueryBudget)
+		got := ProveIdentityWithin(AccessPath{Value: value}, AccessPath{Value: function.Params[1], Root: root}, budget)
+		if got.State != proofs.EvidenceUnknown || got.Reason != proofs.EvidenceUnavailable || got.Provenance != 0 {
+			t.Fatalf("unavailable left path = %+v", got)
+		}
+		if index > 0 && budget.Remaining() != remaining {
+			t.Fatal("unavailable left path queried the right path")
+		}
+		remaining = budget.Remaining()
+	}
+}
+
 func TestAccessPathReadKeepsSnapshotAndDiscardsCutMetadata(t *testing.T) {
 	pkg := ssaflowtest.BuildPackage(t, "reads", `package reads
  type box struct{child *box; value *int}

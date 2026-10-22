@@ -179,10 +179,111 @@ family still awaiting migration. The lifecycle scope is therefore not closed.
 | Retention/escape and response leaves | Existing generated policies own instruction admission, mode gates, escape aliases and exact response Body recognition. Native code applies plans through storage/reaching/use searches, memoization and effect collection. |
 | Lifecycle evidence composition | **Pending strong fit:** `selectedMaskProof` orders direct discharge, ordinary arguments, immutable captures, strict projections, argument cases and possible-alias uncertainty. `localProof` and `importedProof` also contain source-precedence policy. They require a cohesive native binding design that preserves partial-proof payloads, cutoff precedence, provenance and reached-query order. They remain an explicit migration item. |
 
+## Shared value and path review
+
+The 40 remaining authored files in `engine/ssaflow` were read in full, covering
+the root and `path`, `valueforms`, `selection` and `ssaflowtest`. The bounded graph
+query returned all 106 indexed files under `ssaflow`, including the already
+reviewed call/CFG scopes and tests. Exact-path coverage for all 40 authored
+candidates was clean at generation `2026-10-21T23:51:40Z`. The seven child-scope
+gaps were ignored generated outputs; their source rules and shared schemas were
+read directly. Method-name resolution can confuse unrelated `unknown` symbols;
+exact source, rather than that call edge, establishes the identity fallback.
+
+| Family | Disposition |
+| --- | --- |
+| `value_identity.go` | `identity.rules` now sequences structural identity, left-path lookup, right-path lookup and path comparison. Each cutoff remains unknown with its original reason and provenance. Direct identity still precedes nameable-path requirements. Missing inputs and failed left paths do not start later searches. The native equality and projection searches retain their recursion and charges. |
+| `access_paths.go`, `value_field_path.go` | Bounded path construction, exact root checks, constant-index encoding and load snapshot selection. The three projection branches update or extend the path while recursing; a separate descriptor would repeat this dispatch without removing traversal policy. Embedded paths append checked field indexes to a fixed buffer. |
+| `value_reaching.go`, `value_phi.go`, `value_derivation.go`, `value_matching.go` | Generic any/every/agreement folds, cycle handling, sibling-state cloning, use/operand censuses and directional structural matching. Field/index/load branches drive different recursive searches, rather than choose a standalone answer. Keep origin-before-expansion and exact-address-store semantics with these algorithms. |
+| `value_forms.go`, `valueforms`, `value_ownership.go` | Caller-selected wrapper and ownership-source recognition already use rules. Remaining forwarding and terminal-value tests are compact type sets; allocation stores and aggregate membership retain native reaching/use walks. |
+| `channel_aliases.go`, former `channel_types.go`, `named_results.go`, `written_once_cell.go` | Complete alias, store, capture and return-slot censuses with initialization/dominance checks. Small type switches select which census to extend; uniqueness, capture recursion and exact observation boundaries remain with the walk. The one channel-type predicate now lives with channel alias mechanics. |
+| `natural_loops.go`, `slice_elements.go`, `path/counted_loop.go` | Backedge/region collection, induction-edge agreement, invariant bounds and exact variadic-write inventories. Small header/increment/length shapes are local prerequisites of these algorithms; a rule adapter would leave their graph/edge validation and mutable collections intact. |
+| `selection`, `path/flow_select.go`, `path/flow_branch_literals.go` | Select-dispatch and literal-comparison recognizers already use rules. Incoming-phi lookup, all-return literal agreement, helper-local caps and exact receive-edge checks stay native. |
+| `path/flow_guards.go` and guard support | Substantial loaded/stable/address recognition already uses rules. The remaining code owns memoized rendering, bounded guard sets, contradiction comparison, invalidation, byte-compatible keys and IDs. The small contradiction lattice and store/call dispatch do not justify another plan/apply layer around those operations. |
+| `path/flow_assumptions.go`, `flow_successors.go` | Successor narrowing composes literal, fixed-value and exact nonnil/type evidence, retaining cutoff after each query. The code directly filters edge sets and carries predecessor/type context. Its short structural prerequisites and three-stage orchestration remain clearer beside that edge operation. |
+| Other `path` flow files | Work-list traversal carries classifier actions, guards, coverage and witnesses. Termination checks stop only their own paths and scan dominating deferred registrations. Entry modes, outcome lattices and Boolean facades are compact dispatch; classifiers remain the authoritative domain policy. |
+| `source_metadata.go`, `value_instructions.go`, `return_values.go`, `storage_integer.go`, `doc.go`, `ssaflowtest` | Source/closure/instruction enumeration, metadata accessors, literal extraction, all-result validation, package documentation and SSA fixture construction. These are collections, narrow mechanics or test infrastructure without a substantial ordered recognizer to extract. |
+
+The identity tests retain full proof comparison, corresponding/different/dynamic
+paths, shared allowance and final-comparison cutoff. New cases pin missing
+operands, an already exhausted budget and left-before-right query behavior.
+The shared-flow scope is closed after this migration; it is not reopened merely
+to increase the target count.
+
+## Repeated-capture analyzer review
+
+All five authored `concurrentcapture` files and its four rule files were read.
+The graph returned all 15 indexed paths, including tests and fixtures; exact
+implementation-path coverage was clean at generation `2026-10-21T23:54:49Z`.
+The four scope gaps were ignored generated outputs, whose rules were inspected
+directly. This scope is closed without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Mutation decision and synchronization region | `mutation.rules` already owns held-lock/fallback/worker/channel guard precedence; `lock_transition.rules` owns acquire/release/unknown selection. Native code applies selected operations to the held map and keeps uncertainty sticky. |
+| Mutation roots and semaphore statements | `root.rules` and `channel_statement.rules` already own root peeling and direct send/receive recognition. Object resolution, iteration-local version checks, scoped AST searches and the pending-send census remain native. |
+| Worker-prefix evidence | The complete ordered prefix scan requires brokered call summaries and declines conditional/unknown ordering. Target-instruction uniqueness, call-operation collection and compact final held/unknown projection stay with that scan. A descriptor would preserve the same loop and queries in hooks. |
+| Analyzer orchestration and presentation | Loop/closure discovery, binding of varying parameters, candidate-local guard requests, report deduplication, stable reason rendering and diagnostic construction. Small AST dispatch and enum-to-string mapping do not justify additional adapters. |
+
+## Producer lifecycle review
+
+All four authored `producerlifecycle` files and `receive.rules` were read.
+The graph returned all 22 indexed paths, including tests/fixtures. Exact-source
+coverage was clean at generation `2026-10-21T23:54:49Z`; the one scope gap was
+ignored generated receive recognition. Its source policy calls `helperReceives`
+even though the graph has no incoming call edge for that generated consumer.
+
+| Family | Disposition |
+| --- | --- |
+| Instruction receive recognition | Already generated. Direct receives, select-state census and helper results preserve count, uncertainty and reason. |
+| Abandoned-send decision | **Pending strong fit:** `abandonedProducerSend` orders reachable-return evidence, producer-count availability, receive-count uncertainty/zero and the final excess comparison. The count and return searches remain native; a generated policy can own the evidence precedence and proof selection. |
+| Helper receive evidence | **Pending strong fit:** `helperReceives` orders launch/builtin exclusions, summary availability/cutoff, nonreceiving-worker evidence and opaque channel consumption. Preserve short-circuit capture queries, exact counts, reached-query order and the existing uncertainty reason, including its false payload. |
+| Producer/receiver census | Worker discovery, parameter/capture mapping, complete protocol filtering, source attribution, dominance chains, per-worker send order and shared-budget exact receive counts. The collection loops and storage/call-effect searches remain native. |
+| Rendering and reporting | Stable reason table, proof carriers, tracing and position deduplication need no additional rule layer. |
+
+The source review is complete, but this scope remains open until the two
+confirmed evidence sequences are migrated and their production consumers use
+the generated paths.
+
+## Non-Go integration inventory
+
+The tracked non-Go code inventory outside fixtures/skills contains eight Python
+files, seven shell scripts, one jq program, five MJS files, seven TypeScript
+files, nine Astro components and two codec benchmark protobuf schemas. These
+own audit automation, build/process/resource management, website rendering and
+codec inputs. Hyrule emits typed Go rather than those languages; translating
+these tools into Go solely to use rules would add a maintenance boundary.
+The relevant integration review is therefore generation before native builds.
+
+The on-disk compiler symlink and ignored workspace select the local Lockdoc
+module. `scripts/hyrule.sh`, `go:generate`, Make's generation prerequisite,
+`prepare-hyrule`, CI, minimum-toolchain testing, release archive building and
+site package scripts were inspected. Hosted jobs generate before switching to
+standalone module dependencies; the release build and CI's direct binary build
+follow that preparation. The pin still matches the local compiler source.
+
+Three existing integration gaps are confirmed and remain in this checklist:
+
+- `scripts/benchmark-dogfood.sh` directly builds GoHawk without first generating
+  its ignored sources; the `benchmark` Make target does not supply generation.
+- `scripts/precision-regression.py` similarly builds its own binary without
+  generation when no existing binary is supplied. Its Make target does not
+  supply generation either.
+- `.pre-commit-hooks.yaml` still asks pre-commit's Go environment to compile the
+  repository, which cannot contain ignored generated Go on a fresh checkout.
+  The installation guide still describes that isolated-build contract.
+
+The first two entry points need generation before their own source builds.
+The pre-commit hook needs an explicit supported installation contract. These
+are integration corrections within the existing final-check scope, not new
+analyzer conversions. The source-install limitation itself is already documented
+in `docs/installation.md`; release archives are generated before compilation.
+
 ## Fixed completion checklist
 
-The inventory is frozen at `4abb415f` plus this batch on 2026-10-22: 363
-current authored production Go files, 129 reviewed and 234 awaiting review.
+The inventory was frozen at `4abb415f` plus the lifecycle handoff/view batch
+on 2026-10-22: 363 authored production Go files, 129 reviewed and 234 awaiting
+review at that point.
 Reviewed source is tracked by content fingerprint. Review each remaining scope
 once; reopen only the portion affected by a subsequent change. A review may
 close with no migration when the existing Go is clearer. Target count is not a
@@ -190,10 +291,10 @@ completion criterion, and marginal conversions do not extend this checklist.
 
 | Remaining source scope | Authored files | Status |
 | --- | ---: | --- |
-| `analyzers/concurrency/concurrentcapture` | 5 | Pending review |
+| `analyzers/concurrency/concurrentcapture` | 5 | Reviewed; existing rules cover substantial policies |
 | `analyzers/concurrency/goroutineownership` | 23 | Pending review |
 | `analyzers/concurrency/lockorder` | 24 | Pending review |
-| `analyzers/concurrency/producerlifecycle` | 4 | Pending review |
+| `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing pending migration |
 | `analyzers/resources/cancellationownership` | 11 | Pending review |
 | `analyzers/resources/deferinloop` | 6 | Pending review |
 | `analyzers/resources/processownership` | 13 | Pending review |
@@ -201,19 +302,25 @@ completion criterion, and marginal conversions do not extend this checklist.
 | `passes/concurrencyfacts` | 25 | Pending review |
 | `engine/heapmodel` | 22 | Pending review |
 | `engine/lifecycle` | 33 | Pending review |
-| `engine/ssaflow` root, `path` and `valueforms` | 40 | Pending review |
+| `engine/ssaflow` root, `path`, `valueforms`, `selection` and `ssaflowtest` | 40 | Reviewed; identity policy migrated |
 
 Analyzer and pass paths above are relative to `internal/analysis`; engine paths
 are relative to `internal`. Counts include native bindings beside existing
 rules, which need review rather than automatic conversion.
 
+The shared-flow review closes 40 frozen paths; the small channel-type file was
+merged into channel alias mechanics to leave room for the generated identity
+policy. Current source totals are 362 authored files: 177 reviewed and 185 still
+awaiting review across 9 source scopes. Lifecycle evidence composition and
+producer evidence sequencing remain open migration items separately.
+
 The remaining completion steps are finite:
 
-- Close each of the 12 source scopes above with a disposition per policy family.
-- Migrate the confirmed lifecycle evidence-composition family. Record any other
-  confirmed fit under its existing scope and close it with that scope.
-- Review generation/build/CI configuration and non-Go tooling for integration
-  gaps, without treating language translation itself as a goal.
+- Close each remaining source scope above with a disposition per policy family.
+- Migrate the confirmed lifecycle evidence-composition and producer evidence
+  sequencing families. Record any other confirmed fit under its existing scope and close it with that scope.
+- Correct the three confirmed source-build/pre-commit integration gaps above.
+  The non-Go inventory review is complete; no cross-language migration is planned.
 - Run final integration validation after the remaining cohesive migrations,
   record the outcome and close the audit. Unchanged reviewed scopes and
   compiler contracts reuse their existing evidence.
@@ -235,8 +342,8 @@ has been found. In particular:
 - Review remaining schema-copy/equality candidates against their actual mutable
   ownership contracts. A generic deep copy is not equivalent to intentional
   borrowing or branch-local detachment.
-- Check the non-Go tooling/configuration inventory for any relevant integration
-  gaps; the Go inventory alone cannot establish whole-repository completion.
+- Close the three confirmed non-Go integration gaps recorded above; reuse the
+  inspected generation/build/CI paths unless their inputs change.
 - After remaining migrations, verify consumers and removed decision paths,
   generation, relevant behavior and the final repository gate. Reuse unchanged
   validation rather than repeatedly running a broad gate during discovery.

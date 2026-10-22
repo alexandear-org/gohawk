@@ -7,6 +7,13 @@ targets:
     function: DiagnosticAdmission
     rules: [internal/reporting/check/report_admission.rules]
     out: internal/reporting/check/report_admission_gen.go
+  - name: structural_identity_evidence
+    package: internal/engine/ssaflow
+    bindings: internal/engine/ssaflow/value_identity.go
+    signature: identitySignature
+    function: ProveIdentityWithin
+    rules: [internal/engine/ssaflow/identity.rules]
+    out: internal/engine/ssaflow/identity_gen.go
   - name: result_leaf
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/results.go

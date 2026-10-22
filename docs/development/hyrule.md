@@ -70,6 +70,7 @@ path is removed; generator support and examples alone do not qualify.
 | Concurrency snapshot maintenance | Generated complete-record copies for summaries, workers and select choices; nested list hooks retain the original copying depth |
 | Concurrency context/callback and resource recognition | Generated context calls/origins, callback inputs/calls, resource references and identity-root forms; storage resolution, callback binding and summary construction stay in Go |
 | SSA wrapper, projection, and structural source families | Generated transparent wrappers and ownership-source recognition; other projection/source families remain |
+| Corresponding-path identity evidence | Generated structural/path/cutoff precedence over the native equality and access-path searches |
 | Call-use and heap-operation classification | Generated direct call-use effects, field-use admission, heap value definitions and static heap leaves; memory effects, recursive searches and state application stay in Go |
 | Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation/agreement, local completion strategy and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment, worker-completion instruction plans and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
@@ -127,6 +128,14 @@ keeps its exact SSA identity. Arithmetic/logical unary operations retain a false
 recognition result, and traversal stops there. `ExternallyOwnedValue` and
 `ElementOfAggregate` consume this same generated recognition through their
 existing reaching walks; the rules neither traverse nor establish ownership.
+
+`ssaflow/identity.rules` owns `ProveIdentityWithin`: structural identity wins
+before requiring a nameable access path, then left and right path searches run
+in order before step comparison. Missing operands or unavailable paths yield
+unknown without imported provenance; exhaustion retains the budget reason.
+Native traversal and every search charge remain unchanged. The caller must
+already have established equivalent roots. This policy does not replace the
+path-only contract of `SameAccessPathWithin`.
 
 ## Concurrency admission
 

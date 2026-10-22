@@ -1,6 +1,8 @@
 package ssaflow
 
 import (
+	"go/types"
+
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	cfg "github.com/kojah/gohawk/internal/engine/ssaflow/cfg"
 	"golang.org/x/tools/go/ssa"
@@ -162,4 +164,17 @@ func argumentParametersWithin(value ssa.Value, common *ssa.CallCommon, budget *p
 		}
 	}
 	return parameters
+}
+
+// ChannelType reports whether value has channel type.
+func ChannelType(value ssa.Value) bool {
+	if value == nil {
+		return false
+	}
+	return channelTypeForType(value.Type())
+}
+
+func channelTypeForType(value types.Type) bool {
+	_, ok := value.Underlying().(*types.Chan)
+	return ok
 }
