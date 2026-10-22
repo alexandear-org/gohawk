@@ -14,7 +14,7 @@ func hyruleFinalizeRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Final (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/final_flow.rules:22).
+		// Rule Final (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/final_flow.rules:20).
 		var hv10 FlowQueries = hv1
 		var hv11 hyruleImport0.Value = hv2
 		hv3 := (FlowQueries).Flow(hv10, hv11)
@@ -23,64 +23,61 @@ func hyruleFinalizeRecognize(harg0 struct {
 			var zero struct{ V0 Decision }
 			return zero, false
 		}
-		var hv12 Decision = hv3
-		hv4 := (Decision).Reportable(hv12)
+		hv4 := (Decision).Reportable(hv3)
 		_ = hv4
-		var hv13 struct{ V0 Decision }
+		var hv12 struct{ V0 Decision }
 		switch hv4 {
 		case true:
-			var hv14 FlowQueries = hv1
-			hv5 := (FlowQueries).DatabaseCleanup(hv14)
+			var hv13 FlowQueries = hv1
+			hv5 := (FlowQueries).DatabaseCleanup(hv13)
 			_ = hv5
-			var hv15 struct{ V0 Decision }
+			var hv14 struct{ V0 Decision }
 			switch hv5 {
 			case false:
-				var hv16 FlowQueries = hv1
-				hv6 := (FlowQueries).PoolExhausted(hv16)
+				var hv15 FlowQueries = hv1
+				hv6 := (FlowQueries).PoolExhausted(hv15)
 				_ = hv6
-				var hv17 struct{ V0 Decision }
+				var hv16 struct{ V0 Decision }
 				switch hv6 {
 				case false:
-					var hv18 FlowQueries = hv1
-					hv7 := (FlowQueries).Exit(hv18)
+					var hv17 FlowQueries = hv1
+					hv7 := (FlowQueries).Exit(hv17)
 					_ = hv7
-					var hv19 ExitEvidence = hv7
-					hv8 := exitReclaimed(hv19)
+					hv8 := hv7.Reclaimed
 					_ = hv8
-					var hv20 struct{ V0 Decision }
+					var hv18 struct{ V0 Decision }
 					switch hv8 {
 					case false:
-						var hv21 ExitEvidence = hv7
-						hv9 := exitInterrupted(hv21)
+						hv9 := hv7.Exhausted
 						_ = hv9
-						var hv22 struct{ V0 Decision }
+						var hv19 struct{ V0 Decision }
 						switch hv9 {
 						case false:
-							hv22 = struct{ V0 Decision }{V0: hv3}
+							hv19 = struct{ V0 Decision }{V0: hv3}
 						case true:
-							var hv23 Decision = Decision{State: evidenceUnknown, Reason: BudgetExhausted}
-							hv22 = struct{ V0 Decision }{V0: hv23}
+							var hv20 Decision = Decision{State: evidenceUnknown, Reason: BudgetExhausted}
+							hv19 = struct{ V0 Decision }{V0: hv20}
 						}
-						hv20 = hv22
+						hv18 = hv19
 					case true:
-						var hv24 Decision = Decision{State: evidenceDisproven, Reason: ProcessExitReclaims}
-						hv20 = struct{ V0 Decision }{V0: hv24}
+						var hv21 Decision = Decision{State: evidenceDisproven, Reason: ProcessExitReclaims}
+						hv18 = struct{ V0 Decision }{V0: hv21}
 					}
-					hv17 = hv20
+					hv16 = hv18
 				case true:
-					var hv25 Decision = Decision{State: evidenceUnknown, Reason: BudgetExhausted}
-					hv17 = struct{ V0 Decision }{V0: hv25}
+					var hv22 Decision = Decision{State: evidenceUnknown, Reason: BudgetExhausted}
+					hv16 = struct{ V0 Decision }{V0: hv22}
 				}
-				hv15 = hv17
+				hv14 = hv16
 			case true:
-				var hv26 Decision = Decision{State: evidenceDisproven, Reason: ParentCleanup}
-				hv15 = struct{ V0 Decision }{V0: hv26}
+				var hv23 Decision = Decision{State: evidenceDisproven, Reason: ParentCleanup}
+				hv14 = struct{ V0 Decision }{V0: hv23}
 			}
-			hv13 = hv15
+			hv12 = hv14
 		case false:
-			hv13 = struct{ V0 Decision }{V0: hv3}
+			hv12 = struct{ V0 Decision }{V0: hv3}
 		}
-		hresult := hv13
+		hresult := hv12
 		if !hyrulehyruleFinalizeRecognizeRecord12Valid(hresult) {
 			var zero struct{ V0 Decision }
 			return zero, false
@@ -175,8 +172,8 @@ func Finalize(hparam0 FlowQueries, hparam1 hyruleImport0.Value) Decision {
 		P1 hyruleImport0.Value
 	}{P0: hparam0, P1: hparam1})
 	if !hok {
-		var hv27 Decision = Decision{State: evidenceUnknown, Reason: EvidenceUnavailable}
-		hvalue = struct{ V0 Decision }{V0: hv27}
+		var hv24 Decision = Decision{State: evidenceUnknown, Reason: EvidenceUnavailable}
+		hvalue = struct{ V0 Decision }{V0: hv24}
 	}
 	return hvalue.V0
 }

@@ -72,10 +72,6 @@ func receiverLaunched(call ssa.CallInstruction) bool {
 	return launched
 }
 
-func producerExceeds(sends, receives int) bool { return sends > receives }
-
-func zeroReceives(count int) bool { return count == 0 }
-
 func opaqueReceiver(uncertain bool) receiveProof {
 	return receiveProof{unknown: uncertain, reason: reasonReceiverHelperUnknown}
 }

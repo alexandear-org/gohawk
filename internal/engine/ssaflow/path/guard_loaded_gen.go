@@ -55,18 +55,7 @@ func hyruleloadedGuardRecognize(harg0 struct {
 						}
 						return zero, false
 					}
-					var hv25 struct {
-						V0 string
-						V1 bool
-						V2 bool
-					}
-					switch hv7.V2 {
-					case true:
-						hv25 = hv7
-					case false:
-						hv25 = hv7
-					}
-					hresult := hv25
+					hresult := hv7
 					if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
 						var zero struct {
 							V0 string
@@ -100,14 +89,14 @@ func hyruleloadedGuardRecognize(harg0 struct {
 							_ = hv13
 							if hv13 == guardLoadToken {
 								if hv9 == guardEqualToken {
-									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
-									var hv26 hyruleImport0.Value = hv10
-									var hv27 hyruleImport0.Value = hv12
-									var hv28 *hyruleImport0.Const = hv11
-									var hv29 hyruleImport1.Token = hv9
-									var hv30 *hyruleImport2.SearchBudget = hv2
-									var hv31 *guardFormats = hv3
-									hv14part0, hv14part1, hv14part2 := guardLoadedAddress(hv26, hv27, hv28, hv29, hv30, hv31)
+									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:14).
+									var hv25 hyruleImport0.Value = hv10
+									var hv26 hyruleImport0.Value = hv12
+									var hv27 *hyruleImport0.Const = hv11
+									var hv28 hyruleImport1.Token = hv9
+									var hv29 *hyruleImport2.SearchBudget = hv2
+									var hv30 *guardFormats = hv3
+									hv14part0, hv14part1, hv14part2 := guardLoadedAddress(hv25, hv26, hv27, hv28, hv29, hv30)
 									hv14 := struct {
 										V0 string
 										V1 bool
@@ -122,18 +111,7 @@ func hyruleloadedGuardRecognize(harg0 struct {
 										}
 										return zero, false
 									}
-									var hv32 struct {
-										V0 string
-										V1 bool
-										V2 bool
-									}
-									switch hv14.V2 {
-									case true:
-										hv32 = hv14
-									case false:
-										hv32 = hv14
-									}
-									hresult := hv32
+									hresult := hv14
 									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
 										var zero struct {
 											V0 string
@@ -145,14 +123,14 @@ func hyruleloadedGuardRecognize(harg0 struct {
 									return hresult, true
 								}
 								if hv9 == guardNotEqualToken {
-									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
-									var hv33 hyruleImport0.Value = hv10
-									var hv34 hyruleImport0.Value = hv12
-									var hv35 *hyruleImport0.Const = hv11
-									var hv36 hyruleImport1.Token = hv9
-									var hv37 *hyruleImport2.SearchBudget = hv2
-									var hv38 *guardFormats = hv3
-									hv15part0, hv15part1, hv15part2 := guardLoadedAddress(hv33, hv34, hv35, hv36, hv37, hv38)
+									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:14).
+									var hv31 hyruleImport0.Value = hv10
+									var hv32 hyruleImport0.Value = hv12
+									var hv33 *hyruleImport0.Const = hv11
+									var hv34 hyruleImport1.Token = hv9
+									var hv35 *hyruleImport2.SearchBudget = hv2
+									var hv36 *guardFormats = hv3
+									hv15part0, hv15part1, hv15part2 := guardLoadedAddress(hv31, hv32, hv33, hv34, hv35, hv36)
 									hv15 := struct {
 										V0 string
 										V1 bool
@@ -167,18 +145,7 @@ func hyruleloadedGuardRecognize(harg0 struct {
 										}
 										return zero, false
 									}
-									var hv39 struct {
-										V0 string
-										V1 bool
-										V2 bool
-									}
-									switch hv15.V2 {
-									case true:
-										hv39 = hv15
-									case false:
-										hv39 = hv15
-									}
-									hresult := hv39
+									hresult := hv15
 									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
 										var zero struct {
 											V0 string
@@ -203,14 +170,14 @@ func hyruleloadedGuardRecognize(harg0 struct {
 								hv16 := hs4
 								_ = hv16
 								if hv9 == guardEqualToken {
-									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
-									var hv40 hyruleImport0.Value = hv10
-									var hv41 hyruleImport0.Value = hv14
-									var hv42 *hyruleImport0.Const = hv16
-									var hv43 hyruleImport1.Token = hv9
-									var hv44 *hyruleImport2.SearchBudget = hv2
-									var hv45 *guardFormats = hv3
-									hv17part0, hv17part1, hv17part2 := guardLoadedAddress(hv40, hv41, hv42, hv43, hv44, hv45)
+									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:20).
+									var hv37 hyruleImport0.Value = hv10
+									var hv38 hyruleImport0.Value = hv14
+									var hv39 *hyruleImport0.Const = hv16
+									var hv40 hyruleImport1.Token = hv9
+									var hv41 *hyruleImport2.SearchBudget = hv2
+									var hv42 *guardFormats = hv3
+									hv17part0, hv17part1, hv17part2 := guardLoadedAddress(hv37, hv38, hv39, hv40, hv41, hv42)
 									hv17 := struct {
 										V0 string
 										V1 bool
@@ -225,18 +192,7 @@ func hyruleloadedGuardRecognize(harg0 struct {
 										}
 										return zero, false
 									}
-									var hv46 struct {
-										V0 string
-										V1 bool
-										V2 bool
-									}
-									switch hv17.V2 {
-									case true:
-										hv46 = hv17
-									case false:
-										hv46 = hv17
-									}
-									hresult := hv46
+									hresult := hv17
 									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
 										var zero struct {
 											V0 string
@@ -248,14 +204,14 @@ func hyruleloadedGuardRecognize(harg0 struct {
 									return hresult, true
 								}
 								if hv9 == guardNotEqualToken {
-									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
-									var hv47 hyruleImport0.Value = hv10
-									var hv48 hyruleImport0.Value = hv14
-									var hv49 *hyruleImport0.Const = hv16
-									var hv50 hyruleImport1.Token = hv9
-									var hv51 *hyruleImport2.SearchBudget = hv2
-									var hv52 *guardFormats = hv3
-									hv18part0, hv18part1, hv18part2 := guardLoadedAddress(hv47, hv48, hv49, hv50, hv51, hv52)
+									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:20).
+									var hv43 hyruleImport0.Value = hv10
+									var hv44 hyruleImport0.Value = hv14
+									var hv45 *hyruleImport0.Const = hv16
+									var hv46 hyruleImport1.Token = hv9
+									var hv47 *hyruleImport2.SearchBudget = hv2
+									var hv48 *guardFormats = hv3
+									hv18part0, hv18part1, hv18part2 := guardLoadedAddress(hv43, hv44, hv45, hv46, hv47, hv48)
 									hv18 := struct {
 										V0 string
 										V1 bool
@@ -270,18 +226,7 @@ func hyruleloadedGuardRecognize(harg0 struct {
 										}
 										return zero, false
 									}
-									var hv53 struct {
-										V0 string
-										V1 bool
-										V2 bool
-									}
-									switch hv18.V2 {
-									case true:
-										hv53 = hv18
-									case false:
-										hv53 = hv18
-									}
-									hresult := hv53
+									hresult := hv18
 									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
 										var zero struct {
 											V0 string

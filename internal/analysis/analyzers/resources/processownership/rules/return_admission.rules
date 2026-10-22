@@ -1,10 +1,9 @@
 signature total = outputs ^reasonNone false
 
 host
-  startFailureReturn!
-  owner! = lifecycle.ReturnedValueOwnsValue
-  returnsProcessHandle!
-  returnedMergedOwner!
+  startFailureReturn
+  owner = lifecycle.ReturnedValueOwnsValue
+  returnsProcessHandle
   reasonNone
   reasonStartFailureReturn
   reasonReturnedOwner
@@ -14,19 +13,20 @@ host
 // Returning an aggregate that contains the command transfers Wait responsibility
 // just as returning *exec.Cmd does. The lower-level os.Process can also be waited
 // on by the caller. Select one reason before the flow emits its evidence event.
+// A merged command is checked only when present, so no nil phi reaches a check.
 // https://github.com/apache/casbin-gateway/blob/e3606894348d8cd52d85abc29cfb4d3ae99595cb/util/daemon.go#L121-L131
 @Return
-rewrite (inputs returned start command merged) =
-  case startFailureReturn returned start of
-    true -> outputs ^reasonStartFailureReturn true
-    false -> decline
-  <|> case owner returned command of
-    true -> outputs ^reasonReturnedOwner true
-    false -> decline
-  <|> case returnsProcessHandle returned command of
-    true -> outputs ^reasonReturnedHandle true
-    false -> decline
-  <|> case returnedMergedOwner returned merged of
-    true -> outputs ^reasonReturnedMergedOwner true
-    false -> decline
-  <|> outputs ^reasonNone false
+rewrite (inputs returned start command merged)
+  | startFailureReturn returned start
+  =
+  outputs ^reasonStartFailureReturn true
+  | owner returned command
+  =
+  outputs ^reasonReturnedOwner true
+  | returnsProcessHandle returned command
+  =
+  outputs ^reasonReturnedHandle true
+  | merged != nil
+  , owner returned merged || returnsProcessHandle returned merged
+  =
+  outputs ^reasonReturnedMergedOwner true

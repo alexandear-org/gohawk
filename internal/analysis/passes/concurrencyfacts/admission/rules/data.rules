@@ -47,9 +47,7 @@ host
 // A primitive's fields are its internal state, never ordinary data.
 @Field
 rewrite (inputs field@(FieldAddress (owner: owner)))
-  | let type = typeOf owner
-  , let primitive = primitive type
-  , primitive == false
+  | not (primitive (typeOf owner))
   , address field
   =
   outputs true
@@ -58,8 +56,7 @@ rewrite (inputs field@(FieldAddress (owner: owner)))
 // branches the summary already keeps.
 @Write
 rewrite (inputs (Store (value: value, address: location)))
-  | let type = typeOf value
-  , inert type
+  | inert (typeOf value)
   , address location
   =
   outputs true
@@ -77,16 +74,14 @@ rewrite (inputs index@(IndexAddress()))
 // Reslicing shares elements and creates no new identity.
 @Resliced
 rewrite (inputs slice@(Slice()))
-  | let type = typeOf slice
-  , elements type
+  | elements (typeOf slice)
   =
   outputs true
 
 // Comma-ok results carry an element plus a Boolean; failed assertions panic.
 @Element
 rewrite (inputs value@(Lookup() | Assertion()))
-  | let type = elementType value
-  , inert type
+  | inert (elementType value)
   =
   outputs true
 
@@ -96,30 +91,21 @@ rewrite (inputs (Extraction (tuple: Selection()))) = outputs false
 
 @Projected
 rewrite (inputs value@(Extraction()))
-  | let type = typeOf value
-  , inert type
+  | inert (typeOf value)
   =
   outputs true
 
 // Storing resource keys or values would publish them.
 @MapWrite
 rewrite (inputs (MapUpdate (key: key, value: value)))
-  | let keyType = typeOf key
-  , inert keyType
-  , let valueType = typeOf value
-  , inert valueType
+  | inert (typeOf key)
+  , inert (typeOf value)
   =
   outputs true
 
 // Comparing against nil cannot panic, including interface comparisons.
-@LeftNil
-rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken), left: left)))
-  | nilConstant left
-  =
-  outputs true
-
-@RightNil
-rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken), right: right)))
-  | nilConstant right
+@NilComparison
+rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken), left: left, right: right)))
+  | nilConstant left || nilConstant right
   =
   outputs true

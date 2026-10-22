@@ -14,8 +14,7 @@ host
 @Method
 rewrite (inputs call@(Call()))
   | let common = common call
-  , let invokes = invokes common
-  , invokes == true
+  , invokes common
   , input common.Value common.Method
   , arguments common
   =
@@ -24,10 +23,8 @@ rewrite (inputs call@(Call()))
 @Function
 rewrite (inputs call@(Call()))
   | let common = common call
-  , let invokes = invokes common
-  , invokes == false
-  , let callee = callee common
-  , callee == nil
+  , not (invokes common)
+  , (callee common) == nil
   , input common.Value nil
   , arguments common
   =

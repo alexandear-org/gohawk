@@ -94,8 +94,8 @@ func emitImmediateProcessGuard(probe analysisTrace.Probe, function *ssa.Function
 // It does not supply a return witness or alter the flow's feasible successors.
 type returnAdmissionSignature func(*ssa.Return, *ssa.Call, ssa.Value, *ssa.Phi) (processReason, bool)
 
-var _ returnAdmissionSignature = admitProcessReturn
-
-func returnedMergedOwner(returned *ssa.Return, merged *ssa.Phi) bool {
-	return merged != nil && (lifecycle.ReturnedValueOwnsValue(returned, merged) || returnsProcessHandle(returned, merged))
-}
+var (
+	_ returnAdmissionSignature = admitProcessReturn
+	// return_admission.rules calls this directly; the import is its binding.
+	_ = lifecycle.ReturnedValueOwnsValue
+)

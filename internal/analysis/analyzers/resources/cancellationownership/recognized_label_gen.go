@@ -21,10 +21,10 @@ func hyrulerecognizeCancellationRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		// Rule Recognized (internal/analysis/analyzers/resources/cancellationownership/rules/recognized_label.rules:7).
-		var hv7 *cancellationClassifier = hv2
-		var hv8 hyruleImport0.Instruction = hv1
+		var hv7 hyruleImport0.Instruction = hv1
+		var hv8 *cancellationClassifier = hv2
 		var hv9 *hyruleImport0.CallCommon = hv3
-		hv4part0, hv4part1 := (*cancellationClassifier).recognizedDirectAction(hv7, hv8, hv9)
+		hv4part0, hv4part1 := recognizeCancellationDirect(hv7, hv8, hv9)
 		hv4 := struct {
 			V0 cancellationLabel
 			V1 bool
@@ -50,10 +50,10 @@ func hyrulerecognizeCancellationRecognize(harg0 struct {
 				V1 bool
 			}{V0: hv5, V1: true}
 		case false:
-			var hv11 *cancellationClassifier = hv2
-			var hv12 hyruleImport0.Instruction = hv1
+			var hv11 hyruleImport0.Instruction = hv1
+			var hv12 *cancellationClassifier = hv2
 			var hv13 *hyruleImport0.CallCommon = hv3
-			hv6part0, hv6part1 := (*cancellationClassifier).recognizedCallAction(hv11, hv12, hv13)
+			hv6part0, hv6part1 := recognizeCancellationCall(hv11, hv12, hv13)
 			hv6 := struct {
 				V0 cancellationLabel
 				V1 bool
@@ -66,17 +66,7 @@ func hyrulerecognizeCancellationRecognize(harg0 struct {
 				}
 				return zero, false
 			}
-			var hv14 struct {
-				V0 cancellationLabel
-				V1 bool
-			}
-			switch hv6.V1 {
-			case true:
-				hv14 = hv6
-			case false:
-				hv14 = hv6
-			}
-			hv10 = hv14
+			hv10 = hv6
 		}
 		hresult := hv10
 		if !hyrulehyrulerecognizeCancellationRecognizeUnion1Valid(hresult) {

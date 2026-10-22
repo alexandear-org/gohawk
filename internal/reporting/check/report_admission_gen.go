@@ -93,8 +93,6 @@ func hyruleDiagnosticAdmissionRecognize(harg0 struct {
 			return hv16, true
 		}
 	}
-	var zero struct{ V0 ReportingReason }
-	return zero, false
 }
 func DiagnosticAdmission(hparam0 *hyruleImport1.Pass, hparam1 hyruleImport1.Diagnostic, hparam2 string, hparam3 map[string]bool, hparam4 map[string]bool, hparam5 map[string]bool) ReportingReason {
 	hvalue, hok := hyruleDiagnosticAdmissionRecognize(struct {

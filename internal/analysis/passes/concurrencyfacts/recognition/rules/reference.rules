@@ -38,15 +38,12 @@ rewrite (inputs call@(Call()))
 rewrite (inputs call@(Call())) = outputs ^ReferenceRejected call false
 
 @Symbolic
-rewrite (inputs value@(Parameter() | Capture() | Channel()))
-  | let type = typeOf value
-  =
-  outputs ^ReferenceExact value (canceled type)
+rewrite (inputs value@(Parameter() | Capture() | Channel())) =
+  outputs ^ReferenceExact value (canceled (typeOf value))
 
 @Local
 rewrite (inputs value@(Allocation()))
-  | let type = typeOf value
-  , synchronization type
+  | synchronization (typeOf value)
   =
   outputs ^ReferenceExact value false
 
@@ -54,7 +51,6 @@ rewrite (inputs value@(Allocation()))
 // a nonempty embedded path to an existing address before exporting identity.
 @Address
 rewrite (inputs value@(Global() | Field()))
-  | let type = typeOf value
-  , mutex type
+  | mutex (typeOf value)
   =
   outputs ^ReferenceAddress value false

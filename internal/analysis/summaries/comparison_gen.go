@@ -72,17 +72,7 @@ func hyruledecideResultComparisonRecognize(harg0 struct {
 						}
 						return zero, false
 					}
-					var hv18 struct {
-						V0 bool
-						V1 bool
-					}
-					switch hv7.V1 {
-					case true:
-						hv18 = hv7
-					case false:
-						hv18 = hv7
-					}
-					hv13 = hv18
+					hv13 = hv7
 				}
 				hresult := hv13
 				if !hyrulehyruledecideResultComparisonRecognizeUnion0Valid(hresult) {
@@ -95,12 +85,12 @@ func hyruledecideResultComparisonRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule OtherComparison (internal/analysis/summaries/rules/comparison.rules:30).
-		var hv19 *Provider = hv1
-		var hv20 hyruleImport0.Value = hv2
-		var hv21 *hyruleImport0.Const = hv3
-		var hv22 *hyruleImport1.SearchBudget = hv5
-		hv8part0, hv8part1 := (*Provider).literalEquality(hv19, hv20, hv21, hv22)
+		// Rule OtherComparison (internal/analysis/summaries/rules/comparison.rules:28).
+		var hv18 *Provider = hv1
+		var hv19 hyruleImport0.Value = hv2
+		var hv20 *hyruleImport0.Const = hv3
+		var hv21 *hyruleImport1.SearchBudget = hv5
+		hv8part0, hv8part1 := (*Provider).literalEquality(hv18, hv19, hv20, hv21)
 		hv8 := struct {
 			V0 bool
 			V1 bool
@@ -113,17 +103,7 @@ func hyruledecideResultComparisonRecognize(harg0 struct {
 			}
 			return zero, false
 		}
-		var hv23 struct {
-			V0 bool
-			V1 bool
-		}
-		switch hv8.V1 {
-		case true:
-			hv23 = hv8
-		case false:
-			hv23 = hv8
-		}
-		hresult := hv23
+		hresult := hv8
 		if !hyrulehyruledecideResultComparisonRecognizeUnion0Valid(hresult) {
 			var zero struct {
 				V0 bool

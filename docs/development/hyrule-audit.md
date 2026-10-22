@@ -418,6 +418,41 @@ closed without further migration.
 | Storage, containment and transfer evidence | Recursive store/escape/constructor walks drive different searches per arm. `proveOwnershipTransfer` is already an ordered mode/reason/predicate table; a rule would copy it and add twelve bindings. Evidence caching refuses cutoff answers. |
 | Vocabulary | Declarations and a five-case reason projection. |
 
+## Language re-audit
+
+After Hyrule gained Boolean operators, pattern guards, `if`, `where`, pure
+decisions in `do`/`case` and flat formatting of guards and `else if` chains, all
+authored Go in the analyzers, fact passes, `lifecycle`, `heapmodel`, `ssaflow`,
+`summaries` and `reporting/check` was reviewed again for decision code to convert.
+
+No imperative Go was converted. Remaining Go decision ladders call operands that
+spend budget, record cutoffs or trace; those stay ordered `!` queries, which pure
+operators cannot contain. The rest is traversal, memoization, censuses and state
+mutation. Every earlier near-miss keeps its disposition, including
+`lockComparisonKey`, `lockSuccessorStates`, `loadEffect`, `callSummary`,
+`foldLoops`, `proveOwnershipTransfer`, `Storage.Same`, `searchCompletes` and
+`releasesOrdinaryResource`.
+
+The review found that pure checks were declared `!` only so `do` could branch on
+them, and that formatting split guarded equations. With both fixed in Hyrule,
+existing rules were simplified:
+
+| Target | Change |
+| --- | --- |
+| `lock_missing_release_policy` | Pure steps on `Exhausted`/`Proven`; the `Answer.Holds`/`Unavailable` adapters are removed and the cutoff result is one `where` binding. |
+| `process_return_admission` | Guarded alternatives replace four `case … <|>` blocks; `returnedMergedOwner` is removed. |
+| `process_action_settlement`, `process_action_remainder` | Pure direct witnesses use `if`/`||`; settlement returns its whole result. The three stages stay separate because remainder precedence is tested with injected fallbacks. |
+| `lifecycle_returned_view_policy` | One flat `if` chain over five pure hooks. |
+| `lifecycle_evidence_policy`, `lifecycle_local_completion`, `lifecycle_receiver_mapping` | Pure field and invocation checks are no longer `!`; the duplicate `hasPath` alias is removed. |
+| `resource_final_flow_policy`, `resource_acquisition_policy` | Field reads and a constant comparison replace `exitReclaimed`, `exitInterrupted` and `noBoundary`. |
+| `producer_abandonment` | Integer comparisons replace `producerExceeds` and `zeroReceives`. |
+| `path_loaded_guard`, `summary_result_comparison` | Identity `case` passthroughs become whole-result binds. |
+| Concurrency admission and recognition rules | `not` and direct calls replace single-use `let` comparisons; the left/right nil rules merge. |
+| `cancellation_recognized_label` | Rules bind the generated recognizers directly; four forwarding methods are removed. |
+
+`parent.rules` keeps its query because `parentCancelResult` returns a Go tuple,
+which pure expressions do not accept.
+
 ## Non-Go integration inventory
 
 The tracked non-Go code inventory outside fixtures/skills contains eight Python

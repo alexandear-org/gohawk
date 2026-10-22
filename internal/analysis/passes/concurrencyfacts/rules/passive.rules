@@ -77,12 +77,8 @@ rewrite (inputs (instruction: store@(Store())))
 @OrdinaryStore
 rewrite (inputs (instruction: Store (value: value, address: address)))
   | local address
-  , let valueType = typeOf value
-  , let contains = contains valueType
-  , contains == false
-  , let addressType = typeOf address
-  , let primitive = primitive addressType
-  , primitive == false
+  , not (contains (typeOf value))
+  , not (primitive (typeOf address))
   =
   outputs ^ReasonNone
 

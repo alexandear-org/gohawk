@@ -53,18 +53,18 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				hv6 := hs1
 				_ = hv6
 				// Rule Field (internal/analysis/passes/concurrencyfacts/rules/passive.rules:63).
-				var hv17 *hyruleImport2.FieldAddr = hv6
-				var hv18 *hyruleImport3.SearchBudget = hv3
-				hv7 := passiveFieldWithin(hv17, hv18)
+				var hv13 *hyruleImport2.FieldAddr = hv6
+				var hv14 *hyruleImport3.SearchBudget = hv3
+				hv7 := passiveFieldWithin(hv13, hv14)
 				_ = hv7
-				var hv19 struct{ V0 Reason }
+				var hv15 struct{ V0 Reason }
 				switch hv7 {
 				case true:
-					hv19 = struct{ V0 Reason }{V0: ReasonNone}
+					hv15 = struct{ V0 Reason }{V0: ReasonNone}
 				case false:
-					hv19 = struct{ V0 Reason }{V0: ReasonEffectUnknown}
+					hv15 = struct{ V0 Reason }{V0: ReasonEffectUnknown}
 				}
-				return hv19, true
+				return hv15, true
 			}
 		case *hyruleImport2.Store:
 			if hs1 != nil {
@@ -87,23 +87,11 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				{
 					if localAddress(hv11) {
 						{
-							var hv12 hyruleImport4.Type = (passiveValue).Type(hv10)
-							_ = hv12
-							{
-								var hv13 bool = hyruleImport0.ContainsSynchronization(hv12)
-								_ = hv13
-								if hv13 == false {
-									{
-										var hv14 hyruleImport4.Type = (passiveValue).Type(hv11)
-										_ = hv14
-										{
-											var hv15 bool = hyruleImport0.SynchronizationPointer(hv14)
-											_ = hv15
-											if hv15 == false {
-												// Rule OrdinaryStore (internal/analysis/passes/concurrencyfacts/rules/passive.rules:77).
-												return struct{ V0 Reason }{V0: ReasonNone}, true
-											}
-										}
+							if !(hyruleImport0.ContainsSynchronization((passiveValue).Type(hv10))) {
+								{
+									if !(hyruleImport0.SynchronizationPointer((passiveValue).Type(hv11))) {
+										// Rule OrdinaryStore (internal/analysis/passes/concurrencyfacts/rules/passive.rules:77).
+										return struct{ V0 Reason }{V0: ReasonNone}, true
 									}
 								}
 							}
@@ -113,11 +101,11 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 			}
 		case *hyruleImport2.ChangeType:
 			if hs1 != nil {
-				hv16 := hs1
-				_ = hv16
+				hv12 := hs1
+				_ = hv12
 				{
-					if hyruleImport1.ChannelType(hv16) {
-						// Rule ChannelRepresentation (internal/analysis/passes/concurrencyfacts/rules/passive.rules:89).
+					if hyruleImport1.ChannelType(hv12) {
+						// Rule ChannelRepresentation (internal/analysis/passes/concurrencyfacts/rules/passive.rules:85).
 						return struct{ V0 Reason }{V0: ReasonNone}, true
 					}
 				}
@@ -125,7 +113,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 		case *hyruleImport2.MakeChan:
 			if hv1 != (*hyruleImport2.MakeChan)(nil) {
 				if hv2 == true {
-					// Rule RootChannel (internal/analysis/passes/concurrencyfacts/rules/passive.rules:96).
+					// Rule RootChannel (internal/analysis/passes/concurrencyfacts/rules/passive.rules:92).
 					return struct{ V0 Reason }{V0: ReasonNone}, true
 				}
 			}

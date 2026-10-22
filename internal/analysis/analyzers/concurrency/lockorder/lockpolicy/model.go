@@ -51,12 +51,6 @@ type WriterEvidence = proofs.Proof
 // Unknown identifies an opaque field contract without treating it as safety.
 func (p Proof) Unknown() bool { return p.State == proofs.EvidenceUnknown }
 
-// Unavailable prevents a shortened contract search from suppressing a witness.
-func (a Answer) Unavailable() bool { return a.Exhausted }
-
-// Holds reports the contract's completed positive witness.
-func (a Answer) Holds() bool { return a.Proven }
-
 const (
 	unknownState   = proofs.EvidenceUnknown
 	disprovenState = proofs.EvidenceDisproven

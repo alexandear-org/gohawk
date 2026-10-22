@@ -28,55 +28,27 @@ func hyruleparameterIsViewRecognize(harg0 struct {
 		hv6 := harg0.P5
 		_ = hv6
 		// Rule View (internal/analysis/passes/lifecyclefacts/rules/returned_view.rules:25).
-		var hv12 *hyruleImport0.Function = hv1
-		var hv13 hyruleImport0.Value = hv2
-		hv7 := parameterReturnedUnchangedOnEveryReturn(hv12, hv13)
-		_ = hv7
-		var hv14 struct{ V0 bool }
-		switch hv7 {
-		case false:
-			var hv15 *hyruleImport0.Function = hv1
-			var hv16 hyruleImport0.Value = hv2
-			hv8 := parameterMayBeReleased(hv15, hv16)
-			_ = hv8
-			var hv17 struct{ V0 bool }
-			switch hv8 {
-			case false:
-				var hv18 hyruleImport0.Value = hv2
-				hv9 := parameterCanRelease(hv18)
-				_ = hv9
-				var hv19 struct{ V0 bool }
-				switch hv9 {
-				case true:
-					var hv20 hyruleImport1.Type = hv3
-					hv10 := typeCanRelease(hv20)
-					_ = hv10
-					var hv21 struct{ V0 bool }
-					switch hv10 {
-					case true:
-						var hv22 hyruleImport0.Value = hv2
-						var hv23 *hyruleImport1.Struct = hv4
-						var hv24 FieldMask = hv5
-						var hv25 bool = hv6
-						hv11 := unreleasedStoredField(hv22, hv23, hv24, hv25)
-						_ = hv11
-						hv21 = struct{ V0 bool }{V0: hv11}
-					case false:
-						hv21 = struct{ V0 bool }{V0: true}
-					}
-					hv19 = hv21
-				case false:
-					hv19 = struct{ V0 bool }{V0: true}
-				}
-				hv17 = hv19
-			case true:
-				hv17 = struct{ V0 bool }{V0: false}
-			}
-			hv14 = hv17
-		case true:
-			hv14 = struct{ V0 bool }{V0: false}
+		var hv7 bool = parameterReturnedUnchangedOnEveryReturn(hv1, hv2)
+		if !hv7 {
+			hv7 = parameterMayBeReleased(hv1, hv2)
 		}
-		return hv14, true
+		var hv8 struct{ V0 bool }
+		if hv7 {
+			hv8 = struct{ V0 bool }{V0: false}
+		} else {
+			var hv9 bool = parameterCanRelease(hv2)
+			if hv9 {
+				hv9 = typeCanRelease(hv3)
+			}
+			var hv10 struct{ V0 bool }
+			if !(hv9) {
+				hv10 = struct{ V0 bool }{V0: true}
+			} else {
+				hv10 = struct{ V0 bool }{V0: unreleasedStoredField(hv2, hv4, hv5, hv6)}
+			}
+			hv8 = hv10
+		}
+		return hv8, true
 	}
 }
 func parameterIsView(hparam0 *hyruleImport0.Function, hparam1 hyruleImport0.Value, hparam2 hyruleImport1.Type, hparam3 *hyruleImport1.Struct, hparam4 FieldMask, hparam5 bool) bool {

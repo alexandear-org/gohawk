@@ -3,7 +3,6 @@
 package recognition
 
 import hyruleImport0 "github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts/admission"
-import hyruleImport2 "go/types"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruleResourceReferenceRecognize applies rules in source order; false means no rule matched.
@@ -45,101 +44,77 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				{
-					var hv5 hyruleImport2.Type = (referenceValue).Type(hv4)
-					_ = hv5
-					// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
-					return struct {
-						V0 ReferenceKind
-						V1 hyruleImport1.Value
-						V2 bool
-					}{V0: ReferenceExact, V1: hv4, V2: hyruleImport0.CancellationType(hv5)}, true
-				}
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				return struct {
+					V0 ReferenceKind
+					V1 hyruleImport1.Value
+					V2 bool
+				}{V0: ReferenceExact, V1: hv4, V2: hyruleImport0.CancellationType((referenceValue).Type(hv4))}, true
 			}
 		case *hyruleImport1.FreeVar:
 			if hs1 != nil {
-				hv6 := hs1
-				_ = hv6
-				{
-					var hv7 hyruleImport2.Type = (referenceValue).Type(hv6)
-					_ = hv7
-					// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
-					return struct {
-						V0 ReferenceKind
-						V1 hyruleImport1.Value
-						V2 bool
-					}{V0: ReferenceExact, V1: hv6, V2: hyruleImport0.CancellationType(hv7)}, true
-				}
+				hv5 := hs1
+				_ = hv5
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				return struct {
+					V0 ReferenceKind
+					V1 hyruleImport1.Value
+					V2 bool
+				}{V0: ReferenceExact, V1: hv5, V2: hyruleImport0.CancellationType((referenceValue).Type(hv5))}, true
 			}
 		case *hyruleImport1.MakeChan:
 			if hs1 != nil {
-				hv8 := hs1
-				_ = hv8
-				{
-					var hv9 hyruleImport2.Type = (referenceValue).Type(hv8)
-					_ = hv9
-					// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
-					return struct {
-						V0 ReferenceKind
-						V1 hyruleImport1.Value
-						V2 bool
-					}{V0: ReferenceExact, V1: hv8, V2: hyruleImport0.CancellationType(hv9)}, true
-				}
+				hv6 := hs1
+				_ = hv6
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				return struct {
+					V0 ReferenceKind
+					V1 hyruleImport1.Value
+					V2 bool
+				}{V0: ReferenceExact, V1: hv6, V2: hyruleImport0.CancellationType((referenceValue).Type(hv6))}, true
 			}
 		case *hyruleImport1.Alloc:
 			if hs1 != nil {
-				hv10 := hs1
-				_ = hv10
+				hv7 := hs1
+				_ = hv7
 				{
-					var hv11 hyruleImport2.Type = (referenceValue).Type(hv10)
-					_ = hv11
-					{
-						if hyruleImport0.SynchronizationPointer(hv11) {
-							// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:46).
-							return struct {
-								V0 ReferenceKind
-								V1 hyruleImport1.Value
-								V2 bool
-							}{V0: ReferenceExact, V1: hv10, V2: false}, true
-						}
+					if hyruleImport0.SynchronizationPointer((referenceValue).Type(hv7)) {
+						// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:44).
+						return struct {
+							V0 ReferenceKind
+							V1 hyruleImport1.Value
+							V2 bool
+						}{V0: ReferenceExact, V1: hv7, V2: false}, true
 					}
 				}
 			}
 		case *hyruleImport1.Global:
 			if hs1 != nil {
-				hv12 := hs1
-				_ = hv12
+				hv8 := hs1
+				_ = hv8
 				{
-					var hv13 hyruleImport2.Type = (referenceValue).Type(hv12)
-					_ = hv13
-					{
-						if hyruleImport0.MutexPointer(hv13) {
-							// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:55).
-							return struct {
-								V0 ReferenceKind
-								V1 hyruleImport1.Value
-								V2 bool
-							}{V0: ReferenceAddress, V1: hv12, V2: false}, true
-						}
+					if hyruleImport0.MutexPointer((referenceValue).Type(hv8)) {
+						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:52).
+						return struct {
+							V0 ReferenceKind
+							V1 hyruleImport1.Value
+							V2 bool
+						}{V0: ReferenceAddress, V1: hv8, V2: false}, true
 					}
 				}
 			}
 		case *hyruleImport1.FieldAddr:
 			if hs1 != nil {
-				hv14 := hs1
-				_ = hv14
+				hv9 := hs1
+				_ = hv9
 				{
-					var hv15 hyruleImport2.Type = (referenceValue).Type(hv14)
-					_ = hv15
-					{
-						if hyruleImport0.MutexPointer(hv15) {
-							// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:55).
-							return struct {
-								V0 ReferenceKind
-								V1 hyruleImport1.Value
-								V2 bool
-							}{V0: ReferenceAddress, V1: hv14, V2: false}, true
-						}
+					if hyruleImport0.MutexPointer((referenceValue).Type(hv9)) {
+						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:52).
+						return struct {
+							V0 ReferenceKind
+							V1 hyruleImport1.Value
+							V2 bool
+						}{V0: ReferenceAddress, V1: hv9, V2: false}, true
 					}
 				}
 			}

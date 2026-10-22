@@ -1,15 +1,13 @@
 signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
 
 host
-  direct! = cancellationClassifier.recognizedDirectAction
-  call! = cancellationClassifier.recognizedCallAction
+  direct! = recognizeCancellationDirect
+  call! = recognizeCancellationCall
 
 @Recognized
 rewrite (inputs instruction classifier common) =
-  case direct classifier instruction common of
+  case direct instruction classifier common of
     Decided (label: label) -> outputs label true
     Unrecognized() -> do
-      result <- call classifier instruction common
-      case result of
-        Decided() -> result
-        Unrecognized() -> result
+      result <- call instruction classifier common
+      result

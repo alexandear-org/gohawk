@@ -7,9 +7,9 @@ host
   completion! = LifecycleEvidence.completionEvidence
   captured! = LifecycleEvidence.capturedCompletionEvidence
   transfer! = LifecycleEvidence.transferEvidence
-  proven! = Proof.Proven
-  known! = Proof.Known
-  abandonedSearch!
+  proven = Proof.Proven
+  known = Proof.Known
+  abandonedSearch
   selectedEvidenceMask!
   ordinaryEvidenceMask!
   requestedMethod!

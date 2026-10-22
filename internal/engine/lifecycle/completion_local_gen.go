@@ -36,43 +36,40 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 			_ = hv7
 			if hv6 == localCallback {
 				// Rule Callback (internal/engine/lifecycle/rules/completion_local.rules:30).
-				var hv18 struct {
+				var hv17 struct {
 					V0 string
 					V1 bool
 					V2 bool
 				}
-				hv18answered := false
-				if !hv18answered {
-					var hv19 *hyruleImport1.CallCommon = hv5
-					var hv20 hyruleImport1.Value = hv7
-					hv8 := callbackInvoked(hv19, hv20)
+				hv17answered := false
+				if !hv17answered {
+					hv8 := callbackInvoked(hv5, hv7)
 					_ = hv8
-					var hv21 struct {
+					var hv18 struct {
 						V0 string
 						V1 bool
 						V2 bool
 					}
 					switch hv8 {
 					case true:
-						hv18answered = true
-						hv21 = struct {
+						hv17answered = true
+						hv18 = struct {
 							V0 string
 							V1 bool
 							V2 bool
 						}{V0: "", V1: false, V2: true}
 					}
-					if hv18answered {
-						hv18 = hv21
+					if hv17answered {
+						hv17 = hv18
 					}
 				}
-				if !hv18answered {
-					var hv22 *completionSearch = hv1
-					hv9 := (*completionSearch).forCallback(hv22)
+				if !hv17answered {
+					hv9 := (*completionSearch).forCallback(hv1)
 					_ = hv9
-					var hv23 *completionSearch = hv9
-					var hv24 hyruleImport1.Instruction = hv2
-					var hv25 hyruleImport1.Value = hv7
-					hv10 := (*completionSearch).completes(hv23, hv24, hv25)
+					var hv19 *completionSearch = hv9
+					var hv20 hyruleImport1.Instruction = hv2
+					var hv21 hyruleImport1.Value = hv7
+					hv10 := (*completionSearch).completes(hv19, hv20, hv21)
 					_ = hv10
 					if !hyrulehyrulerecognizeLocalCompletionRecognizeUnion0Valid(hv10) {
 						var zero struct {
@@ -82,42 +79,42 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 						}
 						return zero, false
 					}
-					var hv26 struct {
+					var hv22 struct {
 						V0 string
 						V1 bool
 						V2 bool
 					}
 					switch hv10.proven {
 					case true:
-						hv18answered = true
-						hv26 = struct {
+						hv17answered = true
+						hv22 = struct {
 							V0 string
 							V1 bool
 							V2 bool
 						}{V0: "", V1: false, V2: true}
 					case false:
-						hv18answered = true
-						hv26 = struct {
+						hv17answered = true
+						hv22 = struct {
 							V0 string
 							V1 bool
 							V2 bool
 						}{V0: "", V1: false, V2: false}
 					}
-					if hv18answered {
-						hv18 = hv26
+					if hv17answered {
+						hv17 = hv22
 					}
 				}
-				if !hv18answered {
-					hv18answered = true
-					if hv18answered {
-						hv18 = struct {
+				if !hv17answered {
+					hv17answered = true
+					if hv17answered {
+						hv17 = struct {
 							V0 string
 							V1 bool
 							V2 bool
 						}{V0: "", V1: false, V2: false}
 					}
 				}
-				return hv18, true
+				return hv17, true
 			}
 		}
 		{
@@ -129,41 +126,38 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 			hv10 := hs2
 			_ = hv10
 			// Rule Nested (internal/engine/lifecycle/rules/completion_local.rules:49).
-			var hv27 struct {
+			var hv23 struct {
 				V0 string
 				V1 bool
 				V2 bool
 			}
-			hv27answered := false
-			if !hv27answered {
-				var hv28 *completionSearch = hv1
-				var hv29 *hyruleImport1.CallCommon = hv5
-				var hv30 mappedLocal = hv10
-				hv11 := (*completionSearch).exactLocalInvoked(hv28, hv29, hv30)
+			hv23answered := false
+			if !hv23answered {
+				hv11 := (*completionSearch).exactLocalInvoked(hv1, hv5, hv10)
 				_ = hv11
-				var hv31 struct {
+				var hv24 struct {
 					V0 string
 					V1 bool
 					V2 bool
 				}
 				switch hv11 {
 				case true:
-					hv27answered = true
-					hv31 = struct {
+					hv23answered = true
+					hv24 = struct {
 						V0 string
 						V1 bool
 						V2 bool
 					}{V0: "", V1: false, V2: true}
 				}
-				if hv27answered {
-					hv27 = hv31
+				if hv23answered {
+					hv23 = hv24
 				}
 			}
-			if !hv27answered {
-				var hv32 *completionSearch = hv1
-				var hv33 hyruleImport1.Instruction = hv2
-				var hv34 hyruleImport1.Value = hv9
-				hv12 := (*completionSearch).completes(hv32, hv33, hv34)
+			if !hv23answered {
+				var hv25 *completionSearch = hv1
+				var hv26 hyruleImport1.Instruction = hv2
+				var hv27 hyruleImport1.Value = hv9
+				hv12 := (*completionSearch).completes(hv25, hv26, hv27)
 				_ = hv12
 				if !hyrulehyrulerecognizeLocalCompletionRecognizeUnion0Valid(hv12) {
 					var zero struct {
@@ -173,7 +167,7 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 					}
 					return zero, false
 				}
-				var hv35 struct {
+				var hv28 struct {
 					V0 string
 					V1 bool
 					V2 bool
@@ -182,11 +176,11 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 				case true:
 					hv13 := hv12.paths
 					_ = hv13
-					var hv36 *completionSearch = hv1
-					var hv37 mappedLocal = hv10
-					var hv38 hyruleImport1.Value = hv4
-					var hv39 hyruleImport0.Paths = hv13
-					hv14part0, hv14part1 := (*completionSearch).mappedCompletionPath(hv36, hv37, hv38, hv39)
+					var hv29 *completionSearch = hv1
+					var hv30 mappedLocal = hv10
+					var hv31 hyruleImport1.Value = hv4
+					var hv32 hyruleImport0.Paths = hv13
+					hv14part0, hv14part1 := (*completionSearch).mappedCompletionPath(hv29, hv30, hv31, hv32)
 					hv14 := struct {
 						V0 string
 						V1 bool
@@ -200,7 +194,7 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 						}
 						return zero, false
 					}
-					var hv40 struct {
+					var hv33 struct {
 						V0 string
 						V1 bool
 						V2 bool
@@ -209,8 +203,8 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 					case true:
 						hv15 := hv14.V0
 						_ = hv15
-						hv27answered = true
-						hv40 = struct {
+						hv23answered = true
+						hv33 = struct {
 							V0 string
 							V1 bool
 							V2 bool
@@ -218,64 +212,54 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 					case false:
 						hv16 := hv14.V0
 						_ = hv16
-						var hv41 mappedLocal = hv10
-						hv17 := (mappedLocal).requiresNestedPath(hv41)
-						_ = hv17
-						var hv42 struct {
+						var hv34 struct {
 							V0 string
 							V1 bool
 							V2 bool
 						}
-						switch hv17 {
-						case false:
-							hv27answered = true
-							hv42 = struct {
-								V0 string
-								V1 bool
-								V2 bool
-							}{V0: hv16, V1: false, V2: true}
-						case true:
-							hv27answered = true
-							hv42 = struct {
+						if (mappedLocal).requiresNestedPath(hv10) {
+							hv23answered = true
+							hv34 = struct {
 								V0 string
 								V1 bool
 								V2 bool
 							}{V0: "", V1: false, V2: false}
+						} else {
+							hv23answered = true
+							hv34 = struct {
+								V0 string
+								V1 bool
+								V2 bool
+							}{V0: hv16, V1: false, V2: true}
 						}
-						hv40 = hv42
+						hv33 = hv34
 					}
-					hv35 = hv40
+					hv28 = hv33
 				case false:
-					hv27answered = true
-					hv35 = struct {
+					hv23answered = true
+					hv28 = struct {
 						V0 string
 						V1 bool
 						V2 bool
 					}{V0: "", V1: false, V2: false}
 				}
-				if hv27answered {
-					hv27 = hv35
+				if hv23answered {
+					hv23 = hv28
 				}
 			}
-			if !hv27answered {
-				hv27answered = true
-				if hv27answered {
-					hv27 = struct {
+			if !hv23answered {
+				hv23answered = true
+				if hv23answered {
+					hv23 = struct {
 						V0 string
 						V1 bool
 						V2 bool
 					}{V0: "", V1: false, V2: false}
 				}
 			}
-			return hv27, true
+			return hv23, true
 		}
 	}
-	var zero struct {
-		V0 string
-		V1 bool
-		V2 bool
-	}
-	return zero, false
 }
 func hyrulehyrulerecognizeLocalCompletionRecognizeUnion0Valid(value completionAnswer) bool {
 	switch value.proven {

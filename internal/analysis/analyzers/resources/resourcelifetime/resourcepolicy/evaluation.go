@@ -79,10 +79,6 @@ func (p Prepared) Unknown() bool { return p.State == proofs.EvidenceUnknown }
 // Reportable distinguishes a diagnostic witness from accepted or opaque flow.
 func (p Decision) Reportable() bool { return p.State == proofs.EvidenceProven }
 
-func noBoundary(reason Reason) bool       { return reason == None }
-func exitReclaimed(e ExitEvidence) bool   { return e.Reclaimed }
-func exitInterrupted(e ExitEvidence) bool { return e.Exhausted }
-
 type (
 	evaluationSignature  func(EvaluationQueries) Decision
 	acquisitionSignature func(AcquisitionQueries) Decision

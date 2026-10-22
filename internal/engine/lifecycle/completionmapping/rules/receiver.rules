@@ -5,7 +5,6 @@ host
   possible
   samePath
   nonempty
-  hasPath! = nonempty
   relativePath!
   mirrored!
   exactReceiver! = ExactReceiver
@@ -29,7 +28,7 @@ rewrite (inputs (Exact (local: local, path: path)) receiver _ budget)
     MissingPath() -> case derives receiver local budget of
       true -> outputs possible()
       false -> outputs (matching false)
-    KnownPath (path: actual) -> case hasPath actual of
+    KnownPath (path: actual) -> case nonempty actual of
       true -> outputs (matching (samePath actual path))
       false -> do
         match <- derives receiver local budget

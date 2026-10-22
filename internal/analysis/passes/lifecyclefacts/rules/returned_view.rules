@@ -1,11 +1,11 @@
 signature total = outputs false
 
 host
-  unchanged! = parameterReturnedUnchangedOnEveryReturn
-  released! = parameterMayBeReleased
-  capable! = typeCanRelease
-  parameterCapable! = parameterCanRelease
-  fields! = unreleasedStoredField
+  unchanged = parameterReturnedUnchangedOnEveryReturn
+  mayRelease = parameterMayBeReleased
+  capable = typeCanRelease
+  parameterCapable = parameterCanRelease
+  fields = unreleasedStoredField
 
 // Returning the same value under the same static type preserves the
 // caller-visible owner rather than hiding it behind a view. This is the
@@ -24,18 +24,8 @@ host
 // Close that closes its own decompressor.
 @View
 rewrite (inputs function parameter result structure released methodsKnown) =
-  do
-    false <- unchanged function parameter
-      else
-        true -> outputs false
-    false <- released function parameter
-      else
-        true -> outputs false
-    true <- parameterCapable parameter
-      else
-        false -> outputs true
-    true <- capable result
-      else
-        false -> outputs true
-    view <- fields parameter structure released methodsKnown
-    outputs view
+  if unchanged function parameter || mayRelease function parameter
+    then outputs false
+    else if not (parameterCapable parameter && capable result)
+    then outputs true
+    else outputs (fields parameter structure released methodsKnown)

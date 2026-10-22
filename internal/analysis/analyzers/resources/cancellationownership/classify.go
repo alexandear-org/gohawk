@@ -46,33 +46,6 @@ func (classifier *cancellationClassifier) classifyAction(instruction ssa.Instruc
 	return classifyCancellation(instruction, classifier)
 }
 
-func (classifier *cancellationClassifier) recognizedAction(
-	instruction ssa.Instruction,
-	common *ssa.CallCommon,
-) (cancellationLabel, bool) {
-	return recognizeCancellation(instruction, classifier, common)
-}
-
-func (classifier *cancellationClassifier) recognizedDirectAction(
-	instruction ssa.Instruction,
-	common *ssa.CallCommon,
-) (cancellationLabel, bool) {
-	return recognizeCancellationDirect(instruction, classifier, common)
-}
-
-func (classifier *cancellationClassifier) recognizedCallAction(
-	instruction ssa.Instruction,
-	common *ssa.CallCommon,
-) (cancellationLabel, bool) {
-	return recognizeCancellationCall(instruction, classifier, common)
-}
-
-// exactArgumentAction labels a call that passes the exact cancel function
-// as an argument: launched, proven called, or undecided.
-func (classifier *cancellationClassifier) exactArgumentAction(instruction ssa.Instruction) (cancellationLabel, bool) {
-	return recognizeCancellationArgument(instruction, classifier)
-}
-
 func deferredClosureCaptures(instruction ssa.Instruction, target ssa.Value) bool {
 	if _, ok := instruction.(*ssa.Defer); !ok {
 		return false

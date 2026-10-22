@@ -8,8 +8,6 @@ host
   held! = MissingQueries.Held
   caller! = MissingQueries.Caller
   returns! = MissingQueries.Returns
-  unavailable! = Answer.Unavailable
-  holds! = Answer.Holds
   LoadedAcquisitionGuardUnknown
   PrivateMutexOnly
   ReleaseOwnershipUnknown
@@ -24,35 +22,37 @@ rewrite (inputs queries) =
   do
     true <- spend queries
       else
-        false -> outputs (Unknown (reason: ^LockStateBudgetExhausted))
+        false -> exhausted
     false <- uncertain queries
       else
         true -> outputs (Unknown (reason: ^LoadedAcquisitionGuardUnknown))
     private <- private queries
-    false <- unavailable private
+    false <- private.Exhausted
       else
-        true -> outputs (Unknown (reason: ^LockStateBudgetExhausted))
-    false <- holds private
+        true -> exhausted
+    false <- private.Proven
       else
         true -> outputs (Accepted (reason: ^PrivateMutexOnly))
     true <- released queries
       else
         false -> outputs (Unknown (reason: ^ReleaseOwnershipUnknown))
     held <- held queries
-    false <- unavailable held
+    false <- held.Exhausted
       else
-        true -> outputs (Unknown (reason: ^LockStateBudgetExhausted))
-    false <- holds held
+        true -> exhausted
+    false <- held.Proven
       else
         true -> outputs (Accepted (reason: held.Reason))
     caller <- caller queries
-    false <- unavailable caller
+    false <- caller.Exhausted
       else
-        true -> outputs (Unknown (reason: ^LockStateBudgetExhausted))
-    false <- holds caller
+        true -> exhausted
+    false <- caller.Proven
       else
         true -> outputs (Accepted (reason: caller.Reason))
     true <- returns queries
       else
         false -> outputs (Accepted (reason: ^None))
     outputs (Reported (reason: ^UnreleasedReturn))
+  where
+    exhausted = outputs (Unknown (reason: ^LockStateBudgetExhausted))

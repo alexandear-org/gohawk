@@ -23,14 +23,10 @@ rewrite (inputs provider value literal block budget)
       Known() -> answer
       Unknown() -> do
         paired <- paired provider value block budget
-        case paired of
-          Known() -> paired
-          Unknown() -> paired
+        paired
 
 @OtherComparison
 rewrite (inputs provider value literal _ budget) =
   do
     answer <- literal provider value literal budget
-    case answer of
-      Known() -> answer
-      Unknown() -> answer
+    answer

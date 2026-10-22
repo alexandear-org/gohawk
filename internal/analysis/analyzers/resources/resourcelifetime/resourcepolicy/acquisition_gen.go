@@ -9,7 +9,7 @@ func hyruleAcquireRecognize(harg0 struct{ P0 AcquisitionQueries }) (struct{ V0 D
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Acquisition (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/acquisition.rules:22).
+		// Rule Acquisition (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/acquisition.rules:21).
 		var hv15 AcquisitionQueries = hv1
 		hv2 := (AcquisitionQueries).Error(hv15)
 		_ = hv2
@@ -17,118 +17,114 @@ func hyruleAcquireRecognize(harg0 struct{ P0 AcquisitionQueries }) (struct{ V0 D
 			var zero struct{ V0 Decision }
 			return zero, false
 		}
-		var hv16 PairedError = hv2
-		hv3 := (PairedError).Unknown(hv16)
+		hv3 := (PairedError).Unknown(hv2)
 		_ = hv3
-		var hv17 struct{ V0 Decision }
+		var hv16 struct{ V0 Decision }
 		switch hv3 {
 		case false:
-			var hv18 AcquisitionQueries = hv1
-			hv4 := (AcquisitionQueries).Boundary(hv18)
+			var hv17 AcquisitionQueries = hv1
+			hv4 := (AcquisitionQueries).Boundary(hv17)
 			_ = hv4
-			var hv19 Reason = hv4
-			hv5 := noBoundary(hv19)
+			hv5 := (hv4 == None)
 			_ = hv5
-			var hv20 struct{ V0 Decision }
+			var hv18 struct{ V0 Decision }
 			switch hv5 {
 			case true:
-				var hv21 AcquisitionQueries = hv1
-				hv6 := (AcquisitionQueries).Canceled(hv21)
+				var hv19 AcquisitionQueries = hv1
+				hv6 := (AcquisitionQueries).Canceled(hv19)
 				_ = hv6
 				if !hyrulehyruleAcquireRecognizeUnion4Valid(hv6) {
 					var zero struct{ V0 Decision }
 					return zero, false
 				}
-				var hv22 struct{ V0 Decision }
+				var hv20 struct{ V0 Decision }
 				switch hv6.State {
 				case evidenceDisproven:
-					var hv23 AcquisitionQueries = hv1
-					var hv24 hyruleImport0.Value = hv2.Value
-					hv7 := (AcquisitionQueries).Asserted(hv23, hv24)
+					var hv21 AcquisitionQueries = hv1
+					var hv22 hyruleImport0.Value = hv2.Value
+					hv7 := (AcquisitionQueries).Asserted(hv21, hv22)
 					_ = hv7
 					if !hyrulehyruleAcquireRecognizeUnion4Valid(hv7) {
 						var zero struct{ V0 Decision }
 						return zero, false
 					}
-					var hv25 struct{ V0 Decision }
+					var hv23 struct{ V0 Decision }
 					switch hv7.State {
 					case evidenceDisproven:
-						var hv26 AcquisitionQueries = hv1
-						var hv27 hyruleImport0.Value = hv2.Value
-						hv8 := (AcquisitionQueries).Optional(hv26, hv27)
+						var hv24 AcquisitionQueries = hv1
+						var hv25 hyruleImport0.Value = hv2.Value
+						hv8 := (AcquisitionQueries).Optional(hv24, hv25)
 						_ = hv8
 						if !hyrulehyruleAcquireRecognizeUnion2Valid(hv8) {
 							var zero struct{ V0 Decision }
 							return zero, false
 						}
-						var hv28 Correlation = hv8
-						hv9 := (Correlation).Unknown(hv28)
+						hv9 := (Correlation).Unknown(hv8)
 						_ = hv9
-						var hv29 struct{ V0 Decision }
+						var hv26 struct{ V0 Decision }
 						switch hv9 {
 						case false:
-							var hv30 Initialization = hv8.Initialize
-							hv10 := (Initialization).Prepare(hv30)
+							var hv27 Initialization = hv8.Initialize
+							hv10 := (Initialization).Prepare(hv27)
 							_ = hv10
 							if !hyrulehyruleAcquireRecognizeUnion3Valid(hv10) {
 								var zero struct{ V0 Decision }
 								return zero, false
 							}
-							var hv31 Prepared = hv10
-							hv11 := (Prepared).Unknown(hv31)
+							hv11 := (Prepared).Unknown(hv10)
 							_ = hv11
-							var hv32 struct{ V0 Decision }
+							var hv28 struct{ V0 Decision }
 							switch hv11 {
 							case false:
-								var hv33 FlowQueries = hv10.Queries
-								var hv34 hyruleImport0.Value = hv2.Value
-								hv12 := Finalize(hv33, hv34)
+								var hv29 FlowQueries = hv10.Queries
+								var hv30 hyruleImport0.Value = hv2.Value
+								hv12 := Finalize(hv29, hv30)
 								_ = hv12
 								if !hyrulehyruleAcquireRecognizeUnion0Valid(hv12) {
 									var zero struct{ V0 Decision }
 									return zero, false
 								}
-								hv32 = struct{ V0 Decision }{V0: hv12}
+								hv28 = struct{ V0 Decision }{V0: hv12}
 							case true:
-								var hv35 Decision = Decision{State: evidenceUnknown, Reason: hv10.Reason}
-								hv32 = struct{ V0 Decision }{V0: hv35}
+								var hv31 Decision = Decision{State: evidenceUnknown, Reason: hv10.Reason}
+								hv28 = struct{ V0 Decision }{V0: hv31}
 							}
-							hv29 = hv32
+							hv26 = hv28
 						case true:
-							var hv36 Decision = Decision{State: evidenceUnknown, Reason: hv8.Reason}
-							hv29 = struct{ V0 Decision }{V0: hv36}
+							var hv32 Decision = Decision{State: evidenceUnknown, Reason: hv8.Reason}
+							hv26 = struct{ V0 Decision }{V0: hv32}
 						}
-						hv25 = hv29
+						hv23 = hv26
 					case evidenceUnknown:
 						hv13 := hv7.Reason
 						_ = hv13
-						var hv37 Decision = Decision{State: evidenceUnknown, Reason: hv13}
-						hv25 = struct{ V0 Decision }{V0: hv37}
+						var hv33 Decision = Decision{State: evidenceUnknown, Reason: hv13}
+						hv23 = struct{ V0 Decision }{V0: hv33}
 					case evidenceProven:
-						var hv38 Decision = Decision{State: evidenceDisproven, Reason: ReleaseProven}
-						hv25 = struct{ V0 Decision }{V0: hv38}
+						var hv34 Decision = Decision{State: evidenceDisproven, Reason: ReleaseProven}
+						hv23 = struct{ V0 Decision }{V0: hv34}
 					}
-					hv22 = hv25
+					hv20 = hv23
 				case evidenceUnknown:
 					hv14 := hv6.Reason
 					_ = hv14
-					var hv39 Decision = Decision{State: evidenceUnknown, Reason: hv14}
-					hv22 = struct{ V0 Decision }{V0: hv39}
+					var hv35 Decision = Decision{State: evidenceUnknown, Reason: hv14}
+					hv20 = struct{ V0 Decision }{V0: hv35}
 				case evidenceProven:
-					var hv40 Decision = Decision{State: evidenceDisproven, Reason: CanceledAcquisition}
-					hv22 = struct{ V0 Decision }{V0: hv40}
+					var hv36 Decision = Decision{State: evidenceDisproven, Reason: CanceledAcquisition}
+					hv20 = struct{ V0 Decision }{V0: hv36}
 				}
-				hv20 = hv22
+				hv18 = hv20
 			case false:
-				var hv41 Decision = Decision{State: evidenceUnknown, Reason: hv4}
-				hv20 = struct{ V0 Decision }{V0: hv41}
+				var hv37 Decision = Decision{State: evidenceUnknown, Reason: hv4}
+				hv18 = struct{ V0 Decision }{V0: hv37}
 			}
-			hv17 = hv20
+			hv16 = hv18
 		case true:
-			var hv42 Decision = Decision{State: evidenceUnknown, Reason: hv2.Reason}
-			hv17 = struct{ V0 Decision }{V0: hv42}
+			var hv38 Decision = Decision{State: evidenceUnknown, Reason: hv2.Reason}
+			hv16 = struct{ V0 Decision }{V0: hv38}
 		}
-		hresult := hv17
+		hresult := hv16
 		if !hyrulehyruleAcquireRecognizeRecord12Valid(hresult) {
 			var zero struct{ V0 Decision }
 			return zero, false
@@ -220,8 +216,8 @@ func hyrulehyruleAcquireRecognizeRecord12Valid(value struct{ V0 Decision }) bool
 func Acquire(hparam0 AcquisitionQueries) Decision {
 	hvalue, hok := hyruleAcquireRecognize(struct{ P0 AcquisitionQueries }{P0: hparam0})
 	if !hok {
-		var hv43 Decision = Decision{State: evidenceUnknown, Reason: EvidenceUnavailable}
-		hvalue = struct{ V0 Decision }{V0: hv43}
+		var hv39 Decision = Decision{State: evidenceUnknown, Reason: EvidenceUnavailable}
+		hvalue = struct{ V0 Decision }{V0: hv39}
 	}
 	return hvalue.V0
 }

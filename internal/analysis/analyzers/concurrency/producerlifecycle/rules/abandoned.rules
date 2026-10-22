@@ -8,9 +8,7 @@ host
   callerReturns!
   countProducerSends!
   channelReceives!
-  producerExceeds!
-  zeroReceives!
-  known! = producerProof.Known
+  known = producerProof.Known
   producerUnknown
   producerProven
   producerDisproven
@@ -36,10 +34,10 @@ rewrite (inputs function send sends engine) =
     Known (count: receives, reason: _) <- channelReceives function send.channel send.spawn engine
       else
         Unknown (reason: reason) -> outputs (Producer (state: ^producerUnknown, reason: reason))
-    false <- zeroReceives receives
+    false <- receives == 0
       else
         true -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverObligationUnknown))
-    true <- producerExceeds count.count receives
+    true <- count.count > receives
       else
         false -> outputs (Producer (state: ^producerDisproven, reason: ^reasonProducerWithinReceiveCount))
     outputs (Producer (state: ^producerProven, reason: ^reasonProducerExceedsReceives))

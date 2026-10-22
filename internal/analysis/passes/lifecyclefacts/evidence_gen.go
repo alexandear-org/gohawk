@@ -26,36 +26,33 @@ func hyruledecideLifecycleEvidenceRecognize(harg0 struct {
 			var hv26 EvidenceRequest = hv3
 			hv6 := suppliedEvidence(hv26)
 			_ = hv6
-			var hv27 Proof = hv6
-			hv7 := (Proof).Proven(hv27)
+			hv7 := (Proof).Proven(hv6)
 			_ = hv7
-			var hv28 struct{ V0 evidenceAnswer }
+			var hv27 struct{ V0 evidenceAnswer }
 			switch hv7 {
 			case false:
-				var hv29 *LifecycleEvidence = hv2
-				var hv30 EvidenceRequest = hv3
-				var hv31 Proof = hv6
-				hv8 := (*LifecycleEvidence).completionEvidence(hv29, hv30, hv31)
+				var hv28 *LifecycleEvidence = hv2
+				var hv29 EvidenceRequest = hv3
+				var hv30 Proof = hv6
+				hv8 := (*LifecycleEvidence).completionEvidence(hv28, hv29, hv30)
 				_ = hv8
-				var hv32 Proof = hv8
-				hv9 := (Proof).Proven(hv32)
+				hv9 := (Proof).Proven(hv8)
 				_ = hv9
-				var hv33 struct{ V0 evidenceAnswer }
+				var hv31 struct{ V0 evidenceAnswer }
 				switch hv9 {
 				case false:
-					var hv34 *LifecycleEvidence = hv2
-					var hv35 EvidenceRequest = hv3
-					hv10 := (*LifecycleEvidence).capturedCompletionEvidence(hv34, hv35)
+					var hv32 *LifecycleEvidence = hv2
+					var hv33 EvidenceRequest = hv3
+					hv10 := (*LifecycleEvidence).capturedCompletionEvidence(hv32, hv33)
 					_ = hv10
-					var hv36 Proof = hv10
-					hv11 := (Proof).Proven(hv36)
+					hv11 := (Proof).Proven(hv10)
 					_ = hv11
-					var hv37 struct{ V0 evidenceAnswer }
+					var hv34 struct{ V0 evidenceAnswer }
 					switch hv11 {
 					case false:
-						var hv38 *LifecycleEvidence = hv2
-						var hv39 EvidenceRequest = hv3
-						hv12part0, hv12part1 := (*LifecycleEvidence).transferEvidence(hv38, hv39)
+						var hv35 *LifecycleEvidence = hv2
+						var hv36 EvidenceRequest = hv3
+						hv12part0, hv12part1 := (*LifecycleEvidence).transferEvidence(hv35, hv36)
 						hv12 := struct {
 							V0 Proof
 							V1 bool
@@ -65,112 +62,108 @@ func hyruledecideLifecycleEvidenceRecognize(harg0 struct {
 							var zero struct{ V0 evidenceAnswer }
 							return zero, false
 						}
-						var hv40 struct{ V0 evidenceAnswer }
+						var hv37 struct{ V0 evidenceAnswer }
 						switch hv12.V1 {
 						case true:
 							hv13 := hv12.V0
 							_ = hv13
-							var hv41 Proof = hv13
-							hv14 := (Proof).Proven(hv41)
+							hv14 := (Proof).Proven(hv13)
 							_ = hv14
-							var hv42 struct{ V0 evidenceAnswer }
+							var hv38 struct{ V0 evidenceAnswer }
 							switch hv14 {
 							case false:
-								var hv43 Proof = hv8
-								hv15 := abandonedSearch(hv43)
+								hv15 := abandonedSearch(hv8)
 								_ = hv15
-								var hv44 struct{ V0 evidenceAnswer }
+								var hv39 struct{ V0 evidenceAnswer }
 								switch hv15 {
 								case false:
-									var hv45 Proof = hv13
-									hv16 := (Proof).Known(hv45)
+									hv16 := (Proof).Known(hv13)
 									_ = hv16
-									var hv46 struct{ V0 evidenceAnswer }
+									var hv40 struct{ V0 evidenceAnswer }
 									switch hv16 {
 									case true:
-										var hv47 Proof = hv8
-										hv17 := (Proof).Known(hv47)
+										hv17 := (Proof).Known(hv8)
 										_ = hv17
-										var hv48 struct{ V0 evidenceAnswer }
+										var hv41 struct{ V0 evidenceAnswer }
 										switch hv17 {
 										case true:
-											var hv49 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
-											hv48 = struct{ V0 evidenceAnswer }{V0: hv49}
+											var hv42 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
+											hv41 = struct{ V0 evidenceAnswer }{V0: hv42}
 										case false:
-											var hv50 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
-											hv48 = struct{ V0 evidenceAnswer }{V0: hv50}
+											var hv43 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
+											hv41 = struct{ V0 evidenceAnswer }{V0: hv43}
 										}
-										hv46 = hv48
+										hv40 = hv41
 									case false:
-										var hv51 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
-										hv46 = struct{ V0 evidenceAnswer }{V0: hv51}
+										var hv44 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
+										hv40 = struct{ V0 evidenceAnswer }{V0: hv44}
 									}
-									hv44 = hv46
+									hv39 = hv40
 								case true:
-									var hv52 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
-									hv44 = struct{ V0 evidenceAnswer }{V0: hv52}
+									var hv45 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
+									hv39 = struct{ V0 evidenceAnswer }{V0: hv45}
 								}
-								hv42 = hv44
+								hv38 = hv39
 							case true:
-								var hv53 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
-								hv42 = struct{ V0 evidenceAnswer }{V0: hv53}
+								var hv46 evidenceAnswer = evidenceAnswer{proof: hv13, decided: true}
+								hv38 = struct{ V0 evidenceAnswer }{V0: hv46}
 							}
-							hv40 = hv42
+							hv37 = hv38
 						case false:
-							var hv54 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
-							hv40 = struct{ V0 evidenceAnswer }{V0: hv54}
+							var hv47 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
+							hv37 = struct{ V0 evidenceAnswer }{V0: hv47}
 						}
-						hv37 = hv40
+						hv34 = hv37
 					case true:
-						var hv55 evidenceAnswer = evidenceAnswer{proof: hv10, decided: true}
-						hv37 = struct{ V0 evidenceAnswer }{V0: hv55}
+						var hv48 evidenceAnswer = evidenceAnswer{proof: hv10, decided: true}
+						hv34 = struct{ V0 evidenceAnswer }{V0: hv48}
 					}
-					hv33 = hv37
+					hv31 = hv34
 				case true:
-					var hv56 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
-					hv33 = struct{ V0 evidenceAnswer }{V0: hv56}
+					var hv49 evidenceAnswer = evidenceAnswer{proof: hv8, decided: true}
+					hv31 = struct{ V0 evidenceAnswer }{V0: hv49}
 				}
-				hv28 = hv33
+				hv27 = hv31
 			case true:
-				var hv57 evidenceAnswer = evidenceAnswer{proof: hv6, decided: true}
-				hv28 = struct{ V0 evidenceAnswer }{V0: hv57}
+				var hv50 evidenceAnswer = evidenceAnswer{proof: hv6, decided: true}
+				hv27 = struct{ V0 evidenceAnswer }{V0: hv50}
 			}
-			return hv28, true
+			return hv27, true
 		}
 		if hv1 == importedEvidenceStage {
 			if hv5 == false {
 				// Rule ImportedMissing (internal/analysis/passes/lifecyclefacts/rules/evidence.rules:45).
-				var hv58 EvidenceRequest = hv3
-				hv18 := importedEvidenceRequested(hv58)
+				var hv51 EvidenceRequest = hv3
+				hv18 := importedEvidenceRequested(hv51)
 				_ = hv18
-				var hv59 struct{ V0 evidenceAnswer }
+				var hv52 struct{ V0 evidenceAnswer }
 				switch hv18 {
 				case true:
-					var hv60 Proof = unavailableEvidence()
-					var hv61 evidenceAnswer = evidenceAnswer{proof: hv60, decided: true}
-					hv59 = struct{ V0 evidenceAnswer }{V0: hv61}
+					var hv53 Proof = unavailableEvidence()
+					var hv54 evidenceAnswer = evidenceAnswer{proof: hv53, decided: true}
+					hv52 = struct{ V0 evidenceAnswer }{V0: hv54}
 				case false:
-					var hv62 Proof = emptyEvidence()
-					var hv63 evidenceAnswer = evidenceAnswer{proof: hv62, decided: false}
-					hv59 = struct{ V0 evidenceAnswer }{V0: hv63}
+					var hv55 Proof = emptyEvidence()
+					var hv56 evidenceAnswer = evidenceAnswer{proof: hv55, decided: false}
+					hv52 = struct{ V0 evidenceAnswer }{V0: hv56}
 				}
-				return hv59, true
+				return hv52, true
 			}
 			if hv5 == true {
 				// Rule Imported (internal/analysis/passes/lifecyclefacts/rules/evidence.rules:51).
-				var hv64 struct{ V0 evidenceAnswer }
-				hv64answered := false
-				if !hv64answered {
-					var hv65 EvidenceRequest = hv3
-					hv19 := selectedEvidenceRequested(hv65)
+				var hv57 struct{ V0 evidenceAnswer }
+				hv57answered := false
+				if !hv57answered {
+					var hv58 EvidenceRequest = hv3
+					hv19 := selectedEvidenceRequested(hv58)
 					_ = hv19
-					var hv66 struct{ V0 evidenceAnswer }
+					var hv59 struct{ V0 evidenceAnswer }
 					switch hv19 {
 					case true:
-						var hv67 *LifecycleEvidence = hv2
-						var hv68 EvidenceRequest = hv3
-						var hv69 Fact = hv4
-						hv20part0, hv20part1 := (*LifecycleEvidence).selectedMaskProof(hv67, hv68, hv69)
+						var hv60 *LifecycleEvidence = hv2
+						var hv61 EvidenceRequest = hv3
+						var hv62 Fact = hv4
+						hv20part0, hv20part1 := (*LifecycleEvidence).selectedMaskProof(hv60, hv61, hv62)
 						hv20 := struct {
 							V0 Proof
 							V1 bool
@@ -180,80 +173,80 @@ func hyruledecideLifecycleEvidenceRecognize(harg0 struct {
 							var zero struct{ V0 evidenceAnswer }
 							return zero, false
 						}
-						var hv70 struct{ V0 evidenceAnswer }
+						var hv63 struct{ V0 evidenceAnswer }
 						switch hv20.V1 {
 						case true:
 							hv21 := hv20.V0
 							_ = hv21
-							var hv71 evidenceAnswer = evidenceAnswer{proof: hv21, decided: true}
-							hv64answered = true
-							hv70 = struct{ V0 evidenceAnswer }{V0: hv71}
+							var hv64 evidenceAnswer = evidenceAnswer{proof: hv21, decided: true}
+							hv57answered = true
+							hv63 = struct{ V0 evidenceAnswer }{V0: hv64}
 						}
-						hv66 = hv70
+						hv59 = hv63
 					}
-					if hv64answered {
-						hv64 = hv66
+					if hv57answered {
+						hv57 = hv59
 					}
 				}
-				if !hv64answered {
-					var hv72 *LifecycleEvidence = hv2
-					var hv73 EvidenceRequest = hv3
-					var hv74 Fact = hv4
-					hv22 := receiverStoreEvidence(hv72, hv73, hv74)
+				if !hv57answered {
+					var hv65 *LifecycleEvidence = hv2
+					var hv66 EvidenceRequest = hv3
+					var hv67 Fact = hv4
+					hv22 := receiverStoreEvidence(hv65, hv66, hv67)
 					_ = hv22
-					var hv75 struct{ V0 evidenceAnswer }
+					var hv68 struct{ V0 evidenceAnswer }
 					switch hv22 {
 					case true:
-						var hv76 EvidenceRequest = hv3
-						hv23 := receiverEscapes(hv76)
+						var hv69 EvidenceRequest = hv3
+						hv23 := receiverEscapes(hv69)
 						_ = hv23
-						var hv77 struct{ V0 evidenceAnswer }
+						var hv70 struct{ V0 evidenceAnswer }
 						switch hv23 {
 						case true:
-							var hv78 EvidenceRequest = hv3
-							hv24 := requestedMethod(hv78)
+							var hv71 EvidenceRequest = hv3
+							hv24 := requestedMethod(hv71)
 							_ = hv24
-							var hv79 Proof = importedProof(reasonReceiverStoreTransfer, hv24)
-							var hv80 evidenceAnswer = evidenceAnswer{proof: hv79, decided: true}
-							hv64answered = true
-							hv77 = struct{ V0 evidenceAnswer }{V0: hv80}
+							var hv72 Proof = importedProof(reasonReceiverStoreTransfer, hv24)
+							var hv73 evidenceAnswer = evidenceAnswer{proof: hv72, decided: true}
+							hv57answered = true
+							hv70 = struct{ V0 evidenceAnswer }{V0: hv73}
 						case false:
-							var hv81 Proof = unescapedReceiverEvidence()
-							var hv82 evidenceAnswer = evidenceAnswer{proof: hv81, decided: true}
-							hv64answered = true
-							hv77 = struct{ V0 evidenceAnswer }{V0: hv82}
+							var hv74 Proof = unescapedReceiverEvidence()
+							var hv75 evidenceAnswer = evidenceAnswer{proof: hv74, decided: true}
+							hv57answered = true
+							hv70 = struct{ V0 evidenceAnswer }{V0: hv75}
 						}
-						hv75 = hv77
+						hv68 = hv70
 					}
-					if hv64answered {
-						hv64 = hv75
+					if hv57answered {
+						hv57 = hv68
 					}
 				}
-				if !hv64answered {
-					var hv83 EvidenceRequest = hv3
-					hv25 := importedEvidenceRequested(hv83)
+				if !hv57answered {
+					var hv76 EvidenceRequest = hv3
+					hv25 := importedEvidenceRequested(hv76)
 					_ = hv25
-					var hv84 struct{ V0 evidenceAnswer }
+					var hv77 struct{ V0 evidenceAnswer }
 					switch hv25 {
 					case true:
-						var hv85 Proof = unmatchedImportedEvidence()
-						var hv86 evidenceAnswer = evidenceAnswer{proof: hv85, decided: true}
-						hv64answered = true
-						hv84 = struct{ V0 evidenceAnswer }{V0: hv86}
+						var hv78 Proof = unmatchedImportedEvidence()
+						var hv79 evidenceAnswer = evidenceAnswer{proof: hv78, decided: true}
+						hv57answered = true
+						hv77 = struct{ V0 evidenceAnswer }{V0: hv79}
 					}
-					if hv64answered {
-						hv64 = hv84
-					}
-				}
-				if !hv64answered {
-					var hv87 Proof = emptyEvidence()
-					var hv88 evidenceAnswer = evidenceAnswer{proof: hv87, decided: false}
-					hv64answered = true
-					if hv64answered {
-						hv64 = struct{ V0 evidenceAnswer }{V0: hv88}
+					if hv57answered {
+						hv57 = hv77
 					}
 				}
-				return hv64, true
+				if !hv57answered {
+					var hv80 Proof = emptyEvidence()
+					var hv81 evidenceAnswer = evidenceAnswer{proof: hv80, decided: false}
+					hv57answered = true
+					if hv57answered {
+						hv57 = struct{ V0 evidenceAnswer }{V0: hv81}
+					}
+				}
+				return hv57, true
 			}
 		}
 	}
@@ -281,9 +274,9 @@ func decideLifecycleEvidence(hparam0 evidencePolicyStage, hparam1 *LifecycleEvid
 		P4 bool
 	}{P0: hparam0, P1: hparam1, P2: hparam2, P3: hparam3, P4: hparam4})
 	if !hok {
-		var hv89 Proof = emptyEvidence()
-		var hv90 evidenceAnswer = evidenceAnswer{proof: hv89, decided: false}
-		hvalue = struct{ V0 evidenceAnswer }{V0: hv90}
+		var hv82 Proof = emptyEvidence()
+		var hv83 evidenceAnswer = evidenceAnswer{proof: hv82, decided: false}
+		hvalue = struct{ V0 evidenceAnswer }{V0: hv83}
 	}
 	return hvalue.V0
 }

@@ -7,7 +7,7 @@ func hyruleMissingReleaseRecognize(harg0 struct{ P0 MissingQueries }) (struct{ V
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Missing (internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/missing.rules:22).
+		// Rule Missing (internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/missing.rules:20).
 		var hv15 MissingQueries = hv1
 		hv2 := (MissingQueries).Spend(hv15)
 		_ = hv2
@@ -23,110 +23,104 @@ func hyruleMissingReleaseRecognize(harg0 struct{ P0 MissingQueries }) (struct{ V
 				var hv19 MissingQueries = hv1
 				hv4 := (MissingQueries).Private(hv19)
 				_ = hv4
-				var hv20 Answer = hv4
-				hv5 := (Answer).Unavailable(hv20)
+				hv5 := hv4.Exhausted
 				_ = hv5
-				var hv21 struct{ V0 Proof }
+				var hv20 struct{ V0 Proof }
 				switch hv5 {
 				case false:
-					var hv22 Answer = hv4
-					hv6 := (Answer).Holds(hv22)
+					hv6 := hv4.Proven
 					_ = hv6
-					var hv23 struct{ V0 Proof }
+					var hv21 struct{ V0 Proof }
 					switch hv6 {
 					case false:
-						var hv24 MissingQueries = hv1
-						hv7 := (MissingQueries).Released(hv24)
+						var hv22 MissingQueries = hv1
+						hv7 := (MissingQueries).Released(hv22)
 						_ = hv7
-						var hv25 struct{ V0 Proof }
+						var hv23 struct{ V0 Proof }
 						switch hv7 {
 						case true:
-							var hv26 MissingQueries = hv1
-							hv8 := (MissingQueries).Held(hv26)
+							var hv24 MissingQueries = hv1
+							hv8 := (MissingQueries).Held(hv24)
 							_ = hv8
-							var hv27 Answer = hv8
-							hv9 := (Answer).Unavailable(hv27)
+							hv9 := hv8.Exhausted
 							_ = hv9
-							var hv28 struct{ V0 Proof }
+							var hv25 struct{ V0 Proof }
 							switch hv9 {
 							case false:
-								var hv29 Answer = hv8
-								hv10 := (Answer).Holds(hv29)
+								hv10 := hv8.Proven
 								_ = hv10
-								var hv30 struct{ V0 Proof }
+								var hv26 struct{ V0 Proof }
 								switch hv10 {
 								case false:
-									var hv31 MissingQueries = hv1
-									hv11 := (MissingQueries).Caller(hv31)
+									var hv27 MissingQueries = hv1
+									hv11 := (MissingQueries).Caller(hv27)
 									_ = hv11
-									var hv32 Answer = hv11
-									hv12 := (Answer).Unavailable(hv32)
+									hv12 := hv11.Exhausted
 									_ = hv12
-									var hv33 struct{ V0 Proof }
+									var hv28 struct{ V0 Proof }
 									switch hv12 {
 									case false:
-										var hv34 Answer = hv11
-										hv13 := (Answer).Holds(hv34)
+										hv13 := hv11.Proven
 										_ = hv13
-										var hv35 struct{ V0 Proof }
+										var hv29 struct{ V0 Proof }
 										switch hv13 {
 										case false:
-											var hv36 MissingQueries = hv1
-											hv14 := (MissingQueries).Returns(hv36)
+											var hv30 MissingQueries = hv1
+											hv14 := (MissingQueries).Returns(hv30)
 											_ = hv14
-											var hv37 struct{ V0 Proof }
+											var hv31 struct{ V0 Proof }
 											switch hv14 {
 											case true:
-												var hv38 Proof = Proof{State: provenState, Reason: UnreleasedReturn}
-												hv37 = struct{ V0 Proof }{V0: hv38}
+												var hv32 Proof = Proof{State: provenState, Reason: UnreleasedReturn}
+												hv31 = struct{ V0 Proof }{V0: hv32}
 											case false:
-												var hv39 Proof = Proof{State: disprovenState, Reason: None}
-												hv37 = struct{ V0 Proof }{V0: hv39}
+												var hv33 Proof = Proof{State: disprovenState, Reason: None}
+												hv31 = struct{ V0 Proof }{V0: hv33}
 											}
-											hv35 = hv37
+											hv29 = hv31
 										case true:
-											var hv40 Proof = Proof{State: disprovenState, Reason: hv11.Reason}
-											hv35 = struct{ V0 Proof }{V0: hv40}
+											var hv34 Proof = Proof{State: disprovenState, Reason: hv11.Reason}
+											hv29 = struct{ V0 Proof }{V0: hv34}
 										}
-										hv33 = hv35
+										hv28 = hv29
 									case true:
-										var hv41 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
-										hv33 = struct{ V0 Proof }{V0: hv41}
+										var hv35 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
+										hv28 = struct{ V0 Proof }{V0: hv35}
 									}
-									hv30 = hv33
+									hv26 = hv28
 								case true:
-									var hv42 Proof = Proof{State: disprovenState, Reason: hv8.Reason}
-									hv30 = struct{ V0 Proof }{V0: hv42}
+									var hv36 Proof = Proof{State: disprovenState, Reason: hv8.Reason}
+									hv26 = struct{ V0 Proof }{V0: hv36}
 								}
-								hv28 = hv30
+								hv25 = hv26
 							case true:
-								var hv43 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
-								hv28 = struct{ V0 Proof }{V0: hv43}
+								var hv37 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
+								hv25 = struct{ V0 Proof }{V0: hv37}
 							}
-							hv25 = hv28
+							hv23 = hv25
 						case false:
-							var hv44 Proof = Proof{State: unknownState, Reason: ReleaseOwnershipUnknown}
-							hv25 = struct{ V0 Proof }{V0: hv44}
+							var hv38 Proof = Proof{State: unknownState, Reason: ReleaseOwnershipUnknown}
+							hv23 = struct{ V0 Proof }{V0: hv38}
 						}
-						hv23 = hv25
+						hv21 = hv23
 					case true:
-						var hv45 Proof = Proof{State: disprovenState, Reason: PrivateMutexOnly}
-						hv23 = struct{ V0 Proof }{V0: hv45}
+						var hv39 Proof = Proof{State: disprovenState, Reason: PrivateMutexOnly}
+						hv21 = struct{ V0 Proof }{V0: hv39}
 					}
-					hv21 = hv23
+					hv20 = hv21
 				case true:
-					var hv46 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
-					hv21 = struct{ V0 Proof }{V0: hv46}
+					var hv40 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
+					hv20 = struct{ V0 Proof }{V0: hv40}
 				}
-				hv18 = hv21
+				hv18 = hv20
 			case true:
-				var hv47 Proof = Proof{State: unknownState, Reason: LoadedAcquisitionGuardUnknown}
-				hv18 = struct{ V0 Proof }{V0: hv47}
+				var hv41 Proof = Proof{State: unknownState, Reason: LoadedAcquisitionGuardUnknown}
+				hv18 = struct{ V0 Proof }{V0: hv41}
 			}
 			hv16 = hv18
 		case false:
-			var hv48 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
-			hv16 = struct{ V0 Proof }{V0: hv48}
+			var hv42 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
+			hv16 = struct{ V0 Proof }{V0: hv42}
 		}
 		hresult := hv16
 		if !hyrulehyruleMissingReleaseRecognizeRecord1Valid(hresult) {
@@ -173,8 +167,8 @@ func hyrulehyruleMissingReleaseRecognizeRecord1Valid(value struct{ V0 Proof }) b
 func MissingRelease(hparam0 MissingQueries) Proof {
 	hvalue, hok := hyruleMissingReleaseRecognize(struct{ P0 MissingQueries }{P0: hparam0})
 	if !hok {
-		var hv49 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
-		hvalue = struct{ V0 Proof }{V0: hv49}
+		var hv43 Proof = Proof{State: unknownState, Reason: LockStateBudgetExhausted}
+		hvalue = struct{ V0 Proof }{V0: hv43}
 	}
 	return hvalue.V0
 }

@@ -43,7 +43,7 @@
     },
     "cancellation_recognized_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/recognized_label_gen.go",
-      "sha256": "5f40d724cc050496daf87401575fc2b738a42f715fb592d5478fd849e2a3d1d3"
+      "sha256": "4640ea4cc1b95fc4304266477305bceda7bc4f4952fc42b7b71b88800d92b254"
     },
     "cancellation_return_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go",
@@ -83,11 +83,11 @@
     },
     "concurrency_callback_call": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_call_gen.go",
-      "sha256": "cdc329949104b4a8782f22b31e302bcb0d8add0e97909d3fbaf6186d70effc76"
+      "sha256": "2ce6218963f854e01545d989d0661611a109fc012f0ba0efdd50c47a67a3b301"
     },
     "concurrency_callback_input": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_input_gen.go",
-      "sha256": "e536aa8132b194aecfe1595bd897e0467636efe232b36b21c265a3e254f165c1"
+      "sha256": "48e41ccdd8806f611f8cd70564882f23c59def47803f998f50962eae24b5a1f5"
     },
     "concurrency_context_call": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/context_gen.go",
@@ -99,7 +99,7 @@
     },
     "concurrency_effect_support": {
       "path": "internal/analysis/passes/concurrencyfacts/effect_support_gen.go",
-      "sha256": "3241c3eaac9079e03d56cd260226c709ffb38e32839fc2ffad82198f31aeb7a4"
+      "sha256": "2b8d0d7899128895370dc88ae60ac169628f9b80eb16596c7918990fa97aedc4"
     },
     "concurrency_fixed_load": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/fixed_load_gen.go",
@@ -111,7 +111,7 @@
     },
     "concurrency_inert_data": {
       "path": "internal/analysis/passes/concurrencyfacts/admission/data_gen.go",
-      "sha256": "4161118b0ccd3bbf23a0b3cd2bbf77d9abbe6a958fc4629b2e817baa46d8190e"
+      "sha256": "4c72c33a097ff7faa934a24294f26686e2247738641d492420973602a55f795f"
     },
     "concurrency_path_root": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/path_root_gen.go",
@@ -119,7 +119,7 @@
     },
     "concurrency_resource_reference": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/reference_gen.go",
-      "sha256": "011ea964fca7c9d4b6afa3b09fdd21080fe7d91dc0131fd0300c288a2deb5690"
+      "sha256": "88307ea6c365a1617f87d341039fc661c540cae2f18ddf5b5a6d40efd335ebb8"
     },
     "defer_argument_use": {
       "path": "internal/analysis/analyzers/resources/deferinloop/argument_gen.go",
@@ -139,7 +139,7 @@
     },
     "diagnostic_admission": {
       "path": "internal/reporting/check/report_admission_gen.go",
-      "sha256": "f4c5302da22d24670e57b928d8656b491578369987982f89df92bbae73ce3581"
+      "sha256": "4b21f2160af7226d4f097abbe3f69939d2d2214ea55623b2d54e7d77a10a0c34"
     },
     "goroutine_call_contract": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/call_contracts_gen.go",
@@ -279,7 +279,7 @@
     },
     "lifecycle_evidence_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/evidence_gen.go",
-      "sha256": "62982a7bc1e08f9c49a3f79b64bd2e6d07f1a913387f6c3bcdbd61f9ccb6d740"
+      "sha256": "4b43c2206a30e0894f7022d73cfb69fb4979a8b1cf2fd428b125f1fd2747088a"
     },
     "lifecycle_handoff_use": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff_gen.go",
@@ -287,11 +287,11 @@
     },
     "lifecycle_local_completion": {
       "path": "internal/engine/lifecycle/completion_local_gen.go",
-      "sha256": "a28bd89833c80794849b9a251959e483cc6f8b029d1c75fa89039d1a99ee4c5a"
+      "sha256": "62c98b67a5ff90a1e01a402d0aa904ddeb86da1eafe52620013961e88343c178"
     },
     "lifecycle_receiver_mapping": {
       "path": "internal/engine/lifecycle/completionmapping/receiver_gen.go",
-      "sha256": "5bbb8fb141cd9c94ef4f1f58a78699eb0f95997c023e4959dd16df2cc5be0709"
+      "sha256": "c48e6e8d9ee6f24bf122d58b1b429b6b38f42ce4552585a6255e6c578e38bf69"
     },
     "lifecycle_response_body_leaf": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go",
@@ -315,7 +315,7 @@
     },
     "lifecycle_returned_view_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/returned_view_gen.go",
-      "sha256": "a61f9599fd0dceb9b2fd7ca72efce9c5e23fbfb3ff25724016c5350731e48669"
+      "sha256": "bf8e4f187599b3451ddcd560ab3d61c516b2e08faab2869f2cc184c4c481f7d8"
     },
     "lifecycle_selected_mask_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/selected_mask_gen.go",
@@ -339,7 +339,7 @@
     },
     "lock_missing_release_policy": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing_gen.go",
-      "sha256": "d9b5546f4afd800877a4d2942b97c9f80c14db0c84b60af9c7094adade070df1"
+      "sha256": "bee114343ec40f3766bab52f6fcb7a7c46597db63d3d8f812f9d334b4f1b35d4"
     },
     "lock_owner_address_step": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step_gen.go",
@@ -379,7 +379,7 @@
     },
     "path_loaded_guard": {
       "path": "internal/engine/ssaflow/path/guard_loaded_gen.go",
-      "sha256": "ed904de6a9bd6b2f3157d64acb37aa77724828e45549a63e351f9a467a84a85b"
+      "sha256": "a2190d4ffc98c00fbf56892b805d71d01c6533b6d4e5314e1f24f6386cdd8044"
     },
     "path_stable_guard": {
       "path": "internal/engine/ssaflow/path/guard_stable_gen.go",
@@ -391,15 +391,15 @@
     },
     "process_action_remainder": {
       "path": "internal/analysis/analyzers/resources/processownership/action_remainder_gen.go",
-      "sha256": "3e4e89438ce048cd26d77deb8e7935d32aa33ee0dadc3a1599e5d9ce39f0749f"
+      "sha256": "27c0fa0bcab6a308b4433868cf65c92aa724b6b8024bbef0e086779509a487e3"
     },
     "process_action_settlement": {
       "path": "internal/analysis/analyzers/resources/processownership/action_settlement_gen.go",
-      "sha256": "6aade5a25f38a6116e72c50e7b67ae6e20f2cbf61d6f3166c1a300be16327b9d"
+      "sha256": "574254121c96b399d17a06e1de7d0aba38fb68a98fc7c3cc81c5a412046a7077"
     },
     "process_return_admission": {
       "path": "internal/analysis/analyzers/resources/processownership/return_admission_gen.go",
-      "sha256": "fa7e0975d7ef93d0c320b5957f1bb512c6b94285a9aeef027a5afa4f599cd109"
+      "sha256": "191df4376a443811e2cec070c15311032d1af8c83cb00a7ec47463ae627395fc"
     },
     "process_return_decision": {
       "path": "internal/analysis/analyzers/resources/processownership/decision_gen.go",
@@ -415,7 +415,7 @@
     },
     "producer_abandonment": {
       "path": "internal/analysis/analyzers/concurrency/producerlifecycle/abandoned_gen.go",
-      "sha256": "52053367bf32501c3d0ba1183b40e2ddf7a9fa8bd7b18869d1de0dc08a225aee"
+      "sha256": "70ed6edd1a8911746becf40fff36ef609196e3305a14006bee99eca4994c1a3e"
     },
     "producer_helper_receive": {
       "path": "internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive_gen.go",
@@ -431,7 +431,7 @@
     },
     "resource_acquisition_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition_gen.go",
-      "sha256": "1e5a0d510012940dc1ebc468e5006871d22768b220e30fbd46783e2eb1281acb"
+      "sha256": "495d27757398e979f806387537e869f8bdc9b337272a9bf17fb729da703e2795"
     },
     "resource_acquisition_success": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch_gen.go",
@@ -447,7 +447,7 @@
     },
     "resource_final_flow_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow_gen.go",
-      "sha256": "1e9a5450bc65e9c6b8b43308cc70c7b892aa4e0b8d6ab7e081f0f951b7c0f4c9"
+      "sha256": "b38e33fba522f3df13569339977339af9e48509cf7cc3801436b4f2d0aee04fd"
     },
     "resource_opacity_after_callback": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback_gen.go",
@@ -523,7 +523,7 @@
     },
     "summary_result_comparison": {
       "path": "internal/analysis/summaries/comparison_gen.go",
-      "sha256": "55723a201e8815ee2b32d3c16c1f9b97a91b3a06a2de6ce49ca5571f86759f7b"
+      "sha256": "850a7a2b87508611b0a6ac8df7df55f4ddb668d350e7c5da6b2826a78e641b6a"
     },
     "summary_result_condition": {
       "path": "internal/analysis/summaries/condition_gen.go",

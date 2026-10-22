@@ -25,68 +25,40 @@ func hyrulerecognizeProcessSettlementRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		// Rule Settlement (internal/analysis/analyzers/resources/processownership/rules/action_settlement.rules:10).
-		var hv8 hyruleImport1.Instruction = hv2
-		var hv9 hyruleImport1.Value = hv3
-		hv5 := waitsForCommand(hv8, hv9)
-		_ = hv5
-		var hv10 struct {
+		var hv6 bool = waitsForCommand(hv2, hv3)
+		if !hv6 {
+			hv6 = releasedProcess(hv2, hv3)
+		}
+		var hv7 struct {
 			V0 bool
 			V1 hyruleImport0.EvidenceState
 		}
-		switch hv5 {
-		case true:
-			hv10 = struct {
+		if hv6 {
+			hv7 = struct {
 				V0 bool
 				V1 hyruleImport0.EvidenceState
 			}{V0: true, V1: decisionDisproven}
-		case false:
-			var hv11 hyruleImport1.Instruction = hv2
-			var hv12 hyruleImport1.Value = hv3
-			hv6 := releasedProcess(hv11, hv12)
-			_ = hv6
-			var hv13 struct {
+		} else {
+			var hv8 *commandProof = hv1
+			var hv9 hyruleImport1.Instruction = hv2
+			var hv10 hyruleImport1.Value = hv3
+			var hv11 *hyruleImport0.SearchBudget = hv4
+			hv5part0, hv5part1 := (*commandProof).commandOwnership(hv8, hv9, hv10, hv11)
+			hv5 := struct {
 				V0 bool
 				V1 hyruleImport0.EvidenceState
+			}{V0: hv5part0, V1: hv5part1}
+			_ = hv5
+			if !hyrulehyrulerecognizeProcessSettlementRecognizeUnion1Valid(hv5) {
+				var zero struct {
+					V0 bool
+					V1 hyruleImport0.EvidenceState
+				}
+				return zero, false
 			}
-			switch hv6 {
-			case true:
-				hv13 = struct {
-					V0 bool
-					V1 hyruleImport0.EvidenceState
-				}{V0: true, V1: decisionDisproven}
-			case false:
-				var hv14 *commandProof = hv1
-				var hv15 hyruleImport1.Instruction = hv2
-				var hv16 hyruleImport1.Value = hv3
-				var hv17 *hyruleImport0.SearchBudget = hv4
-				hv7part0, hv7part1 := (*commandProof).commandOwnership(hv14, hv15, hv16, hv17)
-				hv7 := struct {
-					V0 bool
-					V1 hyruleImport0.EvidenceState
-				}{V0: hv7part0, V1: hv7part1}
-				_ = hv7
-				if !hyrulehyrulerecognizeProcessSettlementRecognizeUnion1Valid(hv7) {
-					var zero struct {
-						V0 bool
-						V1 hyruleImport0.EvidenceState
-					}
-					return zero, false
-				}
-				var hv18 struct {
-					V0 bool
-					V1 hyruleImport0.EvidenceState
-				}
-				switch hv7.V0 {
-				case true:
-					hv18 = hv7
-				case false:
-					hv18 = hv7
-				}
-				hv13 = hv18
-			}
-			hv10 = hv13
+			hv7 = hv5
 		}
-		hresult := hv10
+		hresult := hv7
 		if !hyrulehyrulerecognizeProcessSettlementRecognizeUnion1Valid(hresult) {
 			var zero struct {
 				V0 bool

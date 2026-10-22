@@ -17,14 +17,12 @@ rewrite (inputs (value: value@(Parameter() | Capture()), method: method))
   | method != nil
   , let type = typeOf value
   , interface type
-  , let canceled = canceled type
-  , canceled == false
+  , not (canceled type)
   =
   outputs true
 
 @Function
 rewrite (inputs (value: value@(Parameter() | Capture()), method: nil))
-  | let type = typeOf value
-  , function type
+  | function (typeOf value)
   =
   outputs true

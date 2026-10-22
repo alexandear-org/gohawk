@@ -28,9 +28,7 @@ func hyruleCallbackInputRecognize(harg0 struct {
 						{
 							if hyruleImport1.IsInterface(hv4) {
 								{
-									var hv5 bool = hyruleImport0.CancellationType(hv4)
-									_ = hv5
-									if hv5 == false {
+									if !(hyruleImport0.CancellationType(hv4)) {
 										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:15).
 										return struct{ V0 bool }{V0: true}, true
 									}
@@ -39,35 +37,29 @@ func hyruleCallbackInputRecognize(harg0 struct {
 						}
 					}
 				}
-				hv9 := hs1
-				_ = hv9
+				hv7 := hs1
+				_ = hv7
 				if hv2 == nil {
 					{
-						var hv10 hyruleImport1.Type = (callbackValue).Type(hv9)
-						_ = hv10
-						{
-							if functionType(hv10) {
-								// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:25).
-								return struct{ V0 bool }{V0: true}, true
-							}
+						if functionType((callbackValue).Type(hv7)) {
+							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:24).
+							return struct{ V0 bool }{V0: true}, true
 						}
 					}
 				}
 			}
 		case *hyruleImport2.FreeVar:
 			if hs1 != nil {
-				hv6 := hs1
-				_ = hv6
+				hv5 := hs1
+				_ = hv5
 				if hv2 != nil {
 					{
-						var hv7 hyruleImport1.Type = (callbackValue).Type(hv6)
-						_ = hv7
+						var hv6 hyruleImport1.Type = (callbackValue).Type(hv5)
+						_ = hv6
 						{
-							if hyruleImport1.IsInterface(hv7) {
+							if hyruleImport1.IsInterface(hv6) {
 								{
-									var hv8 bool = hyruleImport0.CancellationType(hv7)
-									_ = hv8
-									if hv8 == false {
+									if !(hyruleImport0.CancellationType(hv6)) {
 										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:15).
 										return struct{ V0 bool }{V0: true}, true
 									}
@@ -76,17 +68,13 @@ func hyruleCallbackInputRecognize(harg0 struct {
 						}
 					}
 				}
-				hv11 := hs1
-				_ = hv11
+				hv8 := hs1
+				_ = hv8
 				if hv2 == nil {
 					{
-						var hv12 hyruleImport1.Type = (callbackValue).Type(hv11)
-						_ = hv12
-						{
-							if functionType(hv12) {
-								// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:25).
-								return struct{ V0 bool }{V0: true}, true
-							}
+						if functionType((callbackValue).Type(hv8)) {
+							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:24).
+							return struct{ V0 bool }{V0: true}, true
 						}
 					}
 				}

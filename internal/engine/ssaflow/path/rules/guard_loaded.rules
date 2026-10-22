@@ -7,9 +7,7 @@ host
 rewrite (inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget formats) =
   do
     answer <- loaded condition source nil ^guardEqualToken budget formats
-    case answer of
-      KnownLoaded() -> answer
-      UnknownLoaded() -> answer
+    answer
 
 // A constant on the left is swapped before recognizing the load. Unsupported
 // address paths still return their rendered payload, with availability false.
@@ -17,14 +15,10 @@ rewrite (inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget f
 rewrite (inputs condition@(Comparison (left: literal@(Constant()), right: Unary (source: source, op: ^guardLoadToken), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
   do
     answer <- loaded condition source literal op budget formats
-    case answer of
-      KnownLoaded() -> answer
-      UnknownLoaded() -> answer
+    answer
 
 @LiteralRight
 rewrite (inputs condition@(Comparison (left: Unary (source: source, op: ^guardLoadToken), right: literal@(Constant()), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
   do
     answer <- loaded condition source literal op budget formats
-    case answer of
-      KnownLoaded() -> answer
-      UnknownLoaded() -> answer
+    answer

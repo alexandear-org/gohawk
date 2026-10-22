@@ -2,7 +2,6 @@
 
 package admission
 
-import hyruleImport2 "go/types"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleDataInstructionRecognize applies rules in source order; false means no rule matched.
@@ -18,17 +17,11 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				hv3 := hs1
 				_ = hv3
 				{
-					var hv4 hyruleImport2.Type = (node).Type(hv2)
-					_ = hv4
-					{
-						var hv5 bool = SynchronizationPointer(hv4)
-						_ = hv5
-						if hv5 == false {
-							{
-								if Address(hv3) {
-									// Rule Field (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:48).
-									return struct{ V0 bool }{V0: true}, true
-								}
+					if !(SynchronizationPointer((node).Type(hv2))) {
+						{
+							if Address(hv3) {
+								// Rule Field (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:48).
+								return struct{ V0 bool }{V0: true}, true
 							}
 						}
 					}
@@ -36,20 +29,16 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 			}
 		case *hyruleImport0.Store:
 			if hs1 != nil {
-				hv6 := hs1.Val
-				_ = hv6
-				hv7 := hs1.Addr
-				_ = hv7
+				hv4 := hs1.Val
+				_ = hv4
+				hv5 := hs1.Addr
+				_ = hv5
 				{
-					var hv8 hyruleImport2.Type = (node).Type(hv6)
-					_ = hv8
-					{
-						if Value(hv8) {
-							{
-								if Address(hv7) {
-									// Rule Write (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:59).
-									return struct{ V0 bool }{V0: true}, true
-								}
+					if Value((node).Type(hv4)) {
+						{
+							if Address(hv5) {
+								// Rule Write (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:57).
+								return struct{ V0 bool }{V0: true}, true
 							}
 						}
 					}
@@ -57,108 +46,84 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 			}
 		case *hyruleImport0.MakeMap, *hyruleImport0.MakeSlice:
 			if hv1 != (*hyruleImport0.MakeMap)(nil) && hv1 != (*hyruleImport0.MakeSlice)(nil) {
-				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:68).
+				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:65).
 				return struct{ V0 bool }{V0: true}, true
 			}
 		case *hyruleImport0.IndexAddr:
 			if hs1 != nil {
-				hv9 := hs1
-				_ = hv9
+				hv6 := hs1
+				_ = hv6
 				{
-					if Address(hv9) {
-						// Rule Indexed (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:71).
+					if Address(hv6) {
+						// Rule Indexed (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:68).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 			}
 		case *hyruleImport0.Slice:
 			if hs1 != nil {
-				hv10 := hs1
-				_ = hv10
+				hv7 := hs1
+				_ = hv7
 				{
-					var hv11 hyruleImport2.Type = (node).Type(hv10)
-					_ = hv11
-					{
-						if Elements(hv11) {
-							// Rule Resliced (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:78).
-							return struct{ V0 bool }{V0: true}, true
-						}
+					if Elements((node).Type(hv7)) {
+						// Rule Resliced (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:75).
+						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 			}
 		case *hyruleImport0.Lookup:
 			if hs1 != nil {
-				hv12 := hs1
-				_ = hv12
+				hv8 := hs1
+				_ = hv8
 				{
-					var hv13 hyruleImport2.Type = lookupElement(hv12)
-					_ = hv13
-					{
-						if Value(hv13) {
-							// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:86).
-							return struct{ V0 bool }{V0: true}, true
-						}
+					if Value(lookupElement(hv8)) {
+						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:82).
+						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 			}
 		case *hyruleImport0.TypeAssert:
 			if hs1 != nil {
-				hv14 := hs1
-				_ = hv14
+				hv9 := hs1
+				_ = hv9
 				{
-					var hv15 hyruleImport2.Type = lookupElement(hv14)
-					_ = hv15
-					{
-						if Value(hv15) {
-							// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:86).
-							return struct{ V0 bool }{V0: true}, true
-						}
+					if Value(lookupElement(hv9)) {
+						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:82).
+						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 			}
 		case *hyruleImport0.Extract:
 			if hs1 != nil {
-				hv16 := hs1.Tuple
-				_ = hv16
-				if hs2, hok := hv16.(*hyruleImport0.Select); hok && hs2 != nil {
-					// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:94).
+				hv10 := hs1.Tuple
+				_ = hv10
+				if hs2, hok := hv10.(*hyruleImport0.Select); hok && hs2 != nil {
+					// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:89).
 					return struct{ V0 bool }{V0: false}, true
 				}
-				hv17 := hs1.Tuple
-				_ = hv17
-				hv18 := hs1
-				_ = hv18
+				hv11 := hs1.Tuple
+				_ = hv11
+				hv12 := hs1
+				_ = hv12
 				{
-					var hv19 hyruleImport2.Type = (node).Type(hv18)
-					_ = hv19
-					{
-						if Value(hv19) {
-							// Rule Projected (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:97).
-							return struct{ V0 bool }{V0: true}, true
-						}
+					if Value((node).Type(hv12)) {
+						// Rule Projected (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:92).
+						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 			}
 		case *hyruleImport0.MapUpdate:
 			if hs1 != nil {
-				hv20 := hs1.Key
-				_ = hv20
-				hv21 := hs1.Value
-				_ = hv21
+				hv13 := hs1.Key
+				_ = hv13
+				hv14 := hs1.Value
+				_ = hv14
 				{
-					var hv22 hyruleImport2.Type = (node).Type(hv20)
-					_ = hv22
-					{
-						if Value(hv22) {
-							{
-								var hv23 hyruleImport2.Type = (node).Type(hv21)
-								_ = hv23
-								{
-									if Value(hv23) {
-										// Rule MapWrite (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:105).
-										return struct{ V0 bool }{V0: true}, true
-									}
-								}
+					if Value((node).Type(hv13)) {
+						{
+							if Value((node).Type(hv14)) {
+								// Rule MapWrite (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:99).
+								return struct{ V0 bool }{V0: true}, true
 							}
 						}
 					}
@@ -166,40 +131,32 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 			}
 		case *hyruleImport0.BinOp:
 			if hs1 != nil {
-				hv24 := hs1.Op
-				_ = hv24
-				hv25 := hs1.X
-				_ = hv25
-				hv26 := hs1.Y
-				_ = hv26
-				if hv24 == equalToken {
+				hv15 := hs1.Op
+				_ = hv15
+				hv16 := hs1.X
+				_ = hv16
+				hv17 := hs1.Y
+				_ = hv17
+				if hv15 == equalToken {
 					{
-						if nilConstant(hv25) {
-							// Rule LeftNil (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:115).
+						var hv18 bool = nilConstant(hv16)
+						if !hv18 {
+							hv18 = nilConstant(hv17)
+						}
+						if hv18 {
+							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:107).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}
 				}
-				if hv24 == notEqualToken {
+				if hv15 == notEqualToken {
 					{
-						if nilConstant(hv25) {
-							// Rule LeftNil (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:115).
-							return struct{ V0 bool }{V0: true}, true
+						var hv19 bool = nilConstant(hv16)
+						if !hv19 {
+							hv19 = nilConstant(hv17)
 						}
-					}
-				}
-				if hv24 == equalToken {
-					{
-						if nilConstant(hv26) {
-							// Rule RightNil (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:121).
-							return struct{ V0 bool }{V0: true}, true
-						}
-					}
-				}
-				if hv24 == notEqualToken {
-					{
-						if nilConstant(hv26) {
-							// Rule RightNil (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:121).
+						if hv19 {
+							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:107).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}

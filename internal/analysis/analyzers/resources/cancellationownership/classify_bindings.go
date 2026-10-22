@@ -49,7 +49,7 @@ func (classifier *cancellationClassifier) ownerAvailable() bool {
 }
 
 func (classifier *cancellationClassifier) recognizedInstruction(instruction ssa.Instruction) (cancellationLabel, bool) {
-	return classifier.recognizedAction(instruction, ssaflow.InstructionCall(instruction))
+	return recognizeCancellation(instruction, classifier, ssaflow.InstructionCall(instruction))
 }
 
 func (classifier *cancellationClassifier) processLifetimeReturn(instruction ssa.Instruction) bool {
@@ -81,7 +81,7 @@ func (classifier *cancellationClassifier) exactCallArgument(instruction ssa.Inst
 	if common == nil || !commonHasExactArgument(common, classifier.cancel) {
 		return cancellationLabel{}, false
 	}
-	return classifier.exactArgumentAction(instruction)
+	return recognizeCancellationArgument(instruction, classifier)
 }
 
 // A callback which captures cancel may be invoked, retained or discarded.

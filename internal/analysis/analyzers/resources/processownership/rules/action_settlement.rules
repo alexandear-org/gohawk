@@ -1,20 +1,16 @@
 signature total = outputs false ^decisionUnknown
 
 host
-  waits! = waitsForCommand
-  released! = releasedProcess
+  waits = waitsForCommand
+  released = releasedProcess
   ownership! = commandProof.commandOwnership
 
 // Direct witnesses precede the lifecycle query. Their existing identity checks
 // retain their own allowances and do not spend the prepared completion budget.
 @Settlement
 rewrite (inputs proof instruction command budget) =
-  case waits instruction command of
-    true -> outputs true ^decisionDisproven
-    false -> case released instruction command of
-      true -> outputs true ^decisionDisproven
-      false -> do
-        answer <- ownership proof instruction command budget
-        case answer of
-          Settled() -> answer
-          Unsettled() -> answer
+  if waits instruction command || released instruction command
+    then outputs true ^decisionDisproven
+    else do
+      answer <- ownership proof instruction command budget
+      answer

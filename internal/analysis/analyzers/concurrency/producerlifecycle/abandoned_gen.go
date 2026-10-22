@@ -21,7 +21,7 @@ func hyruleabandonedProducerSendRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Abandoned (internal/analysis/analyzers/concurrency/producerlifecycle/rules/abandoned.rules:26).
+		// Rule Abandoned (internal/analysis/analyzers/concurrency/producerlifecycle/rules/abandoned.rules:24).
 		var hv13 producerSend = hv2
 		hv5 := callerReturns(hv13)
 		_ = hv5
@@ -32,66 +32,62 @@ func hyruleabandonedProducerSendRecognize(harg0 struct {
 			var hv16 []producerSend = hv3
 			hv6 := countProducerSends(hv15, hv16)
 			_ = hv6
-			var hv17 producerProof = hv6.producerProof
-			hv7 := (producerProof).Known(hv17)
+			hv7 := (producerProof).Known(hv6.producerProof)
 			_ = hv7
-			var hv18 struct{ V0 producerProof }
+			var hv17 struct{ V0 producerProof }
 			switch hv7 {
 			case true:
-				var hv19 *hyruleImport0.Function = hv1
-				var hv20 hyruleImport0.Value = hv2.channel
-				var hv21 *hyruleImport0.Go = hv2.spawn
-				var hv22 *hyruleImport1.Engine = hv4
-				hv8 := channelReceives(hv19, hv20, hv21, hv22)
+				var hv18 *hyruleImport0.Function = hv1
+				var hv19 hyruleImport0.Value = hv2.channel
+				var hv20 *hyruleImport0.Go = hv2.spawn
+				var hv21 *hyruleImport1.Engine = hv4
+				hv8 := channelReceives(hv18, hv19, hv20, hv21)
 				_ = hv8
 				if !hyrulehyruleabandonedProducerSendRecognizeUnion0Valid(hv8) {
 					var zero struct{ V0 producerProof }
 					return zero, false
 				}
-				var hv23 struct{ V0 producerProof }
+				var hv22 struct{ V0 producerProof }
 				switch hv8.unknown {
 				case false:
 					hv9 := hv8.count
 					_ = hv9
-					var hv24 int = hv9
-					hv10 := zeroReceives(hv24)
+					hv10 := (hv9 == 0)
 					_ = hv10
-					var hv25 struct{ V0 producerProof }
+					var hv23 struct{ V0 producerProof }
 					switch hv10 {
 					case false:
-						var hv26 int = hv6.count
-						var hv27 int = hv9
-						hv11 := producerExceeds(hv26, hv27)
+						hv11 := (hv6.count > hv9)
 						_ = hv11
-						var hv28 struct{ V0 producerProof }
+						var hv24 struct{ V0 producerProof }
 						switch hv11 {
 						case true:
-							var hv29 producerProof = producerProof{State: producerProven, Reason: reasonProducerExceedsReceives}
-							hv28 = struct{ V0 producerProof }{V0: hv29}
+							var hv25 producerProof = producerProof{State: producerProven, Reason: reasonProducerExceedsReceives}
+							hv24 = struct{ V0 producerProof }{V0: hv25}
 						case false:
-							var hv30 producerProof = producerProof{State: producerDisproven, Reason: reasonProducerWithinReceiveCount}
-							hv28 = struct{ V0 producerProof }{V0: hv30}
+							var hv26 producerProof = producerProof{State: producerDisproven, Reason: reasonProducerWithinReceiveCount}
+							hv24 = struct{ V0 producerProof }{V0: hv26}
 						}
-						hv25 = hv28
+						hv23 = hv24
 					case true:
-						var hv31 producerProof = producerProof{State: producerUnknown, Reason: reasonReceiverObligationUnknown}
-						hv25 = struct{ V0 producerProof }{V0: hv31}
+						var hv27 producerProof = producerProof{State: producerUnknown, Reason: reasonReceiverObligationUnknown}
+						hv23 = struct{ V0 producerProof }{V0: hv27}
 					}
-					hv23 = hv25
+					hv22 = hv23
 				case true:
 					hv12 := hv8.reason
 					_ = hv12
-					var hv32 producerProof = producerProof{State: producerUnknown, Reason: hv12}
-					hv23 = struct{ V0 producerProof }{V0: hv32}
+					var hv28 producerProof = producerProof{State: producerUnknown, Reason: hv12}
+					hv22 = struct{ V0 producerProof }{V0: hv28}
 				}
-				hv18 = hv23
+				hv17 = hv22
 			case false:
-				hv18 = struct{ V0 producerProof }{V0: hv6.producerProof}
+				hv17 = struct{ V0 producerProof }{V0: hv6.producerProof}
 			}
-			hv14 = hv18
+			hv14 = hv17
 		case false:
-			var hv33 producerProof = producerProof{State: producerUnknown, Reason: reasonReceiverDoesNotReturn}
-			hv14 = struct{ V0 producerProof }{V0: hv33}
+			var hv29 producerProof = producerProof{State: producerUnknown, Reason: reasonReceiverDoesNotReturn}
+			hv14 = struct{ V0 producerProof }{V0: hv29}
 		}
 		return hv14, true
 	}
@@ -113,8 +109,8 @@ func abandonedProducerSend(hparam0 *hyruleImport0.Function, hparam1 producerSend
 		P3 *hyruleImport1.Engine
 	}{P0: hparam0, P1: hparam1, P2: hparam2, P3: hparam3})
 	if !hok {
-		var hv34 producerProof = producerProof{State: producerUnknown, Reason: reasonNone}
-		hvalue = struct{ V0 producerProof }{V0: hv34}
+		var hv30 producerProof = producerProof{State: producerUnknown, Reason: reasonNone}
+		hvalue = struct{ V0 producerProof }{V0: hv30}
 	}
 	return hvalue.V0
 }

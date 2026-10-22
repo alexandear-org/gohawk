@@ -2,15 +2,14 @@ signature total = outputs (Unavailable (reason: ^EvidenceUnavailable))
 
 host
   error! = AcquisitionQueries.Error
-  errorUnknown! = PairedError.Unknown
+  errorUnknown = PairedError.Unknown
   boundary! = AcquisitionQueries.Boundary
-  noBoundary!
   canceled! = AcquisitionQueries.Canceled
   asserted! = AcquisitionQueries.Asserted
   optional! = AcquisitionQueries.Optional
-  optionalUnknown! = Correlation.Unknown
+  optionalUnknown = Correlation.Unknown
   prepare! = Initialization.Prepare
-  prepareUnknown! = Prepared.Unknown
+  prepareUnknown = Prepared.Unknown
   finalize! = Finalize
   CanceledAcquisition
   ReleaseProven
@@ -27,7 +26,7 @@ rewrite (inputs queries) =
       else
         true -> outputs (Unavailable (reason: error.Reason))
     boundary <- boundary queries
-    true <- noBoundary boundary
+    true <- boundary == ^None
       else
         false -> outputs (Unavailable (reason: boundary))
     Disproven() <- canceled queries

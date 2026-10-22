@@ -16,12 +16,12 @@ type Path = (string, bool)
 
 host
   localCallback
-  callbackInvoked!
-  exactInvoked! = completionSearch.exactLocalInvoked
-  forCallback! = completionSearch.forCallback
+  callbackInvoked
+  exactInvoked = completionSearch.exactLocalInvoked
+  forCallback = completionSearch.forCallback
   completes! = completionSearch.completes
   mappedPath! = completionSearch.mappedCompletionPath
-  requiresNestedPath! = mappedLocal.requiresNestedPath
+  requiresNestedPath = mappedLocal.requiresNestedPath
 
 // A callback bound to a method on the target completes when that exact local
 // is invoked directly or through a nested launch. A failed direct invocation
@@ -59,10 +59,6 @@ rewrite (inputs search candidate local@(Local (value: value)) target called) =
         Unproven() -> outputs "" false false
     Known (path: path) <- mappedPath search local target paths
       else
-        Unknown (path: path) -> do
-          false <- requiresNestedPath local
-            else
-              true -> outputs "" false false
-          outputs path false true
+        Unknown (path: path) -> if requiresNestedPath local then outputs "" false false else outputs path false true
     outputs path true true
   <|> outputs "" false false

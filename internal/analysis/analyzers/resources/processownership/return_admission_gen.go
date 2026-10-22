@@ -24,107 +24,54 @@ func hyruleadmitProcessReturnRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Return (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
-		var hv9 struct {
-			V0 processReason
-			V1 bool
-		}
-		hv9answered := false
-		if !hv9answered {
-			var hv10 *hyruleImport1.Return = hv1
-			var hv11 *hyruleImport1.Call = hv2
-			hv5 := startFailureReturn(hv10, hv11)
-			_ = hv5
-			var hv12 struct {
-				V0 processReason
-				V1 bool
-			}
-			switch hv5 {
-			case true:
-				hv9answered = true
-				hv12 = struct {
+		{
+			if startFailureReturn(hv1, hv2) {
+				// Rule Return (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				return struct {
 					V0 processReason
 					V1 bool
-				}{V0: reasonStartFailureReturn, V1: true}
-			}
-			if hv9answered {
-				hv9 = hv12
+				}{V0: reasonStartFailureReturn, V1: true}, true
 			}
 		}
-		if !hv9answered {
-			var hv13 *hyruleImport1.Return = hv1
-			var hv14 hyruleImport1.Value = hv3
-			hv6 := hyruleImport0.ReturnedValueOwnsValue(hv13, hv14)
-			_ = hv6
-			var hv15 struct {
-				V0 processReason
-				V1 bool
-			}
-			switch hv6 {
-			case true:
-				hv9answered = true
-				hv15 = struct {
+		{
+			if hyruleImport0.ReturnedValueOwnsValue(hv1, hv3) {
+				// Rule Return_2 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				return struct {
 					V0 processReason
 					V1 bool
-				}{V0: reasonReturnedOwner, V1: true}
-			}
-			if hv9answered {
-				hv9 = hv15
+				}{V0: reasonReturnedOwner, V1: true}, true
 			}
 		}
-		if !hv9answered {
-			var hv16 *hyruleImport1.Return = hv1
-			var hv17 hyruleImport1.Value = hv3
-			hv7 := returnsProcessHandle(hv16, hv17)
-			_ = hv7
-			var hv18 struct {
-				V0 processReason
-				V1 bool
-			}
-			switch hv7 {
-			case true:
-				hv9answered = true
-				hv18 = struct {
+		{
+			if returnsProcessHandle(hv1, hv3) {
+				// Rule Return_3 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				return struct {
 					V0 processReason
 					V1 bool
-				}{V0: reasonReturnedHandle, V1: true}
-			}
-			if hv9answered {
-				hv9 = hv18
+				}{V0: reasonReturnedHandle, V1: true}, true
 			}
 		}
-		if !hv9answered {
-			var hv19 *hyruleImport1.Return = hv1
-			var hv20 *hyruleImport1.Phi = hv4
-			hv8 := returnedMergedOwner(hv19, hv20)
-			_ = hv8
-			var hv21 struct {
-				V0 processReason
-				V1 bool
-			}
-			switch hv8 {
-			case true:
-				hv9answered = true
-				hv21 = struct {
-					V0 processReason
-					V1 bool
-				}{V0: reasonReturnedMergedOwner, V1: true}
-			}
-			if hv9answered {
-				hv9 = hv21
+		if hv4 != nil {
+			{
+				var hv5 bool = hyruleImport0.ReturnedValueOwnsValue(hv1, hv4)
+				if !hv5 {
+					hv5 = returnsProcessHandle(hv1, hv4)
+				}
+				if hv5 {
+					// Rule Return_4 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+					return struct {
+						V0 processReason
+						V1 bool
+					}{V0: reasonReturnedMergedOwner, V1: true}, true
+				}
 			}
 		}
-		if !hv9answered {
-			hv9answered = true
-			if hv9answered {
-				hv9 = struct {
-					V0 processReason
-					V1 bool
-				}{V0: reasonNone, V1: false}
-			}
-		}
-		return hv9, true
 	}
+	var zero struct {
+		V0 processReason
+		V1 bool
+	}
+	return zero, false
 }
 func admitProcessReturn(hparam0 *hyruleImport1.Return, hparam1 *hyruleImport1.Call, hparam2 hyruleImport1.Value, hparam3 *hyruleImport1.Phi) (processReason, bool) {
 	hvalue, hok := hyruleadmitProcessReturnRecognize(struct {

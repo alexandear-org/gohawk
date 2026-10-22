@@ -1,21 +1,17 @@
 signature total = outputs ^decisionUnknown
 
 host
-  stored! = storesProcessHandleInExternalField
+  stored = storesProcessHandleInExternalField
   handle! = commandProof.handleOwnership
-  exited! = exitedProcess
+  exited = exitedProcess
 
 // Exact lower-level transfer wins even when earlier evidence stopped. Process
 // exit follows the handle query and can override either provisional cutoff.
 @Remaining
 rewrite (inputs proof instruction command fallback) =
-  case stored instruction command of
-    true -> outputs ^decisionProven
-    false -> case handle proof instruction command of
+  if stored instruction command
+    then outputs ^decisionProven
+    else case handle proof instruction command of
       Completed() -> outputs ^decisionProven
-      Indeterminate() -> case exited instruction of
-        true -> outputs ^decisionProven
-        false -> outputs ^decisionUnknown
-      Incomplete() -> case exited instruction of
-        true -> outputs ^decisionProven
-        false -> outputs fallback
+      Indeterminate() -> if exited instruction then outputs ^decisionProven else outputs ^decisionUnknown
+      Incomplete() -> if exited instruction then outputs ^decisionProven else outputs fallback

@@ -22,56 +22,43 @@ func hyruledecideProcessRemainderRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		// Rule Remaining (internal/analysis/analyzers/resources/processownership/rules/action_remainder.rules:10).
-		var hv9 hyruleImport1.Instruction = hv2
-		var hv10 hyruleImport1.Value = hv3
-		hv5 := storesProcessHandleInExternalField(hv9, hv10)
-		_ = hv5
-		var hv11 struct{ V0 hyruleImport0.EvidenceState }
-		switch hv5 {
-		case true:
-			hv11 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
-		case false:
-			var hv12 *commandProof = hv1
-			var hv13 hyruleImport1.Instruction = hv2
-			var hv14 hyruleImport1.Value = hv3
-			hv6 := (*commandProof).handleOwnership(hv12, hv13, hv14)
-			_ = hv6
-			if !hyrulehyruledecideProcessRemainderRecognizeUnion0Valid(hv6) {
+		var hv6 struct{ V0 hyruleImport0.EvidenceState }
+		if storesProcessHandleInExternalField(hv2, hv3) {
+			hv6 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
+		} else {
+			var hv7 *commandProof = hv1
+			var hv8 hyruleImport1.Instruction = hv2
+			var hv9 hyruleImport1.Value = hv3
+			hv5 := (*commandProof).handleOwnership(hv7, hv8, hv9)
+			_ = hv5
+			if !hyrulehyruledecideProcessRemainderRecognizeUnion0Valid(hv5) {
 				var zero struct{ V0 hyruleImport0.EvidenceState }
 				return zero, false
 			}
-			var hv15 struct{ V0 hyruleImport0.EvidenceState }
-			switch hv6.State {
+			var hv10 struct{ V0 hyruleImport0.EvidenceState }
+			switch hv5.State {
 			case decisionProven:
-				hv15 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
+				hv10 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
 			case decisionUnknown:
-				var hv16 hyruleImport1.Instruction = hv2
-				hv7 := exitedProcess(hv16)
-				_ = hv7
-				var hv17 struct{ V0 hyruleImport0.EvidenceState }
-				switch hv7 {
-				case true:
-					hv17 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
-				case false:
-					hv17 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionUnknown}
+				var hv11 struct{ V0 hyruleImport0.EvidenceState }
+				if exitedProcess(hv2) {
+					hv11 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
+				} else {
+					hv11 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionUnknown}
 				}
-				hv15 = hv17
+				hv10 = hv11
 			case decisionDisproven:
-				var hv18 hyruleImport1.Instruction = hv2
-				hv8 := exitedProcess(hv18)
-				_ = hv8
-				var hv19 struct{ V0 hyruleImport0.EvidenceState }
-				switch hv8 {
-				case true:
-					hv19 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
-				case false:
-					hv19 = struct{ V0 hyruleImport0.EvidenceState }{V0: hv4}
+				var hv12 struct{ V0 hyruleImport0.EvidenceState }
+				if exitedProcess(hv2) {
+					hv12 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}
+				} else {
+					hv12 = struct{ V0 hyruleImport0.EvidenceState }{V0: hv4}
 				}
-				hv15 = hv19
+				hv10 = hv12
 			}
-			hv11 = hv15
+			hv6 = hv10
 		}
-		return hv11, true
+		return hv6, true
 	}
 }
 func hyrulehyruledecideProcessRemainderRecognizeUnion0Valid(value processUseEvidence) bool {
