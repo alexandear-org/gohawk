@@ -1,35 +1,37 @@
-signature total fallback outputs "" false false false;
-guard booleanValue;
-build valueIdentity = guardValueIdentity;
-build stableEquality;
-query stableOperand = stableOperandWithin;
-query computed = computedGuard;
+signature total = outputs "" false false false
 
-rule Parameter:
-  inputs $condition:(Parameter) _
-  && booleanValue $condition
-  => outputs (valueIdentity $condition) false true true;
+host
+  booleanValue
+  valueIdentity = guardValueIdentity
+  stableEquality
+  stableOperand! = stableOperandWithin
+  computed! = computedGuard
+
+@Parameter
+rewrite (inputs condition@(Parameter()) _)
+  | booleanValue condition
+  =
+  outputs (valueIdentity condition) false true true
 
 // Keep left-before-right short circuiting. A failed operand proof tries the
 // ordinary computed-value policy without refunding any search allowance.
-rule Equality:
-  inputs
-    $condition:(Comparison left:$left right:$right op:$op:(or guardEqualToken guardNotEqualToken))
-    $budget
-  => do {
-           true <- query stableOperand $left $budget
-             else decline;
-           true <- query stableOperand $right $budget
-             else decline;
-           pure outputs (stableEquality $left $right) (negated $op) true true;
-         }
-     <|> query computed $condition $budget
-           select KnownGuard identity:$identity => outputs $identity false true true
-     <|> pure outputs "" false false false;
+@Equality
+rewrite (inputs condition@(Comparison (left: left, right: right, op: op@(^guardEqualToken | ^guardNotEqualToken))) budget) =
+  do
+    true <- stableOperand left budget
+      else
+        false -> decline
+    true <- stableOperand right budget
+      else
+        false -> decline
+    outputs (stableEquality left right) (negated op) true true
+  <|> case computed condition budget of
+    KnownGuard (identity: identity) -> outputs identity false true true
+    UnknownGuard() -> decline
+  <|> outputs "" false false false
 
-rule Other:
-  inputs $condition $budget
-  => query computed $condition $budget {
-       KnownGuard identity:$identity => outputs $identity false true true;
-       UnknownGuard => outputs "" false false false;
-     };
+@Other
+rewrite (inputs condition budget) =
+  case computed condition budget of
+    KnownGuard (identity: identity) -> outputs identity false true true
+    UnknownGuard() -> outputs "" false false false

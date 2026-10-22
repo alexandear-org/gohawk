@@ -1,14 +1,15 @@
-signature total fallback outputs (Opaque reasonLabelHelperUndecided) true;
-query direct = cancellationClassifier.recognizedDirectAction;
-query call = cancellationClassifier.recognizedCallAction;
+signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
 
-rule Recognized:
-  inputs $instruction $classifier $common
-  => query direct $classifier $instruction $common {
-       Decided label:$label => outputs $label true;
-       Unrecognized => query $result = call $classifier $instruction $common
-       decide $result {
-         Decided => $result;
-         Unrecognized => $result;
-       };
-     };
+host
+  direct! = cancellationClassifier.recognizedDirectAction
+  call! = cancellationClassifier.recognizedCallAction
+
+@Recognized
+rewrite (inputs instruction classifier common) =
+  case direct classifier instruction common of
+    Decided (label: label) -> outputs label true
+    Unrecognized() -> do
+      result <- call classifier instruction common
+      case result of
+        Decided() -> result
+        Unrecognized() -> result

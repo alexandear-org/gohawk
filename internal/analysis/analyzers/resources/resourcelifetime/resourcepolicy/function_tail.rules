@@ -1,13 +1,15 @@
-signature total fallback outputs None false;
-query escape = FunctionQueries.Escape;
-query aggregate = FunctionQueries.Aggregate;
-query publication = FunctionQueries.Publication;
-query unmodeled = FunctionQueries.Unmodeled;
-const NestedInTransferredArgument, UnsummarizedCallee;
+signature total = outputs ^None false
 
-rule NotCarried:
-  inputs _ _ _ false
-  => outputs None false;
+host
+  escape! = FunctionQueries.Escape
+  aggregate! = FunctionQueries.Aggregate
+  publication! = FunctionQueries.Publication
+  unmodeled! = FunctionQueries.Unmodeled
+  NestedInTransferredArgument
+  UnsummarizedCallee
+
+@NotCarried
+rewrite (inputs _ _ _ false) = outputs ^None false
 
 // An aggregate owner may outlive a retaining helper even with no result. A
 // read-only helper keeps the obligation live.
@@ -15,27 +17,22 @@ rule NotCarried:
 // Otherwise a nested resource crosses this boundary only when the call's own
 // result is published. Discarding that result transfers nothing.
 // https://github.com/google/oss-rebuild/blob/9ce0528dd68bf209b52cc9fdc90bd63742cbb3a0/pkg/sysgraph/sgstorage/loader.go#L173-L179
-rule Carried:
-  inputs $queries $instruction $common true
-  => do {
-       Disproven <- query escape $queries $instruction $common
-         else {
-           Proven reason:$reason => outputs $reason true;
-           Unknown reason:$reason => outputs $reason true;
-         };
-       Disproven <- query aggregate $queries $common
-         else {
-           Unknown reason:$reason => outputs $reason true;
-           Proven => do {
-             Disproven <- query publication $queries $instruction
-               else {
-                 Unknown reason:$reason => outputs $reason true;
-                 Proven => outputs NestedInTransferredArgument true;
-               };
-             $unmodeled <- query unmodeled $queries $instruction $common;
-             pure outputs UnsummarizedCallee $unmodeled;
-           };
-         };
-       $unmodeled <- query unmodeled $queries $instruction $common;
-       pure outputs UnsummarizedCallee $unmodeled;
-     };
+@Carried
+rewrite (inputs queries instruction common true) =
+  do
+    Disproven() <- escape queries instruction common
+      else
+        Proven (reason: reason) -> outputs reason true
+        Unknown (reason: reason) -> outputs reason true
+    Disproven() <- aggregate queries common
+      else
+        Unknown (reason: reason) -> outputs reason true
+        Proven() -> do
+          Disproven() <- publication queries instruction
+            else
+              Unknown (reason: reason) -> outputs reason true
+              Proven() -> outputs ^NestedInTransferredArgument true
+          unmodeled <- unmodeled queries instruction common
+          outputs ^UnsummarizedCallee unmodeled
+    unmodeled <- unmodeled queries instruction common
+    outputs ^UnsummarizedCallee unmodeled

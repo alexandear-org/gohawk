@@ -1,15 +1,17 @@
-signature total fallback outputs None false;
-query handoff = InstructionQueries.Handoff;
-query unknown = Evidence.Unknown;
-query payload = InstructionQueries.Payload;
-const SentToChannel;
+signature total = outputs ^None false
 
-rule Sent:
-  inputs $queries $value $instruction
-  => do {
-       $proof <- query handoff $queries $value $instruction;
-       false <- query unknown $proof
-         else outputs $proof.Reason true;
-       $answer <- query payload $queries $value SentToChannel;
-       pure $answer;
-     };
+host
+  handoff! = InstructionQueries.Handoff
+  unknown! = Evidence.Unknown
+  payload! = InstructionQueries.Payload
+  SentToChannel
+
+@Sent
+rewrite (inputs queries value instruction) =
+  do
+    proof <- handoff queries value instruction
+    false <- unknown proof
+      else
+        true -> outputs proof.Reason true
+    answer <- payload queries value ^SentToChannel
+    answer

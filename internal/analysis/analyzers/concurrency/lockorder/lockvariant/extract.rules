@@ -1,31 +1,30 @@
-signature total fallback outputs false;
-query cycle;
-query follow = Value;
+signature total = outputs false
 
-rule Iterated:
-  inputs _ (Extract tuple:$next:(Next))
-  => query cycle $next {
-       true => outputs true;
-       false => outputs false;
-     };
+host
+  cycle!
+  follow! = Value
+
+@Iterated
+rewrite (inputs _ (Extract (tuple: next@(Next())))) =
+  case cycle next of
+    true -> outputs true
+    false -> outputs false
 
 // Selected-case index and receive-ok are metadata. Only received payloads may
 // inherit the choice's cycle dependence; no extra tuple walk is charged here.
-rule Payload:
-  inputs _ (Extract tuple:$choice:(Select) index:$index)
-  && $index >= 2
-  => query cycle $choice {
-       true => outputs true;
-       false => outputs false;
-     };
+@Payload
+rewrite (inputs _ (Extract (tuple: choice@(Select()), index: index)))
+  | index >= 2
+  =
+  case cycle choice of
+    true -> outputs true
+    false -> outputs false
 
-rule Metadata:
-  inputs _ (Extract tuple:(Select))
-  => outputs false;
+@Metadata
+rewrite (inputs _ (Extract (tuple: Select()))) = outputs false
 
-rule Other:
-  inputs $walk (Extract tuple:$tuple)
-  => query follow $walk $tuple {
-       true => outputs true;
-       false => outputs false;
-     };
+@Other
+rewrite (inputs walk (Extract (tuple: tuple))) =
+  case follow walk tuple of
+    true -> outputs true
+    false -> outputs false

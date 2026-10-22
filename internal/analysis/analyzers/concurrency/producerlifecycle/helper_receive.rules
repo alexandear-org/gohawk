@@ -1,47 +1,63 @@
-signature total fallback outputs (Unknown count:0 reason:reasonReceiverHelperUnknown);
-guard producerOrigin, producerBuiltin;
-query receiverSummary, receiverExhausted, receiverComplete, receiverLaunched;
-query nonReceivingUses, opaqueReceives, summaryReceives;
-query proven = producerProof.Proven;
-build opaqueReceiver;
-const reasonProducerLaunch, reasonBuiltinNotReceive, reasonReceiverBudgetExhausted;
-const reasonWorkerChannelUsesComplete, reasonReceiverHelperUnknown;
+signature total = outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
 
-rule Origin:
-  inputs $call _ $origin _ _
-  && producerOrigin $call $origin
-  => outputs (Known count:0 reason:reasonProducerLaunch);
+host
+  producerOrigin
+  producerBuiltin
+  receiverSummary!
+  receiverExhausted!
+  receiverComplete!
+  receiverLaunched!
+  nonReceivingUses!
+  opaqueReceives!
+  summaryReceives!
+  proven! = producerProof.Proven
+  opaqueReceiver
+  reasonProducerLaunch
+  reasonBuiltinNotReceive
+  reasonReceiverBudgetExhausted
+  reasonWorkerChannelUsesComplete
+  reasonReceiverHelperUnknown
 
-rule Builtin:
-  inputs $call _ _ _ _
-  && producerBuiltin $call
-  => outputs (Known count:0 reason:reasonBuiltinNotReceive);
+@Origin
+rewrite (inputs call _ origin _ _)
+  | producerOrigin call origin
+  =
+  outputs (Known (count: 0, reason: ^reasonProducerLaunch))
 
-rule Helper:
-  inputs $call $channel _ $engine $budget
-  => do {
-       $summary <- query receiverSummary $engine $call $budget;
-       false <- query receiverExhausted $budget
-         else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
-       true <- query receiverComplete $summary
-         else do {
-                    true <- query receiverLaunched $call
-                      else decline;
-                    $uses <- query nonReceivingUses $call $channel $budget;
-                    true <- query proven $uses
-                      else decline;
-                    pure outputs (Known count:0 reason:reasonWorkerChannelUsesComplete);
-                  }
-              <|> do {
-                    false <- query receiverExhausted $budget
-                      else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
-                    $uncertain <- query opaqueReceives $call $channel $budget;
-                    false <- query receiverExhausted $budget
-                      else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
-                    pure outputs (opaqueReceiver $uncertain);
-                  }
-              <|> pure outputs (Unknown count:0 reason:reasonReceiverHelperUnknown);
-       $launched <- query receiverLaunched $call;
-       $answer <- query summaryReceives $summary $channel $launched $budget;
-       pure outputs $answer;
-     };
+@Builtin
+rewrite (inputs call _ _ _ _)
+  | producerBuiltin call
+  =
+  outputs (Known (count: 0, reason: ^reasonBuiltinNotReceive))
+
+@Helper
+rewrite (inputs call channel _ engine budget) =
+  do
+    summary <- receiverSummary engine call budget
+    false <- receiverExhausted budget
+      else
+        true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+    true <- receiverComplete summary
+      else
+        false -> do
+          true <- receiverLaunched call
+            else
+              false -> decline
+          uses <- nonReceivingUses call channel budget
+          true <- proven uses
+            else
+              false -> decline
+          outputs (Known (count: 0, reason: ^reasonWorkerChannelUsesComplete))
+        <|> do
+          false <- receiverExhausted budget
+            else
+              true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+          uncertain <- opaqueReceives call channel budget
+          false <- receiverExhausted budget
+            else
+              true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+          outputs (opaqueReceiver uncertain)
+        <|> outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
+    launched <- receiverLaunched call
+    answer <- summaryReceives summary channel launched budget
+    outputs answer

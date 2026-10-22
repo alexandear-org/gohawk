@@ -1,42 +1,30 @@
-signature total fallback outputs "" false false;
-query loaded = guardLoadedAddress;
+signature total = outputs "" false false
 
-rule Load:
-  inputs $condition:(Unary source:$source op:guardLoadToken) $budget $formats
-  => query $answer = loaded $condition $source nil guardEqualToken $budget $formats
-     decide $answer {
-       KnownLoaded => $answer;
-       UnknownLoaded => $answer;
-     };
+host
+  loaded! = guardLoadedAddress
+
+@Load
+rewrite (inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget formats) =
+  do
+    answer <- loaded condition source nil ^guardEqualToken budget formats
+    case answer of
+      KnownLoaded() -> answer
+      UnknownLoaded() -> answer
 
 // A constant on the left is swapped before recognizing the load. Unsupported
 // address paths still return their rendered payload, with availability false.
-rule LiteralLeft:
-  inputs
-    $condition:(Comparison
-      left:$literal:(Constant)
-      right:(Unary source:$source op:guardLoadToken)
-      op:$op:(or guardEqualToken guardNotEqualToken)
-    )
-    $budget
-    $formats
-  => query $answer = loaded $condition $source $literal $op $budget $formats
-     decide $answer {
-       KnownLoaded => $answer;
-       UnknownLoaded => $answer;
-     };
+@LiteralLeft
+rewrite (inputs condition@(Comparison (left: literal@(Constant()), right: Unary (source: source, op: ^guardLoadToken), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
+  do
+    answer <- loaded condition source literal op budget formats
+    case answer of
+      KnownLoaded() -> answer
+      UnknownLoaded() -> answer
 
-rule LiteralRight:
-  inputs
-    $condition:(Comparison
-      left:(Unary source:$source op:guardLoadToken)
-      right:$literal:(Constant)
-      op:$op:(or guardEqualToken guardNotEqualToken)
-    )
-    $budget
-    $formats
-  => query $answer = loaded $condition $source $literal $op $budget $formats
-     decide $answer {
-       KnownLoaded => $answer;
-       UnknownLoaded => $answer;
-     };
+@LiteralRight
+rewrite (inputs condition@(Comparison (left: Unary (source: source, op: ^guardLoadToken), right: literal@(Constant()), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
+  do
+    answer <- loaded condition source literal op budget formats
+    case answer of
+      KnownLoaded() -> answer
+      UnknownLoaded() -> answer

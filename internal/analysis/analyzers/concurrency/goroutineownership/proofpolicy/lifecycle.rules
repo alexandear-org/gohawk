@@ -1,27 +1,23 @@
-signature total fallback outputs (emptyProof) false;
+signature total = outputs emptyProof() false
 
 // Completion-handle ownership is independent of stop/context inputs. Factory
 // opacity precedes an external transfer claim; a lifetime bound is not a join.
-rule Lifecycle:
-  inputs $queries
-  => do {
-       RelayMissing <- query relay $queries
-         else {
-           RelayFound => outputs (Unknown reason:RelayDependency) true;
-           RelayCutoff budget:$budget => do {
-             $proof <- query relayCutoff $queries $budget;
-             pure outputs $proof true;
-           };
-         };
-       Undecided <- query handle $queries
-         else {
-           Decided proof:$proof => outputs $proof true;
-         };
-       Undecided <- query caller $queries
-         else {
-           Decided proof:$proof => outputs $proof true;
-         };
-       true <- query synctest $queries
-         else outputs (emptyProof) false;
-       pure outputs (Honored reason:SynctestBubbleOwner) true;
-     };
+@Lifecycle
+rewrite (inputs queries) =
+  do
+    RelayMissing() <- relay queries
+      else
+        RelayFound() -> outputs (Unknown (reason: ^RelayDependency)) true
+        RelayCutoff (budget: budget) -> do
+          proof <- relayCutoff queries budget
+          outputs proof true
+    Undecided() <- handle queries
+      else
+        Decided (proof: proof) -> outputs proof true
+    Undecided() <- caller queries
+      else
+        Decided (proof: proof) -> outputs proof true
+    true <- synctest queries
+      else
+        false -> outputs emptyProof() false
+    outputs (Honored (reason: ^SynctestBubbleOwner)) true

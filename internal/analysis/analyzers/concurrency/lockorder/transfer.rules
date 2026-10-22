@@ -1,42 +1,43 @@
-build emptyLockState;
-signature total fallback outputs (emptyLockState);
-view Effect = mutexEffect {
-  operation;
-};
-view Deferred = *ssa.Defer {
-};
-const mutexRelease;
-query deferRelease = lockFlowContext.deferMutexRelease;
-query release = lockFlowContext.releaseMutex;
-query register = lockFlowContext.registerMutexAcquisition;
-query dynamicIndexedMutex;
-query callerOwns = lockFlowContext.callerOwnsMutex;
-query prepare = lockFlowContext.prepareMutexAcquisition;
-query order = lockFlowContext.orderMutexAcquisition;
-query holdMutex;
+host
+  emptyLockState
+
+signature total = outputs emptyLockState()
+
+view Effect = mutexEffect
+  operation
+
+view Deferred = *ssa.Defer
+
+host
+  mutexRelease
+  deferRelease! = lockFlowContext.deferMutexRelease
+  release! = lockFlowContext.releaseMutex
+  register! = lockFlowContext.registerMutexAcquisition
+  dynamicIndexedMutex!
+  callerOwns! = lockFlowContext.callerOwnsMutex
+  prepare! = lockFlowContext.prepareMutexAcquisition
+  order! = lockFlowContext.orderMutexAcquisition
+  holdMutex!
 
 // A deferred unlock remains effective on later control-flow loop trips.
 // Unique identities let the dataflow reach a fixed point without growing.
-rule DeferredRelease:
-  inputs $flow (Deferred) $effect:(Effect operation:mutexRelease) $state
-  => do {
-       $released <- query deferRelease $flow $effect $state;
-       pure outputs $released;
-     };
+@DeferredRelease
+rewrite (inputs flow Deferred() effect@(Effect (operation: ^mutexRelease)) state) =
+  do
+    released <- deferRelease flow effect state
+    outputs released
 
-rule Release:
-  inputs $flow $instruction $effect:(Effect operation:mutexRelease) $state
-  => do {
-       $released <- query release $flow $instruction $effect $state;
-       pure outputs $released;
-     };
+@Release
+rewrite (inputs flow instruction effect@(Effect (operation: ^mutexRelease)) state) =
+  do
+    released <- release flow instruction effect state
+    outputs released
 
 // Registration does not execute a deferred acquisition in the function body.
 // A temporary upgrade may restore its reader state only after writer unlock.
 // https://github.com/refraction-networking/utls/blob/23b1dac19c06c51e278468e29ac329eec605a31f/common.go#L1100-L1119
-rule DeferredAcquisition:
-  inputs _ (Deferred) _ $state
-  => outputs $state;
+@DeferredAcquisition
+rewrite (inputs _ Deferred() _ state) = outputs state
 
 // An indexed or loop-carried receiver may denote a different runtime
 // mutex each iteration. Its SSA identity cannot establish retention.
@@ -45,17 +46,19 @@ rule DeferredAcquisition:
 // Reacquiring a borrowed caller-held lock restores caller state rather
 // than creating a new obligation to release it in this helper.
 // https://github.com/kubernetes/kubernetes/blob/e72c2715ade37738aa5c029e8de5285cbe1c9441/pkg/kubelet/cm/devicemanager/manager.go#L1065-L1075
-rule Acquire:
-  inputs $flow $instruction $effect $state
-  => do {
-       $values <- query register $flow $instruction $effect;
-       false <- query dynamicIndexedMutex $effect.receiver
-         else outputs $state;
-       false <- query callerOwns $flow $effect
-         else outputs $state;
-       $prepared <- query prepare $flow $instruction $effect $state $values;
-       true <- query order $flow $instruction $effect $prepared
-         else outputs $prepared;
-       $held <- query holdMutex $effect $prepared;
-       pure outputs $held;
-     };
+@Acquire
+rewrite (inputs flow instruction effect state) =
+  do
+    values <- register flow instruction effect
+    false <- dynamicIndexedMutex effect.receiver
+      else
+        true -> outputs state
+    false <- callerOwns flow effect
+      else
+        true -> outputs state
+    prepared <- prepare flow instruction effect state values
+    true <- order flow instruction effect prepared
+      else
+        false -> outputs prepared
+    held <- holdMutex effect prepared
+    outputs held

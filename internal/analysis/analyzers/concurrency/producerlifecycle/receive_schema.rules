@@ -1,10 +1,4 @@
-union Receives = receiveProof tag unknown {
-  Known = false {
-    count;
-    reason;
-  };
-  Unknown = true {
-    count;
-    reason;
-  };
-};
+type Receives = receiveProof
+  tag unknown
+  Known (count, reason) = false
+  Unknown (count, reason) = true

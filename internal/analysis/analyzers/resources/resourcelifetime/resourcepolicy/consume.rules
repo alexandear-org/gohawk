@@ -1,53 +1,51 @@
-signature total fallback outputs None false;
-build possible;
-query returned = InstructionQueries.Returned;
-query stored = StoreConsumption;
-query send = Send;
-query payload = InstructionQueries.Payload;
-query select = InstructionQueries.Select;
-query call = InstructionQueries.Call;
-build common = ssaflow.InstructionCall;
-const StoredOnCollectionOwner, StoredInMap;
+signature total = outputs ^None false
 
-rule Returned:
-  inputs $queries $return:(Return)
-  => do {
-       $proof <- query returned $queries $return;
-       pure outputs $proof.Reason (possible $proof);
-     };
+host
+  possible
+  returned! = InstructionQueries.Returned
+  stored! = StoreConsumption
+  send! = Send
+  payload! = InstructionQueries.Payload
+  select! = InstructionQueries.Select
+  call! = InstructionQueries.Call
+  common = ssaflow.InstructionCall
+  StoredOnCollectionOwner
+  StoredInMap
 
-rule Stored:
-  inputs $queries $store:(Store)
-  => do {
-       $answer <- query stored $queries $store;
-       pure $answer;
-     };
+@Returned
+rewrite (inputs queries return@(Return())) =
+  do
+    proof <- returned queries return
+    outputs proof.Reason (possible proof)
 
-rule Sent:
-  inputs $queries $instruction:(Send value:$value)
-  => do {
-       $answer <- query send $queries $value $instruction;
-       pure $answer;
-     };
+@Stored
+rewrite (inputs queries store@(Store())) =
+  do
+    answer <- stored queries store
+    answer
 
-rule Mapped:
-  inputs $queries (Map value:$value)
-  => do {
-       $answer <- query payload $queries $value StoredInMap;
-       pure $answer;
-     };
+@Sent
+rewrite (inputs queries instruction@(Send (value: value))) =
+  do
+    answer <- send queries value instruction
+    answer
 
-rule Selected:
-  inputs $queries $select:(Select)
-  => do {
-       $answer <- query select $queries $select;
-       pure $answer;
-     };
+@Mapped
+rewrite (inputs queries (Map (value: value))) =
+  do
+    answer <- payload queries value ^StoredInMap
+    answer
 
-rule Called:
-  inputs $queries $instruction:(or (Call) (Defer) (Go))
-  let $common = common $instruction
-  => do {
-       $answer <- query call $queries $instruction $common;
-       pure $answer;
-     };
+@Selected
+rewrite (inputs queries select@(Select())) =
+  do
+    answer <- select queries select
+    answer
+
+@Called
+rewrite (inputs queries instruction@(Call() | Defer() | Go()))
+  | let common = common instruction
+  =
+  do
+    answer <- call queries instruction common
+    answer

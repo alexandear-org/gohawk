@@ -1,19 +1,28 @@
-signature total fallback outputs actionNone reasonNone false;
-query stored = storedTerminationInstruction;
-query selected = spawnAnalysis.selectedSignalEntry;
-query possible = spawnAnalysis.selectedPossibleEntry;
-const actionNone, actionJoin, actionUnknown;
-const reasonNone, reasonLabelStoredTestingReceiver;
-const reasonLabelSignalReceived, reasonLabelPossibleSignalReceive;
+signature total = outputs ^actionNone ^reasonNone false
+
+host
+  stored! = storedTerminationInstruction
+  selected! = spawnAnalysis.selectedSignalEntry
+  possible! = spawnAnalysis.selectedPossibleEntry
+  actionNone
+  actionJoin
+  actionUnknown
+  reasonNone
+  reasonLabelStoredTestingReceiver
+  reasonLabelSignalReceived
+  reasonLabelPossibleSignalReceive
 
 // Arm-entry evidence precedes the instruction's own consumption: a selected
 // receive settles that arm even when its first instruction publishes the handle.
-rule Instruction:
-  inputs $analysis $instruction
-  => query stored $instruction
-           select true => outputs actionUnknown reasonLabelStoredTestingReceiver true
-     <|> query selected $analysis $instruction
-           select true => outputs actionJoin reasonLabelSignalReceived true
-     <|> query possible $analysis $instruction
-           select true => outputs actionUnknown reasonLabelPossibleSignalReceive true
-     <|> pure outputs actionNone reasonNone false;
+@Instruction
+rewrite (inputs analysis instruction) =
+  case stored instruction of
+    true -> outputs ^actionUnknown ^reasonLabelStoredTestingReceiver true
+    false -> decline
+  <|> case selected analysis instruction of
+    true -> outputs ^actionJoin ^reasonLabelSignalReceived true
+    false -> decline
+  <|> case possible analysis instruction of
+    true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive true
+    false -> decline
+  <|> outputs ^actionNone ^reasonNone false

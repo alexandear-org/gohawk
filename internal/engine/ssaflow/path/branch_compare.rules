@@ -1,33 +1,34 @@
-signature total fallback outputs false false;
-const guardEqualToken, guardNotEqualToken, guardLessToken, guardLessEqualToken, guardGreaterToken, guardGreaterEqualToken;
-view Constant = *ssa.Const {
-  value: Value;
-};
-guard bothNil = guardBothNil;
-guard present = guardConstantPresent;
-build isEqual = guardIsEqualToken;
-build equalityToken = guardEqualityToken;
-build compare = guardLiteralCompare;
+signature total = outputs false false
+
+host
+  guardEqualToken
+  guardNotEqualToken
+  guardLessToken
+  guardLessEqualToken
+  guardGreaterToken
+  guardGreaterEqualToken
+
+view Constant = *ssa.Const
+  value: Value
+
+host
+  bothNil = guardBothNil
+  present = guardConstantPresent
+  isEqual = guardIsEqualToken
+  equalityToken = guardEqualityToken
+  compare = guardLiteralCompare
 
 // Nil has no go/constant payload. Equality alone decides a pair of nils;
 // other operators remain unavailable and must never reach constant.Compare.
-rule NilPair:
-  inputs $op $left $right
-  && bothNil $left $right
-  => outputs (isEqual $op) (equalityToken $op);
+@NilPair
+rewrite (inputs op left right)
+  | bothNil left right
+  =
+  outputs (isEqual op) (equalityToken op)
 
-rule Literals:
-  inputs
-    $op:(or
-      guardEqualToken
-      guardNotEqualToken
-      guardLessToken
-      guardLessEqualToken
-      guardGreaterToken
-      guardGreaterEqualToken
-    )
-    (Constant value:$left)
-    (Constant value:$right)
-  && present $left
-  && present $right
-  => outputs (compare $left $op $right) true;
+@Literals
+rewrite (inputs op@(^guardEqualToken | ^guardNotEqualToken | ^guardLessToken | ^guardLessEqualToken | ^guardGreaterToken | ^guardGreaterEqualToken) (Constant (value: left)) (Constant (value: right)))
+  | present left
+  , present right
+  =
+  outputs (compare left op right) true

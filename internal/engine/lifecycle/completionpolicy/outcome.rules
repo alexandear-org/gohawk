@@ -1,34 +1,42 @@
-signature total fallback outputs (evidence unknown unavailable noProvenance);
-build evidence;
-guard exhausted;
-const unknown, disproven, unavailable, budgetExhausted, completionInCycle, notFound, localSSA, noProvenance;
+signature total = outputs (evidence ^unknown ^unavailable ^noProvenance)
+
+host
+  evidence
+  exhausted
+  unknown
+  disproven
+  unavailable
+  budgetExhausted
+  completionInCycle
+  notFound
+  localSSA
+  noProvenance
 
 // A stopped walk cannot establish missing completion. Body availability still
 // supplies local provenance when the allowance has been exhausted.
-rule LocalCutoff:
-  inputs $budget true _ _
-  && exhausted $budget
-  => outputs (evidence unknown budgetExhausted localSSA);
+@LocalCutoff
+rewrite (inputs budget true _ _)
+  | exhausted budget
+  =
+  outputs (evidence ^unknown ^budgetExhausted ^localSSA)
 
-rule UnavailableCutoff:
-  inputs $budget false _ _
-  && exhausted $budget
-  => outputs (evidence unknown budgetExhausted noProvenance);
+@UnavailableCutoff
+rewrite (inputs budget false _ _)
+  | exhausted budget
+  =
+  outputs (evidence ^unknown ^budgetExhausted ^noProvenance)
 
 // A helper that releases every element of what it was handed inside a loop,
 // as slackdump's Destroy closes each stored handle, is not covered on every
 // return: the exit edge skips the body and iteration decides the element.
 // This is uncertainty about the element, not a missing completion.
 // https://github.com/rusq/slackdump/blob/f7319928b0993b23d7e9bd8af5e4c69b6f1d2af4/internal/chunk/filemgr.go#L66-L73
-rule LoopOnly:
-  inputs _ true _ true
-  => outputs (evidence unknown completionInCycle localSSA);
+@LoopOnly
+rewrite (inputs _ true _ true) = outputs (evidence ^unknown ^completionInCycle ^localSSA)
 
 // Unresolved nested work cannot establish missing completion.
-rule Incomplete:
-  inputs _ true true _
-  => outputs (evidence unknown unavailable localSSA);
+@Incomplete
+rewrite (inputs _ true true _) = outputs (evidence ^unknown ^unavailable ^localSSA)
 
-rule Missing:
-  inputs _ true _ _
-  => outputs (evidence disproven notFound localSSA);
+@Missing
+rewrite (inputs _ true _ _) = outputs (evidence ^disproven ^notFound ^localSSA)

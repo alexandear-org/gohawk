@@ -1,43 +1,52 @@
-signature total fallback outputs (Opaque reasonLabelOwnerUnavailable);
-view Closure = *ssa.MakeClosure {
-};
-query deferredStore = cancellationClassifier.deferredCaptureStoreLabel;
-query ownerHolds = cancellationClassifier.ownerHoldsInstruction;
-query recognized = cancellationClassifier.recognizedInstruction;
-query ownerAvailable = cancellationClassifier.ownerAvailable;
+signature total = outputs (Opaque ^reasonLabelOwnerUnavailable)
+
+view Closure = *ssa.MakeClosure
+
+host
+  deferredStore! = cancellationClassifier.deferredCaptureStoreLabel
+  ownerHolds! = cancellationClassifier.ownerHoldsInstruction
+  recognized! = cancellationClassifier.recognizedInstruction
+  ownerAvailable! = cancellationClassifier.ownerAvailable
 // A standard context acquired once by the true program entry may span the
 // process lifetime. Exit ends that interval without invoking cancel or joining
 // workers; signal registrations and repeatable acquisitions remain outside it.
 // Exact cleanup or transfer still covers this unknown.
 // https://github.com/k8ssandra/k8ssandra-operator/blob/2028d352ecb495de4b6e053d99d7a77b21eb5107/main.go#L176-L205
-query processReturn = cancellationClassifier.processLifetimeReturn;
-query references($instruction) = instructionReferencesCancellation $instruction $classifier.cancel;
-query localStorageOnly;
-query localObserves($instruction) = localCallOnlyObserves $instruction $classifier.cancel $classifier.observer;
-build opaqueReference;
+  processReturn! = cancellationClassifier.processLifetimeReturn
+  references! instruction = instructionReferencesCancellation instruction classifier.cancel
+  localStorageOnly!
+  localObserves! instruction = localCallOnlyObserves instruction classifier.cancel classifier.observer
+  opaqueReference
 
 // Creating a callback does not release or transfer cancellation. Classify the
 // defer, return, store, launch or opaque call that establishes its lifecycle.
-rule ClosureCreation:
-  inputs (Closure) _
-  => outputs (NoAction reasonCancellationNone);
+@ClosureCreation
+rewrite (inputs Closure() _) = outputs (NoAction ^reasonCancellationNone)
 
-rule Instruction:
-  inputs $instruction $classifier
-  => query deferredStore $classifier $instruction
-           select Decided label:$label => outputs $label
-     <|> query ownerHolds $classifier $instruction
-           select true => outputs (NoAction reasonCancellationNone)
-     <|> query recognized $classifier $instruction
-           select Decided label:$label => outputs $label
-     <|> query ownerAvailable $classifier
-           select false => outputs (Opaque reasonLabelOwnerUnavailable)
-     <|> query processReturn $classifier $instruction
-           select true => outputs (Opaque reasonLabelProcessLifetimeContext)
-     <|> query references $instruction
-           select false => outputs (NoAction reasonCancellationNone)
-     <|> query localStorageOnly $instruction
-           select true => outputs (NoAction reasonCancellationNone)
-     <|> query localObserves $instruction
-           select true => outputs (NoAction reasonCancellationNone)
-     <|> pure outputs (Opaque (opaqueReference $instruction));
+@Instruction
+rewrite (inputs instruction classifier) =
+  case deferredStore classifier instruction of
+    Decided (label: label) -> outputs label
+    Unrecognized() -> decline
+  <|> case ownerHolds classifier instruction of
+    true -> outputs (NoAction ^reasonCancellationNone)
+    false -> decline
+  <|> case recognized classifier instruction of
+    Decided (label: label) -> outputs label
+    Unrecognized() -> decline
+  <|> case ownerAvailable classifier of
+    false -> outputs (Opaque ^reasonLabelOwnerUnavailable)
+    true -> decline
+  <|> case processReturn classifier instruction of
+    true -> outputs (Opaque ^reasonLabelProcessLifetimeContext)
+    false -> decline
+  <|> case references instruction of
+    false -> outputs (NoAction ^reasonCancellationNone)
+    true -> decline
+  <|> case localStorageOnly instruction of
+    true -> outputs (NoAction ^reasonCancellationNone)
+    false -> decline
+  <|> case localObserves instruction of
+    true -> outputs (NoAction ^reasonCancellationNone)
+    false -> decline
+  <|> outputs (Opaque (opaqueReference instruction))

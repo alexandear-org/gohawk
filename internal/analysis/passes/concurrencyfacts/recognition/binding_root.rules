@@ -1,19 +1,15 @@
-signature total fallback outputs AddressBinding nil nil;
+signature total = outputs ^AddressBinding nil nil
 
-rule Global:
-  inputs (Global)
-  => outputs AddressGlobal nil nil;
+@Global
+rewrite (inputs Global()) = outputs ^AddressGlobal nil nil
 
 // Callee root binding retains the existing unary-source contract. It does
 // not repeat the dereference restriction of canonical fixed-load queries.
-rule Capture:
-  inputs (Unary source:$capture:(Capture))
-  => outputs AddressCapture $capture nil;
+@Capture
+rewrite (inputs (Unary (source: capture@(Capture())))) = outputs ^AddressCapture capture nil
 
-rule Field:
-  inputs (Unary source:$field:(Field))
-  => outputs AddressField nil $field;
+@Field
+rewrite (inputs (Unary (source: field@(Field())))) = outputs ^AddressField nil field
 
-rule UnsupportedUnary:
-  inputs (Unary)
-  => outputs AddressBlocked nil nil;
+@UnsupportedUnary
+rewrite (inputs Unary()) = outputs ^AddressBlocked nil nil

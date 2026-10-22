@@ -1,69 +1,66 @@
-signature total fallback outputs "" false;
-query steps = ssaflow.AccessPathStepsWithin;
-build join = ssaflow.JoinAccessPath;
-build appendPath, samePath;
-guard nonempty;
-union Steps = (pathList, bool) tag 1 {
-  KnownSteps = true {
-    path: 0;
-  };
-  MissingSteps = false {
-    path: 0;
-  };
-};
+signature total = outputs "" false
 
-rule Unknown:
-  inputs _ _ _ false _
-  => outputs "" false;
+host
+  steps! = ssaflow.AccessPathStepsWithin
+  join = ssaflow.JoinAccessPath
+  appendPath
+  samePath
+  nonempty
+
+type Steps = (pathList, bool)
+  tag 1
+  KnownSteps (path: 0) = true
+  MissingSteps (path: 0) = false
+
+@Unknown
+rewrite (inputs _ _ _ false _) = outputs "" false
 
 // A contained target is settled only at its selected path, not the aggregate
 // or a sibling field. This comparison does not need a new storage query.
-rule Contained:
-  inputs (Exact path:$path) _ $actual true _
-  && nonempty $path
-  => outputs "" (samePath $actual $path);
+@Contained
+rewrite (inputs (Exact (path: path)) _ actual true _)
+  | nonempty path
+  =
+  outputs "" (samePath actual path)
 
-rule Exact:
-  inputs (Exact supplied:$supplied) $target $actual true $budget
-  => query steps $supplied $target $budget {
-       KnownSteps path:$path => outputs (appendPath $path $actual) true;
-       MissingSteps => outputs "" false;
-     };
+@Exact
+rewrite (inputs (Exact (supplied: supplied)) target actual true budget) =
+  case steps supplied target budget of
+    KnownSteps (path: path) -> outputs (appendPath path actual) true
+    MissingSteps() -> outputs "" false
 
 // A strict projection can settle only itself, never a further projection.
-rule ProjectionChild:
-  inputs (Projection) _ $actual true _
-  && nonempty $actual
-  => outputs "" false;
+@ProjectionChild
+rewrite (inputs Projection() _ actual true _)
+  | nonempty actual
+  =
+  outputs "" false
 
-rule ProjectionPath:
-  inputs (Projection path:$path) _ _ true _
-  && nonempty $path
-  => outputs (join $path) true;
+@ProjectionPath
+rewrite (inputs (Projection (path: path)) _ _ true _)
+  | nonempty path
+  =
+  outputs (join path) true
 
 // Retain the query's path payload even when its availability is false.
-rule Projection:
-  inputs (Projection supplied:$supplied) $target _ true $budget
-  => query steps $supplied $target $budget {
-       KnownSteps path:$path => outputs (join $path) true;
-       MissingSteps path:$path => outputs (join $path) false;
-     };
+@Projection
+rewrite (inputs (Projection (supplied: supplied)) target _ true budget) =
+  case steps supplied target budget of
+    KnownSteps (path: path) -> outputs (join path) true
+    MissingSteps (path: path) -> outputs (join path) false
 
 // Nil denotes the already-matched direct receiver. A nonnil empty path is a
 // nested answer and still needs the mirrored-owner query below.
-rule DirectOwner:
-  inputs (Owner) _ nil true _
-  => outputs "" true;
+@DirectOwner
+rewrite (inputs Owner() _ nil true _) = outputs "" true
 
 // A nested completion must name the mirrored path: settling c.rpc cannot
 // settle the caller's c.monitors beneath the same supplied owner.
-rule NestedOwner:
-  inputs (Owner supplied:$supplied) $target $actual true $budget
-  => query steps $supplied $target $budget {
-       KnownSteps path:$path => outputs "" (samePath $actual $path);
-       MissingSteps => outputs "" false;
-     };
+@NestedOwner
+rewrite (inputs (Owner (supplied: supplied)) target actual true budget) =
+  case steps supplied target budget of
+    KnownSteps (path: path) -> outputs "" (samePath actual path)
+    MissingSteps() -> outputs "" false
 
-rule Callback:
-  inputs (Callback) _ _ true _
-  => outputs "" false;
+@Callback
+rewrite (inputs Callback() _ _ true _) = outputs "" false

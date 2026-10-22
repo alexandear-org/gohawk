@@ -1,20 +1,26 @@
-signature total fallback outputs (Opaque reasonLabelDeferredClosure) true;
-query callsValue($instruction) = lifecycle.DeferredClosureCallsValue $instruction $classifier.cancel;
-query invokes($instruction) = lifecycle.DeferredClosureInvokesArgumentOnEveryReturn $instruction $classifier.cancel;
-query captures($instruction) = deferredClosureCaptures $instruction $classifier.cancel;
-query resolved($instruction) = deferredClosureUseIsLocallyResolved $instruction $classifier.cancel $classifier.observer;
+signature total = outputs (Opaque ^reasonLabelDeferredClosure) true
+
+host
+  callsValue! instruction = lifecycle.DeferredClosureCallsValue instruction classifier.cancel
+  invokes! instruction = lifecycle.DeferredClosureInvokesArgumentOnEveryReturn instruction classifier.cancel
+  captures! instruction = deferredClosureCaptures instruction classifier.cancel
+  resolved! instruction = deferredClosureUseIsLocallyResolved instruction classifier.cancel classifier.observer
 
 // Captured callbacks and helper chains are deliberately ambiguous. These broad
 // traversals establish possible participation, not which callback runs on every
 // path. Each search runs only after the preceding question fails to establish it.
-rule DeferredUse:
-  inputs $instruction $classifier
-  => query callsValue $instruction
-           select true => outputs (Opaque reasonLabelDeferredClosure) true
-     <|> query invokes $instruction
-           select true => outputs (Opaque reasonLabelDeferredClosure) true
-     <|> query captures $instruction
-           select true => outputs (Opaque reasonLabelDeferredClosure) true
-     <|> query resolved $instruction
-           select true => outputs (NoAction reasonCancellationNone) true
-     <|> pure outputs (NoAction reasonCancellationNone) false;
+@DeferredUse
+rewrite (inputs instruction classifier) =
+  case callsValue instruction of
+    true -> outputs (Opaque ^reasonLabelDeferredClosure) true
+    false -> decline
+  <|> case invokes instruction of
+    true -> outputs (Opaque ^reasonLabelDeferredClosure) true
+    false -> decline
+  <|> case captures instruction of
+    true -> outputs (Opaque ^reasonLabelDeferredClosure) true
+    false -> decline
+  <|> case resolved instruction of
+    true -> outputs (NoAction ^reasonCancellationNone) true
+    false -> decline
+  <|> outputs (NoAction ^reasonCancellationNone) false

@@ -1,38 +1,37 @@
-signature total fallback outputs (Unknown reason:None);
-guard defaultClientValue;
-query direct = onlyHTTPDoUsesWithin;
-query unmodified = DefaultClientUnmodified;
-query cell = zeroClientCellWithin;
-build result = carriedProof;
+signature total = outputs (Unknown (reason: ^None))
 
-rule Allocation:
-  inputs $client:(Allocation) _ $budget
-  => query direct $client $budget {
-       true => outputs (result true $budget);
-       false => outputs (result false $budget);
-     };
+host
+  defaultClientValue
+  direct! = onlyHTTPDoUsesWithin
+  unmodified! = DefaultClientUnmodified
+  cell! = zeroClientCellWithin
+  result = carriedProof
+
+@Allocation
+rewrite (inputs client@(Allocation()) _ budget) =
+  case direct client budget of
+    true -> outputs (result true budget)
+    false -> outputs (result false budget)
 
 // The default root's Do-only allowance must not enter strict helper memos.
-rule Default:
-  inputs $client:(Unary source:$source op:loadToken) $function $budget
-  && defaultClientValue $source
-  => query direct $client $budget {
-       false => outputs (result false $budget);
-       true => query $proof = unmodified $function $budget
-       decide $proof {
-         Unknown => outputs $proof;
-         Disproven => outputs $proof;
-         Proven => outputs $proof;
-       };
-     };
+@Default
+rewrite (inputs client@(Unary (source: source, op: ^loadToken)) function budget)
+  | defaultClientValue source
+  =
+  case direct client budget of
+    false -> outputs (result false budget)
+    true -> do
+      proof <- unmodified function budget
+      case proof of
+        Unknown() -> outputs proof
+        Disproven() -> outputs proof
+        Proven() -> outputs proof
 
-rule LocalCell:
-  inputs (Unary source:$cell:(Allocation) op:loadToken) _ $budget
-  => query cell $cell $budget {
-       true => outputs (result true $budget);
-       false => outputs (result false $budget);
-     };
+@LocalCell
+rewrite (inputs (Unary (source: cell@(Allocation()), op: ^loadToken)) _ budget) =
+  case cell cell budget of
+    true -> outputs (result true budget)
+    false -> outputs (result false budget)
 
-rule Other:
-  inputs _ _ $budget
-  => outputs (result false $budget);
+@Other
+rewrite (inputs _ _ budget) = outputs (result false budget)

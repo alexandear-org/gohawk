@@ -1,55 +1,45 @@
-signature total fallback outputs false false;
-const resultAlwaysTrue, resultAlwaysFalse, comparisonEqual, comparisonNotEqual;
-view Comparison = *ssa.BinOp {
-  left: X;
-  right: Y;
-  op: Op;
-};
-view Constant = *ssa.Const {
-};
-build truth = comparisonTruth;
-query equality = decideResultComparison;
-union Equality = (bool, bool) tag 1 {
-  Known = true {
-    equal: 0;
-  };
-  Unknown = false {
-    equal: 0;
-  };
-};
+signature total = outputs false false
 
-rule True:
-  inputs _ _ resultAlwaysTrue _ _
-  => outputs true true;
+host
+  resultAlwaysTrue
+  resultAlwaysFalse
+  comparisonEqual
+  comparisonNotEqual
 
-rule False:
-  inputs _ _ resultAlwaysFalse _ _
-  => outputs false true;
+view Comparison = *ssa.BinOp
+  left: X
+  right: Y
+  op: Op
+
+view Constant = *ssa.Const
+
+host
+  truth = comparisonTruth
+  equality! = decideResultComparison
+
+type Equality = (bool, bool)
+  tag 1
+  Known (equal: 0) = true
+  Unknown (equal: 0) = false
+
+@True
+rewrite (inputs _ _ ^resultAlwaysTrue _ _) = outputs true true
+
+@False
+rewrite (inputs _ _ ^resultAlwaysFalse _ _) = outputs false true
 
 // A literal on the left is swapped first, including when both sides are
 // constants. Do not request a summary for unsupported operators or operands.
-rule LiteralLeft:
-  inputs
-    $provider
-    (Comparison left:$literal:(Constant) right:$left op:$op:(or comparisonEqual comparisonNotEqual))
-    _
-    $block
-    $budget
-  => query equality $provider $left $literal $block $budget {
-       Known equal:$equal => outputs (truth $equal $op) true;
-       Unknown equal:$equal => outputs (truth $equal $op) false;
-     };
+@LiteralLeft
+rewrite (inputs provider (Comparison (left: literal@(Constant()), right: left, op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget) =
+  case equality provider left literal block budget of
+    Known (equal: equal) -> outputs (truth equal op) true
+    Unknown (equal: equal) -> outputs (truth equal op) false
 
 // Preserve the equality payload even when unknown: the caller still requires
 // known before pruning a successor, and this keeps the native result contract.
-rule LiteralRight:
-  inputs
-    $provider
-    (Comparison left:$left right:$literal:(Constant) op:$op:(or comparisonEqual comparisonNotEqual))
-    _
-    $block
-    $budget
-  => query equality $provider $left $literal $block $budget {
-       Known equal:$equal => outputs (truth $equal $op) true;
-       Unknown equal:$equal => outputs (truth $equal $op) false;
-     };
+@LiteralRight
+rewrite (inputs provider (Comparison (left: left, right: literal@(Constant()), op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget) =
+  case equality provider left literal block budget of
+    Known (equal: equal) -> outputs (truth equal op) true
+    Unknown (equal: equal) -> outputs (truth equal op) false

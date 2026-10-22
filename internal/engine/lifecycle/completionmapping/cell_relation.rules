@@ -1,20 +1,24 @@
-signature total fallback outputs (emptyLocal) false;
-const deferredExact, deferredContains, deferredUnknown;
+signature total = outputs emptyLocal() false
 
-rule Exact:
-  inputs _ $local _ $target _ deferredExact
-  => outputs (Exact local:$local supplied:$target path:nil) true;
+host
+  deferredExact
+  deferredContains
+  deferredUnknown
 
-rule Contains:
-  inputs _ $local $cell _ _ deferredContains
-  => outputs (Exact local:$local supplied:$cell path:nil) true;
+@Exact
+rewrite (inputs _ local _ target _ ^deferredExact) =
+  outputs (Exact (local: local, supplied: target, path: nil)) true
+
+@Contains
+rewrite (inputs _ local cell _ _ ^deferredContains) =
+  outputs (Exact (local: local, supplied: cell, path: nil)) true
 
 // A merged cell may hold another value only on paths which never stored this
 // target. Require the target to survive on every path through its own store.
-rule Other:
-  inputs $context $local $cell $target $invocation deferredUnknown
-  => do {
-       true <- query storedOnPath $context.Queries $cell $target $invocation
-         else outputs (emptyLocal) false;
-       pure outputs (Exact local:$local supplied:$target path:nil) true;
-     };
+@Other
+rewrite (inputs context local cell target invocation ^deferredUnknown) =
+  do
+    true <- storedOnPath context.Queries cell target invocation
+      else
+        false -> outputs emptyLocal() false
+    outputs (Exact (local: local, supplied: target, path: nil)) true

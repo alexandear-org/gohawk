@@ -1,23 +1,27 @@
-signature total fallback outputs (missingHandoff);
-query handoffCall, handoffWait, mergedWaitReceiver, handoffBody, handoffStarted;
-query handoffReturns, handoffCompletion, provePossibleCallbackCapture, handoffArguments;
-build missingHandoff, uncertainHandoff, mergedHandoff;
-union Call = (*ssa.CallCommon, bool) tag 1 {
-  Called = true {
-    common: 0;
-  };
-  NotCalled = false;
-};
+signature total = outputs missingHandoff()
+
+host
+  handoffCall!
+  handoffWait!
+  mergedWaitReceiver!
+  handoffBody!
+  handoffStarted!
+  handoffReturns!
+  handoffCompletion!
+  provePossibleCallbackCapture!
+  handoffArguments!
+  missingHandoff
+  uncertainHandoff
+  mergedHandoff
+
 // A callback supplied to an opaque runner may own Wait. A nonreturning worker
 // with a positive Wait witness also remains uncertain: every-return completion
 // deliberately excludes it. Neither case establishes exact reaping.
 // https://github.com/la5nta/pat/blob/2e6a8d14baf0268f4e2aa4d01784a54ca935cf52/internal/prehook/prehook.go#L109-L114
-union Body = (*ssa.Function, bool) tag 1 {
-  Visible = true {
-    function: 0;
-  };
-  Opaque = false;
-};
+type Call = (*ssa.CallCommon, bool)
+  tag 1
+  Called (common: 0) = true
+  NotCalled = false
 
 // A phi may select the started command without proving exact identity.
 // Keep possible reaping unknown instead of crediting a guaranteed Wait.
@@ -25,40 +29,45 @@ union Body = (*ssa.Function, bool) tag 1 {
 // Imported and unresolved runners can retain the same callback whether
 // called or launched. Ask its value before scanning supplied arguments.
 // https://github.com/unstablebuild/rune/blob/3e2165f8983280542c985947378dfa740a397d03/internal/workspace/file_scheme.go#L458-L467
-rule Handoff:
-  inputs $instruction $command $budget
-  => do {
-       Called common:$common <- query handoffCall $instruction
-         else {
-           NotCalled => outputs (missingHandoff);
-         };
-       false <- query handoffWait $common
-         else query mergedWaitReceiver $common $command {
-                true => outputs (mergedHandoff);
-                false => outputs (missingHandoff);
-              };
-       Visible function:$function <- query handoffBody $common
-         else {
-           Opaque => do {
-             $capture <- query provePossibleCallbackCapture $common.Value $command $budget;
-             true <- query known $capture
-               else outputs $capture;
-             $argument <- query handoffArguments $common $command $budget;
-             pure outputs $argument;
-           };
-         };
-       true <- query handoffStarted $instruction
-         else outputs (missingHandoff);
-       $returns <- query handoffReturns $function $budget;
-       false <- query cutoff $returns
-         else outputs $returns;
-       false <- query proven $returns
-         else outputs (missingHandoff);
-       $completion <- query handoffCompletion $instruction $command $budget;
-       true <- query proven $completion
-         else query cutoff $completion {
-                true => outputs (uncertainHandoff $completion);
-                false => outputs (missingHandoff);
-              };
-       pure outputs (uncertainHandoff $completion);
-     };
+type Body = (*ssa.Function, bool)
+  tag 1
+  Visible (function: 0) = true
+  Opaque = false
+
+@Handoff
+rewrite (inputs instruction command budget) =
+  do
+    Called (common: common) <- handoffCall instruction
+      else
+        NotCalled() -> outputs missingHandoff()
+    false <- handoffWait common
+      else
+        true -> case mergedWaitReceiver common command of
+          true -> outputs mergedHandoff()
+          false -> outputs missingHandoff()
+    Visible (function: function) <- handoffBody common
+      else
+        Opaque() -> do
+          capture <- provePossibleCallbackCapture common.Value command budget
+          true <- known capture
+            else
+              false -> outputs capture
+          argument <- handoffArguments common command budget
+          outputs argument
+    true <- handoffStarted instruction
+      else
+        false -> outputs missingHandoff()
+    returns <- handoffReturns function budget
+    false <- cutoff returns
+      else
+        true -> outputs returns
+    false <- proven returns
+      else
+        true -> outputs missingHandoff()
+    completion <- handoffCompletion instruction command budget
+    true <- proven completion
+      else
+        false -> case cutoff completion of
+          true -> outputs (uncertainHandoff completion)
+          false -> outputs missingHandoff()
+    outputs (uncertainHandoff completion)

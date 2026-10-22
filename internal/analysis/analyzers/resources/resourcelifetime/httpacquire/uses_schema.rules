@@ -1,27 +1,28 @@
-view Allocation = *ssa.Alloc {
-};
-view Unary = *ssa.UnOp {
-  source: X;
-  op: Op;
-};
-view Call = *ssa.Call {
-  common: Call;
-};
-view Extraction = *ssa.Extract {
-  tuple: Tuple;
-  index: Index;
-};
-view Store = *ssa.Store {
-  address: Addr;
-  value: Val;
-};
-view FieldAddress = *ssa.FieldAddr {
-  field: Field;
-};
-view Closure = *ssa.MakeClosure {
-};
-view Debug = *ssa.DebugRef {
-};
-view InterfaceChange = *ssa.ChangeInterface {
-};
-const loadToken;
+view Allocation = *ssa.Alloc
+
+view Unary = *ssa.UnOp
+  source: X
+  op: Op
+
+view Call = *ssa.Call
+  common: Call
+
+view Extraction = *ssa.Extract
+  tuple: Tuple
+  index: Index
+
+view Store = *ssa.Store
+  address: Addr
+  value: Val
+
+view FieldAddress = *ssa.FieldAddr
+  field: Field
+
+view Closure = *ssa.MakeClosure
+
+view Debug = *ssa.DebugRef
+
+view InterfaceChange = *ssa.ChangeInterface
+
+host
+  loadToken

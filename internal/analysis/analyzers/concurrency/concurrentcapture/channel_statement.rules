@@ -1,22 +1,26 @@
-signature total fallback outputs channelStatementNone nil;
-view Send = *ast.SendStmt {
-  channel: Chan;
-};
-view Expression = *ast.ExprStmt {
-  expression: X;
-};
-view Unary = *ast.UnaryExpr {
-  op: Op;
-  operand: X;
-};
-const channelStatementNone, channelStatementSend, channelStatementReceive, channelReceiveToken;
+signature total = outputs ^channelStatementNone nil
 
-rule Send:
-  inputs (Send channel:$channel)
-  => outputs channelStatementSend $channel;
+view Send = *ast.SendStmt
+  channel: Chan
+
+view Expression = *ast.ExprStmt
+  expression: X
+
+view Unary = *ast.UnaryExpr
+  op: Op
+  operand: X
+
+host
+  channelStatementNone
+  channelStatementSend
+  channelStatementReceive
+  channelReceiveToken
+
+@Send
+rewrite (inputs (Send (channel: channel))) = outputs ^channelStatementSend channel
 
 // Keep the direct expression-statement boundary: assignments and parenthesized
 // receive expressions are not part of this conservative semaphore recognizer.
-rule Receive:
-  inputs (Expression expression:(Unary op:channelReceiveToken operand:$channel))
-  => outputs channelStatementReceive $channel;
+@Receive
+rewrite (inputs (Expression (expression: Unary (op: ^channelReceiveToken, operand: channel)))) =
+  outputs ^channelStatementReceive channel

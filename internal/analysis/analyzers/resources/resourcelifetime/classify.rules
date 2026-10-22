@@ -1,73 +1,91 @@
-signature total fallback outputs actionUnknown resourceReasonEvidenceUnavailable;
-query collection($instruction) = localCollection.label $analysis.collection $instruction;
-query guarded = resourceAnalysis.resultGuardedLabel;
-query compression = resourceAnalysis.compressionOutputAbandoned;
-query parent = resourceAnalysis.parentCleanup;
-query canceled($instruction) = cancelsTransactionContext $analysis.acquisition $instruction;
-query release = resourceAnalysis.releasesResource;
-query ambiguous = resourceAnalysis.ambiguousCleanup;
-query paired = resourceAnalysis.pairedCleanup;
-query loop = resourceAnalysis.loopCleanup;
-query opaque = resourceAnalysis.opaqueConsumption;
-union Recognized = (resourceAction, resourceLifetimeReason, bool) tag 2 {
-  Recognized = true {
-    action: 0;
-    reason: 1;
-  };
-  Unrecognized = false;
-};
-union Evidence = resourceProof tag State {
-  Proven = resourceProven {
-    reason: Reason;
-  };
-  Disproven = resourceDisproven;
-  Unknown = resourceUnknown {
-    reason: Reason;
-  };
-};
-union Release = (resourceAction, resourceLifetimeReason) tag 0 {
-  Untouched = actionNone;
-  Settled = actionSettled {
-    reason: 1;
-  };
-  Uncertain = actionUnknown {
-    reason: 1;
-  };
-};
-union Opacity = (resourceLifetimeReason, bool) tag 1 {
-  Opaque = true {
-    reason: 0;
-  };
-  Transparent = false;
-};
-const actionNone, actionSettled, actionUnknown;
-const resourceProven, resourceDisproven, resourceUnknown;
-const resourceReasonEvidenceUnavailable, resourceReasonCompressionOutputMayBeAbandoned;
-const resourceReasonTransactionContextCanceled, resourceReasonUntouched;
+signature total = outputs ^actionUnknown ^resourceReasonEvidenceUnavailable
+
+host
+  collection! instruction = localCollection.label analysis.collection instruction
+  guarded! = resourceAnalysis.resultGuardedLabel
+  compression! = resourceAnalysis.compressionOutputAbandoned
+  parent! = resourceAnalysis.parentCleanup
+  canceled! instruction = cancelsTransactionContext analysis.acquisition instruction
+  release! = resourceAnalysis.releasesResource
+  ambiguous! = resourceAnalysis.ambiguousCleanup
+  paired! = resourceAnalysis.pairedCleanup
+  loop! = resourceAnalysis.loopCleanup
+  opaque! = resourceAnalysis.opaqueConsumption
+
+type Recognized = (resourceAction, resourceLifetimeReason, bool)
+  tag 2
+  Recognized (action: 0, reason: 1) = true
+  Unrecognized = false
+
+type Evidence = resourceProof
+  tag State
+  Proven (reason: Reason) = resourceProven
+  Disproven = resourceDisproven
+  Unknown (reason: Reason) = resourceUnknown
+
+type Release = (resourceAction, resourceLifetimeReason)
+  tag 0
+  Untouched = actionNone
+  Settled (reason: 1) = actionSettled
+  Uncertain (reason: 1) = actionUnknown
+
+type Opacity = (resourceLifetimeReason, bool)
+  tag 1
+  Opaque (reason: 0) = true
+  Transparent = false
+
+host
+  actionNone
+  actionSettled
+  actionUnknown
+  resourceProven
+  resourceDisproven
+  resourceUnknown
+  resourceReasonEvidenceUnavailable
+  resourceReasonCompressionOutputMayBeAbandoned
+  resourceReasonTransactionContextCanceled
+  resourceReasonUntouched
 
 // Collection and guarded-result labels are authoritative even when they say
 // untouched. Later evidence queries must not run once one of them recognizes.
 // Parent cleanup and possible releases remain uncertainty, never settlement.
-rule Instruction:
-  inputs $analysis $instruction
-  => query collection $instruction
-           select Recognized action:$action reason:$reason => outputs $action $reason
-     <|> query guarded $analysis $instruction
-           select Recognized action:$action reason:$reason => outputs $action $reason
-     <|> query compression $analysis $instruction
-           select true => outputs actionUnknown resourceReasonCompressionOutputMayBeAbandoned
-     <|> query parent $analysis $instruction
-           select (or (Proven reason:$reason) (Unknown reason:$reason)) => outputs actionUnknown $reason
-     <|> query canceled $instruction
-           select true => outputs actionUnknown resourceReasonTransactionContextCanceled
-     <|> query $label = release $analysis $instruction
-           select (or (Settled) (Uncertain)) => $label
-     <|> query ambiguous $analysis $instruction
-           select (or (Proven reason:$reason) (Unknown reason:$reason)) => outputs actionUnknown $reason
-     <|> query paired $analysis $instruction
-           select (or (Proven reason:$reason) (Unknown reason:$reason)) => outputs actionUnknown $reason
-     <|> query loop $analysis $instruction
-           select (or (Proven reason:$reason) (Unknown reason:$reason)) => outputs actionUnknown $reason
-     <|> query opaque $analysis $instruction
-           select Opaque reason:$reason => outputs actionUnknown $reason
-     <|> pure outputs actionNone resourceReasonUntouched;
+@Instruction
+rewrite (inputs analysis instruction) =
+  case collection instruction of
+    Recognized (action: action, reason: reason) -> outputs action reason
+    Unrecognized() -> decline
+  <|> case guarded analysis instruction of
+    Recognized (action: action, reason: reason) -> outputs action reason
+    Unrecognized() -> decline
+  <|> case compression analysis instruction of
+    true -> outputs ^actionUnknown ^resourceReasonCompressionOutputMayBeAbandoned
+    false -> decline
+  <|> case parent analysis instruction of
+    Proven (reason: reason) -> outputs ^actionUnknown reason
+    Unknown (reason: reason) -> outputs ^actionUnknown reason
+    Disproven() -> decline
+  <|> case canceled instruction of
+    true -> outputs ^actionUnknown ^resourceReasonTransactionContextCanceled
+    false -> decline
+  <|> do
+    label <- release analysis instruction
+    case label of
+      Settled() -> label
+      Uncertain() -> label
+      Untouched() -> decline
+  <|> case ambiguous analysis instruction of
+    Proven (reason: reason) -> outputs ^actionUnknown reason
+    Unknown (reason: reason) -> outputs ^actionUnknown reason
+    Disproven() -> decline
+  <|> case paired analysis instruction of
+    Proven (reason: reason) -> outputs ^actionUnknown reason
+    Unknown (reason: reason) -> outputs ^actionUnknown reason
+    Disproven() -> decline
+  <|> case loop analysis instruction of
+    Proven (reason: reason) -> outputs ^actionUnknown reason
+    Unknown (reason: reason) -> outputs ^actionUnknown reason
+    Disproven() -> decline
+  <|> case opaque analysis instruction of
+    Opaque (reason: reason) -> outputs ^actionUnknown reason
+    Transparent() -> decline
+  <|> outputs ^actionNone ^resourceReasonUntouched

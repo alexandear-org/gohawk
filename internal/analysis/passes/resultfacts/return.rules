@@ -1,43 +1,47 @@
-signature total fallback outputs false false;
-const AlwaysNil, AlwaysNonNil;
-const nilOutcome, nonNilOutcome;
-record Case = pairedCase {
-  errorOutcome;
-  resultOutcome;
-};
-query resultIs = Engine.resultIs;
-query consequent = Engine.consequentHolds;
-query forwarded = Engine.forwardedRelation;
+signature total = outputs false false
 
-rule NilError:
-  inputs $engine AlwaysNil $result _ (Case errorOutcome:nilOutcome) $budget
-  => query resultIs $engine $result AlwaysNonNil $budget {
-       true => outputs true true;
-       false => outputs false true;
-     };
+host
+  AlwaysNil
+  AlwaysNonNil
+  nilOutcome
+  nonNilOutcome
 
-rule VacuousNilError:
-  inputs _ AlwaysNil _ _ _ _
-  => outputs true false;
+type Case = pairedCase
+  errorOutcome
+  resultOutcome
 
-rule NonNilError:
-  inputs $engine AlwaysNonNil $result _ (Case errorOutcome:nonNilOutcome) $budget
-  => query resultIs $engine $result AlwaysNil $budget {
-       true => outputs true true;
-       false => outputs false true;
-     };
+host
+  resultIs! = Engine.resultIs
+  consequent! = Engine.consequentHolds
+  forwarded! = Engine.forwardedRelation
 
-rule VacuousNonNilError:
-  inputs _ AlwaysNonNil _ _ _ _
-  => outputs true false;
+@NilError
+rewrite (inputs engine ^AlwaysNil result _ (Case (errorOutcome: ^nilOutcome)) budget) =
+  case resultIs engine result ^AlwaysNonNil budget of
+    true -> outputs true true
+    false -> outputs false true
+
+@VacuousNilError
+rewrite (inputs _ ^AlwaysNil _ _ _ _) = outputs true false
+
+@NonNilError
+rewrite (inputs engine ^AlwaysNonNil result _ (Case (errorOutcome: ^nonNilOutcome)) budget) =
+  case resultIs engine result ^AlwaysNil budget of
+    true -> outputs true true
+    false -> outputs false true
+
+@VacuousNonNilError
+rewrite (inputs _ ^AlwaysNonNil _ _ _ _) = outputs true false
 
 // Unknown error nilness may still satisfy the consequent directly. Otherwise
 // only two unchanged slots of one call can inherit the callee's relation.
 // A vacuous return above never requests either of these queries.
-rule OtherError:
-  inputs $engine _ $result $error $kind $budget
-  => query consequent $engine $result $kind $budget
-           select true => outputs true true
-     <|> query forwarded $engine $result $error $kind $budget
-           select true => outputs true true
-     <|> pure outputs false false;
+@OtherError
+rewrite (inputs engine _ result error kind budget) =
+  case consequent engine result kind budget of
+    true -> outputs true true
+    false -> decline
+  <|> case forwarded engine result error kind budget of
+    true -> outputs true true
+    false -> decline
+  <|> outputs false false

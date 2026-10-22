@@ -1,30 +1,34 @@
-signature total fallback outputs nil nil false;
-view Call = *ssa.Call {
-};
-build common = callbackCall.Common;
-build invokes = callCommon.IsInvoke;
-build callee = callCommon.StaticCallee;
-guard input = CallbackInput;
-guard arguments = inertArguments;
+signature total = outputs nil nil false
+
+view Call = *ssa.Call
+
+host
+  common = callbackCall.Common
+  invokes = callCommon.IsInvoke
+  callee = callCommon.StaticCallee
+  input = CallbackInput
+  arguments = inertArguments
 
 // Only synchronous calls form callback holes. Launches and defers keep their
 // existing completion policy in the engine.
-rule Method:
-  inputs $call:(Call)
-  let $common = common $call
-  let $invokes = invokes $common
-  && $invokes == true
-  && input $common.Value $common.Method
-  && arguments $common
-  => outputs $common.Value $common.Method true;
+@Method
+rewrite (inputs call@(Call()))
+  | let common = common call
+  , let invokes = invokes common
+  , invokes == true
+  , input common.Value common.Method
+  , arguments common
+  =
+  outputs common.Value common.Method true
 
-rule Function:
-  inputs $call:(Call)
-  let $common = common $call
-  let $invokes = invokes $common
-  && $invokes == false
-  let $callee = callee $common
-  && $callee == nil
-  && input $common.Value nil
-  && arguments $common
-  => outputs $common.Value nil true;
+@Function
+rewrite (inputs call@(Call()))
+  | let common = common call
+  , let invokes = invokes common
+  , invokes == false
+  , let callee = callee common
+  , callee == nil
+  , input common.Value nil
+  , arguments common
+  =
+  outputs common.Value nil true

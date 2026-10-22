@@ -1,20 +1,27 @@
-signature total fallback outputs (Opaque reasonLabelHelperUndecided) true;
-query returnedCallback = cancellationClassifier.returnedCallbackCancels;
-query testingCleanup($common) = testingCleanupCall $common $classifier.cancel;
-query registered($instruction, $common) = registeredCleanupCall $instruction $common $classifier.cancel;
-query exactArgument = cancellationClassifier.exactCallArgument;
-query captured($common) = capturedCancellationArgument $common $classifier.cancel;
+signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
 
-rule Call:
-  inputs $instruction $classifier $common
-  => query returnedCallback $classifier $instruction $common
-           select true => outputs (Release reasonLabelReturnedCallback) true
-     <|> query testingCleanup $common
-           select true => outputs (Transfer reasonLabelTestingCleanup) true
-     <|> query registered $instruction $common
-           select true => outputs (Opaque reasonLabelRegisteredCallback) true
-     <|> query exactArgument $classifier $instruction $common
-           select Decided label:$label => outputs $label true
-     <|> query captured $common
-           select true => outputs (Opaque reasonLabelCapturedByCallback) true
-     <|> pure outputs (NoAction reasonCancellationNone) false;
+host
+  returnedCallback! = cancellationClassifier.returnedCallbackCancels
+  testingCleanup! common = testingCleanupCall common classifier.cancel
+  registered! instruction common = registeredCleanupCall instruction common classifier.cancel
+  exactArgument! = cancellationClassifier.exactCallArgument
+  captured! common = capturedCancellationArgument common classifier.cancel
+
+@Call
+rewrite (inputs instruction classifier common) =
+  case returnedCallback classifier instruction common of
+    true -> outputs (Release ^reasonLabelReturnedCallback) true
+    false -> decline
+  <|> case testingCleanup common of
+    true -> outputs (Transfer ^reasonLabelTestingCleanup) true
+    false -> decline
+  <|> case registered instruction common of
+    true -> outputs (Opaque ^reasonLabelRegisteredCallback) true
+    false -> decline
+  <|> case exactArgument classifier instruction common of
+    Decided (label: label) -> outputs label true
+    Unrecognized() -> decline
+  <|> case captured common of
+    true -> outputs (Opaque ^reasonLabelCapturedByCallback) true
+    false -> decline
+  <|> outputs (NoAction ^reasonCancellationNone) false

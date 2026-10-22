@@ -1,35 +1,46 @@
-union Label = cancellationLabel tag action {
-  NoAction = cancellationActionNone {
-    reason;
-  };
-  Release = cancellationActionRelease {
-    reason;
-  };
-  Transfer = cancellationActionTransfer {
-    reason;
-  };
-  Opaque = cancellationActionUnknown {
-    reason;
-  };
-};
-union Recognized = (cancellationLabel, bool) tag 1 {
-  Decided = true {
-    label: 0;
-  };
-  Unrecognized = false;
-};
-const cancellationActionNone, cancellationActionRelease, cancellationActionTransfer, cancellationActionUnknown;
-const reasonCancellationNone, reasonLabelOwnerUnavailable, reasonLabelProcessLifetimeContext;
-const reasonLabelReturnedCallback, reasonLabelTestingCleanup, reasonLabelRegisteredCallback, reasonLabelCapturedByCallback;
-const reasonLabelLaunchedHelper, reasonLabelHelperRelease, reasonLabelSummaryRelease, reasonLabelHelperUndecided;
-const reasonLabelHelperMayInvoke, reasonLabelReturnsDeferredCleanup;
-view Receive = *ssa.UnOp {
-  op: Op;
-  value: X;
-};
-view Deferred = *ssa.Defer {
-};
-view Started = *ssa.Go {
-};
-const receiveToken;
-const reasonLabelOwnDoneReceive, reasonLabelLaunchedCancel, reasonLabelRelease, reasonLabelDeferredClosure, reasonLabelReturned;
+type Label = cancellationLabel
+  tag action
+  NoAction (reason) = cancellationActionNone
+  Release (reason) = cancellationActionRelease
+  Transfer (reason) = cancellationActionTransfer
+  Opaque (reason) = cancellationActionUnknown
+
+type Recognized = (cancellationLabel, bool)
+  tag 1
+  Decided (label: 0) = true
+  Unrecognized = false
+
+host
+  cancellationActionNone
+  cancellationActionRelease
+  cancellationActionTransfer
+  cancellationActionUnknown
+  reasonCancellationNone
+  reasonLabelOwnerUnavailable
+  reasonLabelProcessLifetimeContext
+  reasonLabelReturnedCallback
+  reasonLabelTestingCleanup
+  reasonLabelRegisteredCallback
+  reasonLabelCapturedByCallback
+  reasonLabelLaunchedHelper
+  reasonLabelHelperRelease
+  reasonLabelSummaryRelease
+  reasonLabelHelperUndecided
+  reasonLabelHelperMayInvoke
+  reasonLabelReturnsDeferredCleanup
+
+view Receive = *ssa.UnOp
+  op: Op
+  value: X
+
+view Deferred = *ssa.Defer
+
+view Started = *ssa.Go
+
+host
+  receiveToken
+  reasonLabelOwnDoneReceive
+  reasonLabelLaunchedCancel
+  reasonLabelRelease
+  reasonLabelDeferredClosure
+  reasonLabelReturned

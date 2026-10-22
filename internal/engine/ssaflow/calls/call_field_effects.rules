@@ -1,44 +1,48 @@
-signature total fallback outputs effectUnknown nil;
-view Debug = *ssa.DebugRef {
-};
-view FieldAddress = *ssa.FieldAddr {
-};
-view Unary = *ssa.UnOp {
-  op: Op;
-};
-view Store = *ssa.Store {
-  address: Addr;
-};
-guard selected = selectedEffectField;
-guard same = sameEffectValue;
-const EffectRead, EffectMutate, EffectRetain, effectUnknown, useLoadToken;
+signature total = outputs ^effectUnknown nil
 
-rule Debug:
-  inputs use:(Debug)
-  => outputs 0 nil;
+view Debug = *ssa.DebugRef
+
+view FieldAddress = *ssa.FieldAddr
+
+view Unary = *ssa.UnOp
+  op: Op
+
+view Store = *ssa.Store
+  address: Addr
+
+host
+  selected = selectedEffectField
+  same = sameEffectValue
+  EffectRead
+  EffectMutate
+  EffectRetain
+  effectUnknown
+  useLoadToken
+
+@Debug
+rewrite (inputs (use: Debug())) = outputs 0 nil
 
 // Other fields cannot overwrite this slot. A matching projection is rebased
 // and visited by Go; no field access follows a loaded pointer implicitly.
-rule SelectedField:
-  inputs path:$path use:$field:(FieldAddress)
-  && selected $path $field
-  => outputs 0 $field;
+@SelectedField
+rewrite (inputs (path: path, use: field@(FieldAddress())))
+  | selected path field
+  =
+  outputs 0 field
 
-rule OtherField:
-  inputs use:(FieldAddress)
-  => outputs 0 nil;
+@OtherField
+rewrite (inputs (use: FieldAddress())) = outputs 0 nil
 
-rule Read:
-  inputs use:(Unary op:useLoadToken)
-  => outputs EffectRead nil;
+@Read
+rewrite (inputs (use: Unary (op: ^useLoadToken))) = outputs ^EffectRead nil
 
 // A whole-owner write includes this child field. Publication is retention,
 // rather than a claim that the stored value establishes ownership transfer.
-rule Written:
-  inputs path:$path use:(Store address:$address)
-  && same $address $path.Root
-  => outputs EffectMutate nil;
+@Written
+rewrite (inputs (path: path, use: Store (address: address)))
+  | same address path.Root
+  =
+  outputs ^EffectMutate nil
 
-rule Published:
-  inputs use:(Store)
-  => outputs EffectRetain nil;
+@Published
+rewrite (inputs (use: Store())) = outputs ^EffectRetain nil

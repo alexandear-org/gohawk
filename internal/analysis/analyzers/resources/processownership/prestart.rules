@@ -1,16 +1,26 @@
-signature total fallback outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
-record Decision = processDecision {
-  state;
-  reason;
-};
-query prefix = commandProof.startPrefix;
-query commandReturnedByHelper, callerCommand;
-query aggregate = ssaflow.ElementOfAggregate;
-query processOwnershipDominatesStart, processOwnerDominatesStart, commandStoredExternallyBeforeStart;
-query returns = commandProof.startCannotReturn;
-const reasonPreStartEvidenceUnavailable, reasonPreStartCutoff, reasonHelperOwnershipUnknown;
-const reasonCallerCommandOwnershipUnknown, reasonAggregateCommandOwnershipUnknown, reasonPreStartOwnershipUnknown;
-const reasonSuccessfulStartCannotReturn, reasonLocalWaitObligation;
+signature total = outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+
+type Decision = processDecision
+  state
+  reason
+
+host
+  prefix! = commandProof.startPrefix
+  commandReturnedByHelper!
+  callerCommand!
+  aggregate! = ssaflow.ElementOfAggregate
+  processOwnershipDominatesStart!
+  processOwnerDominatesStart!
+  commandStoredExternallyBeforeStart!
+  returns! = commandProof.startCannotReturn
+  reasonPreStartEvidenceUnavailable
+  reasonPreStartCutoff
+  reasonHelperOwnershipUnknown
+  reasonCallerCommandOwnershipUnknown
+  reasonAggregateCommandOwnershipUnknown
+  reasonPreStartOwnershipUnknown
+  reasonSuccessfulStartCannotReturn
+  reasonLocalWaitObligation
 
 // A helper returning *exec.Cmd may already have registered cleanup or wait
 // ownership. Reporting without that interprocedural contract loses precision.
@@ -21,39 +31,40 @@ const reasonSuccessfulStartCannotReturn, reasonLocalWaitObligation;
 // https://github.com/cocoonstack/cocoon/blob/51ff88bcf8f175a2d82b162d9bf9f65604a607b5/cmd/storebench/main.go#L123-L138
 // Cleanup can be registered before Start, including by a returned teardown
 // owner. Keep registration and external-store evidence in their prior order.
-rule Start:
-  inputs $proof $function $start $command
-  => do {
-       $prefix <- query prefix $proof $start $command;
-       true <- query proven $prefix.Proof
-         else query cutoff $prefix.Proof {
-                true => outputs (Decision state:decisionUnknown reason:reasonPreStartCutoff);
-                false => outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
-              };
-       false <- query commandReturnedByHelper $command
-         else outputs (Decision state:decisionUnknown reason:reasonHelperOwnershipUnknown);
-       false <- query callerCommand $function $command
-         else outputs (Decision state:decisionUnknown reason:reasonCallerCommandOwnershipUnknown);
-       false <- query aggregate $command
-         else outputs (Decision state:decisionUnknown reason:reasonAggregateCommandOwnershipUnknown);
-       false <- query processOwnershipDominatesStart $proof $prefix.instructions $command
-         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
-       false <- query processOwnerDominatesStart
-                        $proof
-                        $function
-                        $start
-                        $prefix.owners
-                        $prefix.instructions
-         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
-       false <- query commandStoredExternallyBeforeStart $prefix.instructions $command
-         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
-       $returns <- query returns $proof $start;
-       false <- query cutoff $returns
-         else outputs (Decision state:decisionUnknown reason:reasonPreStartCutoff);
-       true <- query proven $returns
-         else query known $returns {
-                true => outputs (Decision state:decisionProven reason:reasonLocalWaitObligation);
-                false => outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
-              };
-       pure outputs (Decision state:decisionDisproven reason:reasonSuccessfulStartCannotReturn);
-     };
+@Start
+rewrite (inputs proof function start command) =
+  do
+    prefix <- prefix proof start command
+    true <- proven prefix.Proof
+      else
+        false -> case cutoff prefix.Proof of
+          true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
+          false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+    false <- commandReturnedByHelper command
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonHelperOwnershipUnknown))
+    false <- callerCommand function command
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonCallerCommandOwnershipUnknown))
+    false <- aggregate command
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonAggregateCommandOwnershipUnknown))
+    false <- processOwnershipDominatesStart proof prefix.instructions command
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+    false <- processOwnerDominatesStart proof function start prefix.owners prefix.instructions
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+    false <- commandStoredExternallyBeforeStart prefix.instructions command
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+    returns <- returns proof start
+    false <- cutoff returns
+      else
+        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
+    true <- proven returns
+      else
+        false -> case known returns of
+          true -> outputs (Decision (state: ^decisionProven, reason: ^reasonLocalWaitObligation))
+          false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+    outputs (Decision (state: ^decisionDisproven, reason: ^reasonSuccessfulStartCannotReturn))

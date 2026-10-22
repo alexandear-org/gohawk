@@ -1,5 +1,7 @@
-signature total fallback outputs (Unknown reason:None);
-const None;
+signature total = outputs (Unknown (reason: ^None))
+
+host
+  None
 
 // A Boolean guard around spawn/join can express correlation this flow does
 // not prove. Keep uncertainty rather than claiming either joined or violated.
@@ -12,27 +14,29 @@ const None;
 // https://github.com/canyonroad/agentsh/blob/0ce9939b6ccead8b21b9ce16783b287d18012777/internal/db/proxy/postgres/upstreamread_test.go#L229-L237
 // Process exit explains lifetime but never completion before another instruction.
 // This conclusion remains unknown for cross-analyzer callers.
-rule Remaining:
-  inputs $queries $witness
-  => do {
-       false <- query flagGuarded $queries
-         else outputs (Unknown reason:FlagGuardedJoin);
-       false <- query counted $queries
-         else outputs (Unknown reason:LoopJoinUnproven);
-       false <- query shared $queries
-         else outputs (Unknown reason:SharedStorageSignal);
-       false <- query buffered $queries
-         else outputs (Unknown reason:BufferedSignal);
-       Observed <- query census $queries
-         else {
-           Unobserved => outputs (Unknown reason:UnobservedSignal);
-           Unavailable => outputs (Unknown reason:SignalCensusUnavailable);
-           CensusCutoff budget:$budget => do {
-             $proof <- query censusCutoff $queries $budget;
-             pure outputs $proof;
-           };
-         };
-       false <- query entry $queries
-         else outputs (Unknown reason:ProcessExitStopsWorker);
-       pure outputs (Violated reason:UnownedReturn witness:$witness);
-     };
+@Remaining
+rewrite (inputs queries witness) =
+  do
+    false <- flagGuarded queries
+      else
+        true -> outputs (Unknown (reason: ^FlagGuardedJoin))
+    false <- counted queries
+      else
+        true -> outputs (Unknown (reason: ^LoopJoinUnproven))
+    false <- shared queries
+      else
+        true -> outputs (Unknown (reason: ^SharedStorageSignal))
+    false <- buffered queries
+      else
+        true -> outputs (Unknown (reason: ^BufferedSignal))
+    Observed() <- census queries
+      else
+        Unobserved() -> outputs (Unknown (reason: ^UnobservedSignal))
+        Unavailable() -> outputs (Unknown (reason: ^SignalCensusUnavailable))
+        CensusCutoff (budget: budget) -> do
+          proof <- censusCutoff queries budget
+          outputs proof
+    false <- entry queries
+      else
+        true -> outputs (Unknown (reason: ^ProcessExitStopsWorker))
+    outputs (Violated (reason: ^UnownedReturn, witness: witness))

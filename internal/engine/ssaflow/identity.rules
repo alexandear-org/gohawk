@@ -1,57 +1,63 @@
-signature total fallback outputs (unknownIdentity nil);
-record Path = AccessPath {
-  value: Value;
-  root: Root;
-};
-union Steps = (identitySteps, bool) tag 1 {
-  KnownPath = true {
-    steps: 0;
-  };
-  UnknownPath = false;
-};
-query structural = StructurallyIdenticalWithin;
-query path = AccessPathStepsWithin;
-query same = sameAccessPathSteps;
-query exhausted = identityBudgetExhausted;
-build unknownIdentity, identityEvidence;
-const identityProven, identityDisproven, identitySameValue, identitySamePath, identityNotFound, identityLocalSSA;
+signature total = outputs (unknownIdentity nil)
+
+type Path = AccessPath
+  value: Value
+  root: Root
+
+type Steps = (identitySteps, bool)
+  tag 1
+  KnownPath (steps: 0) = true
+  UnknownPath = false
+
+host
+  structural! = StructurallyIdenticalWithin
+  path! = AccessPathStepsWithin
+  same! = sameAccessPathSteps
+  exhausted! = identityBudgetExhausted
+  unknownIdentity
+  identityEvidence
+  identityProven
+  identityDisproven
+  identitySameValue
+  identitySamePath
+  identityNotFound
+  identityLocalSSA
 
 // Missing operands cannot establish identity, even when both are missing.
-rule MissingLeft:
-  inputs (Path value:nil) _ $budget
-  => outputs (unknownIdentity $budget);
+@MissingLeft
+rewrite (inputs (Path (value: nil)) _ budget) = outputs (unknownIdentity budget)
 
-rule MissingRight:
-  inputs _ (Path value:nil) $budget
-  => outputs (unknownIdentity $budget);
+@MissingRight
+rewrite (inputs _ (Path (value: nil)) budget) = outputs (unknownIdentity budget)
 
 // Roots are already equivalent by the caller's contract. Direct identity wins
 // before requiring a nameable path, so an identical dynamic index still proves
 // identity. Each failed search retains its allowance and stops at cutoff.
-rule Identity:
-  inputs $left $right $budget
-  => query structural $left.Value $right.Value $budget
-           select true => outputs (identityEvidence identityProven identitySameValue identityLocalSSA)
-     <|> do {
-           false <- query exhausted $budget
-             else outputs (unknownIdentity $budget);
-           KnownPath steps:$leftPath <- query path $left.Value $left.Root $budget
-             else {
-               UnknownPath => outputs (unknownIdentity $budget);
-             };
-           false <- query exhausted $budget
-             else outputs (unknownIdentity $budget);
-           KnownPath steps:$rightPath <- query path $right.Value $right.Root $budget
-             else {
-               UnknownPath => outputs (unknownIdentity $budget);
-             };
-           false <- query exhausted $budget
-             else outputs (unknownIdentity $budget);
-           true <- query same $leftPath $rightPath $budget
-             else query exhausted $budget {
-                    true => outputs (unknownIdentity $budget);
-                    false => outputs (identityEvidence identityDisproven identityNotFound identityLocalSSA);
-                  };
-           pure outputs (identityEvidence identityProven identitySamePath identityLocalSSA);
-         }
-     <|> pure outputs (unknownIdentity $budget);
+@Identity
+rewrite (inputs left right budget) =
+  case structural left.Value right.Value budget of
+    true -> outputs (identityEvidence ^identityProven ^identitySameValue ^identityLocalSSA)
+    false -> decline
+  <|> do
+    false <- exhausted budget
+      else
+        true -> outputs (unknownIdentity budget)
+    KnownPath (steps: leftPath) <- path left.Value left.Root budget
+      else
+        UnknownPath() -> outputs (unknownIdentity budget)
+    false <- exhausted budget
+      else
+        true -> outputs (unknownIdentity budget)
+    KnownPath (steps: rightPath) <- path right.Value right.Root budget
+      else
+        UnknownPath() -> outputs (unknownIdentity budget)
+    false <- exhausted budget
+      else
+        true -> outputs (unknownIdentity budget)
+    true <- same leftPath rightPath budget
+      else
+        false -> case exhausted budget of
+          true -> outputs (unknownIdentity budget)
+          false -> outputs (identityEvidence ^identityDisproven ^identityNotFound ^identityLocalSSA)
+    outputs (identityEvidence ^identityProven ^identitySamePath ^identityLocalSSA)
+  <|> outputs (unknownIdentity budget)

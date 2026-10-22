@@ -1,74 +1,55 @@
-match lockCall, unlockCall, readLockCall, readUnlockCall, waitCall, doneCall, condCall, closeCall, addCall, integer;
-union Primitive = Primitive tag Kind {
-  Lock {
-    resource: Resource;
-  };
-  Unlock {
-    resource: Resource;
-  };
-  ReadLock {
-    resource: Resource;
-  };
-  ReadUnlock {
-    resource: Resource;
-  };
-  CondWait {
-    resource: Resource;
-  };
-  Close {
-    resource: Resource;
-  };
-  GroupDone {
-    resource: Resource;
-  };
-  GroupWait {
-    resource: Resource;
-  };
-  GroupAdd {
-    resource: Resource;
-    count: Count;
-    fixed: Fixed;
-  };
-};
+host
+  lockCall?
+  unlockCall?
+  readLockCall?
+  readUnlockCall?
+  waitCall?
+  doneCall?
+  condCall?
+  closeCall?
+  addCall?
+  integer?
 
-rule ConditionWait:
-  condCall $receiver
-  => CondWait $receiver;
+type Primitive = Primitive
+  tag Kind
+  Lock (resource: Resource)
+  Unlock (resource: Resource)
+  ReadLock (resource: Resource)
+  ReadUnlock (resource: Resource)
+  CondWait (resource: Resource)
+  Close (resource: Resource)
+  GroupDone (resource: Resource)
+  GroupWait (resource: Resource)
+  GroupAdd (resource: Resource, count: Count, fixed: Fixed)
 
-rule WriterLock:
-  lockCall $receiver
-  => Lock $receiver;
+@ConditionWait
+rewrite (condCall receiver) = CondWait receiver
 
-rule WriterUnlock:
-  unlockCall $receiver
-  => Unlock $receiver;
+@WriterLock
+rewrite (lockCall receiver) = Lock receiver
 
-rule ReaderLock:
-  readLockCall $receiver
-  => ReadLock $receiver;
+@WriterUnlock
+rewrite (unlockCall receiver) = Unlock receiver
 
-rule ReaderUnlock:
-  readUnlockCall $receiver
-  => ReadUnlock $receiver;
+@ReaderLock
+rewrite (readLockCall receiver) = ReadLock receiver
 
-rule ChannelClose:
-  closeCall $channel
-  => Close $channel;
+@ReaderUnlock
+rewrite (readUnlockCall receiver) = ReadUnlock receiver
 
-rule GroupCompletion:
-  doneCall $receiver
-  => GroupDone $receiver;
+@ChannelClose
+rewrite (closeCall channel) = Close channel
 
-rule GroupJoin:
-  waitCall $receiver
-  => GroupWait $receiver;
+@GroupCompletion
+rewrite (doneCall receiver) = GroupDone receiver
+
+@GroupJoin
+rewrite (waitCall receiver) = GroupWait receiver
 
 // Preserve the exact integer delta when available. The summary consumer still
 // admits only +1; other clients may model different counter transitions.
-rule KnownGroupCount:
-  addCall $receiver (integer $delta)
-  => GroupAdd $receiver $delta true;
+@KnownGroupCount
+rewrite (addCall receiver (integer delta)) = GroupAdd receiver delta true
 
-rule UnknownGroupCount:
-  addCall $receiver _
-  => GroupAdd $receiver 0 false;
+@UnknownGroupCount
+rewrite (addCall receiver _) = GroupAdd receiver 0 false

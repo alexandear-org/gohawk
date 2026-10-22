@@ -1,45 +1,52 @@
-signature total fallback outputs true;
-view Go = *ssa.Go {
-};
-view Send = *ssa.Send {
-};
-view Box = *ssa.MakeInterface {
-  value: X;
-};
-view MapUpdate = *ssa.MapUpdate {
-  value: Value;
-};
-view Return = *ssa.Return {
-};
-view Store = *ssa.Store {
-  value: Val;
-  address: Addr;
-};
-guard callbackValue, returnedCallback, nonlocalCallbackAddress;
+signature total = outputs true
+
+view Go = *ssa.Go
+
+view Send = *ssa.Send
+
+view Box = *ssa.MakeInterface
+  value: X
+
+view MapUpdate = *ssa.MapUpdate
+  value: Value
+
+view Return = *ssa.Return
+
+view Store = *ssa.Store
+  value: Val
+  address: Addr
+
+host
+  callbackValue
+  returnedCallback
+  nonlocalCallbackAddress
 
 // Reject every escape before collecting invocation contexts. One safe frame
 // cannot establish safety when another consumer can retain or launch a callback.
-rule Concurrent:
-  inputs (or (Go) (Send))
-  => outputs false;
+@Concurrent
+rewrite (inputs (Go() | Send())) = outputs false
 
-rule Box:
-  inputs (Box value:$value)
-  && callbackValue $value
-  => outputs false;
+@Box
+rewrite (inputs (Box (value: value)))
+  | callbackValue value
+  =
+  outputs false
 
-rule Map:
-  inputs (MapUpdate value:$value)
-  && callbackValue $value
-  => outputs false;
+@Map
+rewrite (inputs (MapUpdate (value: value)))
+  | callbackValue value
+  =
+  outputs false
 
-rule Return:
-  inputs $returned:(Return)
-  && returnedCallback $returned
-  => outputs false;
+@Return
+rewrite (inputs returned@(Return()))
+  | returnedCallback returned
+  =
+  outputs false
 
-rule NonlocalStore:
-  inputs (Store value:$value address:$address)
-  && callbackValue $value
-  && nonlocalCallbackAddress $address
-  => outputs false;
+@NonlocalStore
+rewrite (inputs (Store (value: value, address: address)))
+  | callbackValue value
+  , nonlocalCallbackAddress address
+  =
+  outputs false

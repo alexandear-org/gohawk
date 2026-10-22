@@ -1,50 +1,52 @@
-signature total fallback outputs (Opaque reasonLabelCallUnavailable) true;
-view Launch = *ssa.Go {
-};
-view Common = *ssa.CallCommon {
-  value: Value;
-};
-view Builtin = *ssa.Builtin {
-};
-build name = callBuiltin.Name;
-query opaque = spawnAnalysis.opaqueCallAction;
-query arguments = spawnAnalysis.anyArgumentConsumes;
-query direct = spawnAnalysis.directJoinAction;
-const reasonLabelLaunchedHelper, reasonLabelAppended;
+signature total = outputs (Opaque ^reasonLabelCallUnavailable) true
 
-rule Missing:
-  inputs common:nil
-  => outputs (NoAction reasonNone) true;
+view Launch = *ssa.Go
+
+view Common = *ssa.CallCommon
+  value: Value
+
+view Builtin = *ssa.Builtin
+
+host
+  name = callBuiltin.Name
+  opaque! = spawnAnalysis.opaqueCallAction
+  arguments! = spawnAnalysis.anyArgumentConsumes
+  direct! = spawnAnalysis.directJoinAction
+  reasonLabelLaunchedHelper
+  reasonLabelAppended
+
+@Missing
+rewrite (inputs (common: nil)) = outputs (NoAction ^reasonNone) true
 
 // A launched observer runs independently of the caller. Handle it before
 // receiver, summary and library contracts that describe synchronous calls.
-rule Launched:
-  inputs analysis:$analysis instruction:(Launch) common:$common
-  => query $label = opaque $analysis $common reasonLabelLaunchedHelper
-     decide $label {
-       NoAction => outputs $label true;
-       Join => outputs $label true;
-       Transfer => outputs $label true;
-       Opaque => outputs $label true;
-     };
+@Launched
+rewrite (inputs (analysis: analysis, instruction: Launch(), common: common)) =
+  do
+    label <- opaque analysis common ^reasonLabelLaunchedHelper
+    case label of
+      NoAction() -> outputs label true
+      Join() -> outputs label true
+      Transfer() -> outputs label true
+      Opaque() -> outputs label true
 
 // append retains its arguments in a slice the caller keeps; the other
 // builtins only observe a channel or its capacity.
-rule Appended:
-  inputs analysis:$analysis common:$common:(Common value:$builtin:(Builtin))
-  let $name = name $builtin
-  && $name == "append"
-  => query arguments $analysis $common {
-       true => outputs (Opaque reasonLabelAppended) true;
-       false => outputs (NoAction reasonNone) true;
-     };
+@Appended
+rewrite (inputs (analysis: analysis, common: common@(Common (value: builtin@(Builtin())))))
+  | let name = name builtin
+  , name == "append"
+  =
+  case arguments analysis common of
+    true -> outputs (Opaque ^reasonLabelAppended) true
+    false -> outputs (NoAction ^reasonNone) true
 
-rule OtherBuiltin:
-  inputs common:(Common value:(Builtin))
-  => outputs (NoAction reasonNone) true;
+@OtherBuiltin
+rewrite (inputs (common: Common (value: Builtin()))) = outputs (NoAction ^reasonNone) true
 
-rule Direct:
-  inputs analysis:$analysis common:$common
-  => query direct $analysis $common
-           select Decided label:$label => outputs $label true
-     <|> pure outputs (NoAction reasonNone) false;
+@Direct
+rewrite (inputs (analysis: analysis, common: common)) =
+  case direct analysis common of
+    Decided (label: label) -> outputs label true
+    Unrecognized() -> decline
+  <|> outputs (NoAction ^reasonNone) false

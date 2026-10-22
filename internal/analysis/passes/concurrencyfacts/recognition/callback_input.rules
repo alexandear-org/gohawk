@@ -1,26 +1,30 @@
-signature total fallback outputs false;
-view Parameter = *ssa.Parameter {
-};
-view Capture = *ssa.FreeVar {
-};
-build typeOf = callbackValue.Type;
-build canceled = admission.CancellationType;
-guard interface = types.IsInterface;
-guard function = functionType;
+signature total = outputs false
+
+view Parameter = *ssa.Parameter
+
+view Capture = *ssa.FreeVar
+
+host
+  typeOf = callbackValue.Type
+  canceled = admission.CancellationType
+  interface = types.IsInterface
+  function = functionType
 
 // Only exact parameters or captures can be supplied by the caller. Loads,
 // conversions and phi choices remain opaque; contexts belong to cancellation.
-rule Method:
-  inputs value:$value:(or (Parameter) (Capture)) method:$method
-  && $method != nil
-  let $type = typeOf $value
-  && interface $type
-  let $canceled = canceled $type
-  && $canceled == false
-  => outputs true;
+@Method
+rewrite (inputs (value: value@(Parameter() | Capture()), method: method))
+  | method != nil
+  , let type = typeOf value
+  , interface type
+  , let canceled = canceled type
+  , canceled == false
+  =
+  outputs true
 
-rule Function:
-  inputs value:$value:(or (Parameter) (Capture)) method:nil
-  let $type = typeOf $value
-  && function $type
-  => outputs true;
+@Function
+rewrite (inputs (value: value@(Parameter() | Capture()), method: nil))
+  | let type = typeOf value
+  , function type
+  =
+  outputs true

@@ -1,126 +1,100 @@
-signature total fallback outputs (Ignored);
-union Definition = Definition tag Kind {
-  Ignored;
-  Alias {
-    value: Value;
-    source: Source;
-  };
-  FieldAddress {
-    value: Value;
-    source: Source;
-    field: Field;
-  };
-  FieldLoad {
-    value: Value;
-    source: Source;
-    field: Field;
-  };
-  IndexAddress {
-    value: Value;
-    source: Source;
-    index: Index;
-  };
-  IndexLoad {
-    value: Value;
-    source: Source;
-    index: Index;
-  };
-  Sliced {
-    slice: Slice;
-  };
-  Load {
-    value: Value;
-    source: Source;
-  };
-  Opaque {
-    value: Value;
-  };
-};
-view ArrayPointer = *ssa.SliceToArrayPointer {
-  source: X;
-};
-view FieldAddressValue = *ssa.FieldAddr {
-  source: X;
-  field: Field;
-};
-view FieldValue = *ssa.Field {
-  source: X;
-  field: Field;
-};
-view IndexAddressValue = *ssa.IndexAddr {
-  source: X;
-  index: Index;
-};
-view IndexValue = *ssa.Index {
-  source: X;
-  index: Index;
-};
-view SliceValue = *ssa.Slice {
-};
-view Unary = *ssa.UnOp {
-  source: X;
-  op: Op;
-};
-view Assertion = *ssa.TypeAssert {
-  source: X;
-  commaOK: CommaOk;
-};
-view Map = *ssa.MakeMap {
-};
-view Channel = *ssa.MakeChan {
-};
-view SliceAllocation = *ssa.MakeSlice {
-};
-view Range = *ssa.Range {
-};
-view Next = *ssa.Next {
-};
-view Binary = *ssa.BinOp {
-};
-view MultiConversion = *ssa.MultiConvert {
-};
-match wrapper;
-const loadToken;
+signature total = outputs Ignored()
 
-rule ArrayPointer:
-  inputs $value:(ArrayPointer source:$source)
-  => outputs (Alias value:$value source:$source);
+type Definition = Definition
+  tag Kind
+  Ignored
+  Alias (value: Value, source: Source)
+  FieldAddress (value: Value, source: Source, field: Field)
+  FieldLoad (value: Value, source: Source, field: Field)
+  IndexAddress (value: Value, source: Source, index: Index)
+  IndexLoad (value: Value, source: Source, index: Index)
+  Sliced (slice: Slice)
+  Load (value: Value, source: Source)
+  Opaque (value: Value)
 
-rule Wrapper:
-  inputs $value:(wrapper $source)
-  => outputs (Alias value:$value source:$source);
+view ArrayPointer = *ssa.SliceToArrayPointer
+  source: X
 
-rule FieldAddress:
-  inputs $value:(FieldAddressValue source:$source field:$field)
-  => outputs (FieldAddress value:$value source:$source field:$field);
+view FieldAddressValue = *ssa.FieldAddr
+  source: X
+  field: Field
 
-rule FieldLoad:
-  inputs $value:(FieldValue source:$source field:$field)
-  => outputs (FieldLoad value:$value source:$source field:$field);
+view FieldValue = *ssa.Field
+  source: X
+  field: Field
 
-rule IndexAddress:
-  inputs $value:(IndexAddressValue source:$source index:$index)
-  => outputs (IndexAddress value:$value source:$source index:$index);
+view IndexAddressValue = *ssa.IndexAddr
+  source: X
+  index: Index
 
-rule IndexLoad:
-  inputs $value:(IndexValue source:$source index:$index)
-  => outputs (IndexLoad value:$value source:$source index:$index);
+view IndexValue = *ssa.Index
+  source: X
+  index: Index
 
-rule Slice:
-  inputs $slice:(SliceValue)
-  => outputs (Sliced slice:$slice);
+view SliceValue = *ssa.Slice
 
-rule Load:
-  inputs $value:(Unary source:$source op:loadToken)
-  => outputs (Load value:$value source:$source);
+view Unary = *ssa.UnOp
+  source: X
+  op: Op
+
+view Assertion = *ssa.TypeAssert
+  source: X
+  commaOK: CommaOk
+
+view Map = *ssa.MakeMap
+
+view Channel = *ssa.MakeChan
+
+view SliceAllocation = *ssa.MakeSlice
+
+view Range = *ssa.Range
+
+view Next = *ssa.Next
+
+view Binary = *ssa.BinOp
+
+view MultiConversion = *ssa.MultiConvert
+
+host
+  wrapper?
+  loadToken
+
+@ArrayPointer
+rewrite (inputs value@(ArrayPointer (source: source))) = outputs (Alias (value: value, source: source))
+
+@Wrapper
+rewrite (inputs value@(wrapper source)) = outputs (Alias (value: value, source: source))
+
+@FieldAddress
+rewrite (inputs value@(FieldAddressValue (source: source, field: field))) =
+  outputs (FieldAddress (value: value, source: source, field: field))
+
+@FieldLoad
+rewrite (inputs value@(FieldValue (source: source, field: field))) =
+  outputs (FieldLoad (value: value, source: source, field: field))
+
+@IndexAddress
+rewrite (inputs value@(IndexAddressValue (source: source, index: index))) =
+  outputs (IndexAddress (value: value, source: source, index: index))
+
+@IndexLoad
+rewrite (inputs value@(IndexValue (source: source, index: index))) =
+  outputs (IndexLoad (value: value, source: source, index: index))
+
+@Slice
+rewrite (inputs slice@(SliceValue())) = outputs (Sliced (slice: slice))
+
+@Load
+rewrite (inputs value@(Unary (source: source, op: ^loadToken))) =
+  outputs (Load (value: value, source: source))
 
 // A tuple assertion is interpreted by its extraction, never as the object.
-rule Assertion:
-  inputs $value:(Assertion source:$source commaOK:false)
-  => outputs (Alias value:$value source:$source);
+@Assertion
+rewrite (inputs value@(Assertion (source: source, commaOK: false))) =
+  outputs (Alias (value: value, source: source))
 
 // These definitions produce opaque storage, without claiming an alias to an
 // operand. Other unsupported values remain unrecorded by this pass.
-rule Opaque:
-  inputs $value:(or (Map) (Channel) (SliceAllocation) (Range) (Next) (Binary) (MultiConversion))
-  => outputs (Opaque value:$value);
+@Opaque
+rewrite (inputs value@(Map() | Channel() | SliceAllocation() | Range() | Next() | Binary() | MultiConversion())) =
+  outputs (Opaque (value: value))

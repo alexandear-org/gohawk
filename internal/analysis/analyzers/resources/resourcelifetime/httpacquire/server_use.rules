@@ -1,26 +1,31 @@
-signature total fallback outputs false;
-guard hasReferrers, serverClientCall, serverClose;
-query loads = urlFieldLoads;
-query client = onlyClientGetUsesWithin;
+signature total = outputs false
+
+host
+  hasReferrers
+  serverClientCall
+  serverClose
+  loads! = urlFieldLoads
+  client! = onlyClientGetUsesWithin
 
 // URL is field zero. Config/Listener access cannot retain endpoint identity.
-rule URL:
-  inputs $field:(FieldAddress field:0) $budget
-  && hasReferrers $field
-  => query loads $field $budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@URL
+rewrite (inputs field@(FieldAddress (field: 0)) budget)
+  | hasReferrers field
+  =
+  case loads field budget of
+    true -> outputs true
+    false -> outputs false
 
-rule Client:
-  inputs $client:(Call) $budget
-  && serverClientCall $client
-  => query client $client $budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@Client
+rewrite (inputs client@(Call()) budget)
+  | serverClientCall client
+  =
+  case client client budget of
+    true -> outputs true
+    false -> outputs false
 
-rule Close:
-  inputs $instruction _
-  && serverClose $instruction
-  => outputs true;
+@Close
+rewrite (inputs instruction _)
+  | serverClose instruction
+  =
+  outputs true

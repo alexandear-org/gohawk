@@ -1,25 +1,26 @@
-signature total fallback outputs nil nil;
-view Identifier = *ast.Ident {
-};
-view Index = *ast.IndexExpr {
-  source: X;
-};
-view Parenthesis = *ast.ParenExpr {
-  source: X;
-};
-guard mapSource;
+signature total = outputs nil nil
 
-rule Identifier:
-  inputs _ $identifier:(Identifier)
-  => outputs $identifier nil;
+view Identifier = *ast.Ident
+
+view Index = *ast.IndexExpr
+  source: X
+
+view Parenthesis = *ast.ParenExpr
+  source: X
+
+host
+  mapSource
+
+@Identifier
+rewrite (inputs _ identifier@(Identifier())) = outputs identifier nil
 
 // Array and slice element writes are outside this map-root policy. The Go
 // walk repeats these single steps without adding another traversal in a hook.
-rule MapElement:
-  inputs $pass (Index source:$source)
-  && mapSource $pass $source
-  => outputs nil $source;
+@MapElement
+rewrite (inputs pass (Index (source: source)))
+  | mapSource pass source
+  =
+  outputs nil source
 
-rule Parenthesis:
-  inputs _ (Parenthesis source:$source)
-  => outputs nil $source;
+@Parenthesis
+rewrite (inputs _ (Parenthesis (source: source))) = outputs nil source

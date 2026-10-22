@@ -1,101 +1,96 @@
-signature total fallback outputs "";
-view Call = *ssa.Call {
-};
-view Global = *ssa.Global {
-};
-view FieldAddress = *ssa.FieldAddr {
-};
-view Field = *ssa.Field {
-};
-view IndexAddress = *ssa.IndexAddr {
-  owner: X;
-  index: Index;
-};
-view Index = *ssa.Index {
-  owner: X;
-  index: Index;
-};
-view Parameter = *ssa.Parameter {
-};
-view Free = *ssa.FreeVar {
-};
-view Allocation = *ssa.Alloc {
-};
-view Constant = *ssa.Const {
-};
-union Identity = (string, bool) tag 1 {
-  Named = true {
-    name: 0;
-  };
-  Unresolved = false;
-};
-query getter = getterIdentity;
-query address = addressIdentity;
-query copied = copiedIdentity;
-query indexed = indexedIdentity;
-build globalName, parameterName, freeName, allocationName, literalName, valueName;
-guard hasLiteral;
+signature total = outputs ""
+
+view Call = *ssa.Call
+
+view Global = *ssa.Global
+
+view FieldAddress = *ssa.FieldAddr
+
+view Field = *ssa.Field
+
+view IndexAddress = *ssa.IndexAddr
+  owner: X
+  index: Index
+
+view Index = *ssa.Index
+  owner: X
+  index: Index
+
+view Parameter = *ssa.Parameter
+
+view Free = *ssa.FreeVar
+
+view Allocation = *ssa.Alloc
+
+view Constant = *ssa.Const
+
+type Identity = (string, bool)
+  tag 1
+  Named (name: 0) = true
+  Unresolved = false
+
+host
+  getter! = getterIdentity
+  address! = addressIdentity
+  copied! = copiedIdentity
+  indexed! = indexedIdentity
+  globalName
+  parameterName
+  freeName
+  allocationName
+  literalName
+  valueName
+  hasLiteral
 
 // Unresolved calls never fall back to a value name: repeated executions may
 // return different owners, and a field declaration alone identifies no instance.
-rule Getter:
-  inputs $walk $call:(Call) $budget
-  => query getter $walk $call $budget {
-       Named name:$name => outputs $name;
-       Unresolved => outputs "";
-     };
+@Getter
+rewrite (inputs walk call@(Call()) budget) =
+  case getter walk call budget of
+    Named (name: name) -> outputs name
+    Unresolved() -> outputs ""
 
-rule Global:
-  inputs _ $value:(Global) _
-  => outputs (globalName $value);
+@Global
+rewrite (inputs _ value@(Global()) _) = outputs (globalName value)
 
-rule Address:
-  inputs $walk $value:(FieldAddress) $budget
-  => query address $walk $value $budget {
-       Named name:$name => outputs $name;
-       Unresolved => outputs "";
-     };
+@Address
+rewrite (inputs walk value@(FieldAddress()) budget) =
+  case address walk value budget of
+    Named (name: name) -> outputs name
+    Unresolved() -> outputs ""
 
-rule Copied:
-  inputs $walk $value:(Field) $budget
-  => query copied $walk $value $budget {
-       Named name:$name => outputs $name;
-       Unresolved => outputs "";
-     };
+@Copied
+rewrite (inputs walk value@(Field()) budget) =
+  case copied walk value budget of
+    Named (name: name) -> outputs name
+    Unresolved() -> outputs ""
 
 // The query retains owner-then-index evaluation even when the owner is unknown.
-rule Indexed:
-  inputs
-    $walk
-    (or (IndexAddress owner:$owner index:$index) (Index owner:$owner index:$index))
-    $budget
-  => query indexed $walk $owner $index $budget {
-       Named name:$name => outputs $name;
-       Unresolved => outputs "";
-     };
+@Indexed
+rewrite (inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) budget) =
+  case indexed walk owner index budget of
+    Named (name: name) -> outputs name
+    Unresolved() -> outputs ""
 
-rule Parameter:
-  inputs _ $value:(Parameter) _
-  => outputs (parameterName $value);
+@Parameter
+rewrite (inputs _ value@(Parameter()) _) = outputs (parameterName value)
 
 // Captured owners of the same type remain distinct within the closure.
 // https://github.com/trickstercache/trickster/blob/7818ae3c39e725eb998f04fa31e5d315ede84b79/integration/alb_request_headers_test.go#L93-L99
-rule Free:
-  inputs _ $value:(Free) _
-  => outputs (freeName $value);
+@Free
+rewrite (inputs _ value@(Free()) _) = outputs (freeName value)
 
 // Generic allocation comments cannot collapse distinct local lock owners.
-rule Allocation:
-  inputs _ $value:(Allocation) _
-  => outputs (allocationName $value);
+@Allocation
+rewrite (inputs _ value@(Allocation()) _) = outputs (allocationName value)
 
-rule Constant:
-  inputs _ $value:(Constant) _
-  && hasLiteral $value
-  => outputs (literalName $value);
+@Constant
+rewrite (inputs _ value@(Constant()) _)
+  | hasLiteral value
+  =
+  outputs (literalName value)
 
 // Preserve dynamic SSA identity rather than merging owners by their field type.
 // https://github.com/prometheus/prometheus/blob/e06b2dc5a6149e20ca82fe936fb044a6dfe45958/notifier/manager.go#L165-L180
-rule Other:
-  inputs _ $value _
-  => outputs (valueName $value);
+@Other
+rewrite (inputs _ value _) = outputs (valueName value)

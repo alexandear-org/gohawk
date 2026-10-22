@@ -1,52 +1,46 @@
-union Evidence = Evidence tag State {
-  Proven = evidenceProven {
-    reason: Reason;
-  };
-  Disproven = evidenceDisproven {
-    reason: Reason;
-  };
-  Unknown = evidenceUnknown {
-    reason: Reason;
-  };
-};
-union Storage = Storage tag State {
-  Stored = evidenceProven;
-  NotStored = evidenceDisproven;
-  StorageUnknown = evidenceUnknown {
-    reason: Reason;
-  };
-};
-union Answer = (Reason, bool) tag 1 {
-  Opaque = true {
-    reason: 0;
-  };
-  Transparent = false {
-    reason: 0;
-  };
-};
-view Return = *ssa.Return {
-};
-view Store = *ssa.Store {
-};
-view Send = *ssa.Send {
-  value: X;
-};
-view Map = *ssa.MapUpdate {
-  value: Value;
-};
-view Select = *ssa.Select {
-};
-view Call = *ssa.Call {
-};
-view Defer = *ssa.Defer {
-};
-view Go = *ssa.Go {
-};
-view Common = *ssa.CallCommon {
-  value: Value;
-};
-view Builtin = *ssa.Builtin {
-};
-view Closure = *ssa.MakeClosure {
-};
-const None, evidenceProven, evidenceDisproven;
+type Evidence = Evidence
+  tag State
+  Proven (reason: Reason) = evidenceProven
+  Disproven (reason: Reason) = evidenceDisproven
+  Unknown (reason: Reason) = evidenceUnknown
+
+type Storage = Storage
+  tag State
+  Stored = evidenceProven
+  NotStored = evidenceDisproven
+  StorageUnknown (reason: Reason) = evidenceUnknown
+
+type Answer = (Reason, bool)
+  tag 1
+  Opaque (reason: 0) = true
+  Transparent (reason: 0) = false
+
+view Return = *ssa.Return
+
+view Store = *ssa.Store
+
+view Send = *ssa.Send
+  value: X
+
+view Map = *ssa.MapUpdate
+  value: Value
+
+view Select = *ssa.Select
+
+view Call = *ssa.Call
+
+view Defer = *ssa.Defer
+
+view Go = *ssa.Go
+
+view Common = *ssa.CallCommon
+  value: Value
+
+view Builtin = *ssa.Builtin
+
+view Closure = *ssa.MakeClosure
+
+host
+  None
+  evidenceProven
+  evidenceDisproven

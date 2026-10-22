@@ -1,24 +1,27 @@
-signature total fallback outputs (Uncovered);
-query returnedValue, ResolveReturnValue, excludesReturn, ReturnResult;
+signature total = outputs Uncovered()
+
+host
+  returnedValue!
+  ResolveReturnValue!
+  excludesReturn!
+  ReturnResult!
+
 // Exclude contradictory returns before accepting earlier completion. Selecting
 // a nonexistent result is uncovered, even when completion was already seen.
-union Selected = (ssa.Value, bool) tag 1 {
-  SelectedValue = true {
-    value: 0;
-  };
-  MissingValue = false;
-};
+type Selected = (ssa.Value, bool)
+  tag 1
+  SelectedValue (value: 0) = true
+  MissingValue = false
 
-rule Return:
-  inputs $returned $condition $completed $budget
-  => do {
-       SelectedValue value:$value <- query returnedValue $returned $condition.Result
-         else {
-           MissingValue => outputs (Uncovered);
-         };
-       $observed <- query ResolveReturnValue $value $condition.Outcome $budget;
-       false <- query excludesReturn $condition.Outcome $observed
-         else outputs (Irrelevant);
-       $plan <- query ReturnResult $observed $completed;
-       pure outputs $plan;
-     };
+@Return
+rewrite (inputs returned condition completed budget) =
+  do
+    SelectedValue (value: value) <- returnedValue returned condition.Result
+      else
+        MissingValue() -> outputs Uncovered()
+    observed <- ResolveReturnValue value condition.Outcome budget
+    false <- excludesReturn condition.Outcome observed
+      else
+        true -> outputs Irrelevant()
+    plan <- ReturnResult observed completed
+    outputs plan

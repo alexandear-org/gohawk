@@ -1,24 +1,23 @@
-signature total fallback outputs None false;
-query capture = ClosureQueries.Capture;
-query finish = ClosureFinish;
+signature total = outputs ^None false
+
+host
+  capture! = ClosureQueries.Capture
+  finish! = ClosureFinish
 
 // Ordinary carried arguments already establish this relationship. Only an
 // otherwise uncarried closure needs the additional capture search.
-rule Carried:
-  inputs $queries $instruction $closure true
-  => do {
-       $answer <- query finish $queries $instruction $closure;
-       pure $answer;
-     };
+@Carried
+rewrite (inputs queries instruction closure true) =
+  do
+    answer <- finish queries instruction closure
+    answer
 
-rule Uncarried:
-  inputs $queries $instruction $closure false
-  => do {
-       Proven <- query capture $queries $closure
-         else {
-           Unknown reason:$reason => outputs $reason true;
-           Disproven => outputs None false;
-         };
-       $answer <- query finish $queries $instruction $closure;
-       pure $answer;
-     };
+@Uncarried
+rewrite (inputs queries instruction closure false) =
+  do
+    Proven() <- capture queries closure
+      else
+        Unknown (reason: reason) -> outputs reason true
+        Disproven() -> outputs ^None false
+    answer <- finish queries instruction closure
+    answer

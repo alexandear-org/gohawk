@@ -1,36 +1,40 @@
-signature total fallback outputs false;
-guard cookieCall, writerHeaderCall, writerStatusCall;
-query header = benignHTTPHeaders;
-query helper = Effects.writerHelper;
-build status = writerStatus;
+signature total = outputs false
 
-rule InterfaceChange:
-  inputs _ (InterfaceChange) _ _
-  => outputs true;
+host
+  cookieCall
+  writerHeaderCall
+  writerStatusCall
+  header! = benignHTTPHeaders
+  helper! = Effects.writerHelper
+  status = writerStatus
 
-rule Cookie:
-  inputs _ $call:(Call) _ _
-  && cookieCall $call
-  => outputs true;
+@InterfaceChange
+rewrite (inputs _ InterfaceChange() _ _) = outputs true
 
-rule Header:
-  inputs _ $call:(Call) _ $budget
-  && writerHeaderCall $call
-  => query header $call $budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@Cookie
+rewrite (inputs _ call@(Call()) _ _)
+  | cookieCall call
+  =
+  outputs true
+
+@Header
+rewrite (inputs _ call@(Call()) _ budget)
+  | writerHeaderCall call
+  =
+  case header call budget of
+    true -> outputs true
+    false -> outputs false
 
 // Nonredirect final statuses preserve empty framing; a failed status check is
 // terminal, so it never falls through to visible-helper inference.
-rule Status:
-  inputs _ $call:(Call) _ _
-  && writerStatusCall $call
-  => outputs (status $call);
+@Status
+rewrite (inputs _ call@(Call()) _ _)
+  | writerStatusCall call
+  =
+  outputs (status call)
 
-rule Helper:
-  inputs $effects $call:(Call) $writer $budget
-  => query helper $effects $call $writer $budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@Helper
+rewrite (inputs effects call@(Call()) writer budget) =
+  case helper effects call writer budget of
+    true -> outputs true
+    false -> outputs false

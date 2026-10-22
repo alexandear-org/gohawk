@@ -1,25 +1,27 @@
-signature total fallback outputs None false;
-query storage = InstructionQueries.Storage;
-query unknownStorage = Storage.Unknown;
-query wrapper = InstructionQueries.Wrapper;
-query collectionOwner;
-const StoredOnCollectionOwner;
+signature total = outputs ^None false
+
+host
+  storage! = InstructionQueries.Storage
+  unknownStorage! = Storage.Unknown
+  wrapper! = InstructionQueries.Wrapper
+  collectionOwner!
+  StoredOnCollectionOwner
 
 // An owner selected from a collection may already be retained elsewhere.
 // A local collection does not prove its elements are local owners.
 // https://github.com/cloudflare/artifact-fs/blob/2b87a48691ef4ae82d391b7bbe4976c06c7fadf7/internal/fusefs/fuse_unix.go#L256-L287
-rule Stored:
-  inputs $queries $store
-  => do {
-       $storage <- query storage $queries $store;
-       false <- query unknownStorage $storage
-         else outputs $storage.Reason true;
-       false <- query collectionOwner $store $storage
-         else outputs StoredOnCollectionOwner true;
-       Disproven reason:$reason <- query wrapper $queries $store
-         else {
-           Proven reason:$reason => outputs $reason true;
-           Unknown reason:$reason => outputs $reason true;
-         };
-       pure outputs $reason false;
-     };
+@Stored
+rewrite (inputs queries store) =
+  do
+    storage <- storage queries store
+    false <- unknownStorage storage
+      else
+        true -> outputs storage.Reason true
+    false <- collectionOwner store storage
+      else
+        true -> outputs ^StoredOnCollectionOwner true
+    Disproven (reason: reason) <- wrapper queries store
+      else
+        Proven (reason: reason) -> outputs reason true
+        Unknown (reason: reason) -> outputs reason true
+    outputs reason false

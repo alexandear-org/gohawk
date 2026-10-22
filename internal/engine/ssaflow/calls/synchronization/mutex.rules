@@ -1,23 +1,23 @@
-match lockCall, unlockCall, readLockCall, readUnlockCall, tryLockCall;
+host
+  lockCall?
+  unlockCall?
+  readLockCall?
+  readUnlockCall?
+  tryLockCall?
 
 // Recognition supplies only the standard mutation contract. The heap consumer
 // independently requires a synchronous direct call and an exact receiver slot.
-rule Lock:
-  lockCall _
-  => true;
+@Lock
+rewrite (lockCall _) = true
 
-rule Unlock:
-  unlockCall _
-  => true;
+@Unlock
+rewrite (unlockCall _) = true
 
-rule ReadLock:
-  readLockCall _
-  => true;
+@ReadLock
+rewrite (readLockCall _) = true
 
-rule ReadUnlock:
-  readUnlockCall _
-  => true;
+@ReadUnlock
+rewrite (readUnlockCall _) = true
 
-rule TryLock:
-  tryLockCall _
-  => true;
+@TryLock
+rewrite (tryLockCall _) = true

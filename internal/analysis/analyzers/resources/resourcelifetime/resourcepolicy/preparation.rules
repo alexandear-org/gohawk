@@ -1,32 +1,36 @@
-signature total fallback outputs (Unknown reason:EvidenceUnavailable);
-query deferred = PreparationQueries.Deferred;
-query owners = PreparationQueries.Owners;
-query guarded = PreparationQueries.Guarded;
-query unknown = Evidence.Unknown;
-query prior = PreparationQueries.Prior;
-const PriorDeferMayRelease, BudgetExhausted, OpaqueConsumption, EvidenceUnavailable;
+signature total = outputs (Unknown (reason: ^EvidenceUnavailable))
+
+host
+  deferred! = PreparationQueries.Deferred
+  owners! = PreparationQueries.Owners
+  guarded! = PreparationQueries.Guarded
+  unknown! = Evidence.Unknown
+  prior! = PreparationQueries.Prior
+  PriorDeferMayRelease
+  BudgetExhausted
+  OpaqueConsumption
+  EvidenceUnavailable
 
 // Anywhere coverage of a dominating defer may release a later acquisition
 // through captured storage. It supplies uncertainty, not settlement.
 // Only a complete owner census can supply classifier inputs. Collection and
 // guarded-defer initialization then precede prior-cleanup evidence.
-rule Preparation:
-  inputs $queries
-  => do {
-       Disproven <- query deferred $queries
-         else {
-           Unknown reason:$reason => outputs (Unknown reason:$reason);
-           Proven => outputs (Unknown reason:PriorDeferMayRelease);
-         };
-       true <- query owners $queries
-         else outputs (Unknown reason:BudgetExhausted);
-       $guarded <- query guarded $queries;
-       false <- query unknown $guarded
-         else outputs (Unknown reason:$guarded.Reason);
-       Disproven <- query prior $queries
-         else {
-           Unknown reason:$reason => outputs (Unknown reason:$reason);
-           Proven => outputs (Unknown reason:OpaqueConsumption);
-         };
-       pure outputs (Proven reason:None);
-     };
+@Preparation
+rewrite (inputs queries) =
+  do
+    Disproven() <- deferred queries
+      else
+        Unknown (reason: reason) -> outputs (Unknown (reason: reason))
+        Proven() -> outputs (Unknown (reason: ^PriorDeferMayRelease))
+    true <- owners queries
+      else
+        false -> outputs (Unknown (reason: ^BudgetExhausted))
+    guarded <- guarded queries
+    false <- unknown guarded
+      else
+        true -> outputs (Unknown (reason: guarded.Reason))
+    Disproven() <- prior queries
+      else
+        Unknown (reason: reason) -> outputs (Unknown (reason: reason))
+        Proven() -> outputs (Unknown (reason: ^OpaqueConsumption))
+    outputs (Proven (reason: ^None))

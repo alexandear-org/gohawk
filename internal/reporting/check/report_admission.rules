@@ -1,27 +1,39 @@
-signature total fallback outputs ReportingEmitted;
-query categoryIncluded, Suppressed, TestFilePosition;
-const ReportingEmitted, ReportingDelisted, ReportingUnknownCheck;
-const ReportingNotSelected, ReportingSuppressed, ReportingTestFileSkipped;
-view Diagnostic = analysis.Diagnostic {
-  category: Category;
-  position: Pos;
-};
+signature total = outputs ^ReportingEmitted
+
+host
+  categoryIncluded!
+  Suppressed!
+  TestFilePosition!
+  ReportingEmitted
+  ReportingDelisted
+  ReportingUnknownCheck
+  ReportingNotSelected
+  ReportingSuppressed
+  ReportingTestFileSkipped
 
 // Withdrawn identities remain recognized even after leaving the public catalog.
 // Unknown identities are errors before selection can hide them. Suppression
 // precedes the test-file backstop; neither source query runs for earlier exits.
-rule Admission:
-  inputs $pass (Diagnostic category:$category position:$position) $analyzer $declared $withdrawn $disabled
-  => do {
-       false <- query categoryIncluded $withdrawn $category
-         else outputs ReportingDelisted;
-       true <- query categoryIncluded $declared $category
-         else outputs ReportingUnknownCheck;
-       false <- query categoryIncluded $disabled $category
-         else outputs ReportingNotSelected;
-       false <- query Suppressed $pass $position $analyzer
-         else outputs ReportingSuppressed;
-       false <- query TestFilePosition $pass $position
-         else outputs ReportingTestFileSkipped;
-       pure outputs ReportingEmitted;
-     };
+view Diagnostic = analysis.Diagnostic
+  category: Category
+  position: Pos
+
+@Admission
+rewrite (inputs pass (Diagnostic (category: category, position: position)) analyzer declared withdrawn disabled) =
+  do
+    false <- categoryIncluded withdrawn category
+      else
+        true -> outputs ^ReportingDelisted
+    true <- categoryIncluded declared category
+      else
+        false -> outputs ^ReportingUnknownCheck
+    false <- categoryIncluded disabled category
+      else
+        true -> outputs ^ReportingNotSelected
+    false <- Suppressed pass position analyzer
+      else
+        true -> outputs ^ReportingSuppressed
+    false <- TestFilePosition pass position
+      else
+        true -> outputs ^ReportingTestFileSkipped
+    outputs ^ReportingEmitted

@@ -1,38 +1,38 @@
-signature total fallback outputs (Opaque reasonLabelHelperUndecided) true;
-view Launch = *ssa.Go {
-};
-query completion = cancellationClassifier.argumentCompletion;
-query summaryInvokes = cancellationClassifier.summaryInvokes;
-query mayInvoke($instruction) = lifecycle.CallInvokesArgumentOnEveryReturn $instruction $classifier.cancel;
-query returnsCleanup($instruction) = lifecycle.CallReturnsDeferredCleanup $instruction $classifier.cancel;
+signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
+
+view Launch = *ssa.Go
+
+host
+  completion! = cancellationClassifier.argumentCompletion
+  summaryInvokes! = cancellationClassifier.summaryInvokes
+  mayInvoke! instruction = lifecycle.CallInvokesArgumentOnEveryReturn instruction classifier.cancel
+  returnsCleanup! instruction = lifecycle.CallReturnsDeferredCleanup instruction classifier.cancel
+
 // A launched helper is a possible handoff, even if its invocation of cancel is
 // conditional. It cannot establish synchronous release.
 // https://github.com/infercrane/infercrane/blob/93a43cebe36e01c68c1517d5f1eb97417d01588d/internal/asyncinference/service_lease_test.go#L43-L54
-union Completion = (proofs.EvidenceState, lifecycle.CompletionRequest) tag 0 {
-  Completed = completionProven;
-  Indeterminate = completionUnknown {
-    request: 1;
-  };
-  Incomplete = completionDisproven;
-};
+type Completion = (proofs.EvidenceState, lifecycle.CompletionRequest)
+  tag 0
+  Completed = completionProven
+  Indeterminate (request: 1) = completionUnknown
+  Incomplete = completionDisproven
 
-rule Launched:
-  inputs (Launch) _
-  => outputs (Opaque reasonLabelLaunchedHelper) true;
+@Launched
+rewrite (inputs Launch() _) = outputs (Opaque ^reasonLabelLaunchedHelper) true
 
 // May-alias invocation evidence can identify an ambiguous handoff beyond exact
 // completion, but it cannot establish release.
-rule Argument:
-  inputs $instruction $classifier
-  => query completion $classifier $instruction {
-       Completed => outputs (Release reasonLabelHelperRelease) true;
-       Indeterminate request:$request => query summaryInvokes $classifier $instruction $request {
-         true => outputs (Release reasonLabelSummaryRelease) true;
-         false => outputs (Opaque reasonLabelHelperUndecided) true;
-       };
-       Incomplete => query mayInvoke $instruction
-             select true => outputs (Opaque reasonLabelHelperMayInvoke) true
-       <|> query returnsCleanup $instruction
-             select true => outputs (Opaque reasonLabelReturnsDeferredCleanup) true
-       <|> pure outputs (NoAction reasonCancellationNone) false;
-     };
+@Argument
+rewrite (inputs instruction classifier) =
+  case completion classifier instruction of
+    Completed() -> outputs (Release ^reasonLabelHelperRelease) true
+    Indeterminate (request: request) -> case summaryInvokes classifier instruction request of
+      true -> outputs (Release ^reasonLabelSummaryRelease) true
+      false -> outputs (Opaque ^reasonLabelHelperUndecided) true
+    Incomplete() -> case mayInvoke instruction of
+      true -> outputs (Opaque ^reasonLabelHelperMayInvoke) true
+      false -> decline
+    <|> case returnsCleanup instruction of
+      true -> outputs (Opaque ^reasonLabelReturnsDeferredCleanup) true
+      false -> decline
+    <|> outputs (NoAction ^reasonCancellationNone) false

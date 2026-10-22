@@ -1,16 +1,19 @@
-signature total fallback outputs AggregateOpaque nil;
-const AggregateOpaque, AggregateRoot, AggregateFollow, AggregateBounded;
+signature total = outputs ^AggregateOpaque nil
 
-rule Root:
-  inputs (Allocation)
-  => outputs AggregateRoot nil;
+host
+  AggregateOpaque
+  AggregateRoot
+  AggregateFollow
+  AggregateBounded
+
+@Root
+rewrite (inputs Allocation()) = outputs ^AggregateRoot nil
 
 // Explicit bounds, including a constant zero, remain opaque. Only a whole
 // slice may preserve this aggregate's callback slots and element numbering.
-rule WholeSlice:
-  inputs (Slice source:$source low:nil high:nil max:nil)
-  => outputs AggregateFollow $source;
+@WholeSlice
+rewrite (inputs (Slice (source: source, low: nil, high: nil, max: nil))) =
+  outputs ^AggregateFollow source
 
-rule BoundedSlice:
-  inputs (Slice)
-  => outputs AggregateBounded nil;
+@BoundedSlice
+rewrite (inputs Slice()) = outputs ^AggregateBounded nil

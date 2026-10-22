@@ -1,25 +1,26 @@
-signature total fallback outputs nil;
-view Load = *ssa.UnOp {
-  op: Op;
-};
-const returnLoadToken, returnTrue, returnFalse;
-query resolveReturn;
+signature total = outputs nil
+
+view Load = *ssa.UnOp
+  op: Op
+
+host
+  returnLoadToken
+  returnTrue
+  returnFalse
+  resolveReturn!
+
 // Resolve only compiler-spilled Boolean results. An error's interface box must
 // stay intact: a typed nil error is not the nil error result.
-union Resolved = (ssa.Value, bool) tag 1 {
-  ResolvedValue = true {
-    value: 0;
-  };
-  Unavailable = false;
-};
+type Resolved = (ssa.Value, bool)
+  tag 1
+  ResolvedValue (value: 0) = true
+  Unavailable = false
 
-rule BooleanSpill:
-  inputs $original:(Load op:returnLoadToken) (or returnTrue returnFalse) $budget
-  => query resolveReturn $original $budget {
-       ResolvedValue value:$value => outputs $value;
-       Unavailable => outputs $original;
-     };
+@BooleanSpill
+rewrite (inputs original@(Load (op: ^returnLoadToken)) (^returnTrue | ^returnFalse) budget) =
+  case resolveReturn original budget of
+    ResolvedValue (value: value) -> outputs value
+    Unavailable() -> outputs original
 
-rule Original:
-  inputs $value _ _
-  => outputs $value;
+@Original
+rewrite (inputs value _ _) = outputs value

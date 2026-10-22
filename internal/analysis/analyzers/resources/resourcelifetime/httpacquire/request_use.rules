@@ -1,30 +1,34 @@
-signature total fallback outputs false;
-guard requestDo, requestRebindUse, requestHeader;
-query follow = headRequestQuery.followUses;
-query header = headerUsesAreEditsWithin;
+signature total = outputs false
 
-rule Debug:
-  inputs _ _ _ (Debug)
-  => outputs true;
+host
+  requestDo
+  requestRebindUse
+  requestHeader
+  follow! = headRequestQuery.followUses
+  header! = headerUsesAreEditsWithin
 
-rule Do:
-  inputs _ _ $request $call:(Call)
-  && requestDo $call $request
-  => outputs true;
+@Debug
+rewrite (inputs _ _ _ Debug()) = outputs true
 
-rule Rebind:
-  inputs $query $walk $request $call:(Call)
-  && requestRebindUse $call $request
-  => query follow $query $walk $call {
-       true => outputs true;
-       false => outputs false;
-     };
+@Do
+rewrite (inputs _ _ request call@(Call()))
+  | requestDo call request
+  =
+  outputs true
+
+@Rebind
+rewrite (inputs query walk request call@(Call()))
+  | requestRebindUse call request
+  =
+  case follow query walk call of
+    true -> outputs true
+    false -> outputs false
 
 // Header edits preserve Method; opaque map consumers remain unavailable.
-rule Header:
-  inputs $query _ _ $field:(FieldAddress)
-  && requestHeader $field
-  => query header $field $query.budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@Header
+rewrite (inputs query _ _ field@(FieldAddress()))
+  | requestHeader field
+  =
+  case header field query.budget of
+    true -> outputs true
+    false -> outputs false

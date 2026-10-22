@@ -1,56 +1,44 @@
-build emptyLockState;
-signature total fallback outputs (emptyLockState) false;
-query lockCopyAvailable, copyLockLists, copyLockGuards, copyLockOrigins;
-union Lists = (lockStringList, lockStringList, lockStringList, bool) tag 3 {
-  CopiedLists = true {
-    held: 0;
-    readHeld: 1;
-    deferred: 2;
-  };
-  ListsCutoff = false;
-};
-union Guards = (lockGuardMap, bool) tag 1 {
-  CopiedGuards = true {
-    values: 0;
-  };
-  GuardsCutoff = false;
-};
+host
+  emptyLockState
+
+signature total = outputs emptyLockState() false
+
+host
+  lockCopyAvailable!
+  copyLockLists!
+  copyLockGuards!
+  copyLockOrigins!
+
+type Lists = (lockStringList, lockStringList, lockStringList, bool)
+  tag 3
+  CopiedLists (held: 0, readHeld: 1, deferred: 2) = true
+  ListsCutoff = false
+
 // Successors borrow until expansion. Detach every mutable collection in the
 // original charge order; no cutoff can expose a partly copied successor.
-union Origins = (lockOriginMap, bool) tag 1 {
-  CopiedOrigins = true {
-    values: 0;
-  };
-  OriginsCutoff = false;
-};
+type Guards = (lockGuardMap, bool)
+  tag 1
+  CopiedGuards (values: 0) = true
+  GuardsCutoff = false
 
-rule Copy:
-  inputs $state $budget
-  => do {
-       true <- query lockCopyAvailable $budget
-         else outputs (emptyLockState) false;
-       CopiedLists held:$held readHeld:$readHeld deferred:$deferred <- query copyLockLists
-                                                                               $state
-                                                                               $budget
-         else {
-           ListsCutoff => outputs (emptyLockState) false;
-         };
-       CopiedGuards values:$guards <- query copyLockGuards $state $budget
-         else {
-           GuardsCutoff => outputs (emptyLockState) false;
-         };
-       CopiedOrigins values:$origins <- query copyLockOrigins $state $budget
-         else {
-           OriginsCutoff => outputs (emptyLockState) false;
-         };
-       pure outputs
-              (update
-                $state
-                held:$held
-                readHeld:$readHeld
-                deferred:$deferred
-                guards:$guards
-                origins:$origins
-              )
-              true;
-     };
+type Origins = (lockOriginMap, bool)
+  tag 1
+  CopiedOrigins (values: 0) = true
+  OriginsCutoff = false
+
+@Copy
+rewrite (inputs state budget) =
+  do
+    true <- lockCopyAvailable budget
+      else
+        false -> outputs emptyLockState() false
+    CopiedLists (held: held, readHeld: readHeld, deferred: deferred) <- copyLockLists state budget
+      else
+        ListsCutoff() -> outputs emptyLockState() false
+    CopiedGuards (values: guards) <- copyLockGuards state budget
+      else
+        GuardsCutoff() -> outputs emptyLockState() false
+    CopiedOrigins (values: origins) <- copyLockOrigins state budget
+      else
+        OriginsCutoff() -> outputs emptyLockState() false
+    outputs (state with (held: held, readHeld: readHeld, deferred: deferred, guards: guards, origins: origins)) true

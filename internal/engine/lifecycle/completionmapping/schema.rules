@@ -1,59 +1,55 @@
-union Mapping = Local tag Kind {
-  Exact {
-    local: Local;
-    supplied: Supplied;
-    path: Path;
-  };
-  Projection {
-    local: Local;
-    supplied: Supplied;
-    path: Path;
-  };
-  Owner {
-    local: Local;
-    supplied: Supplied;
-  };
-  Callback {
-    local: Local;
-    supplied: Supplied;
-  };
-};
-view Request = Context {
-  exact: Exact;
-};
-view Cell = *ssa.Alloc {
-};
-union ValueResult = (ssa.Value, bool) tag 1 {
-  KnownValue = true {
-    value: 0;
-  };
-  MissingValue = false;
-};
-union CellResult = (*ssa.Alloc, bool) tag 1 {
-  DirectCell = true {
-    cell: 0;
-  };
-  OtherBinding = false;
-};
-union PathResult = pathEvidence tag State {
-  PathMissing = pathMissing;
-  PathFound = pathFound {
-    path: Path;
-  };
-  PathCutoff = pathCutoff;
-};
-build emptyLocal, identical;
-query stable, deferred, exhausted, directCell, capturedOwner, unmatchedContainment;
-query capturedValue = ssaflow.CapturedBindingValueWithin;
-query captureMatches = heapmodel.CapturedBindingMatchesWithin;
-query mayAlias = heapmodel.MayAlias;
-query derives = heapmodel.ValueDerivesFromWithin;
-query pathFrom = ssaflow.ValueIsAccessPathFromWithin;
-query proven = storedValue.Proven;
-query callback = Queries.Callback;
-query contains = Queries.MayContain;
-query deferredValue = Queries.DeferredValue;
-query storedOnPath = Queries.StoredOnPath;
-query uncertain = Queries.Uncertain;
-query cutoff = Queries.Cutoff;
-query same, ambiguous, identity, projection, owner, storedPath;
+type Mapping = Local
+  tag Kind
+  Exact (local: Local, supplied: Supplied, path: Path)
+  Projection (local: Local, supplied: Supplied, path: Path)
+  Owner (local: Local, supplied: Supplied)
+  Callback (local: Local, supplied: Supplied)
+
+view Request = Context
+  exact: Exact
+
+view Cell = *ssa.Alloc
+
+type ValueResult = (ssa.Value, bool)
+  tag 1
+  KnownValue (value: 0) = true
+  MissingValue = false
+
+type CellResult = (*ssa.Alloc, bool)
+  tag 1
+  DirectCell (cell: 0) = true
+  OtherBinding = false
+
+type PathResult = pathEvidence
+  tag State
+  PathMissing = pathMissing
+  PathFound (path: Path) = pathFound
+  PathCutoff = pathCutoff
+
+host
+  emptyLocal
+  identical
+  stable!
+  deferred!
+  exhausted!
+  directCell!
+  capturedOwner!
+  unmatchedContainment!
+  capturedValue! = ssaflow.CapturedBindingValueWithin
+  captureMatches! = heapmodel.CapturedBindingMatchesWithin
+  mayAlias! = heapmodel.MayAlias
+  derives! = heapmodel.ValueDerivesFromWithin
+  pathFrom! = ssaflow.ValueIsAccessPathFromWithin
+  proven! = storedValue.Proven
+  callback! = Queries.Callback
+  contains! = Queries.MayContain
+  deferredValue! = Queries.DeferredValue
+  storedOnPath! = Queries.StoredOnPath
+  uncertain! = Queries.Uncertain
+  cutoff! = Queries.Cutoff
+  same!
+  ambiguous!
+  identity!
+  projection!
+  owner!
+  storedPath!

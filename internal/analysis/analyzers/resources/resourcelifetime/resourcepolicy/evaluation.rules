@@ -1,17 +1,19 @@
-signature total fallback outputs (Unavailable reason:EvidenceUnavailable);
-query memory = EvaluationQueries.MemoryWriter;
-query begin = EvaluationQueries.Begin;
-query acquire = Acquire;
-const MemoryWriter;
+signature total = outputs (Unavailable (reason: ^EvidenceUnavailable))
+
+host
+  memory! = EvaluationQueries.MemoryWriter
+  begin! = EvaluationQueries.Begin
+  acquire! = Acquire
+  MemoryWriter
 
 // This is a policy exclusion, not proof that a compressor was finalized.
 // Keep it before candidate evidence, tracing, allowances and all flow queries.
-rule Candidate:
-  inputs $queries
-  => do {
-       false <- query memory $queries
-         else outputs (Accepted reason:MemoryWriter);
-       $candidate <- query begin $queries;
-       $decision <- query acquire $candidate;
-       pure outputs $decision;
-     };
+@Candidate
+rewrite (inputs queries) =
+  do
+    false <- memory queries
+      else
+        true -> outputs (Accepted (reason: ^MemoryWriter))
+    candidate <- begin queries
+    decision <- acquire candidate
+    outputs decision

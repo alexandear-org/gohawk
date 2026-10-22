@@ -1,12 +1,15 @@
-union State = processUseEvidence tag State {
-  Completed = decisionProven;
-  Incomplete = decisionDisproven;
-  Indeterminate = decisionUnknown;
-};
-union Settlement = (bool, proofs.EvidenceState) tag 0 {
-  Settled = true;
-  Unsettled = false {
-    fallback: 1;
-  };
-};
-const decisionProven, decisionDisproven, decisionUnknown;
+type State = processUseEvidence
+  tag State
+  Completed = decisionProven
+  Incomplete = decisionDisproven
+  Indeterminate = decisionUnknown
+
+type Settlement = (bool, proofs.EvidenceState)
+  tag 0
+  Settled = true
+  Unsettled (fallback: 1) = false
+
+host
+  decisionProven
+  decisionDisproven
+  decisionUnknown

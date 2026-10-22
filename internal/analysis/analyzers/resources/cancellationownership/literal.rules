@@ -1,35 +1,43 @@
-signature total fallback outputs (NoAction reasonCancellationNone) false;
-match deferredLiteralClosure;
-query allowance = cancellationClassifier.budget;
-query capture = cancellationClassifier.proveDeferredCaptureWithin;
-query guarded = cancellationClassifier.deferredLiteralGuard;
-query completes = cancellationClassifier.deferredLiteralCompletion;
-query known = deferredEvidence.Known;
-query proven = deferredEvidence.Proven;
-query deferredLiteralCutoff;
-const reasonLabelResultGuardedDefer, reasonLabelDeferredLiteralRelease;
+signature total = outputs (NoAction ^reasonCancellationNone) false
+
+host
+  deferredLiteralClosure?
+  allowance! = cancellationClassifier.budget
+  capture! = cancellationClassifier.proveDeferredCaptureWithin
+  guarded! = cancellationClassifier.deferredLiteralGuard
+  completes! = cancellationClassifier.deferredLiteralCompletion
+  known! = deferredEvidence.Known
+  proven! = deferredEvidence.Proven
+  deferredLiteralCutoff!
+  reasonLabelResultGuardedDefer
+  reasonLabelDeferredLiteralRelease
 
 // A directly deferred closure is exact only after its captured cell is proven
 // stable. A result guard defers judgment to each return; unknown capture, guard
 // census or completion cannot become evidence that cancel is uncalled.
-rule Literal:
-  inputs $classifier $deferred:(deferredLiteralClosure $closure)
-  => do {
-       $budget <- query allowance $classifier;
-       $capture <- query capture $classifier $closure $budget;
-       true <- query known $capture
-         else outputs (Opaque reasonLabelDeferredClosure) true;
-       true <- query proven $capture
-         else outputs (NoAction reasonCancellationNone) false;
-       $guard <- query guarded $classifier $deferred $budget;
-       true <- query known $guard
-         else outputs (Opaque reasonLabelDeferredClosure) true;
-       false <- query proven $guard
-         else outputs (NoAction reasonLabelResultGuardedDefer) true;
-       $completion <- query completes $classifier $deferred $budget;
-       false <- query proven $completion
-         else outputs (Release reasonLabelDeferredLiteralRelease) true;
-       true <- query deferredLiteralCutoff $budget
-         else outputs (NoAction reasonCancellationNone) false;
-       pure outputs (Opaque reasonLabelDeferredClosure) true;
-     };
+@Literal
+rewrite (inputs classifier deferred@(deferredLiteralClosure closure)) =
+  do
+    budget <- allowance classifier
+    capture <- capture classifier closure budget
+    true <- known capture
+      else
+        false -> outputs (Opaque ^reasonLabelDeferredClosure) true
+    true <- proven capture
+      else
+        false -> outputs (NoAction ^reasonCancellationNone) false
+    guard <- guarded classifier deferred budget
+    true <- known guard
+      else
+        false -> outputs (Opaque ^reasonLabelDeferredClosure) true
+    false <- proven guard
+      else
+        true -> outputs (NoAction ^reasonLabelResultGuardedDefer) true
+    completion <- completes classifier deferred budget
+    false <- proven completion
+      else
+        true -> outputs (Release ^reasonLabelDeferredLiteralRelease) true
+    true <- deferredLiteralCutoff budget
+      else
+        false -> outputs (NoAction ^reasonCancellationNone) false
+    outputs (Opaque ^reasonLabelDeferredClosure) true

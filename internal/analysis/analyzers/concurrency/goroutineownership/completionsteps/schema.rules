@@ -1,20 +1,19 @@
-view Return = *ssa.Return {
-};
-view Defers = *ssa.RunDefers {
-};
-view Jump = *ssa.Jump {
-};
-view Debug = *ssa.DebugRef {
-};
-view Unary = *ssa.UnOp {
-  op: Op;
-};
-view Call = *ssa.Call {
-};
-view Launch = *ssa.Go {
-};
-view Send = *ssa.Send {
-  channel: Chan;
-};
-view DeferCall = *ssa.Defer {
-};
+view Return = *ssa.Return
+
+view Defers = *ssa.RunDefers
+
+view Jump = *ssa.Jump
+
+view Debug = *ssa.DebugRef
+
+view Unary = *ssa.UnOp
+  op: Op
+
+view Call = *ssa.Call
+
+view Launch = *ssa.Go
+
+view Send = *ssa.Send
+  channel: Chan
+
+view DeferCall = *ssa.Defer

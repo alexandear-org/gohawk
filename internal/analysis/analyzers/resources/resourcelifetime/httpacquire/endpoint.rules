@@ -1,42 +1,40 @@
-signature total fallback outputs (Unknown reason:None);
-match localURL;
-query spend;
-query server = localServer;
-query client = matchesClient;
-query handler = localHandler;
-query framing = localEffects;
-union Server = (*ssa.Call, bool) tag 1 {
-  FoundServer = true {
-    server: 0;
-  };
-  NoServer = false;
-};
-union Handler = (*ssa.Function, bool) tag 1 {
-  FoundHandler = true {
-    function: 0;
-  };
-  NoHandler = false;
-};
+signature total = outputs (Unknown (reason: ^None))
 
-rule Endpoint:
-  inputs $call:(localURL $url) $budget
-  => do {
-       true <- query spend $budget
-         else outputs (Unknown reason:BudgetExhausted);
-       FoundServer server:$server <- query server $url $budget
-         else {
-           NoServer => outputs (Disproven reason:ServerIdentityUnavailable);
-         };
-       true <- query client $call $server
-         else outputs (Disproven reason:ServerIdentityUnavailable);
-       FoundHandler function:$handler <- query handler $server $budget
-         else {
-           NoHandler => outputs (Disproven reason:HandlerUnavailable);
-         };
-       Proven reason:$reason <- query framing $call $handler $budget
-         else {
-           Unknown reason:$unknownReason => outputs (Unknown reason:$unknownReason);
-           Disproven reason:$disprovenReason => outputs (Disproven reason:$disprovenReason);
-         };
-       pure outputs (Proven reason:$reason);
-     };
+host
+  localURL?
+  spend!
+  server! = localServer
+  client! = matchesClient
+  handler! = localHandler
+  framing! = localEffects
+
+type Server = (*ssa.Call, bool)
+  tag 1
+  FoundServer (server: 0) = true
+  NoServer = false
+
+type Handler = (*ssa.Function, bool)
+  tag 1
+  FoundHandler (function: 0) = true
+  NoHandler = false
+
+@Endpoint
+rewrite (inputs call@(localURL url) budget) =
+  do
+    true <- spend budget
+      else
+        false -> outputs (Unknown (reason: ^BudgetExhausted))
+    FoundServer (server: server) <- server url budget
+      else
+        NoServer() -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
+    true <- client call server
+      else
+        false -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
+    FoundHandler (function: handler) <- handler server budget
+      else
+        NoHandler() -> outputs (Disproven (reason: ^HandlerUnavailable))
+    Proven (reason: reason) <- framing call handler budget
+      else
+        Unknown (reason: unknownReason) -> outputs (Unknown (reason: unknownReason))
+        Disproven (reason: disprovenReason) -> outputs (Disproven (reason: disprovenReason))
+    outputs (Proven (reason: reason))

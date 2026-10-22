@@ -1,14 +1,20 @@
-union Evidence = Proof tag State {
-  Unknown = unknown {
-    reason: Reason;
-  };
-  Disproven = disproven {
-    reason: Reason;
-  };
-  Proven = proven {
-    reason: Reason;
-  };
-};
-const unknown, disproven, proven;
-const None, BudgetExhausted, HeadAcquisition, HeadClientNotUnconfigured, HeadRequestModified;
-const ClientOverrideUnresolved, HandlerUnavailable, HeaderOnlyEffects, ServerIdentityUnavailable, WriterEffectsUnavailable;
+type Evidence = Proof
+  tag State
+  Unknown (reason: Reason) = unknown
+  Disproven (reason: Reason) = disproven
+  Proven (reason: Reason) = proven
+
+host
+  unknown
+  disproven
+  proven
+  None
+  BudgetExhausted
+  HeadAcquisition
+  HeadClientNotUnconfigured
+  HeadRequestModified
+  ClientOverrideUnresolved
+  HandlerUnavailable
+  HeaderOnlyEffects
+  ServerIdentityUnavailable
+  WriterEffectsUnavailable

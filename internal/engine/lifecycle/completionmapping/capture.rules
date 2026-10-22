@@ -1,47 +1,46 @@
-signature total fallback outputs (emptyLocal) false;
-query classify($value, $originalMatch, $exact) = CaptureRelation $context $local $binding $target $value $originalMatch $exact $invocation;
-query deferredCell($cell) = DeferredCell $context $local $cell $target $invocation;
+signature total = outputs emptyLocal() false
 
-rule ExactCell:
-  inputs $context:(Request exact:true) $local $cell:(Cell) $target $invocation
-  => do {
-       $stored <- query stable $context $cell $invocation;
-       true <- query proven $stored
-         else outputs (emptyLocal) false;
-       pure outputs
-              (Exact local:$local supplied:$stored.Value path:nil)
-              (identical $stored.Value $target);
-     };
+host
+  classify! value originalMatch exact = CaptureRelation context local binding target value originalMatch exact invocation
+  deferredCell! cell = DeferredCell context local cell target invocation
 
-rule ExactValue:
-  inputs (Request exact:true) $local $binding $target _
-  => outputs (Exact local:$local supplied:$binding path:nil) (identical $binding $target);
+@ExactCell
+rewrite (inputs context@(Request (exact: true)) local cell@(Cell()) target invocation) =
+  do
+    stored <- stable context cell invocation
+    true <- proven stored
+      else
+        false -> outputs emptyLocal() false
+    outputs (Exact (local: local, supplied: stored.Value, path: nil)) (identical stored.Value target)
+
+@ExactValue
+rewrite (inputs (Request (exact: true)) local binding target _) =
+  outputs (Exact (local: local, supplied: binding, path: nil)) (identical binding target)
 
 // Deferred stability may change the alias question. Keep the original binding
 // match separately so containment cannot rescue a directly matched capture.
-rule Capture:
-  inputs $context $local $binding $target $invocation
-  => do {
-       $value <- query capturedValue $binding $context.Budget;
-       $matches <- query captureMatches $binding $target $context.Budget;
-       false <- query exhausted $context
-         else outputs (emptyLocal) false;
-       false <- query deferred $context
-         else do {
-                OtherBinding <- query directCell $context $binding
-                  else {
-                    DirectCell cell:$cell => do {
-                      $answer <- query deferredCell $cell;
-                      pure $answer;
-                    };
-                  };
-                $stored <- query deferredValue $context.Queries $binding $target $invocation;
-                true <- query proven $stored
-                  else outputs (emptyLocal) false;
-                $exact <- query mayAlias $stored.Value $target;
-                $answer <- query classify $stored.Value $matches $exact;
-                pure $answer;
-              };
-       $answer <- query classify $value $matches $matches;
-       pure $answer;
-     };
+@Capture
+rewrite (inputs context local binding target invocation) =
+  do
+    value <- capturedValue binding context.Budget
+    matches <- captureMatches binding target context.Budget
+    false <- exhausted context
+      else
+        true -> outputs emptyLocal() false
+    false <- deferred context
+      else
+        true -> do
+          OtherBinding() <- directCell context binding
+            else
+              DirectCell (cell: cell) -> do
+                answer <- deferredCell cell
+                answer
+          stored <- deferredValue context.Queries binding target invocation
+          true <- proven stored
+            else
+              false -> outputs emptyLocal() false
+          exact <- mayAlias stored.Value target
+          answer <- classify stored.Value matches exact
+          answer
+    answer <- classify value matches matches
+    answer

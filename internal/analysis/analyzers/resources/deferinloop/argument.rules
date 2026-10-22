@@ -1,27 +1,31 @@
-signature total fallback outputs resourceUnknown reasonNone false;
-query argumentEvidence, wrappedArgument, argumentReleased;
-const resourceLive, resourceSettled, resourceUnknown, reasonNone;
-const reasonWrapperPassedToCallee, reasonCalleeReleasesArgument;
+signature total = outputs ^resourceUnknown ^reasonNone false
+
+host
+  argumentEvidence!
+  wrappedArgument!
+  argumentReleased!
+  resourceLive
+  resourceSettled
+  resourceUnknown
+  reasonNone
+  reasonWrapperPassedToCallee
+  reasonCalleeReleasesArgument
+
 // Evidence emits the original alias/containment trace before label selection.
 // A wrapper is not the callee's exact argument contract: it can neither prove
 // release nor prove that the resource it holds remains untouched.
 // https://github.com/replicatedhq/troubleshoot/blob/eacd376c1245fe2ebcc3581f015f692d77d89af4/pkg/supportbundle/aftercollection.go#L39-L53
-union Argument = (bool, bool) tag 0 {
-  Aliased = true;
-  Other = false {
-    contains: 1;
-  };
-};
+type Argument = (bool, bool)
+  tag 0
+  Aliased = true
+  Other (contains: 1) = false
 
-rule Argument:
-  inputs $evidence $probe $instruction $argument $target $index
-  => query argumentEvidence $probe $instruction $argument $target {
-       Aliased => query argumentReleased $evidence $instruction $index {
-         true => outputs resourceSettled reasonCalleeReleasesArgument true;
-         false => outputs resourceLive reasonNone true;
-       };
-       Other contains:$contains => query wrappedArgument $contains $argument $target {
-         true => outputs resourceUnknown reasonWrapperPassedToCallee false;
-         false => outputs resourceLive reasonNone false;
-       };
-     };
+@Argument
+rewrite (inputs evidence probe instruction argument target index) =
+  case argumentEvidence probe instruction argument target of
+    Aliased() -> case argumentReleased evidence instruction index of
+      true -> outputs ^resourceSettled ^reasonCalleeReleasesArgument true
+      false -> outputs ^resourceLive ^reasonNone true
+    Other (contains: contains) -> case wrappedArgument contains argument target of
+      true -> outputs ^resourceUnknown ^reasonWrapperPassedToCallee false
+      false -> outputs ^resourceLive ^reasonNone false

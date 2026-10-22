@@ -1,16 +1,19 @@
-signature total fallback outputs nil;
-view Load = *ssa.UnOp {
-  op: Op;
-  source: X;
-};
-view Field = *ssa.FieldAddr {
-};
-guard responseBodyField;
-const loadToken;
+signature total = outputs nil
+
+view Load = *ssa.UnOp
+  op: Op
+  source: X
+
+view Field = *ssa.FieldAddr
+
+host
+  responseBodyField
+  loadToken
 
 // The exact Response type and its Body declaration supply the storage leaf.
 // This does not establish which response was acquired or whether Body changed.
-rule Body:
-  inputs (Load op:loadToken source:$field:(Field))
-  && responseBodyField $field
-  => outputs $field;
+@Body
+rewrite (inputs (Load (op: ^loadToken, source: field@(Field()))))
+  | responseBodyField field
+  =
+  outputs field

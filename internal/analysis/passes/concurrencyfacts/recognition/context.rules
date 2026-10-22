@@ -1,34 +1,43 @@
-signature total fallback outputs ContextUnknown nil;
-guard empty = EmptyContext;
-guard fresh = CancelConstructor;
-guard observes = DoneCall;
-guard cancellation = cancelTarget;
-build parent = parentArgument;
-build receiver = ssaflow.CallReceiver;
-const ContextUnknown, ContextEmpty, ContextFresh, ContextObserve, ContextRequest;
+signature total = outputs ^ContextUnknown nil
 
-rule Missing:
-  inputs nil
-  => outputs ContextUnknown nil;
+host
+  empty = EmptyContext
+  fresh = CancelConstructor
+  observes = DoneCall
+  cancellation = cancelTarget
+  parent = parentArgument
+  receiver = ssaflow.CallReceiver
+  ContextUnknown
+  ContextEmpty
+  ContextFresh
+  ContextObserve
+  ContextRequest
 
-rule NonCanceling:
-  inputs $common
-  && empty $common
-  => outputs ContextEmpty nil;
+@Missing
+rewrite (inputs nil) = outputs ^ContextUnknown nil
 
-rule Constructor:
-  inputs $common
-  && fresh $common
-  => outputs ContextFresh (parent $common);
+@NonCanceling
+rewrite (inputs common)
+  | empty common
+  =
+  outputs ^ContextEmpty nil
 
-rule Observation:
-  inputs $common
-  && observes $common
-  => outputs ContextObserve (receiver $common);
+@Constructor
+rewrite (inputs common)
+  | fresh common
+  =
+  outputs ^ContextFresh (parent common)
+
+@Observation
+rewrite (inputs common)
+  | observes common
+  =
+  outputs ^ContextObserve (receiver common)
 
 // A typed cancellation call is a symbolic request until its exact origin is
 // bound. Context and CancelFunc types alone cannot establish a standard origin.
-rule Request:
-  inputs $common
-  && cancellation $common
-  => outputs ContextRequest $common.Value;
+@Request
+rewrite (inputs common)
+  | cancellation common
+  =
+  outputs ^ContextRequest common.Value

@@ -1,18 +1,22 @@
-signature total fallback outputs (Unknown reason:BudgetExhausted);
-query overrides = Effects.Overrides;
-query headers = handlerHeaders;
-build result = localHTTPEffectProof;
+signature total = outputs (Unknown (reason: ^BudgetExhausted))
+
+host
+  overrides! = Effects.Overrides
+  headers! = handlerHeaders
+  result = localHTTPEffectProof
 
 // Root and handler checks share the same strict effect memo and child quota.
 // Framing evidence is reached only when neither default-override check wins.
-rule Effects:
-  inputs $effects $caller $handler $budget
-  => do {
-       false <- query overrides $effects $caller $budget
-         else outputs (result false ClientOverrideUnresolved $budget);
-       false <- query overrides $effects $handler $budget
-         else outputs (result false ClientOverrideUnresolved $budget);
-       true <- query headers $effects $handler $budget
-         else outputs (result false WriterEffectsUnavailable $budget);
-       pure outputs (result true HeaderOnlyEffects $budget);
-     };
+@Effects
+rewrite (inputs effects caller handler budget) =
+  do
+    false <- overrides effects caller budget
+      else
+        true -> outputs (result false ^ClientOverrideUnresolved budget)
+    false <- overrides effects handler budget
+      else
+        true -> outputs (result false ^ClientOverrideUnresolved budget)
+    true <- headers effects handler budget
+      else
+        false -> outputs (result false ^WriterEffectsUnavailable budget)
+    outputs (result true ^HeaderOnlyEffects budget)

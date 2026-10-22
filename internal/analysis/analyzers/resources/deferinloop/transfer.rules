@@ -1,28 +1,37 @@
-signature total fallback outputs false;
-query global = lifecycle.StoresValueInGlobal;
-query field = lifecycle.StoresValueInEscapingField;
-query sent = lifecycle.SendsValue;
-query returned = lifecycle.CallTransfersArgumentToReturnedOwner;
-query receiver = lifecycle.CallTransfersArgumentToReceiver;
-query lifecycleOwner = lifecycle.CallTransfersArgumentToLifecycleOwner;
-query retained = acquisitionEvidence.ArgumentRetainedByCallee;
+signature total = outputs false
+
+host
+  global! = lifecycle.StoresValueInGlobal
+  field! = lifecycle.StoresValueInEscapingField
+  sent! = lifecycle.SendsValue
+  returned! = lifecycle.CallTransfersArgumentToReturnedOwner
+  receiver! = lifecycle.CallTransfersArgumentToReceiver
+  lifecycleOwner! = lifecycle.CallTransfersArgumentToLifecycleOwner
+  retained! = acquisitionEvidence.ArgumentRetainedByCallee
 
 // Each contract proves a transfer independently. Imported retention is reached
 // only after the structural contracts fail; no allowance is reset or refunded.
-rule Transfer:
-  inputs $evidence $instruction $target
-  => query global $instruction $target
-           select true => outputs true
-     <|> query field $instruction $target
-           select true => outputs true
-     <|> query sent $instruction $target
-           select true => outputs true
-     <|> query returned $instruction $target
-           select true => outputs true
-     <|> query receiver $instruction $target
-           select true => outputs true
-     <|> query lifecycleOwner $instruction $target
-           select true => outputs true
-     <|> query retained $evidence $instruction $target
-           select true => outputs true
-     <|> pure outputs false;
+@Transfer
+rewrite (inputs evidence instruction target) =
+  case global instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case field instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case sent instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case returned instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case receiver instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case lifecycleOwner instruction target of
+    true -> outputs true
+    false -> decline
+  <|> case retained evidence instruction target of
+    true -> outputs true
+    false -> decline
+  <|> outputs false

@@ -1,32 +1,34 @@
-signature total fallback outputs IndexStopped nil;
-view IndexAddress = *ssa.IndexAddr {
-  index: Index;
-};
-view Constant = *ssa.Const {
-};
-view Index = *ssa.Index {
-};
-view Lookup = *ssa.Lookup {
-};
-view Extract = *ssa.Extract {
-  source: Tuple;
-};
-view Field = *ssa.FieldAddr {
-  source: X;
-};
-view Unary = *ssa.UnOp {
-  source: X;
-};
-const IndexStopped, IndexDynamic, IndexFollow;
+signature total = outputs ^IndexStopped nil
 
-rule ConstantAddress:
-  inputs (IndexAddress index:(Constant))
-  => outputs IndexStopped nil;
+view IndexAddress = *ssa.IndexAddr
+  index: Index
 
-rule Dynamic:
-  inputs (or (IndexAddress) (Index) (Lookup))
-  => outputs IndexDynamic nil;
+view Constant = *ssa.Const
 
-rule Follow:
-  inputs (or (Extract source:$source) (Field source:$source) (Unary source:$source))
-  => outputs IndexFollow $source;
+view Index = *ssa.Index
+
+view Lookup = *ssa.Lookup
+
+view Extract = *ssa.Extract
+  source: Tuple
+
+view Field = *ssa.FieldAddr
+  source: X
+
+view Unary = *ssa.UnOp
+  source: X
+
+host
+  IndexStopped
+  IndexDynamic
+  IndexFollow
+
+@ConstantAddress
+rewrite (inputs (IndexAddress (index: Constant()))) = outputs ^IndexStopped nil
+
+@Dynamic
+rewrite (inputs (IndexAddress() | Index() | Lookup())) = outputs ^IndexDynamic nil
+
+@Follow
+rewrite (inputs (Extract (source: source) | Field (source: source) | Unary (source: source))) =
+  outputs ^IndexFollow source

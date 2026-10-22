@@ -1,26 +1,35 @@
-signature total fallback outputs (Decision state:decisionUnknown reason:reasonCommandUseCutoff);
-query commandUse = proveCommandUseAfterStart;
-query entryLifetime;
-const decisionUnknown, decisionDisproven, decisionProven;
-const reasonAmbiguousWaitOwnership, reasonWaitOwnershipProven, reasonCommandUseCutoff;
-const reasonUnusedCommandOwnershipUnknown, reasonProgramLifetimeOwnershipUnknown, reasonUnownedReturn;
-record Decision = processDecision {
-  state;
-  reason;
-};
-union Use = processUseEvidence tag State {
-  Used = decisionProven;
-  Unused = decisionDisproven;
-  Uncertain = decisionUnknown;
-};
+signature total = outputs (Decision (state: ^decisionUnknown, reason: ^reasonCommandUseCutoff))
 
-rule AmbiguousSettlement:
-  inputs witness:nil unknown:true
-  => outputs (Decision state:decisionUnknown reason:reasonAmbiguousWaitOwnership);
+host
+  commandUse! = proveCommandUseAfterStart
+  entryLifetime!
+  decisionUnknown
+  decisionDisproven
+  decisionProven
+  reasonAmbiguousWaitOwnership
+  reasonWaitOwnershipProven
+  reasonCommandUseCutoff
+  reasonUnusedCommandOwnershipUnknown
+  reasonProgramLifetimeOwnershipUnknown
+  reasonUnownedReturn
 
-rule Settled:
-  inputs witness:nil
-  => outputs (Decision state:decisionDisproven reason:reasonWaitOwnershipProven);
+type Decision = processDecision
+  state
+  reason
+
+type Use = processUseEvidence
+  tag State
+  Used = decisionProven
+  Unused = decisionDisproven
+  Uncertain = decisionUnknown
+
+@AmbiguousSettlement
+rewrite (inputs (witness: nil, unknown: true)) =
+  outputs (Decision (state: ^decisionUnknown, reason: ^reasonAmbiguousWaitOwnership))
+
+@Settled
+rewrite (inputs (witness: nil)) =
+  outputs (Decision (state: ^decisionDisproven, reason: ^reasonWaitOwnershipProven))
 
 // Fire-and-forget alone cannot distinguish an intentional browser or daemon
 // launch from a defect. Retiring the detached audit must not broaden missing-wait
@@ -30,13 +39,11 @@ rule Settled:
 // that parent exit terminates the child. Repeated starts, referenced entries
 // and reusable callees remain ordinary wait obligations.
 // https://github.com/coder/acp-go-sdk/blob/0845a3bb9eddda5bfc22a94dd3598c90cb842451/example/agent/main.go#L401-L423
-rule UncoveredReturn:
-  inputs start:$start command:$command budget:$budget
-  => query commandUse $start $command $budget {
-       Uncertain => outputs (Decision state:decisionUnknown reason:reasonCommandUseCutoff);
-       Unused => outputs (Decision state:decisionUnknown reason:reasonUnusedCommandOwnershipUnknown);
-       Used => query entryLifetime $start {
-         true => outputs (Decision state:decisionUnknown reason:reasonProgramLifetimeOwnershipUnknown);
-         false => outputs (Decision state:decisionProven reason:reasonUnownedReturn);
-       };
-     };
+@UncoveredReturn
+rewrite (inputs (start: start, command: command, budget: budget)) =
+  case commandUse start command budget of
+    Uncertain() -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonCommandUseCutoff))
+    Unused() -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonUnusedCommandOwnershipUnknown))
+    Used() -> case entryLifetime start of
+      true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonProgramLifetimeOwnershipUnknown))
+      false -> outputs (Decision (state: ^decisionProven, reason: ^reasonUnownedReturn))

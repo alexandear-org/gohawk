@@ -1,69 +1,68 @@
-signature total fallback outputs (Answer proof:(emptyEvidence) decided:false);
+signature total = outputs (Answer (proof: emptyEvidence(), decided: false))
+
 // Keep whole proofs: a failed completion can carry a cutoff, method or
 // provenance that neither a transfer disproof nor a summary may erase.
-union Selection = (Proof, bool) tag 1 {
-  Available = true {
-    proof: 0;
-  };
-  Absent = false;
-};
+type Selection = (Proof, bool)
+  tag 1
+  Available (proof: 0) = true
+  Absent = false
 
-rule Local:
-  inputs localEvidenceStage $evidence $request $fact $summarized
-  => do {
-       $supplied <- query suppliedEvidence $request;
-       false <- query proven $supplied
-         else outputs (Answer proof:$supplied decided:true);
-       $completion <- query completion $evidence $request $supplied;
-       false <- query proven $completion
-         else outputs (Answer proof:$completion decided:true);
-       $capture <- query captured $evidence $request;
-       false <- query proven $capture
-         else outputs (Answer proof:$capture decided:true);
-       Available proof:$transfer <- query transfer $evidence $request
-         else {
-           Absent => outputs (Answer proof:$completion decided:true);
-         };
-       false <- query proven $transfer
-         else outputs (Answer proof:$transfer decided:true);
-       false <- query abandonedSearch $completion
-         else outputs (Answer proof:$completion decided:true);
-       true <- query known $transfer
-         else outputs (Answer proof:$transfer decided:true);
-       true <- query known $completion
-         else outputs (Answer proof:$transfer decided:true);
-       pure outputs (Answer proof:$completion decided:true);
-     };
+@Local
+rewrite (inputs ^localEvidenceStage evidence request fact summarized) =
+  do
+    supplied <- suppliedEvidence request
+    false <- proven supplied
+      else
+        true -> outputs (Answer (proof: supplied, decided: true))
+    completion <- completion evidence request supplied
+    false <- proven completion
+      else
+        true -> outputs (Answer (proof: completion, decided: true))
+    capture <- captured evidence request
+    false <- proven capture
+      else
+        true -> outputs (Answer (proof: capture, decided: true))
+    Available (proof: transfer) <- transfer evidence request
+      else
+        Absent() -> outputs (Answer (proof: completion, decided: true))
+    false <- proven transfer
+      else
+        true -> outputs (Answer (proof: transfer, decided: true))
+    false <- abandonedSearch completion
+      else
+        true -> outputs (Answer (proof: completion, decided: true))
+    true <- known transfer
+      else
+        false -> outputs (Answer (proof: transfer, decided: true))
+    true <- known completion
+      else
+        false -> outputs (Answer (proof: transfer, decided: true))
+    outputs (Answer (proof: completion, decided: true))
 
 // Imported summaries are consulted only after source-visible evidence fails.
 // Projection matching is an opt-in: a selected owner field may be reassigned
 // or exposed independently. Missing summaries remain unknown.
-rule ImportedMissing:
-  inputs importedEvidenceStage $evidence $request $fact false
-  => query importedEvidenceRequested $request {
-       true => outputs (Answer proof:(unavailableEvidence) decided:true);
-       false => outputs (Answer proof:(emptyEvidence) decided:false);
-     };
+@ImportedMissing
+rewrite (inputs ^importedEvidenceStage evidence request fact false) =
+  case importedEvidenceRequested request of
+    true -> outputs (Answer (proof: unavailableEvidence(), decided: true))
+    false -> outputs (Answer (proof: emptyEvidence(), decided: false))
 
-rule Imported:
-  inputs importedEvidenceStage $evidence $request $fact true
-  => query selectedEvidenceRequested $request
-           select true => query selected $evidence $request $fact {
-             Available proof:$proof => outputs (Answer proof:$proof decided:true);
-             Absent => decline;
-           }
-     <|> query receiverStoreEvidence $evidence $request $fact
-           select true => query receiverEscapes $request {
-             true => do {
-               $method <- query requestedMethod $request;
-               pure outputs
-                      (Answer
-                        proof:(importedProof reasonReceiverStoreTransfer $method)
-                        decided:true
-                      );
-             };
-             false => outputs (Answer proof:(unescapedReceiverEvidence) decided:true);
-           }
-     <|> query importedEvidenceRequested $request
-           select true => outputs (Answer proof:(unmatchedImportedEvidence) decided:true)
-     <|> pure outputs (Answer proof:(emptyEvidence) decided:false);
+@Imported
+rewrite (inputs ^importedEvidenceStage evidence request fact true) =
+  case selectedEvidenceRequested request of
+    true -> case selected evidence request fact of
+      Available (proof: proof) -> outputs (Answer (proof: proof, decided: true))
+      Absent() -> decline
+    false -> decline
+  <|> case receiverStoreEvidence evidence request fact of
+    true -> case receiverEscapes request of
+      true -> do
+        method <- requestedMethod request
+        outputs (Answer (proof: importedProof ^reasonReceiverStoreTransfer method, decided: true))
+      false -> outputs (Answer (proof: unescapedReceiverEvidence(), decided: true))
+    false -> decline
+  <|> case importedEvidenceRequested request of
+    true -> outputs (Answer (proof: unmatchedImportedEvidence(), decided: true))
+    false -> decline
+  <|> outputs (Answer (proof: emptyEvidence(), decided: false))

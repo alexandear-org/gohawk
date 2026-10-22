@@ -1,41 +1,34 @@
-signature total fallback outputs (Absent);
-union Origin = CallbackSource tag Kind {
-  Absent = CallbackAbsent;
-  Exact = CallbackExact {
-    closure: Closure;
-  };
-  Follow = CallbackFollow {
-    source: Source;
-  };
-  Storage = CallbackStorage {
-    source: Source;
-  };
-};
-view Closure = *ssa.MakeClosure {
-};
-view Call = *ssa.Call {
-  common: Call;
-};
-view Unary = *ssa.UnOp {
-  source: X;
-};
-view Allocation = *ssa.Alloc {
-};
-match onceSource;
+signature total = outputs Absent()
 
-rule Closure:
-  inputs $closure:(Closure) _
-  => outputs (Exact closure:$closure);
+type Origin = CallbackSource
+  tag Kind
+  Absent = CallbackAbsent
+  Exact (closure: Closure) = CallbackExact
+  Follow (source: Source) = CallbackFollow
+  Storage (source: Source) = CallbackStorage
 
-rule DeferredOnce:
-  inputs (Call common:(onceSource $source)) true
-  => outputs (Follow source:$source);
+view Closure = *ssa.MakeClosure
+
+view Call = *ssa.Call
+  common: Call
+
+view Unary = *ssa.UnOp
+  source: X
+
+view Allocation = *ssa.Alloc
+
+host
+  onceSource?
+
+@Closure
+rewrite (inputs closure@(Closure()) _) = outputs (Exact (closure: closure))
+
+@DeferredOnce
+rewrite (inputs (Call (common: onceSource source)) true) = outputs (Follow (source: source))
 
 // The storage proof retains its observation point and the same child cap.
-rule CellRead:
-  inputs (Unary source:$source) _
-  => outputs (Storage source:$source);
+@CellRead
+rewrite (inputs (Unary (source: source)) _) = outputs (Storage (source: source))
 
-rule Cell:
-  inputs $source:(Allocation) _
-  => outputs (Storage source:$source);
+@Cell
+rewrite (inputs source@(Allocation()) _) = outputs (Storage (source: source))

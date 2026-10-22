@@ -1,48 +1,44 @@
 // Invalid host outcomes suppress the report without crediting cleanup.
-signature total fallback Unknown reasonNone;
-query transferred($instruction) = transfersResource $evidence $instruction $obligation.target;
-query opaqueUse($instruction) = opaqueResourceUse $instruction $obligation.target;
-query argumentUse($instruction) = resourceUseStatus $evidence $probe $instruction $obligation.target;
-query callDetails, cleanupReceiver, cleanupMethod;
-const reasonResourceTransferred, reasonResourceCapturedOrStored, reasonExplicitCleanup, reasonNone;
-union Call = (bool, *ssa.CallCommon) tag 0 {
-  Called = true {
-    common: 1;
-  };
-  NotCalled = false;
-};
-union Decision = (resourceStatus, deferReason) tag 0 {
-  Live = resourceLive {
-    reason: 1;
-  };
-  Settled = resourceSettled {
-    reason: 1;
-  };
-  Unknown = resourceUnknown {
-    reason: 1;
-  };
-};
+signature total = Unknown ^reasonNone
 
-rule ResourceUse:
-  inputs $evidence $probe $instruction $obligation
-  => query transferred $instruction {
-       true => Settled reasonResourceTransferred;
-       false => query callDetails $instruction {
-         NotCalled => query opaqueUse $instruction {
-           true => Unknown reasonResourceCapturedOrStored;
-           false => Live reasonNone;
-         };
-         Called common:$common => query cleanupReceiver $obligation $common {
-           true => query cleanupMethod $obligation $common {
-             true => Settled reasonExplicitCleanup;
-             false => Live reasonNone;
-           };
-           false => query $decision = argumentUse $instruction
-           decide $decision {
-             Live => $decision;
-             Settled => $decision;
-             Unknown => $decision;
-           };
-         };
-       };
-     };
+host
+  transferred! instruction = transfersResource evidence instruction obligation.target
+  opaqueUse! instruction = opaqueResourceUse instruction obligation.target
+  argumentUse! instruction = resourceUseStatus evidence probe instruction obligation.target
+  callDetails!
+  cleanupReceiver!
+  cleanupMethod!
+  reasonResourceTransferred
+  reasonResourceCapturedOrStored
+  reasonExplicitCleanup
+  reasonNone
+
+type Call = (bool, *ssa.CallCommon)
+  tag 0
+  Called (common: 1) = true
+  NotCalled = false
+
+type Decision = (resourceStatus, deferReason)
+  tag 0
+  Live (reason: 1) = resourceLive
+  Settled (reason: 1) = resourceSettled
+  Unknown (reason: 1) = resourceUnknown
+
+@ResourceUse
+rewrite (inputs evidence probe instruction obligation) =
+  case transferred instruction of
+    true -> Settled ^reasonResourceTransferred
+    false -> case callDetails instruction of
+      NotCalled() -> case opaqueUse instruction of
+        true -> Unknown ^reasonResourceCapturedOrStored
+        false -> Live ^reasonNone
+      Called (common: common) -> case cleanupReceiver obligation common of
+        true -> case cleanupMethod obligation common of
+          true -> Settled ^reasonExplicitCleanup
+          false -> Live ^reasonNone
+        false -> do
+          decision <- argumentUse instruction
+          case decision of
+            Live() -> decision
+            Settled() -> decision
+            Unknown() -> decision

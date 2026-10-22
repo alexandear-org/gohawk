@@ -1,60 +1,68 @@
-signature total fallback outputs actionNone reasonNone;
-view Closure = *ssa.MakeClosure {
-};
-view Receive = *ssa.UnOp {
-};
-view Select = *ssa.Select {
-};
-view Range = *ssa.Range {
-};
-view Send = *ssa.Send {
-  value: X;
-};
-view MapUpdate = *ssa.MapUpdate {
-  value: Value;
-};
-query exact = spawnAnalysis.guaranteedSignal;
-query possible = spawnAnalysis.guaranteedPossible;
-query aggregate = spawnAnalysis.aggregateReceive;
-query selectSends = spawnAnalysis.selectSends;
-query consumes = spawnAnalysis.consumes;
-const actionNone, actionJoin, actionUnknown;
-const reasonNone, reasonLabelSignalReceived;
-const reasonLabelPossibleSignalReceive, reasonLabelSignalAggregateReceive;
-const reasonLabelSelectSends, reasonLabelSent, reasonLabelStoredInMap;
+signature total = outputs ^actionNone ^reasonNone
+
+view Closure = *ssa.MakeClosure
+
+view Receive = *ssa.UnOp
+
+view Select = *ssa.Select
+
+view Range = *ssa.Range
+
+view Send = *ssa.Send
+  value: X
+
+view MapUpdate = *ssa.MapUpdate
+  value: Value
+
+host
+  exact! = spawnAnalysis.guaranteedSignal
+  possible! = spawnAnalysis.guaranteedPossible
+  aggregate! = spawnAnalysis.aggregateReceive
+  selectSends! = spawnAnalysis.selectSends
+  consumes! = spawnAnalysis.consumes
+  actionNone
+  actionJoin
+  actionUnknown
+  reasonNone
+  reasonLabelSignalReceived
+  reasonLabelPossibleSignalReceive
+  reasonLabelSignalAggregateReceive
+  reasonLabelSelectSends
+  reasonLabelSent
+  reasonLabelStoredInMap
 
 // Capturing a value has no effect by itself. Classify the closure's defer,
 // return, store, launch or opaque call where that lifecycle action happens.
-rule ClosureCreation:
-  inputs _ (Closure)
-  => outputs actionNone reasonNone;
+@ClosureCreation
+rewrite (inputs _ Closure()) = outputs ^actionNone ^reasonNone
 
-rule Reception:
-  inputs $analysis $instruction:(or (Receive) (Select) (Range))
-  => query exact $analysis $instruction
-           select true => outputs actionJoin reasonLabelSignalReceived
-     <|> query possible $analysis $instruction
-           select true => outputs actionUnknown reasonLabelPossibleSignalReceive
-     <|> query aggregate $analysis $instruction
-           select true => outputs actionUnknown reasonLabelSignalAggregateReceive
-     <|> query selectSends $analysis $instruction
-           select true => outputs actionUnknown reasonLabelSelectSends
-     <|> pure outputs actionNone reasonNone;
+@Reception
+rewrite (inputs analysis instruction@(Receive() | Select() | Range())) =
+  case exact analysis instruction of
+    true -> outputs ^actionJoin ^reasonLabelSignalReceived
+    false -> decline
+  <|> case possible analysis instruction of
+    true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive
+    false -> decline
+  <|> case aggregate analysis instruction of
+    true -> outputs ^actionUnknown ^reasonLabelSignalAggregateReceive
+    false -> decline
+  <|> case selectSends analysis instruction of
+    true -> outputs ^actionUnknown ^reasonLabelSelectSends
+    false -> decline
+  <|> outputs ^actionNone ^reasonNone
 
-rule Sent:
-  inputs $analysis (Send value:$value)
-  => query consumes $analysis $value {
-       true => outputs actionUnknown reasonLabelSent;
-       false => outputs actionNone reasonNone;
-     };
+@Sent
+rewrite (inputs analysis (Send (value: value))) =
+  case consumes analysis value of
+    true -> outputs ^actionUnknown ^reasonLabelSent
+    false -> outputs ^actionNone ^reasonNone
 
-rule Mapped:
-  inputs $analysis (MapUpdate value:$value)
-  => query consumes $analysis $value {
-       true => outputs actionUnknown reasonLabelStoredInMap;
-       false => outputs actionNone reasonNone;
-     };
+@Mapped
+rewrite (inputs analysis (MapUpdate (value: value))) =
+  case consumes analysis value of
+    true -> outputs ^actionUnknown ^reasonLabelStoredInMap
+    false -> outputs ^actionNone ^reasonNone
 
-rule Other:
-  inputs _ _
-  => outputs actionNone reasonNone;
+@Other
+rewrite (inputs _ _) = outputs ^actionNone ^reasonNone

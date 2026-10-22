@@ -1,38 +1,28 @@
-signature total fallback outputs (Opaque);
-union Step = BindingStep tag Kind {
-  Opaque = BindingOpaque;
-  Exact = BindingExact;
-  Field = BindingField {
-    field: Field;
-  };
-  Element = BindingElement {
-    element: Element;
-  };
-  Load = BindingLoad {
-    source: Source;
-  };
-  Cell = BindingCell {
-    source: Source;
-  };
-};
+signature total = outputs Opaque()
 
-rule Exact:
-  inputs (or (Function) (Closure))
-  => outputs (Exact);
+type Step = BindingStep
+  tag Kind
+  Opaque = BindingOpaque
+  Exact = BindingExact
+  Field (field: Field) = BindingField
+  Element (element: Element) = BindingElement
+  Load (source: Source) = BindingLoad
+  Cell (source: Source) = BindingCell
 
-rule Field:
-  inputs (Unary source:$field:(FieldAddress) op:bindingLoadToken)
-  => outputs (Field field:$field);
+@Exact
+rewrite (inputs (Function() | Closure())) = outputs Exact()
 
-rule Element:
-  inputs (Unary source:$element:(IndexAddress) op:bindingLoadToken)
-  => outputs (Element element:$element);
+@Field
+rewrite (inputs (Unary (source: field@(FieldAddress()), op: ^bindingLoadToken))) =
+  outputs (Field (field: field))
 
-rule Load:
-  inputs (Unary source:$source op:bindingLoadToken)
-  => outputs (Load source:$source);
+@Element
+rewrite (inputs (Unary (source: element@(IndexAddress()), op: ^bindingLoadToken))) =
+  outputs (Element (element: element))
+
+@Load
+rewrite (inputs (Unary (source: source, op: ^bindingLoadToken))) = outputs (Load (source: source))
 
 // Stable content is requested at the original observation point by Go.
-rule Cell:
-  inputs $cell:(Allocation)
-  => outputs (Cell source:$cell);
+@Cell
+rewrite (inputs cell@(Allocation())) = outputs (Cell (source: cell))

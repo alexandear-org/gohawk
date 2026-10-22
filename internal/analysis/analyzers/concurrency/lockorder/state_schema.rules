@@ -1,13 +1,12 @@
-record State = lockFlowState {
-  block;
-  predecessor;
-  held;
-  origins;
-  readHeld;
-  deferred;
-  guards;
-  condition;
-  conditionValue;
-  constants;
-  constraints;
-};
+type State = lockFlowState
+  block
+  predecessor
+  held
+  origins
+  readHeld
+  deferred
+  guards
+  condition
+  conditionValue
+  constants
+  constraints

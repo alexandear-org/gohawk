@@ -1,27 +1,25 @@
-signature total fallback outputs (Opaque reasonLabelOwnerUnavailable);
-query guarded = cancellationClassifier.resultGuardedReturn;
-query returned($instruction) = returnsCancel $instruction $classifier.cancel;
-query owner = cancellationClassifier.ownerReturnLabel;
-query possibleOwner($instruction) = lifecycle.ReturnedValueOwnsValue $instruction $classifier.cancel;
+signature total = outputs (Opaque ^reasonLabelOwnerUnavailable)
 
-rule Return:
-  inputs $instruction $classifier
-  => query guarded $classifier $instruction {
-       Decided label:$label => query returned $instruction {
-         false => outputs $label;
-         true => outputs (Transfer reasonLabelReturned);
-       };
-       Unrecognized => query returned $instruction {
-         true => outputs (Transfer reasonLabelReturned);
-         false => query $label = owner $classifier $instruction
-         decide $label {
-           Release => outputs $label;
-           Transfer => outputs $label;
-           Opaque => outputs $label;
-           NoAction => query possibleOwner $instruction {
-             true => outputs (Opaque reasonLabelReturned);
-             false => outputs (NoAction reasonCancellationNone);
-           };
-         };
-       };
-     };
+host
+  guarded! = cancellationClassifier.resultGuardedReturn
+  returned! instruction = returnsCancel instruction classifier.cancel
+  owner! = cancellationClassifier.ownerReturnLabel
+  possibleOwner! instruction = lifecycle.ReturnedValueOwnsValue instruction classifier.cancel
+
+@Return
+rewrite (inputs instruction classifier) =
+  case guarded classifier instruction of
+    Decided (label: label) -> case returned instruction of
+      false -> outputs label
+      true -> outputs (Transfer ^reasonLabelReturned)
+    Unrecognized() -> case returned instruction of
+      true -> outputs (Transfer ^reasonLabelReturned)
+      false -> do
+        label <- owner classifier instruction
+        case label of
+          Release() -> outputs label
+          Transfer() -> outputs label
+          Opaque() -> outputs label
+          NoAction() -> case possibleOwner instruction of
+            true -> outputs (Opaque ^reasonLabelReturned)
+            false -> outputs (NoAction ^reasonCancellationNone)

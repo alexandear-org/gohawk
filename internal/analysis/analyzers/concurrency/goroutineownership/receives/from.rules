@@ -1,28 +1,28 @@
-signature total fallback outputs false;
-query channel = matchChannel;
-query selected = selectReceives;
-guard channelRange;
+signature total = outputs false
 
-rule Receive:
-  inputs (Unary op:receiveToken channel:$channel) $matches _
-  => query channel $matches $channel {
-       true => outputs true;
-       false => outputs false;
-     };
+host
+  channel! = matchChannel
+  selected! = selectReceives
+  channelRange
+
+@Receive
+rewrite (inputs (Unary (op: ^receiveToken, channel: channel)) matches _) =
+  case channel matches channel of
+    true -> outputs true
+    false -> outputs false
 
 // Select enumeration spends each existing arm visit before invoking a channel
 // predicate. Other arms do not borrow a matching receive's identity.
-rule Select:
-  inputs $choice:(Select) $matches $budget
-  => query selected $choice $matches $budget {
-       true => outputs true;
-       false => outputs false;
-     };
+@Select
+rewrite (inputs choice@(Select()) matches budget) =
+  case selected choice matches budget of
+    true -> outputs true
+    false -> outputs false
 
-rule Range:
-  inputs (Range channel:$channel) $matches _
-  && channelRange $channel
-  => query channel $matches $channel {
-       true => outputs true;
-       false => outputs false;
-     };
+@Range
+rewrite (inputs (Range (channel: channel)) matches _)
+  | channelRange channel
+  =
+  case channel matches channel of
+    true -> outputs true
+    false -> outputs false

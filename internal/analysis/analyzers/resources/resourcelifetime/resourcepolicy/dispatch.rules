@@ -1,36 +1,39 @@
-signature total fallback outputs None false;
-guard invokes, appendBuiltin;
-query closure = CallQueries.Closure;
-query function = CallQueries.Function;
-const InterfaceMethod, Appended;
+signature total = outputs ^None false
+
+host
+  invokes
+  appendBuiltin
+  closure! = CallQueries.Closure
+  function! = CallQueries.Function
+  InterfaceMethod
+  Appended
 
 // Being an interface receiver is not consumption. Only arguments carry this
 // resource into the dynamically selected method body.
-rule Interface:
-  inputs _ _ $common $carried
-  && invokes $common
-  => outputs InterfaceMethod $carried;
+@Interface
+rewrite (inputs _ _ common carried)
+  | invokes common
+  =
+  outputs ^InterfaceMethod carried
 
-rule Append:
-  inputs _ _ (Common value:$builtin:(Builtin)) true
-  && appendBuiltin $builtin
-  => outputs Appended true;
+@Append
+rewrite (inputs _ _ (Common (value: builtin@(Builtin()))) true)
+  | appendBuiltin builtin
+  =
+  outputs ^Appended true
 
 // Preserve the inspected reason even when this builtin consumes nothing.
-rule Builtin:
-  inputs _ _ (Common value:(Builtin)) _
-  => outputs Appended false;
+@Builtin
+rewrite (inputs _ _ (Common (value: Builtin())) _) = outputs ^Appended false
 
-rule Closure:
-  inputs $queries $instruction (Common value:$closure:(Closure)) $carried
-  => query closure $queries $instruction $closure $carried {
-       Opaque reason:$reason => outputs $reason true;
-       Transparent reason:$reason => outputs $reason false;
-     };
+@Closure
+rewrite (inputs queries instruction (Common (value: closure@(Closure()))) carried) =
+  case closure queries instruction closure carried of
+    Opaque (reason: reason) -> outputs reason true
+    Transparent (reason: reason) -> outputs reason false
 
-rule Function:
-  inputs $queries $instruction $common $carried
-  => query function $queries $instruction $common $carried {
-       Opaque reason:$reason => outputs $reason true;
-       Transparent reason:$reason => outputs $reason false;
-     };
+@Function
+rewrite (inputs queries instruction common carried) =
+  case function queries instruction common carried of
+    Opaque (reason: reason) -> outputs reason true
+    Transparent (reason: reason) -> outputs reason false

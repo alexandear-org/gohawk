@@ -1,10 +1,15 @@
-signature total fallback outputs (Stop proof:(Unknown reason:LockStateBudgetExhausted));
-query guard = ReadWriteQueries.Guard;
-query unknown = Proof.Unknown;
-query private = ReadWriteQueries.PrivateStorage;
-query held = ReadWriteQueries.HeldWriter;
-query writer = ReadWriteQueries.Writer;
-const PrivateWriteStorage, ExclusiveWriterUnknown, ImportedWriterGuardUnknown, ReadLockWrite;
+signature total = outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
+
+host
+  guard! = ReadWriteQueries.Guard
+  unknown! = Proof.Unknown
+  private! = ReadWriteQueries.PrivateStorage
+  held! = ReadWriteQueries.HeldWriter
+  writer! = ReadWriteQueries.Writer
+  PrivateWriteStorage
+  ExclusiveWriterUnknown
+  ImportedWriterGuardUnknown
+  ReadLockWrite
 
 // A field-only method exposes caller synchronization or separate ownership;
 // same-owner matching cannot decide which. Keep the candidate unknown.
@@ -13,20 +18,21 @@ const PrivateWriteStorage, ExclusiveWriterUnknown, ImportedWriterGuardUnknown, R
 // a borrowed map or slice. Another held writer also leaves the field's guard
 // unknown; this does not establish that it is protected by that mutex.
 // https://github.com/rfjakob/gocryptfs/blob/842af4463989ee6808d397433e9aba8517e49c89/internal/fusefrontend/file.go#L409-L430
-rule Write:
-  inputs $queries
-  => do {
-       $guard <- query guard $queries;
-       false <- query unknown $guard
-         else outputs (Continue proof:$guard);
-       false <- query private $queries
-         else outputs (Continue proof:(Accepted reason:PrivateWriteStorage));
-       false <- query held $queries
-         else outputs (Continue proof:(Unknown reason:ExclusiveWriterUnknown));
-       WriterAbsent <- query writer $queries
-         else {
-           WriterUnavailable => outputs (Stop proof:(Unknown reason:LockStateBudgetExhausted));
-           WriterFound => outputs (Continue proof:(Unknown reason:ImportedWriterGuardUnknown));
-         };
-       pure outputs (Stop proof:(Reported reason:ReadLockWrite));
-     };
+@Write
+rewrite (inputs queries) =
+  do
+    guard <- guard queries
+    false <- unknown guard
+      else
+        true -> outputs (Continue (proof: guard))
+    false <- private queries
+      else
+        true -> outputs (Continue (proof: Accepted (reason: ^PrivateWriteStorage)))
+    false <- held queries
+      else
+        true -> outputs (Continue (proof: Unknown (reason: ^ExclusiveWriterUnknown)))
+    WriterAbsent() <- writer queries
+      else
+        WriterUnavailable() -> outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
+        WriterFound() -> outputs (Continue (proof: Unknown (reason: ^ImportedWriterGuardUnknown)))
+    outputs (Stop (proof: Reported (reason: ^ReadLockWrite)))

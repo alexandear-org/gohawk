@@ -1,12 +1,16 @@
-match comparison, extract, selectValue, integer;
-build result;
+host
+  comparison?
+  extract?
+  selectValue?
+  integer?
+  result
 
 // Result zero is the selected arm index. Receive-ok and payload results do not
 // identify a selected case; no wrapper traversal is implicit in these rules.
-rule Forward:
-  comparison $equal (extract (selectValue $selection) 0) (integer $number)
-  => result $selection $number $equal false;
+@Forward
+rewrite (comparison equal (extract (selectValue selection) 0) (integer number)) =
+  result selection number equal false
 
-rule Reversed:
-  comparison $equal (integer $number) (extract (selectValue $selection) 0)
-  => result $selection $number $equal true;
+@Reversed
+rewrite (comparison equal (integer number) (extract (selectValue selection) 0)) =
+  result selection number equal true

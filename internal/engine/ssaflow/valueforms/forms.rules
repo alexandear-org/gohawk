@@ -1,54 +1,65 @@
-view changeInterface = *ssa.ChangeInterface {
-  value: X;
-};
-view changeType = *ssa.ChangeType {
-  value: X;
-};
-view convert = *ssa.Convert {
-  value: X;
-};
-view makeInterface = *ssa.MakeInterface {
-  value: X;
-};
-view assertion = *ssa.TypeAssert {
-  value: X;
-  commaOK: CommaOk;
-};
-view extract = *ssa.Extract {
-  tuple: Tuple;
-  index: Index;
-};
-guard allows;
-const ChangeInterface, ChangeType, Convert, MakeInterface, TypeAssert;
+view changeInterface = *ssa.ChangeInterface
+  value: X
 
-rule ChangedInterface:
-  changeInterface $value
-  && allows ChangeInterface
-  => $value;
+view changeType = *ssa.ChangeType
+  value: X
 
-rule ChangedType:
-  changeType $value
-  && allows ChangeType
-  => $value;
+view convert = *ssa.Convert
+  value: X
 
-rule Converted:
-  convert $value
-  && allows Convert
-  => $value;
+view makeInterface = *ssa.MakeInterface
+  value: X
 
-rule Boxed:
-  makeInterface $value
-  && allows MakeInterface
-  => $value;
+view assertion = *ssa.TypeAssert
+  value: X
+  commaOK: CommaOk
+
+view extract = *ssa.Extract
+  tuple: Tuple
+  index: Index
+
+host
+  allows
+  ChangeInterface
+  ChangeType
+  Convert
+  MakeInterface
+  TypeAssert
+
+@ChangedInterface
+rewrite (changeInterface value)
+  | allows ^ChangeInterface
+  =
+  value
+
+@ChangedType
+rewrite (changeType value)
+  | allows ^ChangeType
+  =
+  value
+
+@Converted
+rewrite (convert value)
+  | allows ^Convert
+  =
+  value
+
+@Boxed
+rewrite (makeInterface value)
+  | allows ^MakeInterface
+  =
+  value
 
 // A comma-ok assertion produces a tuple. Only extraction of element zero
 // denotes the asserted object; the success flag is different evidence.
-rule DirectAssertion:
-  assertion $value false
-  && allows TypeAssert
-  => $value;
+@DirectAssertion
+rewrite (assertion value false)
+  | allows ^TypeAssert
+  =
+  value
 
-rule ExtractedAssertion:
-  extract (assertion $value _) 0
-  && allows TypeAssert
-  => $value;
+@ExtractedAssertion
+rewrite (extract (assertion value _) 0)
+  | allows ^TypeAssert
+  =
+  value

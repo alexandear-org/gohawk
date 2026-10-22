@@ -1,47 +1,46 @@
-signature total fallback outputs nil;
-query terminal = notificationTerminal;
-query channel = notificationChannel;
-query cyclic = notificationInCycle;
-// A detached notification belongs to another worker and cannot settle this one.
-union Channel = (ssa.Value, bool) tag 1 {
-  Available = true {
-    value: 0;
-  };
-  Missing = false;
-};
+signature total = outputs nil
 
-rule Detached:
-  inputs (Launch) _
-  => outputs nil;
+host
+  terminal! = notificationTerminal
+  channel! = notificationChannel
+  cyclic! = notificationInCycle
+
+// A detached notification belongs to another worker and cannot settle this one.
+type Channel = (ssa.Value, bool)
+  tag 1
+  Available (value: 0) = true
+  Missing = false
+
+@Detached
+rewrite (inputs Launch() _) = outputs nil
 
 // A send followed by further work can announce readiness or progress rather
 // than completion. Blocking-producer checks use the full send lifecycle.
 // https://github.com/kubernetes-sigs/cluster-proportional-autoscaler/blob/39dd2288da294e98d683c5619fc3556016df1e76/pkg/autoscaler/autoscaler_server.go#L109-L124
-rule Sent:
-  inputs $send:(Send channel:$channel) $coverage
-  => query terminal $coverage $send {
-       true => outputs $channel;
-       false => outputs nil;
-     };
+@Sent
+rewrite (inputs send@(Send (channel: channel)) coverage) =
+  case terminal coverage send of
+    true -> outputs channel
+    false -> outputs nil
 
 // A deferred close may announce completion even inside a loop; its caller
 // must still require registration on every normal return.
 // https://github.com/BurntSushi/wingo/blob/33b154361587e65ec35d4499f1cc487835d0ab48/event/ipc.go#L124-L157
-rule DeferredClose:
-  inputs $instruction:(DeferCall) _
-  => query channel $instruction
-           select Available value:$channel => outputs $channel
-     <|> pure outputs nil;
+@DeferredClose
+rewrite (inputs instruction@(DeferCall()) _) =
+  case channel instruction of
+    Available (value: channel) -> outputs channel
+    Missing() -> decline
+  <|> outputs nil
 
 // Other closes inside a cycle are per-item cleanup, not worker completion.
-rule Close:
-  inputs $instruction _
-  => do {
-       Available value:$channel <- query channel $instruction
-         else {
-           Missing => outputs nil;
-         };
-       false <- query cyclic $instruction
-         else outputs nil;
-       pure outputs $channel;
-     };
+@Close
+rewrite (inputs instruction _) =
+  do
+    Available (value: channel) <- channel instruction
+      else
+        Missing() -> outputs nil
+    false <- cyclic instruction
+      else
+        true -> outputs nil
+    outputs channel

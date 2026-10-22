@@ -1,23 +1,26 @@
-signature total fallback outputs None false;
-query unreadable = ClosureQueries.Unreadable;
-query retains = ClosureQueries.Retains;
-const CapturedByStartedLiteral, CapturedByLiteralCallingUnreadableCallee, CapturedByRetainingLiteral;
+signature total = outputs ^None false
+
+host
+  unreadable! = ClosureQueries.Unreadable
+  retains! = ClosureQueries.Retains
+  CapturedByStartedLiteral
+  CapturedByLiteralCallingUnreadableCallee
+  CapturedByRetainingLiteral
 
 // Cleanup in a started literal cannot be ordered against this function's return.
-rule Started:
-  inputs _ (Go) _
-  => outputs CapturedByStartedLiteral true;
+@Started
+rewrite (inputs _ Go() _) = outputs ^CapturedByStartedLiteral true
 
 // A called or deferred literal runs in this frame. Cleanup was already queried;
 // retention now decides whether the obligation moved. A capture is a cell loaded
 // by the body, so exact-argument summaries can miss its cleanup through an
 // imported helper. Unreadable-body evidence must precede a retention verdict.
 // https://github.com/block/spirit/blob/c554eae/pkg/checksum/single.go#L493-L503
-rule Local:
-  inputs $queries _ $closure
-  => do {
-       false <- query unreadable $queries $closure
-         else outputs CapturedByLiteralCallingUnreadableCallee true;
-       $retains <- query retains $queries $closure;
-       pure outputs CapturedByRetainingLiteral $retains;
-     };
+@Local
+rewrite (inputs queries _ closure) =
+  do
+    false <- unreadable queries closure
+      else
+        true -> outputs ^CapturedByLiteralCallingUnreadableCallee true
+    retains <- retains queries closure
+    outputs ^CapturedByRetainingLiteral retains

@@ -1,23 +1,24 @@
-signature partial;
-view ChangeType = *ssa.ChangeType {
-};
-view Convert = *ssa.Convert {
-};
-view Box = *ssa.MakeInterface {
-};
-view Interface = *ssa.ChangeInterface {
-};
-view Field = *ssa.FieldAddr {
-};
-view Index = *ssa.IndexAddr {
-};
-view Slice = *ssa.Slice {
-};
-match valueInstruction;
+signature partial
+
+view ChangeType = *ssa.ChangeType
+
+view Convert = *ssa.Convert
+
+view Box = *ssa.MakeInterface
+
+view Interface = *ssa.ChangeInterface
+
+view Field = *ssa.FieldAddr
+
+view Index = *ssa.IndexAddr
+
+view Slice = *ssa.Slice
+
+host
+  valueInstruction?
 
 // The original converted/projected value, rather than its operand, supplies
 // the next use list. This is not a universal unwrap or an ownership proof.
-rule Alias:
-  inputs
-    (valueInstruction $source:(or (ChangeType) (Convert) (Box) (Interface) (Field) (Index) (Slice)))
-  => outputs $source;
+@Alias
+rewrite (inputs (valueInstruction source@(ChangeType() | Convert() | Box() | Interface() | Field() | Index() | Slice()))) =
+  outputs source

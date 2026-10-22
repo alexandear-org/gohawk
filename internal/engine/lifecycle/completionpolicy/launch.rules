@@ -1,46 +1,45 @@
-signature total fallback outputs (Absent);
-union Plan = Callee tag Kind {
-  Absent = CalleeAbsent;
-  Common = CalleeCommon {
-    launch: Launch;
-    common: Common;
-    once: AllowOnceFunc;
-  };
-  Callback = CalleeCallback {
-    launch: Launch;
-    callback: Callback;
-  };
-};
-view Defer = *ssa.Defer {
-};
-view Go = *ssa.Go {
-};
-view Call = *ssa.Call {
-  common: Call;
-};
-match groupCallback, cleanupCallback;
-build commonOf;
-const LaunchDeferred, LaunchCalled, LaunchStarted;
+signature total = outputs Absent()
+
+type Plan = Callee
+  tag Kind
+  Absent = CalleeAbsent
+  Common (launch: Launch, common: Common, once: AllowOnceFunc) = CalleeCommon
+  Callback (launch: Launch, callback: Callback) = CalleeCallback
+
+view Defer = *ssa.Defer
+
+view Go = *ssa.Go
+
+view Call = *ssa.Call
+  common: Call
+
+host
+  groupCallback?
+  cleanupCallback?
+  commonOf
+  LaunchDeferred
+  LaunchCalled
+  LaunchStarted
 
 // Only a defer may unwrap OnceFunc: an immediate call could have consumed the
 // wrapper before this completion question. Resolver/body searches remain Go.
-rule Deferred:
-  inputs $instruction:(Defer)
-  => outputs (Common launch:LaunchDeferred common:(commonOf $instruction) once:true);
+@Deferred
+rewrite (inputs instruction@(Defer())) =
+  outputs (Common (launch: ^LaunchDeferred, common: commonOf instruction, once: true))
 
-rule Started:
-  inputs $instruction:(Go)
-  => outputs (Common launch:LaunchStarted common:(commonOf $instruction) once:false);
+@Started
+rewrite (inputs instruction@(Go())) =
+  outputs (Common (launch: ^LaunchStarted, common: commonOf instruction, once: false))
 
-rule WaitGroupGo:
-  inputs (Call common:(groupCallback $callback))
-  => outputs (Callback launch:LaunchStarted callback:$callback);
+@WaitGroupGo
+rewrite (inputs (Call (common: groupCallback callback))) =
+  outputs (Callback (launch: ^LaunchStarted, callback: callback))
 
 // testing.TB guarantees registered cleanup runs after the test and subtests.
-rule Cleanup:
-  inputs (Call common:(cleanupCallback $callback))
-  => outputs (Callback launch:LaunchDeferred callback:$callback);
+@Cleanup
+rewrite (inputs (Call (common: cleanupCallback callback))) =
+  outputs (Callback (launch: ^LaunchDeferred, callback: callback))
 
-rule Called:
-  inputs $instruction:(Call)
-  => outputs (Common launch:LaunchCalled common:(commonOf $instruction) once:false);
+@Called
+rewrite (inputs instruction@(Call())) =
+  outputs (Common (launch: ^LaunchCalled, common: commonOf instruction, once: false))

@@ -1,46 +1,50 @@
-signature total fallback outputs (Unavailable reason:EvidenceUnavailable);
-query error = AcquisitionQueries.Error;
-query errorUnknown = PairedError.Unknown;
-query boundary = AcquisitionQueries.Boundary;
-query noBoundary;
-query canceled = AcquisitionQueries.Canceled;
-query asserted = AcquisitionQueries.Asserted;
-query optional = AcquisitionQueries.Optional;
-query optionalUnknown = Correlation.Unknown;
-query prepare = Initialization.Prepare;
-query prepareUnknown = Prepared.Unknown;
-query finalize = Finalize;
-const CanceledAcquisition, ReleaseProven;
+signature total = outputs (Unavailable (reason: ^EvidenceUnavailable))
+
+host
+  error! = AcquisitionQueries.Error
+  errorUnknown! = PairedError.Unknown
+  boundary! = AcquisitionQueries.Boundary
+  noBoundary!
+  canceled! = AcquisitionQueries.Canceled
+  asserted! = AcquisitionQueries.Asserted
+  optional! = AcquisitionQueries.Optional
+  optionalUnknown! = Correlation.Unknown
+  prepare! = Initialization.Prepare
+  prepareUnknown! = Prepared.Unknown
+  finalize! = Finalize
+  CanceledAcquisition
+  ReleaseProven
 
 // A paired error restricts the edges on which acquisition creates an obligation.
 // A shortened lookup stops before missing evidence can activate a failed edge.
 // Optional correlation may bind a resource phi only after a complete proof;
 // initialization carries that exact packet into owner discovery and flow.
-rule Acquisition:
-  inputs $queries
-  => do {
-       $error <- query error $queries;
-       false <- query errorUnknown $error
-         else outputs (Unavailable reason:$error.Reason);
-       $boundary <- query boundary $queries;
-       true <- query noBoundary $boundary
-         else outputs (Unavailable reason:$boundary);
-       Disproven <- query canceled $queries
-         else {
-           Unknown reason:$reason => outputs (Unavailable reason:$reason);
-           Proven => outputs (Accepted reason:CanceledAcquisition);
-         };
-       Disproven <- query asserted $queries $error.Value
-         else {
-           Unknown reason:$reason => outputs (Unavailable reason:$reason);
-           Proven => outputs (Accepted reason:ReleaseProven);
-         };
-       $optional <- query optional $queries $error.Value;
-       false <- query optionalUnknown $optional
-         else outputs (Unavailable reason:$optional.Reason);
-       $prepared <- query prepare $optional.Initialize;
-       false <- query prepareUnknown $prepared
-         else outputs (Unavailable reason:$prepared.Reason);
-       $decision <- query finalize $prepared.Queries $error.Value;
-       pure outputs $decision;
-     };
+@Acquisition
+rewrite (inputs queries) =
+  do
+    error <- error queries
+    false <- errorUnknown error
+      else
+        true -> outputs (Unavailable (reason: error.Reason))
+    boundary <- boundary queries
+    true <- noBoundary boundary
+      else
+        false -> outputs (Unavailable (reason: boundary))
+    Disproven() <- canceled queries
+      else
+        Unknown (reason: reason) -> outputs (Unavailable (reason: reason))
+        Proven() -> outputs (Accepted (reason: ^CanceledAcquisition))
+    Disproven() <- asserted queries error.Value
+      else
+        Unknown (reason: reason) -> outputs (Unavailable (reason: reason))
+        Proven() -> outputs (Accepted (reason: ^ReleaseProven))
+    optional <- optional queries error.Value
+    false <- optionalUnknown optional
+      else
+        true -> outputs (Unavailable (reason: optional.Reason))
+    prepared <- prepare optional.Initialize
+    false <- prepareUnknown prepared
+      else
+        true -> outputs (Unavailable (reason: prepared.Reason))
+    decision <- finalize prepared.Queries error.Value
+    outputs decision

@@ -24,6 +24,22 @@ standalone GoHawk module, including its supported Go floor. The manifest
 records generated-file ownership and hashes. Edit rules or bindings and
 regenerate, never patch generated Go.
 
+## Equation frontend
+
+Rules use compact equations, `host` blocks, whitespace application and named
+argument groups. The handwritten lexer/parser is specified by
+[grammar.ebnf](../../tools/hyrule/grammar.ebnf) and
+[LAYOUT.md](../../tools/hyrule/LAYOUT.md). The
+[Hyrule reference](../../tools/hyrule/README.md) covers all language forms.
+`?` marks host matchers, `!` marks ordered queries, and unmarked aliases bind
+pure functions or constants. Optional `@Label` lines preserve diagnostic names.
+
+The legacy parser is migration-only. From the Lockdoc checkout, run
+`scripts/migrate-hyrule.sh /path/to/lockdoc /path/to/gohawk` to convert configured
+sources structurally; the command checks all configurations before replacing
+files. This does not establish behavioral equivalence: generation, compiler
+contracts and affected analyzer tests still need validation.
+
 ## Query sequencing and schema maintenance
 
 The HTTP acquisition policies use `do` blocks for dependent, stateful queries.
@@ -31,9 +47,9 @@ The success-branch policy combines `do` with ordered alternatives: explicit
 `decline` tries ordinary flow after an unavailable assertion strategy, without
 repeating its queries or refunding its allowance.
 Conditional steps select a complete outcome and explicitly return on every
-other outcome. An unconditional `$value <- query operation ...;` binds the
+other outcome. An unconditional `value <- operation ...` binds the
 complete result without inventing a success tag; reached calls still execute
-once in order, and declared union results retain validation. Boolean steps may write `false <- query ... else result;` (or `true`)
+once in order, and declared union results retain validation. Boolean steps may write `false <- operation ...` followed by `else result` (or `true`)
 to handle the complementary literal without a one-arm block. Tagged outcomes
 retain explicit named arms. Reached queries retain their original order and budget charges; the
 public Go entry points still discard evidence if the child or shared allowance
@@ -206,8 +222,8 @@ spent child allowance travel together into summary fallback. The existing action
 cache remains the sole cache and trace boundary, and parent/return combination
 continues to feed the same obligation-flow query.
 
-First-answer policies use `query ... select Pattern => answer <|> ... <|>
-pure fallback`. Each query is explicit and lazy; unselected valid outcomes
+First-answer policies use `do` pattern binds or exhaustive `case` decisions
+with explicit `decline` arms, joined by `<|>` and ending in a pure fallback expression. Each query is explicit and lazy; unselected valid outcomes
 continue inside the committed rule. Answers and captures stay local to their
 alternative. Invalid tags or active payloads stop with the declared conservative
 fallback. Cancellation instruction, call and deferred-use chains preserve their
@@ -354,7 +370,8 @@ with its original child allowance and candidate pool. Unknown is never promoted
 to settlement, and exhausted evidence cannot fall through as an absent cleanup.
 
 Selections can share an answer across complete evidence variants with
-`select (or (Proven reason:$reason) (Unknown reason:$reason))`. A named selection
+`(Proven (reason: reason) | Unknown (reason: reason)) <- queryName ...`
+with an explicit else arm for remaining outcomes. A whole-result bind
 retains the exact native release tuple, so the action/reason pair needs no new
 adapter record. Bindings continue to delegate to existing proofs, caches and flow.
 

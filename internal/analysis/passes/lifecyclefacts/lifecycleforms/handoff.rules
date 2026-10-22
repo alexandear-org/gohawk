@@ -1,62 +1,53 @@
-signature total fallback outputs (Reject);
-union Use = HandoffUse tag Kind {
-  Reject = HandoffReject;
-  Ignore = HandoffIgnore;
-  Follow = HandoffFollow {
-    alias: Alias;
-  };
-  Return = HandoffReturn {
-    returned: Return;
-  };
-  Call = HandoffCall {
-    call: Call;
-  };
-};
-view ReturnValue = *ssa.Return {
-};
-view Box = *ssa.MakeInterface {
-};
-view Interface = *ssa.ChangeInterface {
-};
-view Phi = *ssa.Phi {
-};
-view Binary = *ssa.BinOp {
-  op: Op;
-};
-view CallValue = *ssa.Call {
-};
-view Debug = *ssa.DebugRef {
-};
-const equalToken, notEqualToken;
+signature total = outputs Reject()
 
-rule Return:
-  inputs $returned:(ReturnValue)
-  => outputs (Return returned:$returned);
+type Use = HandoffUse
+  tag Kind
+  Reject = HandoffReject
+  Ignore = HandoffIgnore
+  Follow (alias: Alias) = HandoffFollow
+  Return (returned: Return) = HandoffReturn
+  Call (call: Call) = HandoffCall
+
+view ReturnValue = *ssa.Return
+
+view Box = *ssa.MakeInterface
+
+view Interface = *ssa.ChangeInterface
+
+view Phi = *ssa.Phi
+
+view Binary = *ssa.BinOp
+  op: Op
+
+view CallValue = *ssa.Call
+
+view Debug = *ssa.DebugRef
+
+host
+  equalToken
+  notEqualToken
+
+@Return
+rewrite (inputs returned@(ReturnValue())) = outputs (Return (returned: returned))
 
 // These are the transparent forms shared by fresh and retained results.
 // The host keeps visited state, wrapper depth and result-position agreement.
-rule Box:
-  inputs $alias:(Box)
-  => outputs (Follow alias:$alias);
+@Box
+rewrite (inputs alias@(Box())) = outputs (Follow (alias: alias))
 
-rule Interface:
-  inputs $alias:(Interface)
-  => outputs (Follow alias:$alias);
+@Interface
+rewrite (inputs alias@(Interface())) = outputs (Follow (alias: alias))
 
-rule Phi:
-  inputs $alias:(Phi)
-  => outputs (Follow alias:$alias);
+@Phi
+rewrite (inputs alias@(Phi())) = outputs (Follow (alias: alias))
 
-rule Comparison:
-  inputs (Binary op:(or equalToken notEqualToken))
-  => outputs (Ignore);
+@Comparison
+rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken)))) = outputs Ignore()
 
 // A call is only a request: fresh results require cleanup evidence; retained
 // results require an exact wrapper contract and remain within their depth bound.
-rule Call:
-  inputs $call:(CallValue)
-  => outputs (Call call:$call);
+@Call
+rewrite (inputs call@(CallValue())) = outputs (Call (call: call))
 
-rule Debug:
-  inputs (Debug)
-  => outputs (Ignore);
+@Debug
+rewrite (inputs Debug()) = outputs Ignore()

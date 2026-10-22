@@ -1,24 +1,23 @@
-signature total fallback outputs None false;
-query exposure = CallQueries.Exposure;
-query dispatch = Dispatch;
+signature total = outputs ^None false
+
+host
+  exposure! = CallQueries.Exposure
+  dispatch! = Dispatch
 
 // A helper can expose the exact resource asynchronously without being launched.
 // Preserving an address alone does not establish ownership of its loaded value.
-rule Carried:
-  inputs $queries $instruction $common true
-  => do {
-       Disproven <- query exposure $queries $instruction $common
-         else {
-           Proven reason:$reason => outputs $reason true;
-           Unknown reason:$reason => outputs $reason true;
-         };
-       $answer <- query dispatch $queries $instruction $common true;
-       pure $answer;
-     };
+@Carried
+rewrite (inputs queries instruction common true) =
+  do
+    Disproven() <- exposure queries instruction common
+      else
+        Proven (reason: reason) -> outputs reason true
+        Unknown (reason: reason) -> outputs reason true
+    answer <- dispatch queries instruction common true
+    answer
 
-rule NotCarried:
-  inputs $queries $instruction $common false
-  => query dispatch $queries $instruction $common false {
-       Opaque reason:$reason => outputs $reason true;
-       Transparent reason:$reason => outputs $reason false;
-     };
+@NotCarried
+rewrite (inputs queries instruction common false) =
+  case dispatch queries instruction common false of
+    Opaque (reason: reason) -> outputs reason true
+    Transparent (reason: reason) -> outputs reason false

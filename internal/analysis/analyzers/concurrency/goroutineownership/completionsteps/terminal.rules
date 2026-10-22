@@ -1,16 +1,18 @@
-signature total fallback outputs Reject;
-const Reject, Returned, RunDefers, Follow;
+signature total = outputs ^Reject
 
-rule Return:
-  inputs (Return)
-  => outputs Returned;
+host
+  Reject
+  Returned
+  RunDefers
+  Follow
 
-rule Deferred:
-  inputs (Defers)
-  => outputs RunDefers;
+@Return
+rewrite (inputs Return()) = outputs ^Returned
+
+@Deferred
+rewrite (inputs Defers()) = outputs ^RunDefers
 
 // Conditional terminal sends may jump to a shared return block. A jump performs
 // no work; the host must still find a successor and prove its remaining suffix.
-rule Successor:
-  inputs (Jump)
-  => outputs Follow;
+@Successor
+rewrite (inputs Jump()) = outputs ^Follow

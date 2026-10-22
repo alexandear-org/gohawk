@@ -1,49 +1,57 @@
-signature total fallback outputs (emptyProof) false;
-query stop = CallerLifetimeQueries.Stop;
-query context = CallerLifetimeQueries.Context;
-query canceled = CallerLifetimeQueries.Canceled;
-query receiver = CallerLifetimeQueries.Receiver;
-query cutoff = CallerLifetimeQueries.Cutoff;
-const StopLifecycle, ContextLifecycle, LocallyCanceledContext, ReceiverContext;
-query available = LifetimeObservation.Available;
-query matched = LifetimeObservation.Matched;
+signature total = outputs emptyProof() false
+
+host
+  stop! = CallerLifetimeQueries.Stop
+  context! = CallerLifetimeQueries.Context
+  canceled! = CallerLifetimeQueries.Canceled
+  receiver! = CallerLifetimeQueries.Receiver
+  cutoff! = CallerLifetimeQueries.Cutoff
+  StopLifecycle
+  ContextLifecycle
+  LocallyCanceledContext
+  ReceiverContext
+  available! = LifetimeObservation.Available
+  matched! = LifetimeObservation.Matched
 
 // Cutoff precedes every witness, including a positive partial search. Each
 // completed false query alone permits the next strategy under the same budget.
-rule Caller:
-  inputs $queries
-  => do {
-       $stop <- query stop $queries;
-       true <- query available $stop
-         else do {
-                $proof <- query cutoff $queries;
-                pure outputs $proof true;
-              };
-       false <- query matched $stop
-         else outputs (Unknown reason:StopLifecycle) true;
-       $context <- query context $queries;
-       true <- query available $context
-         else do {
-                $proof <- query cutoff $queries;
-                pure outputs $proof true;
-              };
-       false <- query matched $context
-         else outputs (Unknown reason:ContextLifecycle) true;
-       $canceled <- query canceled $queries;
-       true <- query available $canceled
-         else do {
-                $proof <- query cutoff $queries;
-                pure outputs $proof true;
-              };
-       false <- query matched $canceled
-         else outputs (Unknown reason:LocallyCanceledContext) true;
-       $receiver <- query receiver $queries;
-       true <- query available $receiver
-         else do {
-                $proof <- query cutoff $queries;
-                pure outputs $proof true;
-              };
-       false <- query matched $receiver
-         else outputs (Unknown reason:ReceiverContext) true;
-       pure outputs (emptyProof) false;
-     };
+@Caller
+rewrite (inputs queries) =
+  do
+    stop <- stop queries
+    true <- available stop
+      else
+        false -> do
+          proof <- cutoff queries
+          outputs proof true
+    false <- matched stop
+      else
+        true -> outputs (Unknown (reason: ^StopLifecycle)) true
+    context <- context queries
+    true <- available context
+      else
+        false -> do
+          proof <- cutoff queries
+          outputs proof true
+    false <- matched context
+      else
+        true -> outputs (Unknown (reason: ^ContextLifecycle)) true
+    canceled <- canceled queries
+    true <- available canceled
+      else
+        false -> do
+          proof <- cutoff queries
+          outputs proof true
+    false <- matched canceled
+      else
+        true -> outputs (Unknown (reason: ^LocallyCanceledContext)) true
+    receiver <- receiver queries
+    true <- available receiver
+      else
+        false -> do
+          proof <- cutoff queries
+          outputs proof true
+    false <- matched receiver
+      else
+        true -> outputs (Unknown (reason: ^ReceiverContext)) true
+    outputs emptyProof() false

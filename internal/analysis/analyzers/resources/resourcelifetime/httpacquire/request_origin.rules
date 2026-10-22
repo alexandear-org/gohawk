@@ -1,26 +1,29 @@
-signature total fallback outputs false;
-guard constructorCall;
-match requestRebinding;
-query follow = headRequestQuery.followOrigin;
-query preserve = headRequestQuery.preserve;
+signature total = outputs false
+
+host
+  constructorCall
+  requestRebinding?
+  follow! = headRequestQuery.followOrigin
+  preserve! = headRequestQuery.preserve
 
 // Only result zero of an exact HEAD constructor admits a new request origin.
-rule Constructor:
-  inputs $query _ $value:(Extraction tuple:$call:(Call) index:0)
-  && constructorCall $call
-  => query preserve $query $value {
-       true => outputs true;
-       false => outputs false;
-     };
+@Constructor
+rewrite (inputs query _ value@(Extraction (tuple: call@(Call()), index: 0)))
+  | constructorCall call
+  =
+  case preserve query value of
+    true -> outputs true
+    false -> outputs false
 
 // A rebind must first prove its receiver's origin, then independently preserve
 // every use of the new request. Neither fold admits phi requests or aliases.
-rule Rebind:
-  inputs $query $walk $value:(Call common:(requestRebinding $receiver))
-  => do {
-       true <- query follow $query $walk $receiver
-         else outputs false;
-       true <- query preserve $query $value
-         else outputs false;
-       pure outputs true;
-     };
+@Rebind
+rewrite (inputs query walk value@(Call (common: requestRebinding receiver))) =
+  do
+    true <- follow query walk receiver
+      else
+        false -> outputs false
+    true <- preserve query value
+      else
+        false -> outputs false
+    outputs true

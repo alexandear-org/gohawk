@@ -1,38 +1,31 @@
-signature total fallback outputs (Answer proof:(emptyEvidence) decided:false);
+signature total = outputs (Answer (proof: emptyEvidence(), decided: false))
 
 // A cleanup method is matched by its discharge path. Ordinary masks exclude
 // that method mask and keep identity/containment matching. A possible alias is
 // uncertainty, never completion or evidence of missing cleanup.
-rule Mask:
-  inputs $evidence $request $fact
-  => do {
-       $mask <- query selectedEvidenceMask $request $fact;
-       $method <- query requestedMethod $request;
-       $observer <- query observer $evidence.probe;
-       false <- query directDischargeEvidence $fact $request $method $observer
-         else outputs (Answer proof:(importedProof reasonLifecycleSummary $method) decided:true);
-       $ordinary <- query ordinaryEvidenceMask $fact $mask $method;
-       false <- query factOwnsArgument $request.Instruction $request.Target $ordinary $observer
-         else outputs (Answer proof:(importedProof reasonLifecycleSummary $method) decided:true);
-       false <- query factOwnsImmutableCapturedArgument
-                        $request.Instruction
-                        $request.Target
-                        $mask
-                        $observer
-         else outputs
-                (Answer
-                  proof:(importedProof reasonLifecycleSummaryCapturedArgument $method)
-                  decided:true
-                );
-       false <- query projectedArgumentEvidence $request $mask $observer
-         else outputs
-                (Answer
-                  proof:(importedProof reasonLifecycleSummaryProjectedArgument $method)
-                  decided:true
-                );
-       false <- query conditional $evidence $request $fact
-         else outputs (Answer proof:(importedProof reasonArgumentCase $method) decided:true);
-       false <- query possibleArgumentEvidence $request $mask
-         else outputs (Answer proof:(unavailableEvidence) decided:true);
-       pure outputs (Answer proof:(emptyEvidence) decided:false);
-     };
+@Mask
+rewrite (inputs evidence request fact) =
+  do
+    mask <- selectedEvidenceMask request fact
+    method <- requestedMethod request
+    observer <- observer evidence.probe
+    false <- directDischargeEvidence fact request method observer
+      else
+        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
+    ordinary <- ordinaryEvidenceMask fact mask method
+    false <- factOwnsArgument request.Instruction request.Target ordinary observer
+      else
+        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
+    false <- factOwnsImmutableCapturedArgument request.Instruction request.Target mask observer
+      else
+        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryCapturedArgument method, decided: true))
+    false <- projectedArgumentEvidence request mask observer
+      else
+        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryProjectedArgument method, decided: true))
+    false <- conditional evidence request fact
+      else
+        true -> outputs (Answer (proof: importedProof ^reasonArgumentCase method, decided: true))
+    false <- possibleArgumentEvidence request mask
+      else
+        true -> outputs (Answer (proof: unavailableEvidence(), decided: true))
+    outputs (Answer (proof: emptyEvidence(), decided: false))

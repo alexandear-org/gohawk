@@ -1,47 +1,53 @@
-signature total fallback outputs Unknown;
-view Constant = *ssa.Const {
-  literal: Value;
-};
-view Box = *ssa.MakeInterface {
-  value: X;
-};
-view Allocation = *ssa.Alloc {
-};
-view Channel = *ssa.MakeChan {
-};
-view Map = *ssa.MakeMap {
-};
-view Slice = *ssa.MakeSlice {
-};
-view Function = *ssa.Function {
-};
-view Closure = *ssa.MakeClosure {
-};
-match Boolean = resultBooleanLiteral;
-guard Nil = resultNilConstant;
-guard Concrete = resultConcreteBox;
-const Unknown, AlwaysNil, AlwaysNonNil, AlwaysTrue, AlwaysFalse;
+signature total = outputs ^Unknown
 
-rule NilConstant:
-  inputs $constant:(Constant)
-  && Nil $constant
-  => outputs AlwaysNil;
+view Constant = *ssa.Const
+  literal: Value
 
-rule TrueConstant:
-  inputs (Constant literal:(Boolean true))
-  => outputs AlwaysTrue;
+view Box = *ssa.MakeInterface
+  value: X
 
-rule FalseConstant:
-  inputs (Constant literal:(Boolean false))
-  => outputs AlwaysFalse;
+view Allocation = *ssa.Alloc
+
+view Channel = *ssa.MakeChan
+
+view Map = *ssa.MakeMap
+
+view Slice = *ssa.MakeSlice
+
+view Function = *ssa.Function
+
+view Closure = *ssa.MakeClosure
+
+host
+  Boolean? = resultBooleanLiteral
+  Nil = resultNilConstant
+  Concrete = resultConcreteBox
+  Unknown
+  AlwaysNil
+  AlwaysNonNil
+  AlwaysTrue
+  AlwaysFalse
+
+@NilConstant
+rewrite (inputs constant@(Constant()))
+  | Nil constant
+  =
+  outputs ^AlwaysNil
+
+@TrueConstant
+rewrite (inputs (Constant (literal: Boolean true))) = outputs ^AlwaysTrue
+
+@FalseConstant
+rewrite (inputs (Constant (literal: Boolean false))) = outputs ^AlwaysFalse
 
 // Concrete boxing is nonnil even when its payload is a typed nil. Abstract
 // interface/type-parameter payloads retain Unknown through the total fallback.
-rule ConcreteBox:
-  inputs (Box value:$value)
-  && Concrete $value
-  => outputs AlwaysNonNil;
+@ConcreteBox
+rewrite (inputs (Box (value: value)))
+  | Concrete value
+  =
+  outputs ^AlwaysNonNil
 
-rule FreshValue:
-  inputs (or (Allocation) (Channel) (Map) (Slice) (Function) (Closure))
-  => outputs AlwaysNonNil;
+@FreshValue
+rewrite (inputs (Allocation() | Channel() | Map() | Slice() | Function() | Closure())) =
+  outputs ^AlwaysNonNil

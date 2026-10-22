@@ -1,92 +1,98 @@
-signature total fallback outputs ReasonEffectUnknown;
-view Branch = *ssa.If {
-};
-view Jump = *ssa.Jump {
-};
-view Phi = *ssa.Phi {
-};
-view Debug = *ssa.DebugRef {
-};
-view Allocation = *ssa.Alloc {
-};
-view Closure = *ssa.MakeClosure {
-};
-view FieldAddress = *ssa.FieldAddr {
-};
-view Store = *ssa.Store {
-  value: Val;
-  address: Addr;
-};
-view ChangedType = *ssa.ChangeType {
-};
-view Boxed = *ssa.MakeInterface {
-};
-view ChangedInterface = *ssa.ChangeInterface {
-};
-view Channel = *ssa.MakeChan {
-};
-guard free = effectFree;
-guard inert = admission.Value;
-guard localPointer = localSynchronizationPointerStore;
-guard local = localAddress;
-guard channel = ssaflow.ChannelType;
-build typeOf = passiveValue.Type;
-build contains = admission.ContainsSynchronization;
-build primitive = admission.SynchronizationPointer;
-query fieldPath = passiveFieldWithin;
-const ReasonNone, ReasonEffectUnknown;
+signature total = outputs ^ReasonEffectUnknown
 
-rule EffectFree:
-  inputs instruction:$instruction root:$root
-  && free $instruction $root
-  => outputs ReasonNone;
+view Branch = *ssa.If
+
+view Jump = *ssa.Jump
+
+view Phi = *ssa.Phi
+
+view Debug = *ssa.DebugRef
+
+view Allocation = *ssa.Alloc
+
+view Closure = *ssa.MakeClosure
+
+view FieldAddress = *ssa.FieldAddr
+
+view Store = *ssa.Store
+  value: Val
+  address: Addr
+
+view ChangedType = *ssa.ChangeType
+
+view Boxed = *ssa.MakeInterface
+
+view ChangedInterface = *ssa.ChangeInterface
+
+view Channel = *ssa.MakeChan
+
+host
+  free = effectFree
+  inert = admission.Value
+  localPointer = localSynchronizationPointerStore
+  local = localAddress
+  channel = ssaflow.ChannelType
+  typeOf = passiveValue.Type
+  contains = admission.ContainsSynchronization
+  primitive = admission.SynchronizationPointer
+  fieldPath! = passiveFieldWithin
+  ReasonNone
+  ReasonEffectUnknown
+
+@EffectFree
+rewrite (inputs (instruction: instruction, root: root))
+  | free instruction root
+  =
+  outputs ^ReasonNone
 
 // The acyclic collector checks all successors and identical ordered effects.
 // Allocation/debug/closure creation and interface boxing publish no value by
 // themselves; every subsequent use still needs a complete modeled callee.
-rule Structural:
-  inputs instruction:(or (Branch) (Jump) (Debug) (Allocation) (Closure) (Boxed) (ChangedInterface))
-  => outputs ReasonNone;
+@Structural
+rewrite (inputs (instruction: (Branch() | Jump() | Debug() | Allocation() | Closure() | Boxed() | ChangedInterface()))) =
+  outputs ^ReasonNone
 
 // Every incoming computation remains checked by the instruction whitelist.
-rule InertMerge:
-  inputs instruction:$phi:(Phi)
-  let $type = typeOf $phi
-  && inert $type
-  => outputs ReasonNone;
+@InertMerge
+rewrite (inputs (instruction: phi@(Phi())))
+  | let type = typeOf phi
+  , inert type
+  =
+  outputs ^ReasonNone
 
-rule Field:
-  inputs instruction:$field:(FieldAddress) budget:$budget
-  => query fieldPath $field $budget {
-       true => outputs ReasonNone;
-       false => outputs ReasonEffectUnknown;
-     };
+@Field
+rewrite (inputs (instruction: field@(FieldAddress()), budget: budget)) =
+  case fieldPath field budget of
+    true -> outputs ^ReasonNone
+    false -> outputs ^ReasonEffectUnknown
 
 // Spilling a primitive pointer into a local closure cell does not copy it.
-rule PointerSpill:
-  inputs instruction:$store:(Store)
-  && localPointer $store
-  => outputs ReasonNone;
+@PointerSpill
+rewrite (inputs (instruction: store@(Store())))
+  | localPointer store
+  =
+  outputs ^ReasonNone
 
 // Resetting or copying primitive state invalidates its counter/lock proof.
-rule OrdinaryStore:
-  inputs instruction:(Store value:$value address:$address)
-  && local $address
-  let $valueType = typeOf $value
-  let $contains = contains $valueType
-  && $contains == false
-  let $addressType = typeOf $address
-  let $primitive = primitive $addressType
-  && $primitive == false
-  => outputs ReasonNone;
+@OrdinaryStore
+rewrite (inputs (instruction: Store (value: value, address: address)))
+  | local address
+  , let valueType = typeOf value
+  , let contains = contains valueType
+  , contains == false
+  , let addressType = typeOf address
+  , let primitive = primitive addressType
+  , primitive == false
+  =
+  outputs ^ReasonNone
 
-rule ChannelRepresentation:
-  inputs instruction:$value:(ChangedType)
-  && channel $value
-  => outputs ReasonNone;
+@ChannelRepresentation
+rewrite (inputs (instruction: value@(ChangedType())))
+  | channel value
+  =
+  outputs ^ReasonNone
 
 // Callee allocation sites cannot name runtime instances across separate calls.
-rule RootChannel:
-  inputs instruction:(Channel) root:true
-  => outputs ReasonNone;
+@RootChannel
+rewrite (inputs (instruction: Channel(), root: true)) = outputs ^ReasonNone
 // Unmodeled calls, publication, launch, panic and blocking remain unknown.
