@@ -325,6 +325,30 @@ closed; unchanged families are not reopened. Ordered-policy tests pin lazy
 query order and partial-cutoff precedence; compiled-SSA and trace fixtures pin
 exact versus possible ownership, notification registration and root boundaries.
 
+## Lock-order source review
+
+All 24 frozen authored files were read, including `lockforms`, `lockidentity`,
+`lockpolicy` and `lockvariant`. Exact-scope coverage was clean at generation
+`2026-10-22T00:51:48Z`; the ten scope gaps were ignored generated outputs, whose
+rules were read directly. The three provisional candidates were reassessed
+against their complete adapters and are kept in Go. This scope is closed
+without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Mutex transfer and state copy | `transfer.rules` and `copy.rules` already own acquire/release/defer action selection and the all-or-cutoff state copy. Native hooks retain held-list, origin and guard mutation. |
+| Instruction transfer (`lockStateWalk.transfer`) | Kept in Go. Its only policy branch is that a complete summary replaces fallback release evidence; every other stage mutates the state and is followed by the shared `incomplete` fence. A rule would need one state-threading hook per stage plus the same fence, re-encoding the sequence without moving a decision. |
+| Successor feasibility (`lockSuccessorStates`) | Kept in Go. The four rejections are ordered, but two of them compute the successor's carried constraints and condition, each rejection traces its own reason at that point, and each successor first spends budget. A rule would need tuple-returning hooks and an accept payload carrying those values, so the loop and its per-guard rationale would remain beside it. |
+| Comparison keys and classes (`lockComparisonKey`, `lockClassOf`) | Kept in Go. The six-step precedence over pure queries is about 20 lines with early returns. A recognized local path whose key is empty remains terminal, and loop allocations keep the empty key. `lockClassOf` shares the local-path, allocation and fresh-field exclusions with callee snapshots, so a rule would need about seven host bindings for both consumers. |
+| Missing-release and read-lock-write proofs | `lockpolicy/missing.rules` and `read_write.rules` already own proof precedence. `missingReleaseQueries` and `readWriteQueries` are thin lazy adapters; release-attempt recording, return-state merging and caller-release flag correlation remain native. |
+| Identity, forms and loop variance | Existing `lockforms`, `lockidentity` leaf and `lockvariant` rules own destination, index, owner-step and value-form choices. Reaching walks, getter resolution and identity spelling remain native. |
+| Order graph and cycles | Edge recording, the cross-owner uncertainty rewrite, path search, serialized and novel cycle checks and report construction form one graph algorithm over mutable edge state. |
+| Exclusivity, publication and writer witnesses | Parameter-exclusive caller censuses, unique-writer matching over held identities and dominance/may-follow release witnesses are bounded searches with budget fences inside their loops. Their small final projections need no rule adapter. |
+| Setup, callee snapshots and orchestration | Summary binding, callee lock memoization, fresh bound-slot mutation searches, caller collection, analyzer orchestration, reason tables and rendering remain native. |
+
+Existing ordered-policy, flow, release and read-lock tests continue to pin
+these contracts. No source changed, so no new validation is needed.
+
 ## Non-Go integration inventory
 
 The tracked non-Go code inventory outside fixtures/skills contains eight Python
@@ -373,7 +397,7 @@ completion criterion, and marginal conversions do not extend this checklist.
 | --- | ---: | --- |
 | `analyzers/concurrency/concurrentcapture` | 5 | Reviewed; existing rules cover substantial policies |
 | `analyzers/concurrency/goroutineownership` | 23 | Reviewed; lifetime, edge, aggregate and notification policies migrated |
-| `analyzers/concurrency/lockorder` | 24 | Pending review |
+| `analyzers/concurrency/lockorder` | 24 | Reviewed; existing rules cover substantial policies; no new migration |
 | `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing migrated |
 | `analyzers/resources/cancellationownership` | 11 | Reviewed; parent-origin and deferred-literal policies migrated |
 | `analyzers/resources/deferinloop` | 6 | Reviewed; transfer/argument policies migrated |
@@ -390,8 +414,9 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. Current source totals are 360 authored files: 228 reviewed and 132 still
-awaiting review across 5 source scopes. All previously confirmed migrations
+policy. The lock-order review closes 24 more paths. Current source totals are
+360 authored files: 252 reviewed and 108 still awaiting review across 4 source
+scopes. All previously confirmed migrations
 are integrated; remaining candidates must come from those unreviewed scopes.
 
 The remaining completion steps are finite:
