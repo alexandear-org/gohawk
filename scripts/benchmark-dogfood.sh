@@ -6,7 +6,13 @@ usage() {
 	cat <<'EOF'
 Usage: scripts/benchmark-dogfood.sh [options]
 
-Measure whole-repository gohawk runtime and peak resident memory.
+Measure whole-repository gohawk runtime, CPU time and memory.
+
+go vet caches each package's analysis by the vet tool's build ID, so a
+repeated run with the same binary replays results instead of analyzing.
+The warm-up run fills the compile cache; every measured run then uses a
+freshly linked gohawk binary, so it reuses compiled packages but analyzes
+every package again.
 
 Options:
   --manifest PATH       Repository manifest (default: benchmarks/repositories.tsv)
@@ -14,6 +20,9 @@ Options:
   --runs COUNT          Measured runs per repository (default: 3)
   --output DIRECTORY    New result directory (default: benchmark-results/<UTC time>)
   --gohawk-arg=ARG      Pass an analyzer-selection argument to gohawk (repeatable)
+  --profile             After the measured runs, make one profiled run per
+                        repository and write per-unit timings, an analyzer
+                        summary and merged CPU profiles under profiles/
   --keep-workdir        Keep temporary repository checkouts
   -h, --help            Show this help
 EOF
@@ -62,6 +71,7 @@ manifest_path="$repository_root/benchmarks/repositories.tsv"
 runs=3
 output_directory="$repository_root/benchmark-results/$(date -u +%Y%m%dT%H%M%SZ)"
 keep_workdir=false
+profile=false
 declare -a only_repositories=()
 declare -a gohawk_arguments=()
 
@@ -93,6 +103,10 @@ while (($# > 0)); do
 		;;
 	--keep-workdir)
 		keep_workdir=true
+		shift
+		;;
+	--profile)
+		profile=true
 		shift
 		;;
 	-h | --help)
@@ -135,9 +149,56 @@ trap cleanup EXIT
 
 gohawk_binary="$work_directory/gohawk"
 measure_binary="$work_directory/measure"
+summary_binary="$work_directory/profilesummary"
 sh "$repository_root/scripts/hyrule.sh" generate
 go build -trimpath -o "$gohawk_binary" "$repository_root"
 go build -trimpath -o "$measure_binary" "$repository_root/tools/measure"
+go build -trimpath -o "$summary_binary" "$repository_root/tools/profilesummary"
+
+# fresh_gohawk links a gohawk binary with a build ID go vet has not seen, so
+# none of its cached analysis results apply. The -X value names no variable;
+# it only changes the link inputs and therefore the binary. The value includes
+# the unique work directory: a label reused by an earlier benchmark of the
+# same source would rebuild an identical binary and hit that run's cache.
+fresh_gohawk() {
+	local label=$1
+	local binary="$work_directory/gohawk-$label"
+	go build -trimpath -ldflags="-X=main.benchmarkRun=${work_directory##*/}-$label" -o "$binary" "$repository_root"
+	printf '%s\n' "$binary"
+}
+
+# merge_profiles combines every unit's CPU profile into one. It merges in
+# batches so a run with thousands of units stays within argument limits.
+merge_profiles() {
+	local directory=$1
+	local merged=$2
+	local batch_directory="$directory.batches"
+	local -a profiles=()
+	local -a batches=()
+	local index
+
+	mapfile -d '' -t profiles < <(find "$directory" -name '*.pprof' -size +0 -print0 | sort -z)
+	((${#profiles[@]} > 0)) || fail "no CPU profiles were written under $directory"
+	mkdir -p "$batch_directory"
+	for ((index = 0; index < ${#profiles[@]}; index += 500)); do
+		batches+=("$batch_directory/batch-$index.pb.gz")
+		go tool pprof -proto "${profiles[@]:index:500}" >"${batches[-1]}" 2>/dev/null
+	done
+	go tool pprof -proto "${batches[@]}" >"$merged" 2>/dev/null
+	rm -rf -- "$batch_directory"
+}
+
+# A transient systemd scope gives each measured run its own cgroup, so the
+# helper can report memory for the whole process tree rather than only the
+# largest process. Without one, those columns are unknown.
+declare -a measure_scope=()
+declare -a measure_flags=()
+if command -v systemd-run >/dev/null 2>&1 && systemd-run --user --scope --quiet --collect true >/dev/null 2>&1; then
+	measure_scope=(systemd-run --user --scope --quiet --collect)
+	measure_flags=(-cgroup)
+else
+	printf 'Warning: no systemd user scope; process-tree memory will be unknown.\n' >&2
+fi
 
 gohawk_revision=$(git -C "$repository_root" rev-parse HEAD)
 if [[ -n $(git -C "$repository_root" status --porcelain) ]]; then
@@ -171,12 +232,24 @@ fi
 		printf ' `%s`' "${gohawk_arguments[@]}"
 		printf '\n'
 	fi
-	printf '\nClone time, dependency downloads, binary construction, package counting, and one warm-up run are excluded. Peak RSS is reported by the repository-owned measurement helper.\n\n'
-	printf '| Repository | Revision | Packages | Run | Wall time (s) | Peak RSS (MiB) | Exit | Output |\n'
-	printf '|---|---|---:|---:|---:|---:|---:|---|\n'
+	printf '\nClone time, dependency downloads, binary construction, package counting, and one warm-up run are excluded. '
+	printf 'The warm-up fills the compile cache; each measured run links a fresh gohawk binary so go vet cannot replay cached analysis. '
+	printf 'CPU time covers every process the run waited for. Tree peak is the cgroup memory.peak, which includes page cache; '
+	printf 'tree anon is sampled anonymous memory; largest process is the biggest single-process peak RSS.\n\n'
+	printf '| Repository | Revision | Packages | Run | Wall time (s) | CPU time (s) | Parallelism | Tree peak (MiB) | Tree anon (MiB) | Largest process (MiB) | Exit | Output |\n'
+	printf '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|\n'
 } >"$output_directory/summary.md"
 
-printf 'repository,revision,packages,run,wall_seconds,peak_rss_kib,exit_code,log\n' >"$output_directory/results.csv"
+printf 'repository,revision,packages,run,wall_seconds,cpu_seconds,tree_peak_kib,tree_anon_peak_kib,peak_rss_kib,exit_code,log\n' \
+	>"$output_directory/results.csv"
+
+mebibytes() {
+	if [[ $1 == unknown ]]; then
+		printf 'unknown'
+		return
+	fi
+	awk -v kib="$1" 'BEGIN { printf "%.1f", kib / 1024 }'
+}
 
 measured_repositories=0
 while IFS=$'\t' read -r repository_name repository_url requested_revision package_pattern extra; do
@@ -219,31 +292,56 @@ while IFS=$'\t' read -r repository_name repository_url requested_revision packag
 	for ((run = 1; run <= runs; run++)); do
 		run_log="$output_directory/logs/$repository_name-run-$run.log"
 		timing_file="$work_directory/$repository_name-run-$run.time"
+		run_binary=$(fresh_gohawk "$repository_name-$run")
 		set +e
 		(
 			cd "$checkout"
-			"$measure_binary" -output "$timing_file" -- \
-				"$gohawk_binary" "${gohawk_arguments[@]}" "$package_pattern"
+			"${measure_scope[@]}" "$measure_binary" "${measure_flags[@]}" -output "$timing_file" -- \
+				"$run_binary" "${gohawk_arguments[@]}" "$package_pattern"
 		) >"$run_log" 2>&1
 		command_status=$?
 		set -e
 		if [[ $command_status -ne 0 && $command_status -ne 3 ]]; then
 			fail "measurement failed for $repository_name with exit $command_status; see $run_log"
 		fi
-		IFS=$'\t' read -r wall_seconds peak_rss_kib reported_status <"$timing_file"
+		IFS=$'\t' read -r wall_seconds peak_rss_kib reported_status cpu_seconds tree_peak_kib tree_anon_kib <"$timing_file"
 		[[ $reported_status == "$command_status" ]] || \
 			fail "time reported exit $reported_status for $repository_name, command returned $command_status"
-		peak_rss_mib=$(awk -v kib="$peak_rss_kib" 'BEGIN { printf "%.1f", kib / 1024 }')
+		parallelism=$(awk -v cpu="$cpu_seconds" -v wall="$wall_seconds" 'BEGIN { printf "%.1f", cpu / wall }')
 		log_name="logs/$repository_name-run-$run.log"
-		printf '%s,%s,%s,%s,%s,%s,%s,%s\n' \
+		printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
 			"$repository_name" "$resolved_revision" "$package_count" "$run" \
-			"$wall_seconds" "$peak_rss_kib" "$command_status" "$log_name" \
+			"$wall_seconds" "$cpu_seconds" "$tree_peak_kib" "$tree_anon_kib" "$peak_rss_kib" "$command_status" "$log_name" \
 			>>"$output_directory/results.csv"
-		printf '| %s | `%s` | %s | %s | %s | %s | %s | [%s](%s) |\n' \
+		printf '| %s | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s | [%s](%s) |\n' \
 			"$repository_name" "${resolved_revision:0:12}" "$package_count" "$run" \
-			"$wall_seconds" "$peak_rss_mib" "$command_status" "log" "$log_name" \
+			"$wall_seconds" "$cpu_seconds" "$parallelism" "$(mebibytes "$tree_peak_kib")" "$(mebibytes "$tree_anon_kib")" \
+			"$(mebibytes "$peak_rss_kib")" "$command_status" "log" "$log_name" \
 			>>"$output_directory/summary.md"
 	done
+
+	if [[ $profile == true ]]; then
+		profile_directory="$output_directory/profiles/$repository_name"
+		profile_log="$output_directory/logs/$repository_name-profile.log"
+		profile_binary=$(fresh_gohawk "$repository_name-profile")
+		set +e
+		(
+			cd "$checkout"
+			GOHAWK_PROFILE_DIR=$profile_directory "$profile_binary" "${gohawk_arguments[@]}" "$package_pattern"
+		) >"$profile_log" 2>&1
+		command_status=$?
+		set -e
+		if [[ $command_status -ne 0 && $command_status -ne 3 ]]; then
+			fail "profiled run failed for $repository_name with exit $command_status; see $profile_log"
+		fi
+		"$summary_binary" "$profile_directory" >"$output_directory/profiles/$repository_name.md"
+		merged_profile="$output_directory/profiles/$repository_name-cpu.pb.gz"
+		merge_profiles "$profile_directory" "$merged_profile"
+		# The analyzer label splits merged samples by analyzer; unlabelled
+		# samples are setup: parsing, type checking and fact decoding.
+		go tool pprof -top -nodecount=60 "$merged_profile" >"$output_directory/profiles/$repository_name-cpu-top.txt" 2>&1
+		go tool pprof -tags "$merged_profile" >"$output_directory/profiles/$repository_name-cpu-analyzers.txt" 2>&1
+	fi
 
 	measured_repositories=$((measured_repositories + 1))
 done <"$manifest_path"

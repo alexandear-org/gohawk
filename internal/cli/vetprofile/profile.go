@@ -1,0 +1,301 @@
+// Package vetprofile records where one go vet analysis unit spends its time.
+//
+// gohawk analyzes each package in its own vet-tool process, so a whole-run
+// profile is the union of per-unit records. When the profile directory is set,
+// Instrument starts a CPU profile labelled by analyzer and times every
+// analyzer's Run. When the last selected root analyzer returns, it stops the
+// profile and writes the unit's record. unitchecker calls os.Exit itself, so
+// a deferred stop would never run; the last root's return is the final point
+// the tool controls before results are printed.
+//
+// go vet caches unit results by tool identity and inputs, not by environment,
+// so a cached unit runs nothing and records nothing. Profile with a binary
+// whose build ID go vet has not seen, or with a cleared cache.
+package vetprofile
+
+import (
+	"bufio"
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime/pprof"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	"golang.org/x/tools/go/analysis"
+)
+
+// DirectoryVariable names the environment variable that enables profiling.
+// Its value is the directory that receives one record and one CPU profile per
+// analyzed unit.
+const DirectoryVariable = "GOHAWK_PROFILE_DIR"
+
+// Record is the timing of one vet-tool unit, written as name.json beside the
+// unit's CPU profile name.pprof.
+type Record struct {
+	Package   string `json:"package"`
+	ID        string `json:"id"`
+	FactsOnly bool   `json:"facts_only"`
+	// SetupSeconds covers parsing, type checking and fact decoding: the time
+	// from process start until the first analyzer runs.
+	SetupSeconds    float64 `json:"setup_seconds"`
+	AnalysisSeconds float64 `json:"analysis_seconds"`
+	// PeakRSSKiB is the process high-water mark when analysis finished, or
+	// nil when the platform does not report it.
+	PeakRSSKiB *int64 `json:"peak_rss_kib"`
+	// Analyzers maps each analyzer to the wall time of its own Run, which
+	// excludes its prerequisites. Analyzers run in parallel within a unit, so
+	// these can sum past AnalysisSeconds.
+	Analyzers map[string]float64 `json:"analyzers"`
+}
+
+// unitConfig is the part of unitchecker's .cfg file that names the unit.
+type unitConfig struct {
+	ID         string `json:"ID"`
+	ImportPath string `json:"ImportPath"`
+	VetxOnly   bool   `json:"VetxOnly"`
+}
+
+type session struct {
+	started  time.Time
+	unit     unitConfig
+	name     string
+	dir      string
+	roots    []*analysis.Analyzer
+	profile  *os.File
+	mu       sync.Mutex
+	first    time.Time
+	pending  map[*analysis.Analyzer]bool
+	analyzer map[string]float64
+}
+
+// Instrument prepares analyzers for profiling the unit named by the .cfg
+// file in arguments. It returns analyzers unchanged when directory is empty
+// or the invocation is not an analysis unit.
+//
+// Run is replaced on the shared analyzer values rather than on copies:
+// passes look up prerequisite results by the original analyzer pointers, so
+// a cloned graph would break every ResultOf lookup. This is safe only because
+// a vet-tool process analyzes exactly one unit.
+func Instrument(directory string, arguments []string, analyzers []*analysis.Analyzer) ([]*analysis.Analyzer, error) {
+	configPath := unitConfigPath(arguments)
+	if directory == "" || configPath == "" {
+		return analyzers, nil
+	}
+	started := time.Now()
+	unit, err := readUnitConfig(configPath)
+	if err != nil {
+		return nil, err
+	}
+	// go vet can analyze one unit ID twice, once for facts as a dependency and
+	// once in full as a root, so the process ID keeps their records apart.
+	digest := sha256.Sum256([]byte(unit.ID))
+	current := &session{
+		started:  started,
+		unit:     unit,
+		name:     hex.EncodeToString(digest[:12]) + "-" + strconv.Itoa(os.Getpid()),
+		dir:      directory,
+		roots:    analyzers,
+		analyzer: make(map[string]float64),
+	}
+	if err := current.startProfile(); err != nil {
+		return nil, err
+	}
+	wrapped := make(map[*analysis.Analyzer]bool)
+	for _, analyzer := range analyzers {
+		current.wrap(analyzer, wrapped)
+	}
+	return analyzers, nil
+}
+
+func unitConfigPath(arguments []string) string {
+	if len(arguments) == 0 {
+		return ""
+	}
+	last := arguments[len(arguments)-1]
+	if !strings.HasSuffix(last, ".cfg") {
+		return ""
+	}
+	return last
+}
+
+func readUnitConfig(path string) (unitConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // go vet names the unit's config file.
+	if err != nil {
+		return unitConfig{}, fmt.Errorf("read vet unit config: %w", err)
+	}
+	var unit unitConfig
+	if err := json.Unmarshal(data, &unit); err != nil {
+		return unitConfig{}, fmt.Errorf("decode vet unit config %s: %w", path, err)
+	}
+	return unit, nil
+}
+
+func (s *session) startProfile() error {
+	if err := os.MkdirAll(s.dir, 0o750); err != nil {
+		return fmt.Errorf("create profile directory: %w", err)
+	}
+	file, err := os.Create(filepath.Join(s.dir, s.name+".pprof"))
+	if err != nil {
+		return fmt.Errorf("create CPU profile: %w", err)
+	}
+	if err := pprof.StartCPUProfile(file); err != nil {
+		closeErr := file.Close()
+		return errors.Join(fmt.Errorf("start CPU profile: %w", err), closeErr)
+	}
+	s.profile = file
+	return nil
+}
+
+// wrap times analyzer and its prerequisites and labels their CPU samples.
+// Labels set by pprof.Do are inherited by goroutines the analyzer starts.
+func (s *session) wrap(analyzer *analysis.Analyzer, wrapped map[*analysis.Analyzer]bool) {
+	if wrapped[analyzer] {
+		return
+	}
+	wrapped[analyzer] = true
+	for _, required := range analyzer.Requires {
+		s.wrap(required, wrapped)
+	}
+	run := analyzer.Run
+	name := analyzer.Name
+	analyzer.Run = func(pass *analysis.Pass) (result any, err error) {
+		began := s.begin()
+		pprof.Do(context.Background(), pprof.Labels("analyzer", name), func(context.Context) {
+			result, err = run(pass)
+		})
+		if s.finish(analyzer, time.Since(began)) {
+			err = errors.Join(err, s.write())
+		}
+		return result, err
+	}
+}
+
+// begin records the start of analysis. The first call happens after
+// unitchecker has parsed its flags, so the selected roots are known here.
+func (s *session) begin() time.Time {
+	now := time.Now()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.first.IsZero() {
+		s.first = now
+		s.pending = s.selectedRoots()
+	}
+	return now
+}
+
+// finish accumulates an analyzer's time and reports whether it was the last
+// selected root to return. Prerequisites finish before the roots that need
+// them, so the last root marks the end of the unit's analysis.
+func (s *session) finish(analyzer *analysis.Analyzer, elapsed time.Duration) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.analyzer[analyzer.Name] += elapsed.Seconds()
+	if !s.pending[analyzer] {
+		return false
+	}
+	delete(s.pending, analyzer)
+	return len(s.pending) == 0
+}
+
+// selectedRoots mirrors unitchecker's selection: if any analyzer flag is set
+// true, only those run; otherwise any set false are dropped. A facts-only unit
+// further skips analyzers that neither produce nor require facts.
+// flag.Visit sees only flags set on the command line, which distinguishes an
+// explicit -NAME=true from the default.
+func (s *session) selectedRoots() map[*analysis.Analyzer]bool {
+	explicit := make(map[string]string)
+	flag.Visit(func(f *flag.Flag) { explicit[f.Name] = f.Value.String() })
+	anyTrue := false
+	for _, root := range s.roots {
+		if explicit[root.Name] == "true" {
+			anyTrue = true
+		}
+	}
+	selected := make(map[*analysis.Analyzer]bool)
+	for _, root := range s.roots {
+		value, set := explicit[root.Name]
+		switch {
+		case anyTrue && value != "true", !anyTrue && set && value == "false":
+			continue
+		case s.unit.VetxOnly && !usesFacts(root, make(map[*analysis.Analyzer]bool)):
+			continue
+		}
+		selected[root] = true
+	}
+	return selected
+}
+
+func usesFacts(analyzer *analysis.Analyzer, seen map[*analysis.Analyzer]bool) bool {
+	if seen[analyzer] {
+		return false
+	}
+	seen[analyzer] = true
+	if len(analyzer.FactTypes) > 0 {
+		return true
+	}
+	for _, required := range analyzer.Requires {
+		if usesFacts(required, seen) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *session) write() error {
+	finished := time.Now()
+	pprof.StopCPUProfile()
+	closeErr := s.profile.Close()
+	s.mu.Lock()
+	first := s.first
+	record := Record{
+		Package:         s.unit.ImportPath,
+		ID:              s.unit.ID,
+		FactsOnly:       s.unit.VetxOnly,
+		SetupSeconds:    first.Sub(s.started).Seconds(),
+		AnalysisSeconds: finished.Sub(first).Seconds(),
+		PeakRSSKiB:      peakRSSKiB(),
+		Analyzers:       s.analyzer,
+	}
+	data, err := json.Marshal(record)
+	s.mu.Unlock()
+	if err != nil {
+		return errors.Join(fmt.Errorf("encode profile record: %w", err), closeErr)
+	}
+	writeErr := os.WriteFile(filepath.Join(s.dir, s.name+".json"), data, 0o600)
+	if writeErr != nil {
+		writeErr = fmt.Errorf("write profile record: %w", writeErr)
+	}
+	return errors.Join(closeErr, writeErr)
+}
+
+// peakRSSKiB reads the Linux high-water mark. Other platforms report nil,
+// which consumers must treat as unknown rather than zero.
+func peakRSSKiB() *int64 {
+	data, err := os.ReadFile("/proc/self/status")
+	if err != nil {
+		return nil
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		value, found := strings.CutPrefix(scanner.Text(), "VmHWM:")
+		if !found {
+			continue
+		}
+		kib, err := strconv.ParseInt(strings.TrimSuffix(strings.TrimSpace(value), " kB"), 10, 64)
+		if err != nil {
+			return nil
+		}
+		return &kib
+	}
+	return nil
+}

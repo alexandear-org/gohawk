@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	gohawk "github.com/kojah/gohawk/analyzers"
+	"github.com/kojah/gohawk/internal/cli/vetprofile"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/unitchecker"
 )
@@ -81,7 +82,12 @@ func Main() int {
 	// tests that stub the process boundary.
 	registerSelectionFlags()
 	os.Args = result.invocation.arguments
-	unitchecker.Main(result.invocation.analyzers...)
+	analyzers, err := vetprofile.Instrument(runtime.getenv(vetprofile.DirectoryVariable), os.Args, result.invocation.analyzers)
+	if err != nil {
+		writeLine(runtime.errorsOutput, "gohawk:", err)
+		return 1
+	}
+	unitchecker.Main(analyzers...)
 	return 0
 }
 

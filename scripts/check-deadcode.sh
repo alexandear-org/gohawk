@@ -28,7 +28,7 @@ DEADCODE=${DEADCODE:-go run golang.org/x/tools/cmd/deadcode@v0.49.0}
 # finding. Line numbers are dropped so unrelated edits do not churn the
 # baseline.
 findings=$(
-  $DEADCODE -test . ./tools/gendocs ./tools/measure ./plugin/golangci |
+  $DEADCODE -test . ./tools/gendocs ./tools/measure ./tools/profilesummary ./plugin/golangci |
     awk -F: '/unreachable func: / {
       name = $NF
       sub(/^[[:space:]]*unreachable func: /, "", name)
