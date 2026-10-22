@@ -2,8 +2,10 @@
 
 Hyrule generates structural recognizers and ordered decision functions from
 rules. Runtime builds compile the generated Go; analysis does not invoke the
-compiler or interpret rules. Generated Go and the ownership manifest are ignored
-by Git, so a fresh checkout must generate before compiling.
+compiler or interpret rules. Generated Go and the ownership manifest are
+committed, so a fresh checkout compiles without the generator. CI checks that
+committed output matches its rules before regenerating anything; commit
+regenerated output together with the rule change that produced it.
 
 ## Local development workspace
 
@@ -26,8 +28,8 @@ regenerate, never patch generated Go.
 
 Each package keeps its rule sources in a `rules/` folder beside the Go file
 holding its bindings. Generated `*_gen.go` output stays in the package directory
-itself, since it calls unexported host functions; it is ignored by Git and does
-not count toward the directory file limit.
+itself, since it calls unexported host functions. It is marked as generated
+for GitHub and does not count toward the directory file limit.
 
 ## Equation frontend
 

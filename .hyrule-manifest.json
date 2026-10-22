@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "targets": {
+    "call_effect_field_use": {
+      "path": "internal/engine/ssaflow/calls/call_field_effects_gen.go",
+      "sha256": "85f560373de94c26d655d3e952e9a5f3a10ce958c22124b5f2a8173286bfa53b"
+    },
+    "call_effect_use": {
+      "path": "internal/engine/ssaflow/calls/call_effect_uses_gen.go",
+      "sha256": "a653b8f1aa50aec2566c842ef4c5d1d0a1c5a706b3543a513970a8de9a20b921"
+    },
+    "call_fixed_outcome": {
+      "path": "internal/engine/ssaflow/calls/fixed_outcome_gen.go",
+      "sha256": "3ad7a47743d3ac680d5200d0f011f37bd836baf2fe55ff7160a8898e0692278a"
+    },
+    "cancellation_argument_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/argument_label_gen.go",
+      "sha256": "6728e698bd6079b14d99c03375987104462fdf321fa5a3530ed2ac6c7d97d0e3"
+    },
+    "cancellation_call_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/call_label_gen.go",
+      "sha256": "165b76ca94c51b6c8c83605ee25db71bdeb44b76a78c419cdc46ebfaf8ad318b"
+    },
+    "cancellation_deferred_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/deferred_label_gen.go",
+      "sha256": "ef802c377e779631d5dd906052beb26da6a6e7bd325f5036bd3559749f1410d8"
+    },
+    "cancellation_deferred_literal": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/literal_gen.go",
+      "sha256": "b1e84cd29efd493ef17c6f141242919e93434fa6caac58a2f7f141cd8962842e"
+    },
+    "cancellation_direct_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/direct_label_gen.go",
+      "sha256": "5aab7537792bd1f0bbf7afc3c12bfd6a159ba7d6ac4271fecacab9302e99b192"
+    },
+    "cancellation_instruction_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/classify_gen.go",
+      "sha256": "16c6af012b6e57f67c9adb1ebcdb8e89dd1aa4a66dd0b9933d12c3e987c8f94a"
+    },
+    "cancellation_parent_origin": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/parent_gen.go",
+      "sha256": "45a97e26deae8a3a07a62c3c39d0506aa6b536fe77372cea06653a24a2d3581f"
+    },
+    "cancellation_recognized_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/recognized_label_gen.go",
+      "sha256": "5f40d724cc050496daf87401575fc2b738a42f715fb592d5478fd849e2a3d1d3"
+    },
+    "cancellation_return_label": {
+      "path": "internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go",
+      "sha256": "2c1d6f3688c854bb49f09af9e0ab3b6522e26b04dc226c9dd0b8ddf9eee88902"
+    },
+    "capture_channel_statement": {
+      "path": "internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement_gen.go",
+      "sha256": "b311a23580f33b1a26cb629dcd7ef840bb357155f6174cdbdbd64cea684f2462"
+    },
+    "capture_lock_transition": {
+      "path": "internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition_gen.go",
+      "sha256": "ae8af54c0173d7ffa6248627f3a30441e1653be916bb1dac569abcc38375594f"
+    },
+    "capture_mutation_guard": {
+      "path": "internal/analysis/analyzers/concurrency/concurrentcapture/mutation_gen.go",
+      "sha256": "adc0417fb1ed0cd65f61490b02ff338418c9e3fe34a59d70c753cd100024b4c7"
+    },
+    "capture_mutation_root": {
+      "path": "internal/analysis/analyzers/concurrency/concurrentcapture/root_gen.go",
+      "sha256": "ec0ace78c20a8828b420601f2b37b9f51f887cfea5e37382ea1bebf838dd84dd"
+    },
+    "completion_callback_origin": {
+      "path": "internal/engine/lifecycle/completionpolicy/callback_gen.go",
+      "sha256": "ae6b722c71cac2a7459e557258311631f646b0cde0858b5d73a257cef5055cce"
+    },
+    "completion_launch": {
+      "path": "internal/engine/lifecycle/completionpolicy/launch_gen.go",
+      "sha256": "e2b8d233c5be4b61ee2bca1895f7c88249de4f320dc9ab17071ae2bb2fb83357"
+    },
+    "completion_unproven_outcome": {
+      "path": "internal/engine/lifecycle/completionpolicy/outcome_gen.go",
+      "sha256": "85b8d0d8ee3a17a7657a8d4ab1c0670c5f051c0afcf7c74fdd0d448c018c40cc"
+    },
+    "concurrency_binding_root": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/binding_root_gen.go",
+      "sha256": "8cfae0eface729a15b771b17a692da2137248c5fc96eab40004907f55925e1a2"
+    },
+    "concurrency_callback_call": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_call_gen.go",
+      "sha256": "037c67a885d931dbb5cd922e8edb60b60c6f07b29e32ddf7d764d8cfd6bd987b"
+    },
+    "concurrency_callback_input": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_input_gen.go",
+      "sha256": "b2cfa2626407d2bde4aea46e3ba5e3462bc3ab3da91acab029c2e240882d7e76"
+    },
+    "concurrency_context_call": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/context_gen.go",
+      "sha256": "644f06f3631a0551310b1cebdd01b9ff875bf0c25e02c3da559dbd0169e394c7"
+    },
+    "concurrency_context_origin": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/origin_gen.go",
+      "sha256": "2fd4d36f820cbfc0896880a25a52b2f71f1befaf62d75d344668161ee973172b"
+    },
+    "concurrency_effect_support": {
+      "path": "internal/analysis/passes/concurrencyfacts/effect_support_gen.go",
+      "sha256": "580c11d137e6e28ae65528292de9051568a2441e06ee474952a544b984f0c2a9"
+    },
+    "concurrency_fixed_load": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/fixed_load_gen.go",
+      "sha256": "a8eb3874130022dc03138ea9e561e01db6291922f5b6676ffd31ef1d029c0f99"
+    },
+    "concurrency_inert_builtin": {
+      "path": "internal/analysis/passes/concurrencyfacts/admission/builtin_gen.go",
+      "sha256": "a300acf9b0b4117fc6939cf05ed3fc0ac64b57451a332729c7a1816f179415b0"
+    },
+    "concurrency_inert_data": {
+      "path": "internal/analysis/passes/concurrencyfacts/admission/data_gen.go",
+      "sha256": "f42f8318e9d9afcd0e9495a7466dc4b2d8f1f2bdcdad912d6ec36f515d450358"
+    },
+    "concurrency_path_root": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/path_root_gen.go",
+      "sha256": "b7a4e483fb26aa21c6d7745d33af30e087bd42ecf33428356788c246949d8729"
+    },
+    "concurrency_resource_reference": {
+      "path": "internal/analysis/passes/concurrencyfacts/recognition/reference_gen.go",
+      "sha256": "28de480acc0a0a28b60ff48ec84ce0669cbb1244630bd2f76b5df88dbba8373e"
+    },
+    "defer_argument_use": {
+      "path": "internal/analysis/analyzers/resources/deferinloop/argument_gen.go",
+      "sha256": "00c57f147a20a934fa24a0d67b462f5d3d3f2f13f1940422b17aa1701b3dcd08"
+    },
+    "defer_resource_transfer": {
+      "path": "internal/analysis/analyzers/resources/deferinloop/transfer_gen.go",
+      "sha256": "d9147e5742cb8aab855e43db9368800a06c994a8ee17f172bef94892ab36b5cc"
+    },
+    "deferred_resource_acquisition": {
+      "path": "internal/analysis/analyzers/resources/deferinloop/acquisition_gen.go",
+      "sha256": "0b056686a57e8cfd7637dc601a20667e6326b1d658205971ef282e51f68d875e"
+    },
+    "deferred_resource_use": {
+      "path": "internal/analysis/analyzers/resources/deferinloop/classify_gen.go",
+      "sha256": "0da7c22e1d058eaf9fefb8f723d4107507a78f7bc9992a01ab4850a717210744"
+    },
+    "diagnostic_admission": {
+      "path": "internal/reporting/check/report_admission_gen.go",
+      "sha256": "f75dee61173bd284690b14d7a6afbf23a31e3ccac6bd13ae4fa89c463fc753db"
+    },
+    "goroutine_call_contract": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/call_contracts_gen.go",
+      "sha256": "5069e0829fbcd4808b4b0448a34fa3ca3003cb8da70d8cc65dd45dc83b2aead9"
+    },
+    "goroutine_call_recognition": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/call_prefix_gen.go",
+      "sha256": "4c983351fbcc066b9ec39ae39cb289bb151debf967254eb12e3108ab17a16e6d"
+    },
+    "goroutine_entry_recognition": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/entry_gen.go",
+      "sha256": "b6dedf783645144756f8457ea67db570c002a3ab083375ee15e3bf7f8650fe85"
+    },
+    "goroutine_instruction_label": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/classify_gen.go",
+      "sha256": "ebb9387278b6c9504c2430ecf91160ebf740e99d1945aa6ff0b0eb2467cf04e2"
+    },
+    "goroutine_lifetime_policy": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle_gen.go",
+      "sha256": "76d112fe7b9c1522cca2670856b1053386db1f071f478e38ad251ffe777532eb"
+    },
+    "goroutine_proof_fallback": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/fallback_gen.go",
+      "sha256": "51e0dfc4d29731441356595a34865b4499204308f0f771c08288d8f9b0c6df76"
+    },
+    "goroutine_proof_policy": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/proof_gen.go",
+      "sha256": "a7900322b9d3bb2ec2b2d0a596a8e13dbbef2d3db040eb779a4f38375e29796d"
+    },
+    "heap_static_leaf": {
+      "path": "internal/engine/heapmodel/operations/leaf_gen.go",
+      "sha256": "9e584509110f297b282ac27ba1a28a0b357f7b64bd6b75885b330a5bdd60e7b1"
+    },
+    "heap_value_definition": {
+      "path": "internal/engine/heapmodel/operations/definition_gen.go",
+      "sha256": "d0925b25349909a080106a15c3c81c4be5cfa23b8fd9da32c648f45516f615d7"
+    },
+    "http_acquisition_effects": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects_gen.go",
+      "sha256": "b4824e8f60d263b54e32f38c8c1e0208c10f30237c08053a178b6d8f95505790"
+    },
+    "http_cell_use": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use_gen.go",
+      "sha256": "5209d768ea04c2d183792b83894e1ef1271424de6aa5f2c9841de529af9c451e"
+    },
+    "http_client": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client_gen.go",
+      "sha256": "3a950c35e6005be417fe6f268002b46cb88243e1ba072c49f2d2478dbff759f9"
+    },
+    "http_default_use": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use_gen.go",
+      "sha256": "991a8c4d4efef2a78fdde109408486aef1a773b928700d8537d81fd2d5928a37"
+    },
+    "http_head_acquisition": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head_gen.go",
+      "sha256": "325421fa20cc172d60525d57bf594e7363dc1a0afeb7eadb3135927bde2dc6d5"
+    },
+    "http_local_acquisition": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint_gen.go",
+      "sha256": "98cc299052729c70440fa09e0877143de3014672f4e18e83ae57266926af8ea9"
+    },
+    "http_request_origin": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin_gen.go",
+      "sha256": "0ed31dc04748bd66945e32446c6256885f188eebfea38f8f6ef2421274d2f3f6"
+    },
+    "http_request_use": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use_gen.go",
+      "sha256": "ab43a27dc7987ad6342ced34897c2972636b17a97e79ee5ab53bab0e865954b5"
+    },
+    "http_server_use": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use_gen.go",
+      "sha256": "40c496edf9d520063cd7ae9a57a646df06461626a753a20938dbf4f2ae949f94"
+    },
+    "http_writer_use": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use_gen.go",
+      "sha256": "2d5f4ef9913fe8daf41b9706923c002b2bb186b42cdfc7554bae90eed4b3f61e"
+    },
+    "lifecycle_argument_mapping": {
+      "path": "internal/engine/lifecycle/completionmapping/argument_gen.go",
+      "sha256": "64bb12b482a3a1b0e24973c852a623e957586322a0850203474285042187ba87"
+    },
+    "lifecycle_callback_aggregate": {
+      "path": "internal/engine/lifecycle/completionpolicy/aggregate_gen.go",
+      "sha256": "b702843ef1761c72a658e8765424a68c8bde8d3481a60bc35acdc4c1168347e4"
+    },
+    "lifecycle_callback_binding": {
+      "path": "internal/engine/lifecycle/completionpolicy/binding_gen.go",
+      "sha256": "c3d366beed5798f13e212e8959e963b5e2509a69500abc67158d6eb0aa7aedd7"
+    },
+    "lifecycle_callback_context_safe": {
+      "path": "internal/engine/lifecycle/completionpolicy/context_safe_gen.go",
+      "sha256": "f4cd9a678398aaeffb45567ef120f0555c2652061c72257a3a4c22582faae259"
+    },
+    "lifecycle_capture_mapping": {
+      "path": "internal/engine/lifecycle/completionmapping/capture_gen.go",
+      "sha256": "ed6edda244573e6493b4846b3eac3891c99e9cd185d98affff5d43d8571faa32"
+    },
+    "lifecycle_capture_relation": {
+      "path": "internal/engine/lifecycle/completionmapping/capture_relation_gen.go",
+      "sha256": "bf58317e29f9ced30c5747381e61e0f1c23a4aedb59f0e9375c76d65665b8d70"
+    },
+    "lifecycle_completion_path": {
+      "path": "internal/engine/lifecycle/completionmapping/path_gen.go",
+      "sha256": "b1afea067cdcea4095ff381aaf842fbec9f453023204048fc2b5d12a54ae7913"
+    },
+    "lifecycle_completion_path_fold": {
+      "path": "internal/engine/lifecycle/completionmapping/accumulation_gen.go",
+      "sha256": "e91112966feb160decd1eeb52466764ef0cf0685b5559fb041b76283f2a6c4f2"
+    },
+    "lifecycle_condition_comparison": {
+      "path": "internal/engine/lifecycle/completionpolicy/condition_gen.go",
+      "sha256": "51044516050cd9b146200d94acdc6714b221fc0ac91c7d44e109f7448dd223a6"
+    },
+    "lifecycle_conditional_return": {
+      "path": "internal/engine/lifecycle/completionpolicy/return_gen.go",
+      "sha256": "04392af49ed94e8d0be7bd1d92dc1a41380b4cf96f86e6f5339dde7a23661688"
+    },
+    "lifecycle_deferred_mapping": {
+      "path": "internal/engine/lifecycle/completionmapping/deferred_gen.go",
+      "sha256": "1bab577c51659771101719d3a48d87509ec49bde42e5d82a541680b260860943"
+    },
+    "lifecycle_deferred_relation": {
+      "path": "internal/engine/lifecycle/completionmapping/cell_relation_gen.go",
+      "sha256": "2922625589bcf5d1d4aa349d4ed57147bb8944d37a47c0a01d77d6a01b887b9d"
+    },
+    "lifecycle_enclosing_reference": {
+      "path": "internal/engine/lifecycle/completionpolicy/enclosing_gen.go",
+      "sha256": "f6a3f9f15c123f3c97085f03bf166eb2309e9ac04ad8ebf0d9323679e1a0810d"
+    },
+    "lifecycle_escape_alias": {
+      "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias_gen.go",
+      "sha256": "c55fcdcfb1b4e085da57d60b9550acaa78496f1562ea520c31cab819c7babf5c"
+    },
+    "lifecycle_escape_use": {
+      "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_gen.go",
+      "sha256": "f45b78c1b090a807d0f01db4e9e26b4609b769219b6dc895e619796e7d64f494"
+    },
+    "lifecycle_evidence_policy": {
+      "path": "internal/analysis/passes/lifecyclefacts/evidence_gen.go",
+      "sha256": "62982a7bc1e08f9c49a3f79b64bd2e6d07f1a913387f6c3bcdbd61f9ccb6d740"
+    },
+    "lifecycle_handoff_use": {
+      "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff_gen.go",
+      "sha256": "26e0443ad47fd36c9b27f61041501cefdf471f0e9088696cf09a5a0c2872c451"
+    },
+    "lifecycle_local_completion": {
+      "path": "internal/engine/lifecycle/completion_local_gen.go",
+      "sha256": "dcb490c670f0edffede77e985499967dda25c3c3f10e1ce4893f2afcdf2d8b2d"
+    },
+    "lifecycle_receiver_mapping": {
+      "path": "internal/engine/lifecycle/completionmapping/receiver_gen.go",
+      "sha256": "5bbb8fb141cd9c94ef4f1f58a78699eb0f95997c023e4959dd16df2cc5be0709"
+    },
+    "lifecycle_response_body_leaf": {
+      "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go",
+      "sha256": "b986f81bcb9cc9cc71970e08009ce0af17e745479cecbdde457a7b3716c3934d"
+    },
+    "lifecycle_retained_callback": {
+      "path": "internal/engine/lifecycle/completionpolicy/retained_gen.go",
+      "sha256": "f2de37501bf297f32a13afdfccde9767347f7644fa0f620ee3786c6ee0f278e3"
+    },
+    "lifecycle_retention_use": {
+      "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/retention_gen.go",
+      "sha256": "7755fbcd409a60dbe42bf9388131055b136822111b8aec98057d6c3581ddc89e"
+    },
+    "lifecycle_return_result": {
+      "path": "internal/engine/lifecycle/completionpolicy/return_result_gen.go",
+      "sha256": "14e1c7b769402e3d32b7935306b4287c4bc0a5cb7aaeb4b98a825eb1ce61811d"
+    },
+    "lifecycle_return_value": {
+      "path": "internal/engine/lifecycle/completionpolicy/return_value_gen.go",
+      "sha256": "a7ef477c58e9d878b864fddcd17c3f604e7190f9b541d1552889de97d1ab49b7"
+    },
+    "lifecycle_returned_view_policy": {
+      "path": "internal/analysis/passes/lifecyclefacts/returned_view_gen.go",
+      "sha256": "a61f9599fd0dceb9b2fd7ca72efce9c5e23fbfb3ff25724016c5350731e48669"
+    },
+    "lifecycle_selected_mask_policy": {
+      "path": "internal/analysis/passes/lifecyclefacts/selected_mask_gen.go",
+      "sha256": "773bc3ad18c9955d02fce78cfbcbabdaa1773cd9acec7ebda41bd6cd30f8eceb"
+    },
+    "lock_dynamic_index_step": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/index_gen.go",
+      "sha256": "99460c3ed2c7a189b01ee6e74cc428473cc8d5abd874bb10342196301f7068ca"
+    },
+    "lock_identity": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf_gen.go",
+      "sha256": "965074fc6430fe57bc88dc65f29868f317c14fbf93ac3d9ed2eb5779db722ae8"
+    },
+    "lock_loop_extraction": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract_gen.go",
+      "sha256": "f78eb581f6b3bd0c21223136204a37e21f92881873655af710b78eb06a662ba4"
+    },
+    "lock_loop_origin": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockvariant/value_gen.go",
+      "sha256": "058b2d41ff098f0f6f1d420292dfb299aa92752b5c62c722396a8a4cc5edf66e"
+    },
+    "lock_missing_release_policy": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing_gen.go",
+      "sha256": "d9b5546f4afd800877a4d2942b97c9f80c14db0c84b60af9c7094adade070df1"
+    },
+    "lock_owner_address_step": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step_gen.go",
+      "sha256": "0b7f18d92bde4daca3f44114c1f79972a44a7dd4dd0f26bd1fdeeb6179a50197"
+    },
+    "lock_read_write_policy": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write_gen.go",
+      "sha256": "64d101c0b7c7f87c0d8bbf5e6e2d72fae64bd318a8a27e6310a6654e27d7a2d8"
+    },
+    "lock_state_copy": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/copy_gen.go",
+      "sha256": "e17b31a5d28e6a815a61c444e48ed25fc7165199c01ea1a0f1d7a43f0cb988c5"
+    },
+    "lock_state_transfer": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/transfer_gen.go",
+      "sha256": "8423d5428286540f0de4fb792da44034d9144ff1ada978868aafe568ef01cc77"
+    },
+    "lock_write_destination": {
+      "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/destination_gen.go",
+      "sha256": "32b2daed245d20090c0a62cffd81f03961d8c1df3b8a709ea4a3c926f7c5cb5d"
+    },
+    "mutex_storage_contract": {
+      "path": "internal/engine/ssaflow/calls/synchronization/mutex_gen.go",
+      "sha256": "d1558a0cb437bca149b2c7fa7559aeb21a8ab7904dbbbebef73a227c7185d68d"
+    },
+    "ownership_value_source": {
+      "path": "internal/engine/ssaflow/valueforms/ownership_gen.go",
+      "sha256": "382a24694ede299e48c8bfcc3e47358e530f9ac0f9838d3a8f0d4dd822d6ee66"
+    },
+    "path_guard_address": {
+      "path": "internal/engine/ssaflow/path/guard_address_gen.go",
+      "sha256": "41ffe4f3746e7c25cb35ffe06778ecc83b9a16e24da2156e8eb87a81e8954c86"
+    },
+    "path_literal_comparison": {
+      "path": "internal/engine/ssaflow/path/branch_compare_gen.go",
+      "sha256": "f0af1439e547628663b19130d43441d9dcbc978faa2022d3ad7157684fef778d"
+    },
+    "path_loaded_guard": {
+      "path": "internal/engine/ssaflow/path/guard_loaded_gen.go",
+      "sha256": "c4145e7bcd5f2cbeb9173223c894c19c116a5b369dfb92c4ecdc324d916e52c8"
+    },
+    "path_stable_guard": {
+      "path": "internal/engine/ssaflow/path/guard_stable_gen.go",
+      "sha256": "0d0141a49b711421da09cc158ae5350cda894eea7c476018238cb69cffabf26d"
+    },
+    "process_action_entry": {
+      "path": "internal/analysis/analyzers/resources/processownership/action_entry_gen.go",
+      "sha256": "ad6097c4678d26aa2dfc698bd1c762c60541b0a338d7819edcaa797d15e60180"
+    },
+    "process_action_remainder": {
+      "path": "internal/analysis/analyzers/resources/processownership/action_remainder_gen.go",
+      "sha256": "3e4e89438ce048cd26d77deb8e7935d32aa33ee0dadc3a1599e5d9ce39f0749f"
+    },
+    "process_action_settlement": {
+      "path": "internal/analysis/analyzers/resources/processownership/action_settlement_gen.go",
+      "sha256": "6aade5a25f38a6116e72c50e7b67ae6e20f2cbf61d6f3166c1a300be16327b9d"
+    },
+    "process_return_admission": {
+      "path": "internal/analysis/analyzers/resources/processownership/return_admission_gen.go",
+      "sha256": "fa7e0975d7ef93d0c320b5957f1bb512c6b94285a9aeef027a5afa4f599cd109"
+    },
+    "process_return_decision": {
+      "path": "internal/analysis/analyzers/resources/processownership/decision_gen.go",
+      "sha256": "60b63a848c98c7efc422c33be8b9a35126aa20c6b53c44085a1077a4f7fac2db"
+    },
+    "process_start_decision": {
+      "path": "internal/analysis/analyzers/resources/processownership/prestart_gen.go",
+      "sha256": "30c55f5a405e24dc9539f569d9b5a09a9e5b2c4e757fdb34b42b4db07a3616ea"
+    },
+    "process_wait_handoff": {
+      "path": "internal/analysis/analyzers/resources/processownership/handoff_gen.go",
+      "sha256": "f826eaf3ada8dce50ecd0547305e8a4304ad9501e937230cf76742c55755316e"
+    },
+    "producer_abandonment": {
+      "path": "internal/analysis/analyzers/concurrency/producerlifecycle/abandoned_gen.go",
+      "sha256": "52053367bf32501c3d0ba1183b40e2ddf7a9fa8bd7b18869d1de0dc08a225aee"
+    },
+    "producer_helper_receive": {
+      "path": "internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive_gen.go",
+      "sha256": "32423f62876e7bb2a2df814a586ca2b7fac0c4e2fbbab9a4d9a06e34fa8d49f7"
+    },
+    "producer_instruction_receive": {
+      "path": "internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go",
+      "sha256": "1dd76b1830edb6d406bce4c9150f333ccbbf205a7cf6941e577f5ca965858e5b"
+    },
+    "resource_acquisition_absence": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence_gen.go",
+      "sha256": "d285638034965c133e06a999e5008e56fe303709d863fdc81c22c3655990c54b"
+    },
+    "resource_acquisition_policy": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition_gen.go",
+      "sha256": "1e5a0d510012940dc1ebc468e5006871d22768b220e30fbd46783e2eb1281acb"
+    },
+    "resource_acquisition_success": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch_gen.go",
+      "sha256": "9a7bb1f475e53beeffa525f85d97be48107096e1078dbcb6ae316e335bd90f40"
+    },
+    "resource_classification": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/classify_gen.go",
+      "sha256": "0223f83078ef0d90e6fa74a799ad1e7ae8278a17355d303c5145e248859db112"
+    },
+    "resource_evaluation_policy": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_gen.go",
+      "sha256": "599d7ec5299bdd5f04725acfcc09be38bbfa5f3bb6702fd1dc6087951d553973"
+    },
+    "resource_final_flow_policy": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow_gen.go",
+      "sha256": "1e9a5450bc65e9c6b8b43308cc70c7b892aa4e0b8d6ab7e081f0f951b7c0f4c9"
+    },
+    "resource_opacity_after_callback": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback_gen.go",
+      "sha256": "4538ac6c758ee2ecd6c47c0dd2da2f7797cbb48abc8de2ef5bd4bbe3160dfa02"
+    },
+    "resource_opacity_call": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call_gen.go",
+      "sha256": "ac7a73646a93d93cfc2705df4cc1cac4b2fe6bb07c5ffa60c2298721deb20cd6"
+    },
+    "resource_opacity_closure": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_gen.go",
+      "sha256": "4d913fc29bad4390c9dc92af6b5e8e121f93be06c1b40337191ae3faea8c0e8b"
+    },
+    "resource_opacity_closure_body": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body_gen.go",
+      "sha256": "0fbcce9936daafa8042413b32981e1f3dc993dc9847242923b92fa2cbb995b9a"
+    },
+    "resource_opacity_closure_capture": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture_gen.go",
+      "sha256": "8c0a57b6f669a1f7fc5f85ca18e55d4a19401e596547f25e80c7268901a5b7c8"
+    },
+    "resource_opacity_closure_finish": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish_gen.go",
+      "sha256": "4feb0b5a569cd055a6fea086eab0c5ef2d11456e74d47740cdfd3147986ce89a"
+    },
+    "resource_opacity_consume": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume_gen.go",
+      "sha256": "f6da1172806f23f7b9b2678f47ad81092d8cb3f28528ae61d8e54c300fcbbe93"
+    },
+    "resource_opacity_dispatch": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch_gen.go",
+      "sha256": "0e47ca23d7276010d35a01210572ae62023b1551ce8023e8b8fff9e5bec59b24"
+    },
+    "resource_opacity_function": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_gen.go",
+      "sha256": "6e72f4038013c2eff5d471acbe0e32c04f58582b631d09ce51b9493cec38b2c5"
+    },
+    "resource_opacity_function_tail": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail_gen.go",
+      "sha256": "1d2b10a5ca7bdd265469ca8210048b8dc61663192145d401ab34d6bf8eef5222"
+    },
+    "resource_opacity_send": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send_gen.go",
+      "sha256": "004705ca06437cb09761ca8892af2ed390243c9d46382ba7834395ae626d6e59"
+    },
+    "resource_opacity_store": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store_gen.go",
+      "sha256": "d0bf0d44a0a2878fc153d4833f51374ad6c80952684b452a33394b6e5fdeadb0"
+    },
+    "resource_preparation_policy": {
+      "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation_gen.go",
+      "sha256": "ec8b0b6701e6a89c84c4b18ae7e8fea58e936fbb561f761df3c93670ab0a08cf"
+    },
+    "result_assumed_leaf": {
+      "path": "internal/analysis/passes/resultfacts/assumed_gen.go",
+      "sha256": "5c7b0bb455a9919a0ae763252960797c65d187ad97355f193bf56b22404b2323"
+    },
+    "result_leaf": {
+      "path": "internal/analysis/passes/resultfacts/leaf_gen.go",
+      "sha256": "6644809b7196318b796318efcd5a7fcbb59afab4f2ef3c41179a0c14eb75cce3"
+    },
+    "result_return_relation": {
+      "path": "internal/analysis/passes/resultfacts/return_gen.go",
+      "sha256": "2fbe3cfaeba14ea84058af742dc669abf4e32ba727ea772300794fd8e81c6f0d"
+    },
+    "select_comparison": {
+      "path": "internal/engine/ssaflow/selection/comparison_gen.go",
+      "sha256": "055ddfc3450af0ea5111d6d7e8e4684b1f73a82a1fe8801d2d9b14a6d8bc8316"
+    },
+    "structural_identity_evidence": {
+      "path": "internal/engine/ssaflow/identity_gen.go",
+      "sha256": "e7d53a7170ae847445491183df3cb98e20914a900c2329f5af100e93c45a52ef"
+    },
+    "summary_result_comparison": {
+      "path": "internal/analysis/summaries/comparison_gen.go",
+      "sha256": "55723a201e8815ee2b32d3c16c1f9b97a91b3a06a2de6ce49ca5571f86759f7b"
+    },
+    "summary_result_condition": {
+      "path": "internal/analysis/summaries/condition_gen.go",
+      "sha256": "45aac8d62541d99b6dd51cf5e656c1de104dd2490a165d121d68a832072b1da7"
+    },
+    "synchronization_primitives": {
+      "path": "internal/engine/ssaflow/calls/synchronization/primitives_gen.go",
+      "sha256": "7f2712e0a297826dc599ebbbc3eeb68baa15a30bde47fb639c861b23dad6fd6a"
+    },
+    "transparent_value_form": {
+      "path": "internal/engine/ssaflow/valueforms/forms_gen.go",
+      "sha256": "25f0a1ff3a494b915d86a3bfec360c57340d7f1fe8f88a4773fa354b3a3bff56"
+    },
+    "worker_aggregate_source": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate_gen.go",
+      "sha256": "6bea91ccc9c3e2d2cdb62a544b10aa8258c149864dfad750a56db4e9e75efa12"
+    },
+    "worker_caller_lifetime": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime_gen.go",
+      "sha256": "7e094ea67c42fa0897e64101aa5e4a7fb9a3bfc3fc2a1638fd5deb916f5c7636"
+    },
+    "worker_completion_notification": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification_gen.go",
+      "sha256": "4c610d2d923a82b6f36a47b44c16cf1b98bba6222dfd913a7d0793f080299f57"
+    },
+    "worker_completion_tail": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail_gen.go",
+      "sha256": "5e502b050324836458bc75eb2ef6da71dc80ed0e3aaa339e8682df0ac95ebece"
+    },
+    "worker_completion_terminal": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal_gen.go",
+      "sha256": "a4a8239c67897387343912f29d6c5f12ce67b1fa7f6505efed9ef2c1e978a4fc"
+    },
+    "worker_containment": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf_gen.go",
+      "sha256": "ce11cbc8bf2a3cdc2c75c3a2770ee67b365f42fbcb21eea0cbe0618fa0bcef51"
+    },
+    "worker_edge_precedence": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge_gen.go",
+      "sha256": "ccf4fdcdf867beab6452eb3648e393cfdcdde99a66577d3877c9d87626149bf0"
+    },
+    "worker_guaranteed_receive": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed_gen.go",
+      "sha256": "160c3f9828e8e64a06e10afd74611b935258b1760ff564d7c8ae00b927f2e677"
+    },
+    "worker_helper_escape": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/escape_gen.go",
+      "sha256": "4b40d6d15dc74045b87eb9a1c082cc59a2b871ff7af6a3f62dddf6b1c856124c"
+    },
+    "worker_receive": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/receives/from_gen.go",
+      "sha256": "83d396a28b1985ff2022dfefc1c2f92868a3dcdf7bfa50b20ecd2cb4ef8146c4"
+    },
+    "worker_stored_containment": {
+      "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use_gen.go",
+      "sha256": "432ec67b1cc300869fa97a95874a4596b271cdfd80163590e4b6b5ea4f23e5ff"
+    }
+  }
+}

@@ -17,9 +17,16 @@ and put it on your `PATH`. Archives cover Linux, macOS, and Windows on AMD64 and
 ARM64. Each release includes SHA-256 checksums. The prebuilt CLI still requires
 a supported Go command to analyze projects.
 
-Source builds require Go 1.27 for generation. Generated Go files are not stored
-in Git, so `go install github.com/kojah/gohawk@latest` cannot build a fresh source
-checkout. Clone the generator alongside GoHawk and build through Make:
+Generated Go sources are committed, so revisions after v0.6.0 install directly
+with the Go command (use `@main` until the next release is tagged):
+
+```sh
+go install github.com/kojah/gohawk@main
+```
+
+v0.6.0 and earlier releases did not commit generated sources and cannot be built
+this way. Development builds that change rules regenerate through Make, which
+requires Go 1.27 and the adjacent generator checkout:
 
 ```sh
 git clone https://github.com/kojah/lockdoc.git

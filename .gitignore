@@ -21,10 +21,9 @@ go.work.sum
 .beads-credential-key
 .beads/proxieddb/
 
-# Generated Go sources and local generator ownership receipts
-*_gen.go
+# Generated protobuf sources. Hyrule's generated Go and ownership manifest are
+# tracked so that `go install` and plain `go build` work without the generator.
 *.pb.go
-.hyrule-manifest.json
 
 # Fully generated Markdown; curated pages with generated sections stay tracked.
 /docs/analyzers/index.md
