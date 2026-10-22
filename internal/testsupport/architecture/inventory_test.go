@@ -14,8 +14,8 @@ import (
 )
 
 // repositorySourceInventory gives architecture tests one stable view of
-// maintained Go source. Authored views exclude generated files, while layout
-// counts include them. All views share fixture and external-tree exclusions.
+// maintained Go source. Every view excludes generated files and shares the
+// fixture and external-tree exclusions.
 type repositorySourceInventory struct {
 	root string
 }
@@ -41,12 +41,6 @@ func (view sourceView) includesFile(path string) bool {
 	default:
 		return !isTest
 	}
-}
-
-// countsGenerated reports whether generated files belong to the view. Layout
-// views count every file in a directory; authored views skip generated code.
-func (view sourceView) countsGenerated() bool {
-	return view == productionLayout || view == testLayout
 }
 
 type repositoryGoSource struct {
@@ -104,14 +98,15 @@ func (inventory repositorySourceInventory) authoredGoFiles(t *testing.T, roots .
 	return inventory.goFiles(t, authoredIncludingTests, roots...)
 }
 
-// layoutGoFiles counts all production source, including generated files and
-// inactive build variants. Layout is a repository invariant, not a build view.
+// layoutGoFiles counts authored production source, including inactive build
+// variants. Generated files are ignored outputs and do not count. Layout is a
+// repository invariant, not a build view.
 func (inventory repositorySourceInventory) layoutGoFiles(t *testing.T, roots ...string) []repositoryGoSource {
 	t.Helper()
 	return inventory.goFiles(t, productionLayout, roots...)
 }
 
-// testLayoutGoFiles counts all test source, including generated tests. Like
+// testLayoutGoFiles counts authored test source; generated tests do not. Like
 // production layout, it measures how many files a directory holds.
 func (inventory repositorySourceInventory) testLayoutGoFiles(t *testing.T, roots ...string) []repositoryGoSource {
 	t.Helper()
@@ -145,7 +140,7 @@ func (inventory repositorySourceInventory) goFiles(t *testing.T, view sourceView
 			if parseErr != nil {
 				return parseErr
 			}
-			if !view.countsGenerated() && ast.IsGenerated(file) {
+			if ast.IsGenerated(file) {
 				return nil
 			}
 			repositoryPath, relativeErr := filepath.Rel(inventory.root, path)

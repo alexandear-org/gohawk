@@ -507,6 +507,12 @@ Moving `loadEffect` into the passive target would also place loads behind its
 effect-free and data-instruction admission, changing precedence. The
 dispositions stand.
 
+Generated files have since stopped counting toward the directory limit, since
+they are ignored build outputs. That removes the package-boundary cost from
+this recheck. A separate `loadEffect` target would also avoid the passive
+precedence change, but it remains line-neutral, and the host declarations and
+adapters still outweigh the other candidates. The dispositions are unchanged.
+
 The source-build and pre-commit integration corrections and the non-Go
 inventory remain as reviewed. Future changes to a reviewed family reopen only
 that family.

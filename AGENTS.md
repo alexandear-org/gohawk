@@ -90,8 +90,8 @@ policy structure instead of merely wrapping a long Boolean expression.
 
 Keep at most 20 production Go files directly in each directory. Nested packages
 are allowed and receive their own allowance; their boundaries must still own
-cohesive responsibilities. Generated production files and inactive build
-variants count. Tests, fixtures and external dependency trees do not. The
+cohesive responsibilities. Inactive build variants count. Generated files,
+tests, fixtures and external dependency trees do not. The
 architecture check has no migration-debt exemption.
 
 Keep at most 20 `_test.go` files directly in each directory as well, counted

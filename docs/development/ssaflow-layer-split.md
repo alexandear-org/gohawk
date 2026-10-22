@@ -5,8 +5,8 @@ Status: complete.
 The requested end state has two requirements: split the SSA machinery into
 packages with explicit responsibility layers, and enforce at most twenty
 production Go files directly in every repository directory. Tests and fixture
-or external trees do not count. Generated production files do count. The limit
-has no baseline exemption.
+or external trees do not count. Generated files no longer count either; they
+are ignored build outputs. The limit has no baseline exemption.
 
 Nested packages are allowed. The limit counts direct children of each
 directory, not the sum of files in its subtree. Package boundaries still need

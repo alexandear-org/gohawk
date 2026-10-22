@@ -527,8 +527,8 @@ Direct and wrapped fresh-result searches share `result_handoffs.go`; their
 independent cleanup, wrapper, depth and result-slot checks remain unchanged.
 Invocation-only and complete summary inference also share their existing
 pass-owned callback engine in `summarize.go`. Both file consolidations preserve
-the original bodies and rationale comments. This leaves the root package at
-20 production files including generated code.
+the original bodies and rationale comments. This left the root package at
+20 production files when generated code still counted toward the limit.
 
 Mask selection has a separate generated entry point so the imported policy
 does not call back into its own dispatcher. During dogfooding, that static

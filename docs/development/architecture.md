@@ -295,11 +295,11 @@ the code cannot drift apart silently.
 |---|---|
 | `TestSourceInventoryExcludesNonProductionTrees` | source inventories exclude fixtures, generated files, tests, and dot/underscore-prefixed trees such as cached audit checkouts |
 | `TestSourceInventoryIncludesAuthoredTests` | test-inclusive invariants share the source inventory, retaining fixture/generated exclusions and deduplicating overlapping roots |
-| `TestProductionFileLimit` | every directory has at most twenty direct production Go files, including generated source and inactive build variants, without a baseline exemption |
+| `TestProductionFileLimit` | every directory has at most twenty direct authored production Go files, including inactive build variants, without a baseline exemption |
 | `TestProductionFileLimitBoundaryAndNesting` | twenty files pass and twenty-one fail; nested directories receive independent allowances |
-| `TestProductionFileLimitCountingScope` | generated production files count; tests, fixtures, hidden/underscore trees and external dependency trees do not |
+| `TestProductionFileLimitCountingScope` | inactive build variants count; generated files, tests, fixtures, hidden/underscore trees and external dependency trees do not |
 | `TestTestFileLimit` | every directory has at most twenty direct `_test.go` files, counted separately from production files; tests are grouped by behavior rather than moved, because white-box tests must stay beside their package |
-| `TestTestFileLimitCountingScope` | twenty tests and twenty production files may share a directory; generated tests count, fixture and hidden trees do not, and a twenty-first test fails |
+| `TestTestFileLimitCountingScope` | twenty tests and twenty production files may share a directory; generated tests, fixture and hidden trees do not count, and a twenty-first authored test fails |
 | `TestInternalPackagesRespectDependencyDirection` | analyzers may use shared tools; shared tools never depend on analyzers or the catalog |
 | `TestAnalyzerImplementationBoundaries` | an analyzer may use its owned implementation helpers; helpers cannot import an entry package or another analyzer |
 | `TestAnalyzerHelperPlacementPolicy` | nested helpers require an active analyzer owner and cannot declare another `Analyzer` entry point |
