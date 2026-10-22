@@ -1,14 +1,15 @@
 # Hyrule migration completion audit
 
 The objective is to use Hyrule wherever it is a strong fit across GoHawk.
-Completion remains unproven. A growing target count measures integration work,
-not the fraction of suitable policy that has been reviewed.
+The audit is complete: every authored source scope has a recorded disposition.
+A target count measures integration work, not the fraction of suitable policy
+that has been reviewed.
 
 ## Completion requirements
 
 | Requirement | Evidence needed | Current evidence |
 | --- | --- | --- |
-| Review the whole repository | Source inventory including small functions and code outside `internal` | Baseline inventory below; internal review remains open |
+| Review the whole repository | Source inventory including small functions and code outside `internal` | Baseline inventory below; every frozen scope is closed |
 | Migrate strong fits | Production consumers call generated policies and the former decision path is removed | `hyrule.yaml` and consumer diffs; integration guide maps the migrated families |
 | Keep the migration useful | Review ordered recognizers, evidence decisions and state policies; distinguish traversal and effect application | Bounded scope findings below; a branch-count threshold cannot establish this |
 | Preserve semantics | Focused boundary tests, query-order checks, relevant trace/JSON checks and repository gates | Per-batch validation; new admission tests cover precedence and reporting effects |
@@ -349,6 +350,74 @@ without further migration.
 Existing ordered-policy, flow, release and read-lock tests continue to pin
 these contracts. No source changed, so no new validation is needed.
 
+## Resource lifetime source review
+
+All 28 frozen authored files were read, including `httpacquire`,
+`resourcepolicy` and `sqlparents`, with all 33 rule sources read directly.
+Exact-scope coverage at generation `2026-10-22T02:12:03Z` reported only ignored
+generated outputs. This scope is closed without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Instruction classification | `classify.rules` owns the eleven-step label order. Native code keeps the action memo, per-candidate pool, action tracing, the one-budget-per-query opacity adapter and three-way enum projections. |
+| Candidate evaluation | Existing evaluation, acquisition, preparation and final-flow rules sequence the exclusions. Query structs, probe/pool allocation, report construction and decision tracing remain native; `Guarded` binds the collection (with its trace) before guarded-defer discovery. |
+| Path flow and returned owners | Keyed state walks, obligation transitions, edge refinement and the flow lattice are traversal over mutable state. The returned-owner chain iterates results and methods and traces each exit. Any cutoff drops the leak witness. |
+| Acquisition-error branches | `acquisition_branch.rules` and `acquisition_absence.rules` own the order. Sentinel tables, the captured-predicate walk and summary implication remain native. |
+| Consumption, opacity and carriage | Thirteen `resourcepolicy` rules own consume/store/send/call/callback/dispatch/function/closure precedence. Per-argument and per-binding censuses, depth-bounded wrapper chains and complete-only owner publication remain native. The aggregate-escape argument loop was the closest candidate: its six steps mix terminal and continue outcomes and would need a skip/escape/stop union, seven hooks and the same native driver, so it is not a strong fit. |
+| Release evidence | `releasesOrdinaryResource` is one settlement disjunction followed by a per-method completion loop over one eagerly shared storage query; only a budget-exhausted storage answer is terminal. A rule would add about seven bindings and keep the loop native. Prior-defer, paired-error and ambiguous-cleanup censuses feed the existing classify queries. |
+| Contracts, correlations and HTTP exceptions | Exact symbol catalogues, inferred owned-result contracts, optional-acquisition matching, local-collection use models and SQL parent identity are declarations plus structural matching. HTTP head, endpoint, effect, client and use rules are already generated; memoized summaries and censuses remain native. |
+
+## Concurrency facts source review
+
+All 25 frozen authored files were read, including `admission` and
+`recognition`, with the rule sources read directly. Exact-scope coverage at
+generation `2026-10-22T02:12:03Z` reported only ignored generated outputs. The
+root directory holds 20 production files including `effect_support_gen.go`,
+so a new root policy would also need a package boundary. This scope is closed
+without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Instruction and type admission | `data.rules`, `builtin.rules` and `passive.rules` own admission. Exact `sync`/`context` type contracts, atomic argument censuses and scalar sets are compact predicates. |
+| Symbolic recognition | Eight generated policies own context, origin, callback, reference, binding-root, fixed-load and path-root forms; the Go files declare symbols and extractors. |
+| Effect collection and call dispatch | `callSummary` dispatches over recognizers that are already generated, and each arm builds effect-applied summaries; cancellation must precede callback holes. A second dispatch layer would retain every hook. `loadEffect` and `appendGo` were considered and are marginal. |
+| Control-flow collectors | Kahn ordering, loop folding, path products, select walks and counted-loop retry are traversal with observable speculative collection and first-cutoff recording. |
+| Binding, identity and facts | Binding matching, stable-content proofs, canonical-load caches, all-or-nothing fact export/import and condition numbering remain native. |
+| Completion lattice and presentation | The reason lattice is interleaved with requirement collection and the operation limit. `snapshots.rules` owns clone/borrow policy; trace vocabulary and rendering stay as declarations. |
+
+## Heap model source review
+
+All 22 frozen authored files were read, including `operations`, with both rule
+sources read directly. Exact-scope coverage at generation
+`2026-10-22T02:12:03Z` reported only the two ignored generated outputs. This
+scope is closed without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Value definition and leaf storage | `definition.rules` and `leaf.rules` own recognition order and leaf kinds. Native application caches leaves except pending ones. |
+| Transfer and state lattice | Fixpoint rounds, merges, versioning, strong/weak stores and recursive content following are abstract interpretation over mutable state. |
+| Call effects and summaries | Call-application reasons interleave with call recording, consulted-generation stamping (before summary lookup) and on-demand projection. A rule would roughly double those lines and leave the effects native. Summary projection, deterministic truncation and fresh-object numbering stay together. |
+| Registry and graph cache | Locks, LRU generations, dependent invalidation and memoized reachability are lifetime and concurrency mechanics. |
+| Relationship and storage queries | `Storage.Same` and unmodified-projection proofs are short straight-line sequences whose budget fences and single give-up observer would move into bindings without clarifying precedence. Alias, escape and reaching-write searches decide inside budgeted loops. |
+| Write-once fields and presentation | Closed-world package census, verdict memo, stable codes and rendering remain native. |
+
+## Lifecycle engine source review
+
+All 33 frozen authored files were read; their content matches the freeze. All
+21 rule targets under `completionpolicy`, `completionmapping` and the local
+completion policy were read directly. Exact-scope coverage at generation
+`2026-10-22T02:12:03Z` reported only ignored generated outputs. This scope is
+closed without further migration.
+
+| Family | Disposition |
+| --- | --- |
+| Launch, callee and callback resolution | Launch, callback, binding and aggregate rules own the structural steps. Reaching walks, environment substitution, stable-storage lookups and the field/element census remain native. |
+| Target mapping and path evidence | Eight mapping rules own capture, argument, deferred, cell, receiver and path forms. Native adapters keep root walks, memo invalidation on cutoff and the rule that a cut-off prefix publishes no locals. |
+| Completion search core | `completion_local.rules` and `outcome.rules` own local completion and unproven outcomes. Saved/restored search state, memo keys, coverage censuses and method loops remain native. `searchCompletes` has only a two-step lazy prefix before an accumulating callee loop. |
+| Conditions, result guards and returned cleanup | Condition, return, retained, enclosing and context-safe rules own decoding, plans and admission. Negation recursion, edge work lists, opposing-outcome probes, relation memoization and frame walks remain native. |
+| Storage, containment and transfer evidence | Recursive store/escape/constructor walks drive different searches per arm. `proveOwnershipTransfer` is already an ordered mode/reason/predicate table; a rule would copy it and add twelve bindings. Evidence caching refuses cutoff answers. |
+| Vocabulary | Declarations and a five-case reason projection. |
+
 ## Non-Go integration inventory
 
 The tracked non-Go code inventory outside fixtures/skills contains eight Python
@@ -402,10 +471,10 @@ completion criterion, and marginal conversions do not extend this checklist.
 | `analyzers/resources/cancellationownership` | 11 | Reviewed; parent-origin and deferred-literal policies migrated |
 | `analyzers/resources/deferinloop` | 6 | Reviewed; transfer/argument policies migrated |
 | `analyzers/resources/processownership` | 13 | Reviewed; three decision families migrated |
-| `analyzers/resources/resourcelifetime` | 28 | Pending review |
-| `passes/concurrencyfacts` | 25 | Pending review |
-| `engine/heapmodel` | 22 | Pending review |
-| `engine/lifecycle` | 33 | Pending review |
+| `analyzers/resources/resourcelifetime` | 28 | Reviewed; existing rules cover substantial policies; no new migration |
+| `passes/concurrencyfacts` | 25 | Reviewed; existing rules cover substantial policies; no new migration |
+| `engine/heapmodel` | 22 | Reviewed; definition and leaf rules cover recognizers; no new migration |
+| `engine/lifecycle` | 33 | Reviewed; completion and mapping rules cover substantial policies; no new migration |
 | `engine/ssaflow` root, `path`, `valueforms`, `selection` and `ssaflowtest` | 40 | Reviewed; identity policy migrated |
 
 Analyzer and pass paths above are relative to `internal/analysis`; engine paths
@@ -414,40 +483,20 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. The lock-order review closes 24 more paths. Current source totals are
-360 authored files: 252 reviewed and 108 still awaiting review across 4 source
-scopes. All previously confirmed migrations
-are integrated; remaining candidates must come from those unreviewed scopes.
+policy. The lock-order, resource-lifetime, concurrency-facts, heap-model and
+lifecycle reviews close the final 132 paths. All 360 authored files are
+reviewed; every confirmed migration is integrated.
 
-The remaining completion steps are finite:
+## Audit closure
 
-- Close each remaining source scope above with a disposition per policy family.
-- Migrate any confirmed fit under its existing scope and close it with that scope.
-- Preserve the completed source-build/pre-commit integration corrections above
-  during the remaining migrations; reuse their current validation.
-- Run final integration validation after the remaining cohesive migrations,
-  record the outcome and close the audit. Unchanged reviewed scopes and
-  compiler contracts reuse their existing evidence.
+Every frozen scope is closed with per-family dispositions. The final five
+reviews found no further strong fit; the closest candidates are recorded with
+their reasons. Their sources were not changed. The last migration commit,
+`a245e724`, passed the full test suite and dogfood. After a test-fixture lint
+correction, focused tests and lint passed, and a CLI comparison preserved all
+117 diagnostics and 3,332 trace records. The commits that follow change only
+this document, so that evidence is the final integration validation.
 
-## Remaining audit work
-
-The internal scope still needs a complete source review with per-family
-dispositions. Earlier migration work and the integration guide establish many
-positive integrations, but do not establish that every remaining strong fit
-has been found. In particular:
-
-- Review smaller recognizers and remaining mixed policy/traversal functions.
-- Resolve conditional candidates against existing generated policies before
-  introducing new interfaces. Parent cancellation, for example, requires result
-  zero and same-function provenance; the context-origin recognizer admits a
-  different result contract and cannot be substituted without proof.
-- Review remaining schema-copy/equality candidates against their actual mutable
-  ownership contracts. A generic deep copy is not equivalent to intentional
-  borrowing or branch-local detachment.
-- Reuse the completed non-Go integration review and its validation unless the
-  generation/build/CI inputs change.
-- After remaining migrations, verify consumers and removed decision paths,
-  generation, relevant behavior and the final repository gate. Reuse unchanged
-  validation rather than repeatedly running a broad gate during discovery.
-
-The audit should close these scopes before claiming that the goal is complete.
+The source-build and pre-commit integration corrections and the non-Go
+inventory remain as reviewed. Future changes to a reviewed family reopen only
+that family.

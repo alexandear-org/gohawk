@@ -55,8 +55,8 @@ fixed-point scheduling, budgets, caches, and effect application remain in Go.
 A trivial enum switch or an already-declarative lookup table is not a migration
 requirement merely because a rule could express it.
 
-The [completion audit](hyrule-audit.md) records reviewed scopes, remaining
-questions and the evidence needed to establish repository-wide completion.
+The [completion audit](hyrule-audit.md) records the per-family disposition of
+every reviewed scope and the validation that closed the migration.
 
 The repository-wide migration covers these families. Integration is complete
 only when the consuming production path uses the rules and the old decision
