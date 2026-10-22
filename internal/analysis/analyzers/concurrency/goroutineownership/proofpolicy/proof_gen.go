@@ -15,48 +15,42 @@ func hyruleProveRecognize(harg0 struct {
 		hv2 := harg0.P1
 		_ = hv2
 		{
-			hv3, hv4, hv5, hok := (func(hinput Discovery) (hr0 bool, hr1 bool, hr2 bool, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Exhausted
-				hr1 = hvalue.Obligation
-				hr2 = hvalue.EarlyDone
-				return hr0, hr1, hr2, true
-			})(hv1)
+			hs1 := hv1
+			hv3 := hs1.Exhausted
 			_ = hv3
+			hv4 := hs1.Obligation
 			_ = hv4
+			hv5 := hs1.EarlyDone
 			_ = hv5
-			if hok {
-				if hv3 == true {
-					// Rule DiscoveryCutoff (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:7).
-					var hv16 Proof = Proof{Outcome: Unknown, Reason: DiscoveryBudgetExhausted}
-					hresult := struct{ V0 Proof }{V0: hv16}
+			if hv3 == true {
+				// Rule DiscoveryCutoff (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:7).
+				var hv16 Proof = Proof{Outcome: Unknown, Reason: DiscoveryBudgetExhausted}
+				hresult := struct{ V0 Proof }{V0: hv16}
+				if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
+					var zero struct{ V0 Proof }
+					return zero, false
+				}
+				return hresult, true
+			}
+			if hv4 == false {
+				if hv5 == true {
+					// Rule EarlyDone (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:14).
+					var hv17 Proof = Proof{Outcome: Unknown, Reason: DoneBeforeCompletion}
+					hresult := struct{ V0 Proof }{V0: hv17}
 					if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
 						var zero struct{ V0 Proof }
 						return zero, false
 					}
 					return hresult, true
 				}
-				if hv4 == false {
-					if hv5 == true {
-						// Rule EarlyDone (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:14).
-						var hv17 Proof = Proof{Outcome: Unknown, Reason: DoneBeforeCompletion}
-						hresult := struct{ V0 Proof }{V0: hv17}
-						if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
-							var zero struct{ V0 Proof }
-							return zero, false
-						}
-						return hresult, true
-					}
-					// Rule NoObligation (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:18).
-					var hv18 Proof = Proof{Outcome: Unknown, Reason: NoObligation}
-					hresult := struct{ V0 Proof }{V0: hv18}
-					if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
-						var zero struct{ V0 Proof }
-						return zero, false
-					}
-					return hresult, true
+				// Rule NoObligation (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:18).
+				var hv18 Proof = Proof{Outcome: Unknown, Reason: NoObligation}
+				hresult := struct{ V0 Proof }{V0: hv18}
+				if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
+					var zero struct{ V0 Proof }
+					return zero, false
 				}
+				return hresult, true
 			}
 		}
 		// Rule Prove (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:26).

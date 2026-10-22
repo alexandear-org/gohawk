@@ -14,21 +14,11 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/callback.rules:23).
 				var hv8 CallbackSource = CallbackSource{Kind: CallbackExact, Closure: hv3}
 				hresult := struct{ V0 CallbackSource }{V0: hv8}
@@ -38,23 +28,10 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv4 := hs1.Call
+				_ = hv4
 				{
 					hv5, hok := onceSource(hv4)
 					_ = hv5
@@ -72,23 +49,10 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				// Rule CellRead (internal/engine/lifecycle/completionpolicy/rules/callback.rules:30).
 				var hv10 CallbackSource = CallbackSource{Kind: CallbackStorage, Source: hv6}
 				hresult := struct{ V0 CallbackSource }{V0: hv10}
@@ -98,22 +62,10 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv7 := hs1
+				_ = hv7
 				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/callback.rules:33).
 				var hv11 CallbackSource = CallbackSource{Kind: CallbackStorage, Source: hv7}
 				hresult := struct{ V0 CallbackSource }{V0: hv11}

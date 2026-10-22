@@ -16,21 +16,11 @@ func hyruleCallbackInputRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport2.Value) (hwhole *hyruleImport2.Parameter, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport2.Parameter:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				if hv2 != nil {
 					{
 						var hv4 hyruleImport1.Type = (callbackValue).Type(hv3)
@@ -49,23 +39,25 @@ func hyruleCallbackInputRecognize(harg0 struct {
 						}
 					}
 				}
+				hv9 := hs1
+				_ = hv9
+				if hv2 == nil {
+					{
+						var hv10 hyruleImport1.Type = (callbackValue).Type(hv9)
+						_ = hv10
+						{
+							if functionType(hv10) {
+								// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:25).
+								return struct{ V0 bool }{V0: true}, true
+							}
+						}
+					}
+				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport2.Value) (hwhole *hyruleImport2.FreeVar, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport2.FreeVar:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				if hv2 != nil {
 					{
 						var hv7 hyruleImport1.Type = (callbackValue).Type(hv6)
@@ -84,52 +76,8 @@ func hyruleCallbackInputRecognize(harg0 struct {
 						}
 					}
 				}
-			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport2.Value) (hwhole *hyruleImport2.Parameter, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
-				if hv2 == nil {
-					{
-						var hv10 hyruleImport1.Type = (callbackValue).Type(hv9)
-						_ = hv10
-						{
-							if functionType(hv10) {
-								// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:25).
-								return struct{ V0 bool }{V0: true}, true
-							}
-						}
-					}
-				}
-			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport2.Value) (hwhole *hyruleImport2.FreeVar, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv11
-			if hok {
+				hv11 := hs1
+				_ = hv11
 				if hv2 == nil {
 					{
 						var hv12 hyruleImport1.Type = (callbackValue).Type(hv11)

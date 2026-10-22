@@ -28,75 +28,69 @@ func hyruleDiagnosticAdmissionRecognize(harg0 struct {
 		hv6 := harg0.P5
 		_ = hv6
 		{
-			hv7, hv8, hok := (func(hinput hyruleImport1.Diagnostic) (hr0 string, hr1 hyruleImport0.Pos, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Category
-				hr1 = hvalue.Pos
-				return hr0, hr1, true
-			})(hv2)
+			hs1 := hv2
+			hv7 := hs1.Category
 			_ = hv7
+			hv8 := hs1.Pos
 			_ = hv8
-			if hok {
-				// Rule Admission (internal/reporting/check/rules/report_admission.rules:21).
-				var hv14 map[string]bool = hv5
-				var hv15 string = hv7
-				hv9 := categoryIncluded(hv14, hv15)
-				_ = hv9
-				var hv16 struct{ V0 ReportingReason }
-				switch hv9 {
-				case false:
-					var hv17 map[string]bool = hv4
-					var hv18 string = hv7
-					hv10 := categoryIncluded(hv17, hv18)
-					_ = hv10
-					var hv19 struct{ V0 ReportingReason }
-					switch hv10 {
-					case true:
-						var hv20 map[string]bool = hv6
-						var hv21 string = hv7
-						hv11 := categoryIncluded(hv20, hv21)
-						_ = hv11
-						var hv22 struct{ V0 ReportingReason }
-						switch hv11 {
-						case false:
-							var hv23 *hyruleImport1.Pass = hv1
-							var hv24 hyruleImport0.Pos = hv8
-							var hv25 string = hv3
-							hv12 := Suppressed(hv23, hv24, hv25)
-							_ = hv12
-							var hv26 struct{ V0 ReportingReason }
-							switch hv12 {
-							case false:
-								var hv27 *hyruleImport1.Pass = hv1
-								var hv28 hyruleImport0.Pos = hv8
-								hv13 := TestFilePosition(hv27, hv28)
-								_ = hv13
-								var hv29 struct{ V0 ReportingReason }
-								switch hv13 {
-								case false:
-									hv29 = struct{ V0 ReportingReason }{V0: ReportingEmitted}
-								case true:
-									hv29 = struct{ V0 ReportingReason }{V0: ReportingTestFileSkipped}
-								}
-								hv26 = hv29
-							case true:
-								hv26 = struct{ V0 ReportingReason }{V0: ReportingSuppressed}
-							}
-							hv22 = hv26
-						case true:
-							hv22 = struct{ V0 ReportingReason }{V0: ReportingNotSelected}
-						}
-						hv19 = hv22
-					case false:
-						hv19 = struct{ V0 ReportingReason }{V0: ReportingUnknownCheck}
-					}
-					hv16 = hv19
+			// Rule Admission (internal/reporting/check/rules/report_admission.rules:21).
+			var hv14 map[string]bool = hv5
+			var hv15 string = hv7
+			hv9 := categoryIncluded(hv14, hv15)
+			_ = hv9
+			var hv16 struct{ V0 ReportingReason }
+			switch hv9 {
+			case false:
+				var hv17 map[string]bool = hv4
+				var hv18 string = hv7
+				hv10 := categoryIncluded(hv17, hv18)
+				_ = hv10
+				var hv19 struct{ V0 ReportingReason }
+				switch hv10 {
 				case true:
-					hv16 = struct{ V0 ReportingReason }{V0: ReportingDelisted}
+					var hv20 map[string]bool = hv6
+					var hv21 string = hv7
+					hv11 := categoryIncluded(hv20, hv21)
+					_ = hv11
+					var hv22 struct{ V0 ReportingReason }
+					switch hv11 {
+					case false:
+						var hv23 *hyruleImport1.Pass = hv1
+						var hv24 hyruleImport0.Pos = hv8
+						var hv25 string = hv3
+						hv12 := Suppressed(hv23, hv24, hv25)
+						_ = hv12
+						var hv26 struct{ V0 ReportingReason }
+						switch hv12 {
+						case false:
+							var hv27 *hyruleImport1.Pass = hv1
+							var hv28 hyruleImport0.Pos = hv8
+							hv13 := TestFilePosition(hv27, hv28)
+							_ = hv13
+							var hv29 struct{ V0 ReportingReason }
+							switch hv13 {
+							case false:
+								hv29 = struct{ V0 ReportingReason }{V0: ReportingEmitted}
+							case true:
+								hv29 = struct{ V0 ReportingReason }{V0: ReportingTestFileSkipped}
+							}
+							hv26 = hv29
+						case true:
+							hv26 = struct{ V0 ReportingReason }{V0: ReportingSuppressed}
+						}
+						hv22 = hv26
+					case true:
+						hv22 = struct{ V0 ReportingReason }{V0: ReportingNotSelected}
+					}
+					hv19 = hv22
+				case false:
+					hv19 = struct{ V0 ReportingReason }{V0: ReportingUnknownCheck}
 				}
-				return hv16, true
+				hv16 = hv19
+			case true:
+				hv16 = struct{ V0 ReportingReason }{V0: ReportingDelisted}
 			}
+			return hv16, true
 		}
 	}
 	var zero struct{ V0 ReportingReason }

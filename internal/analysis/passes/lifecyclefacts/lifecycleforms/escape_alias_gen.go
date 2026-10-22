@@ -13,135 +13,53 @@ func hyruleEscapeAliasRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (s
 			hv2, hok := valueInstruction(hv1)
 			_ = hv2
 			if hok {
-				{
-					hv3, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.ChangeType, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.ChangeType)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv3
-					if hok {
+				switch hs1 := hv2.(type) {
+				case *hyruleImport0.ChangeType:
+					if hs1 != nil {
+						hv3 := hs1
+						_ = hv3
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv3}, true
 					}
-				}
-				{
-					hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Convert, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Convert)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv4
-					if hok {
+				case *hyruleImport0.Convert:
+					if hs1 != nil {
+						hv4 := hs1
+						_ = hv4
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv4}, true
 					}
-				}
-				{
-					hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeInterface, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.MakeInterface)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv5
-					if hok {
+				case *hyruleImport0.MakeInterface:
+					if hs1 != nil {
+						hv5 := hs1
+						_ = hv5
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv5}, true
 					}
-				}
-				{
-					hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.ChangeInterface, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.ChangeInterface)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv6
-					if hok {
+				case *hyruleImport0.ChangeInterface:
+					if hs1 != nil {
+						hv6 := hs1
+						_ = hv6
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv6}, true
 					}
-				}
-				{
-					hv7, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv7
-					if hok {
+				case *hyruleImport0.FieldAddr:
+					if hs1 != nil {
+						hv7 := hs1
+						_ = hv7
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv7}, true
 					}
-				}
-				{
-					hv8, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.IndexAddr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv8
-					if hok {
+				case *hyruleImport0.IndexAddr:
+					if hs1 != nil {
+						hv8 := hs1
+						_ = hv8
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv8}, true
 					}
-				}
-				{
-					hv9, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Slice, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Slice)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv9
-					if hok {
+				case *hyruleImport0.Slice:
+					if hs1 != nil {
+						hv9 := hs1
+						_ = hv9
 						// Rule Alias (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules:22).
 						return struct{ V0 hyruleImport0.Value }{V0: hv9}, true
 					}

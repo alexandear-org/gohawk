@@ -17,42 +17,19 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.MakeClosure:
+			if hv2 != (*hyruleImport0.MakeClosure)(nil) {
 				// Rule ClosureCreation (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:36).
 				return struct {
 					V0 ownershipAction
 					V1 goroutineOwnershipReason
 				}{V0: actionNone, V1: reasonNone}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
 				var hv18 struct {
 					V0 ownershipAction
@@ -154,22 +131,10 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 				}
 				return hv18, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Select:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
 				var hv31 struct {
 					V0 ownershipAction
@@ -271,22 +236,10 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 				}
 				return hv31, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Range, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Range)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Range:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
 				var hv44 struct {
 					V0 ownershipAction
@@ -388,23 +341,10 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 				}
 				return hv44, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Send:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				// Rule Sent (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:55).
 				var hv57 *spawnAnalysis = hv1
 				var hv58 hyruleImport0.Value = hv6
@@ -428,23 +368,10 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 				}
 				return hv59, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv2)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv7 := hs1.Value
+				_ = hv7
 				// Rule Mapped (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:61).
 				var hv60 *spawnAnalysis = hv1
 				var hv61 hyruleImport0.Value = hv7

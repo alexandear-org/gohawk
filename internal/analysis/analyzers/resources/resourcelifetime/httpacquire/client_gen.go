@@ -3,7 +3,6 @@
 package httpacquire
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideHeadClientRecognize applies rules in source order; false means no rule matched.
@@ -19,21 +18,11 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Allocation (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:10).
 				var hv12 hyruleImport0.Value = hv4
 				var hv13 *hyruleImport2.SearchBudget = hv3
@@ -53,26 +42,14 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			_ = hv7
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
+				hv6 := hs1.Op
+				_ = hv6
+				hv7 := hs1
+				_ = hv7
 				if hv6 == loadToken {
 					{
 						if defaultClientValue(hv5) {
@@ -114,61 +91,32 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 						}
 					}
 				}
-			}
-		}
-		{
-			hv8, hv9, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv8
-			_ = hv9
-			if hok {
-				{
-					hv10, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Alloc)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv8)
+				hv8 := hs1.X
+				_ = hv8
+				hv9 := hs1.Op
+				_ = hv9
+				if hs2, hok := hv8.(*hyruleImport0.Alloc); hok && hs2 != nil {
+					hv10 := hs2
 					_ = hv10
-					if hok {
-						if hv9 == loadToken {
-							// Rule LocalCell (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:30).
-							var hv21 *hyruleImport0.Alloc = hv10
-							var hv22 *hyruleImport2.SearchBudget = hv3
-							hv11 := zeroClientCellWithin(hv21, hv22)
-							_ = hv11
-							var hv23 struct{ V0 Proof }
-							switch hv11 {
-							case true:
-								hv23 = struct{ V0 Proof }{V0: carriedProof(true, hv3)}
-							case false:
-								hv23 = struct{ V0 Proof }{V0: carriedProof(false, hv3)}
-							}
-							hresult := hv23
-							if !hyrulehyruledecideHeadClientRecognizeRecord10Valid(hresult) {
-								var zero struct{ V0 Proof }
-								return zero, false
-							}
-							return hresult, true
+					if hv9 == loadToken {
+						// Rule LocalCell (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:30).
+						var hv21 *hyruleImport0.Alloc = hv10
+						var hv22 *hyruleImport2.SearchBudget = hv3
+						hv11 := zeroClientCellWithin(hv21, hv22)
+						_ = hv11
+						var hv23 struct{ V0 Proof }
+						switch hv11 {
+						case true:
+							hv23 = struct{ V0 Proof }{V0: carriedProof(true, hv3)}
+						case false:
+							hv23 = struct{ V0 Proof }{V0: carriedProof(false, hv3)}
 						}
+						hresult := hv23
+						if !hyrulehyruledecideHeadClientRecognizeRecord10Valid(hresult) {
+							var zero struct{ V0 Proof }
+							return zero, false
+						}
+						return hresult, true
 					}
 				}
 			}

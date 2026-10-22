@@ -15,28 +15,14 @@ func hyruleclassifyCancellationRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule ClosureCreation (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:23).
-				hresult := struct{ V0 cancellationLabel }{V0: cancellationLabel{action: cancellationActionNone, reason: reasonCancellationNone}}
-				if !hyrulehyruleclassifyCancellationRecognizeRecord5Valid(hresult) {
-					var zero struct{ V0 cancellationLabel }
-					return zero, false
-				}
-				return hresult, true
+		if hs1, hok := hv1.(*hyruleImport0.MakeClosure); hok && hs1 != nil {
+			// Rule ClosureCreation (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:23).
+			hresult := struct{ V0 cancellationLabel }{V0: cancellationLabel{action: cancellationActionNone, reason: reasonCancellationNone}}
+			if !hyrulehyruleclassifyCancellationRecognizeRecord5Valid(hresult) {
+				var zero struct{ V0 cancellationLabel }
+				return zero, false
 			}
+			return hresult, true
 		}
 		// Rule Instruction (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:26).
 		var hv13 struct{ V0 cancellationLabel }

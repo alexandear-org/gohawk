@@ -9,21 +9,11 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Defer:
+			if hs1 != nil {
+				hv2 := hs1
+				_ = hv2
 				// Rule Deferred (internal/engine/lifecycle/completionpolicy/rules/launch.rules:26).
 				var hv9 *hyruleImport0.CallCommon = commonOf(hv2)
 				var hv10 Callee = Callee{Kind: CalleeCommon, Launch: LaunchDeferred, Common: hv9, AllowOnceFunc: true}
@@ -34,22 +24,10 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Go, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.Go:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Started (internal/engine/lifecycle/completionpolicy/rules/launch.rules:30).
 				var hv11 *hyruleImport0.CallCommon = commonOf(hv3)
 				var hv12 Callee = Callee{Kind: CalleeCommon, Launch: LaunchStarted, Common: hv11, AllowOnceFunc: false}
@@ -60,23 +38,10 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv4 := hs1.Call
+				_ = hv4
 				{
 					hv5, hok := groupCallback(hv4)
 					_ = hv5
@@ -105,25 +70,10 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 						return hresult, true
 					}
 				}
-			}
-		}
-		{
-			hv7, hv8, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv7
-			_ = hv8
-			if hok {
+				hv7 := hs1.Call
+				_ = hv7
+				hv8 := hs1
+				_ = hv8
 				// Rule Called (internal/engine/lifecycle/completionpolicy/rules/launch.rules:43).
 				var hv15 *hyruleImport0.CallCommon = commonOf(hv8)
 				var hv16 Callee = Callee{Kind: CalleeCommon, Launch: LaunchCalled, Common: hv15, AllowOnceFunc: false}

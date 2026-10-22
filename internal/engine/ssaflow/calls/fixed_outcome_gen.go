@@ -2,7 +2,6 @@
 
 package calls
 
-import hyruleImport0 "go/constant"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruledecideFixedOutcomeRecognize applies rules in source order; false means no rule matched.
@@ -28,22 +27,11 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 				V1 bool
 			}{V0: hv2, V1: true}, true
 		}
-		{
-			hv4, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.Const:
+			if hs1 != nil {
+				hv4 := hs1.Value
+				_ = hv4
 				{
 					hv5, hok := outcomeBoolean(hv4)
 					_ = hv5
@@ -68,25 +56,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 						}
 					}
 				}
-			}
-		}
-		{
-			hv6, hv7, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Value, hwhole *hyruleImport1.Const, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv6
-			_ = hv7
-			if hok {
+				hv6 := hs1.Value
+				_ = hv6
+				hv7 := hs1
+				_ = hv7
 				if hv3 == false {
 					{
 						if outcomeNil(hv7) {
@@ -99,22 +72,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport1.Alloc:
+			if hs1 != nil {
+				hv8 := hs1
+				_ = hv8
 				if hv3 == false {
 					{
 						if outcomeNilable(hv8) {
@@ -127,22 +88,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeMap, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeMap)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport1.MakeMap:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				if hv3 == false {
 					{
 						if outcomeNilable(hv9) {
@@ -155,22 +104,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeSlice, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeSlice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport1.MakeSlice:
+			if hs1 != nil {
+				hv10 := hs1
+				_ = hv10
 				if hv3 == false {
 					{
 						if outcomeNilable(hv10) {
@@ -183,22 +120,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeChan, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeChan)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv11
-			if hok {
+		case *hyruleImport1.MakeChan:
+			if hs1 != nil {
+				hv11 := hs1
+				_ = hv11
 				if hv3 == false {
 					{
 						if outcomeNilable(hv11) {
@@ -211,22 +136,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv12
-			if hok {
+		case *hyruleImport1.MakeClosure:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				if hv3 == false {
 					{
 						if outcomeNilable(hv12) {
@@ -239,22 +152,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv13, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeInterface, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv13
-			if hok {
+		case *hyruleImport1.MakeInterface:
+			if hs1 != nil {
+				hv13 := hs1
+				_ = hv13
 				if hv3 == false {
 					{
 						if outcomeNilable(hv13) {
@@ -267,22 +168,10 @@ func hyruledecideFixedOutcomeRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Function, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Function)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv14
-			if hok {
+		case *hyruleImport1.Function:
+			if hs1 != nil {
+				hv14 := hs1
+				_ = hv14
 				if hv3 == false {
 					{
 						if outcomeNilable(hv14) {

@@ -14,51 +14,38 @@ func hyruleCallbackCallRecognize(harg0 struct{ P0 hyruleImport0.CallInstruction 
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.CallInstruction) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
+		if hs1, hok := hv1.(*hyruleImport0.Call); hok && hs1 != nil {
+			hv2 := hs1
 			_ = hv2
-			if hok {
+			{
+				var hv3 *hyruleImport0.CallCommon = (*callbackCall).Common(hv2)
+				_ = hv3
 				{
-					var hv3 *hyruleImport0.CallCommon = (*callbackCall).Common(hv2)
-					_ = hv3
-					{
-						var hv4 bool = (*callCommon).IsInvoke(hv3)
-						_ = hv4
-						if hv4 == true {
+					var hv4 bool = (*callCommon).IsInvoke(hv3)
+					_ = hv4
+					if hv4 == true {
+						{
+							var hv5 hyruleImport0.Value = hv3.Value
+							_ = hv5
 							{
-								var hv5 hyruleImport0.Value = hv3.Value
-								_ = hv5
+								var hv6 *hyruleImport1.Func = hv3.Method
+								_ = hv6
 								{
-									var hv6 *hyruleImport1.Func = hv3.Method
-									_ = hv6
-									{
-										if CallbackInput(hv5, hv6) {
-											{
-												if inertArguments(hv3) {
+									if CallbackInput(hv5, hv6) {
+										{
+											if inertArguments(hv3) {
+												{
+													var hv7 hyruleImport0.Value = hv3.Value
+													_ = hv7
 													{
-														var hv7 hyruleImport0.Value = hv3.Value
-														_ = hv7
-														{
-															var hv8 *hyruleImport1.Func = hv3.Method
-															_ = hv8
-															// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:14).
-															return struct {
-																V0 hyruleImport0.Value
-																V1 *hyruleImport1.Func
-																V2 bool
-															}{V0: hv7, V1: hv8, V2: true}, true
-														}
+														var hv8 *hyruleImport1.Func = hv3.Method
+														_ = hv8
+														// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:14).
+														return struct {
+															V0 hyruleImport0.Value
+															V1 *hyruleImport1.Func
+															V2 bool
+														}{V0: hv7, V1: hv8, V2: true}, true
 													}
 												}
 											}
@@ -69,34 +56,34 @@ func hyruleCallbackCallRecognize(harg0 struct{ P0 hyruleImport0.CallInstruction 
 						}
 					}
 				}
+			}
+			{
+				var hv9 *hyruleImport0.CallCommon = (*callbackCall).Common(hv2)
+				_ = hv9
 				{
-					var hv9 *hyruleImport0.CallCommon = (*callbackCall).Common(hv2)
-					_ = hv9
-					{
-						var hv10 bool = (*callCommon).IsInvoke(hv9)
-						_ = hv10
-						if hv10 == false {
-							{
-								var hv11 *hyruleImport0.Function = (*callCommon).StaticCallee(hv9)
-								_ = hv11
-								if hv11 == nil {
+					var hv10 bool = (*callCommon).IsInvoke(hv9)
+					_ = hv10
+					if hv10 == false {
+						{
+							var hv11 *hyruleImport0.Function = (*callCommon).StaticCallee(hv9)
+							_ = hv11
+							if hv11 == nil {
+								{
+									var hv12 hyruleImport0.Value = hv9.Value
+									_ = hv12
 									{
-										var hv12 hyruleImport0.Value = hv9.Value
-										_ = hv12
-										{
-											if CallbackInput(hv12, nil) {
-												{
-													if inertArguments(hv9) {
-														{
-															var hv13 hyruleImport0.Value = hv9.Value
-															_ = hv13
-															// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:24).
-															return struct {
-																V0 hyruleImport0.Value
-																V1 *hyruleImport1.Func
-																V2 bool
-															}{V0: hv13, V1: nil, V2: true}, true
-														}
+										if CallbackInput(hv12, nil) {
+											{
+												if inertArguments(hv9) {
+													{
+														var hv13 hyruleImport0.Value = hv9.Value
+														_ = hv13
+														// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:24).
+														return struct {
+															V0 hyruleImport0.Value
+															V1 *hyruleImport1.Func
+															V2 bool
+														}{V0: hv13, V1: nil, V2: true}, true
 													}
 												}
 											}

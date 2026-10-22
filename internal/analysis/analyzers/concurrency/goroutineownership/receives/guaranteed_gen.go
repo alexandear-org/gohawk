@@ -14,46 +14,33 @@ func hyruledecideGuaranteedRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
+		if hs1, hok := hv1.(*hyruleImport0.Select); hok && hs1 != nil {
+			hv3 := hs1
 			_ = hv3
-			if hok {
-				// Rule Select (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules:11).
-				var hv8 hyruleImport0.Instruction = hv3
-				var hv9 func(hyruleImport0.Value) bool = hv2
-				hv4 := SelectedAtEntry(hv8, hv9)
-				_ = hv4
-				var hv10 struct{ V0 bool }
-				switch hv4 {
+			// Rule Select (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules:11).
+			var hv8 hyruleImport0.Instruction = hv3
+			var hv9 func(hyruleImport0.Value) bool = hv2
+			hv4 := SelectedAtEntry(hv8, hv9)
+			_ = hv4
+			var hv10 struct{ V0 bool }
+			switch hv4 {
+			case true:
+				hv10 = struct{ V0 bool }{V0: true}
+			case false:
+				var hv11 *hyruleImport0.Select = hv3
+				var hv12 func(hyruleImport0.Value) bool = hv2
+				hv5 := selectGuaranteed(hv11, hv12)
+				_ = hv5
+				var hv13 struct{ V0 bool }
+				switch hv5 {
 				case true:
-					hv10 = struct{ V0 bool }{V0: true}
+					hv13 = struct{ V0 bool }{V0: true}
 				case false:
-					var hv11 *hyruleImport0.Select = hv3
-					var hv12 func(hyruleImport0.Value) bool = hv2
-					hv5 := selectGuaranteed(hv11, hv12)
-					_ = hv5
-					var hv13 struct{ V0 bool }
-					switch hv5 {
-					case true:
-						hv13 = struct{ V0 bool }{V0: true}
-					case false:
-						hv13 = struct{ V0 bool }{V0: false}
-					}
-					hv10 = hv13
+					hv13 = struct{ V0 bool }{V0: false}
 				}
-				return hv10, true
+				hv10 = hv13
 			}
+			return hv10, true
 		}
 		// Rule Other (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules:19).
 		var hv14 hyruleImport0.Instruction = hv1

@@ -19,34 +19,20 @@ func hyrulerecognizeCancellationArgumentRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport1.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Launched (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:20).
-				hresult := struct {
+		if hs1, hok := hv1.(*hyruleImport1.Go); hok && hs1 != nil {
+			// Rule Launched (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:20).
+			hresult := struct {
+				V0 cancellationLabel
+				V1 bool
+			}{V0: cancellationLabel{action: cancellationActionUnknown, reason: reasonLabelLaunchedHelper}, V1: true}
+			if !hyrulehyrulerecognizeCancellationArgumentRecognizeUnion2Valid(hresult) {
+				var zero struct {
 					V0 cancellationLabel
 					V1 bool
-				}{V0: cancellationLabel{action: cancellationActionUnknown, reason: reasonLabelLaunchedHelper}, V1: true}
-				if !hyrulehyrulerecognizeCancellationArgumentRecognizeUnion2Valid(hresult) {
-					var zero struct {
-						V0 cancellationLabel
-						V1 bool
-					}
-					return zero, false
 				}
-				return hresult, true
+				return zero, false
 			}
+			return hresult, true
 		}
 		// Rule Argument (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:25).
 		var hv8 *cancellationClassifier = hv2

@@ -18,66 +18,39 @@ func hyruleclassifyParentOriginRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv1)
+		if hs1, hok := hv1.(*hyruleImport0.Extract); hok && hs1 != nil {
+			hv4 := hs1.Tuple
 			_ = hv4
+			hv5 := hs1.Index
 			_ = hv5
-			if hok {
-				{
-					hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Call, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Call)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv4)
-					_ = hv6
-					if hok {
-						if hv5 == 0 {
-							{
-								if sameParentFrame(hv6, hv2) {
-									// Rule Parent (internal/analysis/analyzers/resources/cancellationownership/rules/parent.rules:23).
-									var hv9 *hyruleImport0.Call = hv6
-									hv7part0, hv7part1 := parentCancelResult(hv9)
-									hv7 := struct {
-										V0 hyruleImport0.Value
-										V1 bool
-									}{V0: hv7part0, V1: hv7part1}
-									_ = hv7
-									if !hyrulehyruleclassifyParentOriginRecognizeUnion0Valid(hv7) {
-										var zero struct{ V0 *cancellationClassifier }
-										return zero, false
-									}
-									var hv10 struct{ V0 *cancellationClassifier }
-									switch hv7.V1 {
-									case true:
-										hv8 := hv7.V0
-										_ = hv8
-										hv10 = struct{ V0 *cancellationClassifier }{V0: newParentClassifier(hv8, hv3)}
-									case false:
-										hv10 = struct{ V0 *cancellationClassifier }{V0: nil}
-									}
-									return hv10, true
-								}
+			if hs2, hok := hv4.(*hyruleImport0.Call); hok && hs2 != nil {
+				hv6 := hs2
+				_ = hv6
+				if hv5 == 0 {
+					{
+						if sameParentFrame(hv6, hv2) {
+							// Rule Parent (internal/analysis/analyzers/resources/cancellationownership/rules/parent.rules:23).
+							var hv9 *hyruleImport0.Call = hv6
+							hv7part0, hv7part1 := parentCancelResult(hv9)
+							hv7 := struct {
+								V0 hyruleImport0.Value
+								V1 bool
+							}{V0: hv7part0, V1: hv7part1}
+							_ = hv7
+							if !hyrulehyruleclassifyParentOriginRecognizeUnion0Valid(hv7) {
+								var zero struct{ V0 *cancellationClassifier }
+								return zero, false
 							}
+							var hv10 struct{ V0 *cancellationClassifier }
+							switch hv7.V1 {
+							case true:
+								hv8 := hv7.V0
+								_ = hv8
+								hv10 = struct{ V0 *cancellationClassifier }{V0: newParentClassifier(hv8, hv3)}
+							case false:
+								hv10 = struct{ V0 *cancellationClassifier }{V0: nil}
+							}
+							return hv10, true
 						}
 					}
 				}

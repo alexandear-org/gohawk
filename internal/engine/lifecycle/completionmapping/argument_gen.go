@@ -29,51 +29,46 @@ func hyruleArgumentRecognize(harg0 struct {
 		hv5 := harg0.P4
 		_ = hv5
 		{
-			hv6, hv7, hok := (func(hinput Context) (hr0 bool, hwhole Context, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Exact
-				return hr0, hvalue, true
-			})(hv1)
+			hs1 := hv1
+			hv6 := hs1.Exact
 			_ = hv6
+			hv7 := hs1
 			_ = hv7
-			if hok {
-				if hv6 == true {
-					// Rule Exact (internal/engine/lifecycle/completionmapping/rules/argument.rules:3).
-					var hv24 Context = hv7
-					var hv25 hyruleImport2.Value = hv3
-					var hv26 hyruleImport2.Value = hv4
-					hv8 := same(hv24, hv25, hv26)
-					_ = hv8
-					var hv27 struct {
+			if hv6 == true {
+				// Rule Exact (internal/engine/lifecycle/completionmapping/rules/argument.rules:3).
+				var hv24 Context = hv7
+				var hv25 hyruleImport2.Value = hv3
+				var hv26 hyruleImport2.Value = hv4
+				hv8 := same(hv24, hv25, hv26)
+				_ = hv8
+				var hv27 struct {
+					V0 Local
+					V1 bool
+				}
+				switch hv8 {
+				case true:
+					var hv28 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
+					hv27 = struct {
+						V0 Local
+						V1 bool
+					}{V0: hv28, V1: true}
+				case false:
+					var hv29 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
+					var hv30 bool = identical(hv3, hv4)
+					hv27 = struct {
+						V0 Local
+						V1 bool
+					}{V0: hv29, V1: hv30}
+				}
+				hresult := hv27
+				if !hyrulehyruleArgumentRecognizeRecord3Valid(hresult) {
+					var zero struct {
 						V0 Local
 						V1 bool
 					}
-					switch hv8 {
-					case true:
-						var hv28 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
-						hv27 = struct {
-							V0 Local
-							V1 bool
-						}{V0: hv28, V1: true}
-					case false:
-						var hv29 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
-						var hv30 bool = identical(hv3, hv4)
-						hv27 = struct {
-							V0 Local
-							V1 bool
-						}{V0: hv29, V1: hv30}
-					}
-					hresult := hv27
-					if !hyrulehyruleArgumentRecognizeRecord3Valid(hresult) {
-						var zero struct {
-							V0 Local
-							V1 bool
-						}
-						return zero, false
-					}
-					return hresult, true
+					return zero, false
 				}
+				return hresult, true
 			}
 		}
 		// Rule Argument (internal/engine/lifecycle/completionmapping/rules/argument.rules:13).

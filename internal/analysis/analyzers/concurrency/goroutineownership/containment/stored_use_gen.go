@@ -21,24 +21,13 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				hr1 = hvalue.Val
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv5
-			_ = hv6
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv5 := hs1.Addr
+				_ = hv5
+				hv6 := hs1.Val
+				_ = hv6
 				{
 					if sameValue(hv5, hv3) {
 						// Rule Store (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:8).
@@ -58,24 +47,12 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv7, hv8, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv7
-			_ = hv8
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
+				hv8 := hs1
+				_ = hv8
 				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:18).
 				var hv16 hyruleImport1.ReachingWalk = hv1
 				var hv17 hyruleImport0.Value = hv8
@@ -91,24 +68,12 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 				}
 				return hv19, true
 			}
-		}
-		{
-			hv9, hv10, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.IndexAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv9
-			_ = hv10
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv9 := hs1.X
+				_ = hv9
+				hv10 := hs1
+				_ = hv10
 				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:18).
 				var hv20 hyruleImport1.ReachingWalk = hv1
 				var hv21 hyruleImport0.Value = hv10

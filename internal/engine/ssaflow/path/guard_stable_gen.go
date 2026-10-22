@@ -3,7 +3,6 @@
 package path
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideStableGuardRecognize applies rules in source order; false means no rule matched.
@@ -21,21 +20,11 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Parameter, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Parameter:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				{
 					if booleanValue(hv3) {
 						// Rule Parameter (internal/engine/ssaflow/path/rules/guard_stable.rules:10).
@@ -48,28 +37,16 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv4, hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hr2 hyruleImport1.Token, hwhole *hyruleImport0.BinOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Y
-				hr2 = hvalue.Op
-				return hr0, hr1, hr2, hvalue, true
-			})(hv1)
-			_ = hv4
-			_ = hv5
-			_ = hv6
-			_ = hv7
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
+				hv5 := hs1.Y
+				_ = hv5
+				hv6 := hs1.Op
+				_ = hv6
+				hv7 := hs1
+				_ = hv7
 				if hv6 == guardEqualToken {
 					// Rule Equality (internal/engine/ssaflow/path/rules/guard_stable.rules:18).
 					var hv18 struct {

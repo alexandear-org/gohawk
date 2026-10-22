@@ -20,34 +20,20 @@ func hyruleClosureFinishRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
-				// Rule Started (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:11).
-				hresult := struct {
+		if hs1, hok := hv2.(*hyruleImport0.Go); hok && hs1 != nil {
+			// Rule Started (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:11).
+			hresult := struct {
+				V0 Reason
+				V1 bool
+			}{V0: CapturedByStartedLiteral, V1: true}
+			if !hyrulehyruleClosureFinishRecognizeUnion2Valid(hresult) {
+				var zero struct {
 					V0 Reason
 					V1 bool
-				}{V0: CapturedByStartedLiteral, V1: true}
-				if !hyrulehyruleClosureFinishRecognizeUnion2Valid(hresult) {
-					var zero struct {
-						V0 Reason
-						V1 bool
-					}
-					return zero, false
 				}
-				return hresult, true
+				return zero, false
 			}
+			return hresult, true
 		}
 		// Rule Local (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:19).
 		var hv6 ClosureQueries = hv1

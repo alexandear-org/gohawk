@@ -2,7 +2,6 @@
 
 package operations
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleDefineRecognize applies rules in source order; false means no rule matched.
@@ -10,32 +9,19 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.SliceToArrayPointer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.SliceToArrayPointer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv1)
+		if hs1, hok := hv1.(*hyruleImport0.SliceToArrayPointer); hok && hs1 != nil {
+			hv2 := hs1.X
 			_ = hv2
+			hv3 := hs1
 			_ = hv3
-			if hok {
-				// Rule ArrayPointer (internal/engine/heapmodel/operations/rules/definition.rules:62).
-				var hv31 Definition = Definition{Kind: Alias, Value: hv3, Source: hv2}
-				hresult := struct{ V0 Definition }{V0: hv31}
-				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
-					var zero struct{ V0 Definition }
-					return zero, false
-				}
-				return hresult, true
+			// Rule ArrayPointer (internal/engine/heapmodel/operations/rules/definition.rules:62).
+			var hv31 Definition = Definition{Kind: Alias, Value: hv3, Source: hv2}
+			hresult := struct{ V0 Definition }{V0: hv31}
+			if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
+				var zero struct{ V0 Definition }
+				return zero, false
 			}
+			return hresult, true
 		}
 		{
 			hv4, hok := wrapper(hv1)
@@ -51,25 +37,15 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				return hresult, true
 			}
 		}
-		{
-			hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Field
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			_ = hv7
-			if hok {
+		switch hs2 := hv1.(type) {
+		case *hyruleImport0.FieldAddr:
+			if hs2 != nil {
+				hv5 := hs2.X
+				_ = hv5
+				hv6 := hs2.Field
+				_ = hv6
+				hv7 := hs2
+				_ = hv7
 				// Rule FieldAddress (internal/engine/heapmodel/operations/rules/definition.rules:68).
 				var hv33 Definition = Definition{Kind: FieldAddress, Value: hv7, Source: hv5, Field: hv6}
 				hresult := struct{ V0 Definition }{V0: hv33}
@@ -79,26 +55,14 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv8, hv9, hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hwhole *hyruleImport0.Field, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Field)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Field
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv8
-			_ = hv9
-			_ = hv10
-			if hok {
+		case *hyruleImport0.Field:
+			if hs2 != nil {
+				hv8 := hs2.X
+				_ = hv8
+				hv9 := hs2.Field
+				_ = hv9
+				hv10 := hs2
+				_ = hv10
 				// Rule FieldLoad (internal/engine/heapmodel/operations/rules/definition.rules:72).
 				var hv34 Definition = Definition{Kind: FieldLoad, Value: hv10, Source: hv8, Field: hv9}
 				hresult := struct{ V0 Definition }{V0: hv34}
@@ -108,26 +72,14 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv11, hv12, hv13, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hwhole *hyruleImport0.IndexAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv11
-			_ = hv12
-			_ = hv13
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs2 != nil {
+				hv11 := hs2.X
+				_ = hv11
+				hv12 := hs2.Index
+				_ = hv12
+				hv13 := hs2
+				_ = hv13
 				// Rule IndexAddress (internal/engine/heapmodel/operations/rules/definition.rules:76).
 				var hv35 Definition = Definition{Kind: IndexAddress, Value: hv13, Source: hv11, Index: hv12}
 				hresult := struct{ V0 Definition }{V0: hv35}
@@ -137,26 +89,14 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv14, hv15, hv16, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hwhole *hyruleImport0.Index, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv14
-			_ = hv15
-			_ = hv16
-			if hok {
+		case *hyruleImport0.Index:
+			if hs2 != nil {
+				hv14 := hs2.X
+				_ = hv14
+				hv15 := hs2.Index
+				_ = hv15
+				hv16 := hs2
+				_ = hv16
 				// Rule IndexLoad (internal/engine/heapmodel/operations/rules/definition.rules:80).
 				var hv36 Definition = Definition{Kind: IndexLoad, Value: hv16, Source: hv14, Index: hv15}
 				hresult := struct{ V0 Definition }{V0: hv36}
@@ -166,22 +106,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv17, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Slice, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv17
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs2 != nil {
+				hv17 := hs2
+				_ = hv17
 				// Rule Slice (internal/engine/heapmodel/operations/rules/definition.rules:84).
 				var hv37 Definition = Definition{Kind: Sliced, Slice: hv17}
 				hresult := struct{ V0 Definition }{V0: hv37}
@@ -191,26 +119,14 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv18, hv19, hv20, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv18
-			_ = hv19
-			_ = hv20
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs2 != nil {
+				hv18 := hs2.X
+				_ = hv18
+				hv19 := hs2.Op
+				_ = hv19
+				hv20 := hs2
+				_ = hv20
 				if hv19 == loadToken {
 					// Rule Load (internal/engine/heapmodel/operations/rules/definition.rules:87).
 					var hv38 Definition = Definition{Kind: Load, Value: hv20, Source: hv18}
@@ -222,26 +138,14 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv21, hv22, hv23, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 bool, hwhole *hyruleImport0.TypeAssert, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.CommaOk
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv21
-			_ = hv22
-			_ = hv23
-			if hok {
+		case *hyruleImport0.TypeAssert:
+			if hs2 != nil {
+				hv21 := hs2.X
+				_ = hv21
+				hv22 := hs2.CommaOk
+				_ = hv22
+				hv23 := hs2
+				_ = hv23
 				if hv22 == false {
 					// Rule Assertion (internal/engine/heapmodel/operations/rules/definition.rules:92).
 					var hv39 Definition = Definition{Kind: Alias, Value: hv23, Source: hv21}
@@ -253,22 +157,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv24, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeMap, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeMap)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv24
-			if hok {
+		case *hyruleImport0.MakeMap:
+			if hs2 != nil {
+				hv24 := hs2
+				_ = hv24
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv40 Definition = Definition{Kind: Opaque, Value: hv24}
 				hresult := struct{ V0 Definition }{V0: hv40}
@@ -278,22 +170,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv25, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeChan, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeChan)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv25
-			if hok {
+		case *hyruleImport0.MakeChan:
+			if hs2 != nil {
+				hv25 := hs2
+				_ = hv25
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv41 Definition = Definition{Kind: Opaque, Value: hv25}
 				hresult := struct{ V0 Definition }{V0: hv41}
@@ -303,22 +183,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv26, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeSlice, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeSlice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv26
-			if hok {
+		case *hyruleImport0.MakeSlice:
+			if hs2 != nil {
+				hv26 := hs2
+				_ = hv26
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv42 Definition = Definition{Kind: Opaque, Value: hv26}
 				hresult := struct{ V0 Definition }{V0: hv42}
@@ -328,22 +196,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv27, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Range, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Range)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv27
-			if hok {
+		case *hyruleImport0.Range:
+			if hs2 != nil {
+				hv27 := hs2
+				_ = hv27
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv43 Definition = Definition{Kind: Opaque, Value: hv27}
 				hresult := struct{ V0 Definition }{V0: hv43}
@@ -353,22 +209,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv28, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Next, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Next)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv28
-			if hok {
+		case *hyruleImport0.Next:
+			if hs2 != nil {
+				hv28 := hs2
+				_ = hv28
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv44 Definition = Definition{Kind: Opaque, Value: hv28}
 				hresult := struct{ V0 Definition }{V0: hv44}
@@ -378,22 +222,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv29, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.BinOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv29
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs2 != nil {
+				hv29 := hs2
+				_ = hv29
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv45 Definition = Definition{Kind: Opaque, Value: hv29}
 				hresult := struct{ V0 Definition }{V0: hv45}
@@ -403,22 +235,10 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv30, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MultiConvert, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MultiConvert)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv30
-			if hok {
+		case *hyruleImport0.MultiConvert:
+			if hs2 != nil {
+				hv30 := hs2
+				_ = hv30
 				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
 				var hv46 Definition = Definition{Kind: Opaque, Value: hv30}
 				hresult := struct{ V0 Definition }{V0: hv46}

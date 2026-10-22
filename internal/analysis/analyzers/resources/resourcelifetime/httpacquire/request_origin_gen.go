@@ -18,82 +18,47 @@ func hyruledecideRequestOriginRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hv5, hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hwhole *hyruleImport0.Extract, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				hr1 = hvalue.Index
-				return hr0, hr1, hvalue, true
-			})(hv3)
-			_ = hv4
-			_ = hv5
-			_ = hv6
-			if hok {
-				{
-					hv7, hv8, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Call)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Call
-						return hr0, hvalue, true
-					})(hv4)
+		switch hs1 := hv3.(type) {
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv4 := hs1.Tuple
+				_ = hv4
+				hv5 := hs1.Index
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
+				if hs2, hok := hv4.(*hyruleImport0.Call); hok && hs2 != nil {
+					hv7 := hs2.Call
 					_ = hv7
+					hv8 := hs2
 					_ = hv8
-					if hok {
-						if hv5 == 0 {
-							{
-								if constructorCall(hv8) {
-									// Rule Constructor (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:10).
-									var hv14 headRequestQuery = hv1
-									var hv15 hyruleImport0.Value = hv6
-									hv9 := (headRequestQuery).preserve(hv14, hv15)
-									_ = hv9
-									var hv16 struct{ V0 bool }
-									switch hv9 {
-									case true:
-										hv16 = struct{ V0 bool }{V0: true}
-									case false:
-										hv16 = struct{ V0 bool }{V0: false}
-									}
-									return hv16, true
+					if hv5 == 0 {
+						{
+							if constructorCall(hv8) {
+								// Rule Constructor (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:10).
+								var hv14 headRequestQuery = hv1
+								var hv15 hyruleImport0.Value = hv6
+								hv9 := (headRequestQuery).preserve(hv14, hv15)
+								_ = hv9
+								var hv16 struct{ V0 bool }
+								switch hv9 {
+								case true:
+									hv16 = struct{ V0 bool }{V0: true}
+								case false:
+									hv16 = struct{ V0 bool }{V0: false}
 								}
+								return hv16, true
 							}
 						}
 					}
 				}
 			}
-		}
-		{
-			hv9, hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv3)
-			_ = hv9
-			_ = hv10
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv9 := hs1.Call
+				_ = hv9
+				hv10 := hs1
+				_ = hv10
 				{
 					hv11, hok := requestRebinding(hv9)
 					_ = hv11

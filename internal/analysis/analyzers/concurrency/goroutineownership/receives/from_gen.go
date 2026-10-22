@@ -3,7 +3,6 @@
 package receives
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport0 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruledecideFromRecognize applies rules in source order; false means no rule matched.
@@ -19,24 +18,13 @@ func hyruledecideFromRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hv5, hok := (func(hinput hyruleImport1.Instruction) (hr0 hyruleImport0.Token, hr1 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv4
-			_ = hv5
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.UnOp:
+			if hs1 != nil {
+				hv4 := hs1.Op
+				_ = hv4
+				hv5 := hs1.X
+				_ = hv5
 				if hv4 == receiveToken {
 					// Rule Receive (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:8).
 					var hv9 func(hyruleImport1.Value) bool = hv2
@@ -53,22 +41,10 @@ func hyruledecideFromRecognize(harg0 struct {
 					return hv11, true
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport1.Select:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				// Rule Select (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:16).
 				var hv12 *hyruleImport1.Select = hv6
 				var hv13 func(hyruleImport1.Value) bool = hv2
@@ -84,23 +60,10 @@ func hyruledecideFromRecognize(harg0 struct {
 				}
 				return hv15, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport1.Instruction) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Range)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport1.Range:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
 				{
 					if channelRange(hv7) {
 						// Rule Range (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:22).

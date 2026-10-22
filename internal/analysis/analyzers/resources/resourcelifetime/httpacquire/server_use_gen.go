@@ -15,23 +15,13 @@ func hyruledecideServerUseRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 int, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Field
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv3
-			_ = hv4
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv3 := hs1.Field
+				_ = hv3
+				hv4 := hs1
+				_ = hv4
 				if hv3 == 0 {
 					{
 						if hasReferrers(hv4) {
@@ -52,24 +42,12 @@ func hyruledecideServerUseRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv5 := hs1.Call
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
 				{
 					if serverClientCall(hv6) {
 						// Rule Client (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:19).

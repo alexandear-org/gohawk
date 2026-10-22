@@ -2,7 +2,6 @@
 
 package resultfacts
 
-import hyruleImport0 "go/constant"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruleclassifyResultLeafRecognize applies rules in source order; false means no rule matched.
@@ -10,47 +9,21 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Value, hwhole *hyruleImport1.Const, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.Const:
+			if hs1 != nil {
+				hv2 := hs1.Value
+				_ = hv2
+				hv3 := hs1
+				_ = hv3
 				{
 					if resultNilConstant(hv3) {
 						// Rule NilConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:31).
 						return struct{ V0 Guarantee }{V0: AlwaysNil}, true
 					}
 				}
-			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+				hv4 := hs1.Value
+				_ = hv4
 				{
 					hv5, hok := resultBooleanLiteral(hv4)
 					_ = hv5
@@ -66,23 +39,10 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 					}
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport1.MakeInterface:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				{
 					if resultConcreteBox(hv6) {
 						// Rule ConcreteBox (internal/analysis/passes/resultfacts/rules/leaf.rules:45).
@@ -90,111 +50,8 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 					}
 				}
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
-				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeChan)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
-				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeMap)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
-				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeSlice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
-				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Function)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
-				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport1.Alloc, *hyruleImport1.MakeChan, *hyruleImport1.MakeMap, *hyruleImport1.MakeSlice, *hyruleImport1.Function, *hyruleImport1.MakeClosure:
+			if hv1 != (*hyruleImport1.Alloc)(nil) && hv1 != (*hyruleImport1.MakeChan)(nil) && hv1 != (*hyruleImport1.MakeMap)(nil) && hv1 != (*hyruleImport1.MakeSlice)(nil) && hv1 != (*hyruleImport1.Function)(nil) && hv1 != (*hyruleImport1.MakeClosure)(nil) {
 				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
 				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
 			}

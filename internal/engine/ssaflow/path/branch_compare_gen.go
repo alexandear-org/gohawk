@@ -2,7 +2,6 @@
 
 package path
 
-import hyruleImport0 "go/constant"
 import hyruleImport2 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
@@ -32,43 +31,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardEqualToken {
-			{
-				hv4, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs1 := hv2; hs1 != nil {
+				hv4 := hs1.Value
 				_ = hv4
-				if hok {
+				if hs2 := hv3; hs2 != nil {
+					hv5 := hs2.Value
+					_ = hv5
 					{
-						hv5, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv5
-						if hok {
+						if guardConstantPresent(hv4) {
 							{
-								if guardConstantPresent(hv4) {
-									{
-										if guardConstantPresent(hv5) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv4, hv1, hv5), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv5) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv4, hv1, hv5), V1: true}, true
 								}
 							}
 						}
@@ -77,43 +54,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardNotEqualToken {
-			{
-				hv6, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs3 := hv2; hs3 != nil {
+				hv6 := hs3.Value
 				_ = hv6
-				if hok {
+				if hs4 := hv3; hs4 != nil {
+					hv7 := hs4.Value
+					_ = hv7
 					{
-						hv7, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv7
-						if hok {
+						if guardConstantPresent(hv6) {
 							{
-								if guardConstantPresent(hv6) {
-									{
-										if guardConstantPresent(hv7) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv6, hv1, hv7), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv7) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv6, hv1, hv7), V1: true}, true
 								}
 							}
 						}
@@ -122,43 +77,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardLessToken {
-			{
-				hv8, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs5 := hv2; hs5 != nil {
+				hv8 := hs5.Value
 				_ = hv8
-				if hok {
+				if hs6 := hv3; hs6 != nil {
+					hv9 := hs6.Value
+					_ = hv9
 					{
-						hv9, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv9
-						if hok {
+						if guardConstantPresent(hv8) {
 							{
-								if guardConstantPresent(hv8) {
-									{
-										if guardConstantPresent(hv9) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv8, hv1, hv9), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv9) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv8, hv1, hv9), V1: true}, true
 								}
 							}
 						}
@@ -167,43 +100,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardLessEqualToken {
-			{
-				hv10, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs7 := hv2; hs7 != nil {
+				hv10 := hs7.Value
 				_ = hv10
-				if hok {
+				if hs8 := hv3; hs8 != nil {
+					hv11 := hs8.Value
+					_ = hv11
 					{
-						hv11, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv11
-						if hok {
+						if guardConstantPresent(hv10) {
 							{
-								if guardConstantPresent(hv10) {
-									{
-										if guardConstantPresent(hv11) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv10, hv1, hv11), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv11) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv10, hv1, hv11), V1: true}, true
 								}
 							}
 						}
@@ -212,43 +123,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardGreaterToken {
-			{
-				hv12, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs9 := hv2; hs9 != nil {
+				hv12 := hs9.Value
 				_ = hv12
-				if hok {
+				if hs10 := hv3; hs10 != nil {
+					hv13 := hs10.Value
+					_ = hv13
 					{
-						hv13, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv13
-						if hok {
+						if guardConstantPresent(hv12) {
 							{
-								if guardConstantPresent(hv12) {
-									{
-										if guardConstantPresent(hv13) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv12, hv1, hv13), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv13) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv12, hv1, hv13), V1: true}, true
 								}
 							}
 						}
@@ -257,43 +146,21 @@ func hyruledecideLiteralComparisonRecognize(harg0 struct {
 			}
 		}
 		if hv1 == guardGreaterEqualToken {
-			{
-				hv14, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-					hvalue := hinput
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.Value
-					return hr0, true
-				})(hv2)
+			if hs11 := hv2; hs11 != nil {
+				hv14 := hs11.Value
 				_ = hv14
-				if hok {
+				if hs12 := hv3; hs12 != nil {
+					hv15 := hs12.Value
+					_ = hv15
 					{
-						hv15, hok := (func(hinput *hyruleImport1.Const) (hr0 hyruleImport0.Value, hok bool) {
-							hvalue := hinput
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							hr0 = hvalue.Value
-							return hr0, true
-						})(hv3)
-						_ = hv15
-						if hok {
+						if guardConstantPresent(hv14) {
 							{
-								if guardConstantPresent(hv14) {
-									{
-										if guardConstantPresent(hv15) {
-											// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
-											return struct {
-												V0 bool
-												V1 bool
-											}{V0: guardLiteralCompare(hv14, hv1, hv15), V1: true}, true
-										}
-									}
+								if guardConstantPresent(hv15) {
+									// Rule Literals (internal/engine/ssaflow/path/rules/branch_compare.rules:29).
+									return struct {
+										V0 bool
+										V1 bool
+									}{V0: guardLiteralCompare(hv14, hv1, hv15), V1: true}, true
 								}
 							}
 						}

@@ -2,7 +2,6 @@
 
 package recognition
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyrulePathRootRecognize applies rules in source order; false means no rule matched.
@@ -18,83 +17,17 @@ func hyrulePathRootRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Alloc, *hyruleImport0.Parameter, *hyruleImport0.FreeVar:
+			if hv1 != (*hyruleImport0.Alloc)(nil) && hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) {
 				// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:7).
 				return struct {
 					V0 bool
 					V1 *hyruleImport0.UnOp
 				}{V0: true, V1: nil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:7).
-				return struct {
-					V0 bool
-					V1 *hyruleImport0.UnOp
-				}{V0: true, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:7).
-				return struct {
-					V0 bool
-					V1 *hyruleImport0.UnOp
-				}{V0: true, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.Global:
+			if hv1 != (*hyruleImport0.Global)(nil) {
 				if hv2 == true {
 					// Rule GlobalMutex (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:12).
 					return struct {
@@ -103,26 +36,14 @@ func hyrulePathRootRecognize(harg0 struct {
 					}{V0: true, V1: nil}, true
 				}
 			}
-		}
-		{
-			hv3, hv4, hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv3
-			_ = hv4
-			_ = hv5
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv3 := hs1.Op
+				_ = hv3
+				hv4 := hs1.X
+				_ = hv4
+				hv5 := hs1
+				_ = hv5
 				// Rule Unary (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:15).
 				return struct {
 					V0 bool

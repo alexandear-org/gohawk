@@ -3,7 +3,6 @@
 package httpacquire
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideDefaultUseRecognize applies rules in source order; false means no rule matched.
@@ -22,54 +21,41 @@ func hyruledecideDefaultUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, hvalue, true
-			})(hv2)
+		if hs1, hok := hv2.(*hyruleImport0.UnOp); hok && hs1 != nil {
+			hv5 := hs1.X
 			_ = hv5
+			hv6 := hs1.Op
 			_ = hv6
+			hv7 := hs1
 			_ = hv7
-			if hok {
-				if hv6 == loadToken {
-					if hv3 == true {
-						{
-							if defaultClientValue(hv5) {
-								// Rule RootDo (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:11).
-								var hv12 hyruleImport0.Value = hv7
-								var hv13 *hyruleImport2.SearchBudget = hv4
-								hv8 := onlyHTTPDoUsesWithin(hv12, hv13)
-								_ = hv8
-								var hv14 struct{ V0 bool }
-								switch hv8 {
+			if hv6 == loadToken {
+				if hv3 == true {
+					{
+						if defaultClientValue(hv5) {
+							// Rule RootDo (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:11).
+							var hv12 hyruleImport0.Value = hv7
+							var hv13 *hyruleImport2.SearchBudget = hv4
+							hv8 := onlyHTTPDoUsesWithin(hv12, hv13)
+							_ = hv8
+							var hv14 struct{ V0 bool }
+							switch hv8 {
+							case true:
+								hv14 = struct{ V0 bool }{V0: false}
+							case false:
+								var hv15 hyruleImport0.Instruction = hv7
+								var hv16 *hyruleImport2.SearchBudget = hv4
+								hv9 := defaultOperands(hv15, hv16)
+								_ = hv9
+								var hv17 struct{ V0 bool }
+								switch hv9 {
 								case true:
-									hv14 = struct{ V0 bool }{V0: false}
+									hv17 = struct{ V0 bool }{V0: true}
 								case false:
-									var hv15 hyruleImport0.Instruction = hv7
-									var hv16 *hyruleImport2.SearchBudget = hv4
-									hv9 := defaultOperands(hv15, hv16)
-									_ = hv9
-									var hv17 struct{ V0 bool }
-									switch hv9 {
-									case true:
-										hv17 = struct{ V0 bool }{V0: true}
-									case false:
-										hv17 = struct{ V0 bool }{V0: false}
-									}
-									hv14 = hv17
+									hv17 = struct{ V0 bool }{V0: false}
 								}
-								return hv14, true
+								hv14 = hv17
 							}
+							return hv14, true
 						}
 					}
 				}

@@ -3,7 +3,6 @@
 package concurrentcapture
 
 import hyruleImport0 "go/ast"
-import hyruleImport1 "go/token"
 
 // hyrulechannelStatementRecognize applies rules in source order; false means no rule matched.
 func hyrulechannelStatementRecognize(harg0 struct{ P0 hyruleImport0.Stmt }) (struct {
@@ -13,70 +12,32 @@ func hyrulechannelStatementRecognize(harg0 struct{ P0 hyruleImport0.Stmt }) (str
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Stmt) (hr0 hyruleImport0.Expr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.SendStmt)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Chan
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.SendStmt:
+			if hs1 != nil {
+				hv2 := hs1.Chan
+				_ = hv2
 				// Rule Send (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:19).
 				return struct {
 					V0 channelStatementKind
 					V1 hyruleImport0.Expr
 				}{V0: channelStatementSend, V1: hv2}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Stmt) (hr0 hyruleImport0.Expr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ExprStmt)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv3
-			if hok {
-				{
-					hv4, hv5, hok := (func(hinput hyruleImport0.Expr) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Expr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.UnaryExpr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Op
-						hr1 = hvalue.X
-						return hr0, hr1, true
-					})(hv3)
+		case *hyruleImport0.ExprStmt:
+			if hs1 != nil {
+				hv3 := hs1.X
+				_ = hv3
+				if hs2, hok := hv3.(*hyruleImport0.UnaryExpr); hok && hs2 != nil {
+					hv4 := hs2.Op
 					_ = hv4
+					hv5 := hs2.X
 					_ = hv5
-					if hok {
-						if hv4 == channelReceiveToken {
-							// Rule Receive (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:24).
-							return struct {
-								V0 channelStatementKind
-								V1 hyruleImport0.Expr
-							}{V0: channelStatementReceive, V1: hv5}, true
-						}
+					if hv4 == channelReceiveToken {
+						// Rule Receive (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:24).
+						return struct {
+							V0 channelStatementKind
+							V1 hyruleImport0.Expr
+						}{V0: channelStatementReceive, V1: hv5}, true
 					}
 				}
 			}

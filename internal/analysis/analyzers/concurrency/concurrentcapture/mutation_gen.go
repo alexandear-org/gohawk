@@ -29,46 +29,34 @@ func hyruledecideMutationGuardRecognize(harg0 struct {
 		hv6 := harg0.P5
 		_ = hv6
 		{
-			hv7, hv8, hv9, hok := (func(hinput lockGuardProof) (hr0 bool, hr1 bool, hr2 captureReason, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.known
-				hr1 = hvalue.guarded
-				hr2 = hvalue.reason
-				return hr0, hr1, hr2, true
-			})(hv6)
+			hs1 := hv6
+			hv7 := hs1.known
 			_ = hv7
+			hv8 := hs1.guarded
 			_ = hv8
+			hv9 := hs1.reason
 			_ = hv9
-			if hok {
-				if hv7 == true {
-					if hv8 == true {
-						// Rule Held (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:25).
-						var hv15 mutationProof = mutationProof{state: mutationUnknown, reason: hv9}
-						return struct{ V0 mutationProof }{V0: hv15}, true
-					}
+			if hv7 == true {
+				if hv8 == true {
+					// Rule Held (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:25).
+					var hv15 mutationProof = mutationProof{state: mutationUnknown, reason: hv9}
+					return struct{ V0 mutationProof }{V0: hv15}, true
 				}
 			}
 		}
 		if hv5 == true {
 			{
-				hv10, hv11, hv12, hok := (func(hinput lockGuardProof) (hr0 bool, hr1 bool, hr2 captureReason, hok bool) {
-					hvalue := hinput
-					_ = hvalue
-					hr0 = hvalue.known
-					hr1 = hvalue.guarded
-					hr2 = hvalue.reason
-					return hr0, hr1, hr2, true
-				})(hv6)
+				hs2 := hv6
+				hv10 := hs2.known
 				_ = hv10
+				hv11 := hs2.guarded
 				_ = hv11
+				hv12 := hs2.reason
 				_ = hv12
-				if hok {
-					if hv10 == false {
-						// Rule LockFallback (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:29).
-						var hv16 mutationProof = mutationProof{state: mutationUnknown, reason: reasonLockFallbackUnknown}
-						return struct{ V0 mutationProof }{V0: hv16}, true
-					}
+				if hv10 == false {
+					// Rule LockFallback (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:29).
+					var hv16 mutationProof = mutationProof{state: mutationUnknown, reason: reasonLockFallbackUnknown}
+					return struct{ V0 mutationProof }{V0: hv16}, true
 				}
 			}
 		}

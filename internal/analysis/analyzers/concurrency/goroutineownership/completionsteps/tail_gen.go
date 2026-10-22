@@ -2,7 +2,6 @@
 
 package completionsteps
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleTailRecognize applies rules in source order; false means no rule matched.
@@ -10,97 +9,25 @@ func hyruleTailRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struct{ 
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Return, *hyruleImport0.Jump, *hyruleImport0.DebugRef:
+			if hv1 != (*hyruleImport0.Return)(nil) && hv1 != (*hyruleImport0.Jump)(nil) && hv1 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
 				return struct{ V0 TailStep }{V0: Passive}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Jump)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
-				return struct{ V0 TailStep }{V0: Passive}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
-				return struct{ V0 TailStep }{V0: Passive}, true
-			}
-		}
-		{
-			hv2, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv2 := hs1.Op
+				_ = hv2
 				if hv2 == loadToken {
 					// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
 					return struct{ V0 TailStep }{V0: Passive}, true
 				}
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				{
 					if closes(hv3) {
 						// Rule Close (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:16).
@@ -108,21 +35,8 @@ func hyruleTailRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struct{ 
 					}
 				}
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.RunDefers)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.RunDefers:
+			if hv1 != (*hyruleImport0.RunDefers)(nil) {
 				// Rule Deferred (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:22).
 				return struct{ V0 TailStep }{V0: Deferred}, true
 			}

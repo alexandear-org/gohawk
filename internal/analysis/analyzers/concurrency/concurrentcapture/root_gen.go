@@ -18,44 +18,21 @@ func hyrulemutationRootStepRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport0.Expr) (hwhole *hyruleImport0.Ident, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Ident)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.Ident:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Identifier (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:14).
 				return struct {
 					V0 *hyruleImport0.Ident
 					V1 hyruleImport0.Expr
 				}{V0: hv3, V1: nil}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Expr) (hr0 hyruleImport0.Expr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexExpr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.IndexExpr:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
 				{
 					if mapSource(hv1, hv4) {
 						// Rule MapElement (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:19).
@@ -66,23 +43,10 @@ func hyrulemutationRootStepRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Expr) (hr0 hyruleImport0.Expr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ParenExpr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.ParenExpr:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
 				// Rule Parenthesis (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:25).
 				return struct {
 					V0 *hyruleImport0.Ident

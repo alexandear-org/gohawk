@@ -2,7 +2,6 @@
 
 package lifecycleforms
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleHandoffRecognize applies rules in source order; false means no rule matched.
@@ -10,21 +9,11 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Return, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Return:
+			if hs1 != nil {
+				hv2 := hs1
+				_ = hv2
 				// Rule Return (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:30).
 				var hv8 HandoffUse = HandoffUse{Kind: HandoffReturn, Return: hv2}
 				hresult := struct{ V0 HandoffUse }{V0: hv8}
@@ -34,22 +23,10 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeInterface, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.MakeInterface:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Box (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:35).
 				var hv9 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv3}
 				hresult := struct{ V0 HandoffUse }{V0: hv9}
@@ -59,22 +36,10 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.ChangeInterface, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ChangeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.ChangeInterface:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Interface (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:38).
 				var hv10 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv4}
 				hresult := struct{ V0 HandoffUse }{V0: hv10}
@@ -84,22 +49,10 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Phi, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Phi)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Phi:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				// Rule Phi (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:41).
 				var hv11 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv5}
 				hresult := struct{ V0 HandoffUse }{V0: hv11}
@@ -109,23 +62,10 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv6 := hs1.Op
+				_ = hv6
 				if hv6 == equalToken {
 					// Rule Comparison (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:44).
 					hresult := struct{ V0 HandoffUse }{V0: HandoffUse{Kind: HandoffIgnore}}
@@ -145,22 +85,10 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv7 := hs1
+				_ = hv7
 				// Rule Call (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:49).
 				var hv12 HandoffUse = HandoffUse{Kind: HandoffCall, Call: hv7}
 				hresult := struct{ V0 HandoffUse }{V0: hv12}
@@ -170,21 +98,8 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				}
 				return hresult, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.DebugRef:
+			if hv1 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Debug (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:52).
 				hresult := struct{ V0 HandoffUse }{V0: HandoffUse{Kind: HandoffIgnore}}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {

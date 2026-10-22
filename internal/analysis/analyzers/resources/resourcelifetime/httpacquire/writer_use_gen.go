@@ -21,41 +21,18 @@ func hyruledecideWriterUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ChangeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.ChangeInterface:
+			if hv2 != (*hyruleImport0.ChangeInterface)(nil) {
 				// Rule InterfaceChange (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:11).
 				return struct{ V0 bool }{V0: true}, true
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv5 := hs1.Call
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
 				{
 					if cookieCall(hv6) {
 						// Rule Cookie (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:14).

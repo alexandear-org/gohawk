@@ -17,21 +17,11 @@ func hyruleRetainsRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Store, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Store (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:31).
 				var hv12 RetentionUse = RetentionUse{Kind: RetentionStore, Store: hv4}
 				hresult := struct{ V0 RetentionUse }{V0: hv12}
@@ -41,22 +31,10 @@ func hyruleRetainsRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				if hv3 == false {
 					// Rule Closure (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:36).
 					var hv13 RetentionUse = RetentionUse{Kind: RetentionClosure, Closure: hv5}
@@ -68,23 +46,10 @@ func hyruleRetainsRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Send:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				if hv3 == false {
 					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:39).
 					var hv14 RetentionUse = RetentionUse{Kind: RetentionValue, Value: hv6}
@@ -96,23 +61,10 @@ func hyruleRetainsRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv7 := hs1.Value
+				_ = hv7
 				if hv3 == false {
 					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:39).
 					var hv15 RetentionUse = RetentionUse{Kind: RetentionValue, Value: hv7}
@@ -124,23 +76,10 @@ func hyruleRetainsRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport0.Instruction) (hr0 []hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Results
-				return hr0, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport0.Return:
+			if hs1 != nil {
+				hv8 := hs1.Results
+				_ = hv8
 				if hv2 == false {
 					// Rule Returned (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:45).
 					var hv16 RetentionUse = RetentionUse{Kind: RetentionReturn, Values: hv8}
@@ -152,22 +91,10 @@ func hyruleRetainsRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				// Rule Called (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:48).
 				var hv17 RetentionUse = RetentionUse{Kind: RetentionCall, Instruction: hv9}
 				hresult := struct{ V0 RetentionUse }{V0: hv17}
@@ -177,22 +104,10 @@ func hyruleRetainsRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport0.Defer:
+			if hs1 != nil {
+				hv10 := hs1
+				_ = hv10
 				// Rule Called (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:48).
 				var hv18 RetentionUse = RetentionUse{Kind: RetentionCall, Instruction: hv10}
 				hresult := struct{ V0 RetentionUse }{V0: hv18}
@@ -202,22 +117,10 @@ func hyruleRetainsRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Go, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv11
-			if hok {
+		case *hyruleImport0.Go:
+			if hs1 != nil {
+				hv11 := hs1
+				_ = hv11
 				// Rule Called (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:48).
 				var hv19 RetentionUse = RetentionUse{Kind: RetentionCall, Instruction: hv11}
 				hresult := struct{ V0 RetentionUse }{V0: hv19}

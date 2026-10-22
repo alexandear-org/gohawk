@@ -2,7 +2,6 @@
 
 package lifecycleforms
 
-import hyruleImport0 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruleResponseBodyRecognize applies rules in source order; false means no rule matched.
@@ -10,46 +9,19 @@ func hyruleResponseBodyRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struct
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Token, hr1 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
+		if hs1, hok := hv1.(*hyruleImport1.UnOp); hok && hs1 != nil {
+			hv2 := hs1.Op
 			_ = hv2
+			hv3 := hs1.X
 			_ = hv3
-			if hok {
-				if hv2 == loadToken {
+			if hv2 == loadToken {
+				if hs2, hok := hv3.(*hyruleImport1.FieldAddr); hok && hs2 != nil {
+					hv4 := hs2
+					_ = hv4
 					{
-						hv4, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.FieldAddr, hok bool) {
-							hvalue, hok := hinput.(*hyruleImport1.FieldAddr)
-							if !hok {
-								return
-							}
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							return hvalue, true
-						})(hv3)
-						_ = hv4
-						if hok {
-							{
-								if responseBodyField(hv4) {
-									// Rule Body (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/response.rules:15).
-									return struct{ V0 *hyruleImport1.FieldAddr }{V0: hv4}, true
-								}
-							}
+						if responseBodyField(hv4) {
+							// Rule Body (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/response.rules:15).
+							return struct{ V0 *hyruleImport1.FieldAddr }{V0: hv4}, true
 						}
 					}
 				}

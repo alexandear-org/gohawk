@@ -12,67 +12,29 @@ func hyruleOwnerStepRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct {
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
 				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:15).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv2, V1: true}, true
 			}
-		}
-		{
-			hv3, hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv3
-			_ = hv4
-			if hok {
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv4)
-					if hok {
-						// Rule ConstantIndex (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:24).
-						return struct {
-							V0 hyruleImport0.Value
-							V1 bool
-						}{V0: indexedSource(hv3), V1: true}, true
-					}
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv3 := hs1.X
+				_ = hv3
+				hv4 := hs1.Index
+				_ = hv4
+				if hs2, hok := hv4.(*hyruleImport0.Const); hok && hs2 != nil {
+					// Rule ConstantIndex (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:24).
+					return struct {
+						V0 hyruleImport0.Value
+						V1 bool
+					}{V0: indexedSource(hv3), V1: true}, true
 				}
 			}
 		}

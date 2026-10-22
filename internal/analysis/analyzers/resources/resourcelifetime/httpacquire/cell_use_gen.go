@@ -3,7 +3,6 @@
 package httpacquire
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideClientCellUseRecognize applies rules in source order; false means no rule matched.
@@ -25,113 +24,65 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.DebugRef:
+			if hv1 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:9).
 				return struct {
 					V0 bool
 					V1 bool
 				}{V0: true, V1: hv3}, true
 			}
-		}
-		{
-			hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hwhole *hyruleImport0.Store, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				hr1 = hvalue.Val
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			_ = hv7
-			if hok {
-				{
-					hv8, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Alloc)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv6)
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv5 := hs1.Addr
+				_ = hv5
+				hv6 := hs1.Val
+				_ = hv6
+				hv7 := hs1
+				_ = hv7
+				if hs2, hok := hv6.(*hyruleImport0.Alloc); hok && hs2 != nil {
+					hv8 := hs2
 					_ = hv8
-					if hok {
-						if hv3 == false {
-							{
-								if sameValue(hv5, hv2) {
-									// Rule Store (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:13).
-									var hv14 *hyruleImport0.Alloc = hv8
-									var hv15 *hyruleImport0.Store = hv7
-									var hv16 *hyruleImport2.SearchBudget = hv4
-									hv9 := onlyStoredIntoWithin(hv14, hv15, hv16)
-									_ = hv9
-									var hv17 struct {
+					if hv3 == false {
+						{
+							if sameValue(hv5, hv2) {
+								// Rule Store (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:13).
+								var hv14 *hyruleImport0.Alloc = hv8
+								var hv15 *hyruleImport0.Store = hv7
+								var hv16 *hyruleImport2.SearchBudget = hv4
+								hv9 := onlyStoredIntoWithin(hv14, hv15, hv16)
+								_ = hv9
+								var hv17 struct {
+									V0 bool
+									V1 bool
+								}
+								switch hv9 {
+								case true:
+									hv17 = struct {
 										V0 bool
 										V1 bool
-									}
-									switch hv9 {
-									case true:
-										hv17 = struct {
-											V0 bool
-											V1 bool
-										}{V0: true, V1: true}
-									case false:
-										hv17 = struct {
-											V0 bool
-											V1 bool
-										}{V0: false, V1: false}
-									}
-									return hv17, true
+									}{V0: true, V1: true}
+								case false:
+									hv17 = struct {
+										V0 bool
+										V1 bool
+									}{V0: false, V1: false}
 								}
+								return hv17, true
 							}
 						}
 					}
 				}
 			}
-		}
-		{
-			hv9, hv10, hv11, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv9
-			_ = hv10
-			_ = hv11
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv9 := hs1.X
+				_ = hv9
+				hv10 := hs1.Op
+				_ = hv10
+				hv11 := hs1
+				_ = hv11
 				if hv10 == loadToken {
 					// Rule Load (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:21).
 					var hv18 hyruleImport0.Value = hv11
@@ -157,22 +108,10 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 					return hv20, true
 				}
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv12
-			if hok {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				// Rule Captured (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:27).
 				var hv21 *hyruleImport0.MakeClosure = hv12
 				var hv22 *hyruleImport0.Alloc = hv2

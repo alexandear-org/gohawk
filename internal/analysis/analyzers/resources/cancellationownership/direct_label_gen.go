@@ -2,7 +2,6 @@
 
 package cancellationownership
 
-import hyruleImport0 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyrulerecognizeCancellationDirectRecognize applies rules in source order; false means no rule matched.
@@ -21,24 +20,13 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hv5, hok := (func(hinput hyruleImport1.Instruction) (hr0 hyruleImport0.Token, hr1 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv4
-			_ = hv5
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.UnOp:
+			if hs1 != nil {
+				hv4 := hs1.Op
+				_ = hv4
+				hv5 := hs1.X
+				_ = hv5
 				if hv4 == receiveToken {
 					{
 						if (*cancellationClassifier).ownDoneChannel(hv2, hv5) {
@@ -59,21 +47,8 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport1.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport1.Go:
+			if hv1 != (*hyruleImport1.Go)(nil) {
 				{
 					if exactCancelCall(hv3, hv2.cancel) {
 						// Rule StartedCancel (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:16).
@@ -110,87 +85,74 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		{
-			hv6, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
+		if hs2, hok := hv1.(*hyruleImport1.Defer); hok && hs2 != nil {
+			hv6 := hs2
 			_ = hv6
-			if hok {
-				// Rule DeferredLiteral (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:28).
-				var hv11 *cancellationClassifier = hv2
-				var hv12 *hyruleImport1.Defer = hv6
-				hv7part0, hv7part1 := (*cancellationClassifier).deferredLiteralLabel(hv11, hv12)
-				hv7 := struct {
-					V0 cancellationLabel
-					V1 bool
-				}{V0: hv7part0, V1: hv7part1}
-				_ = hv7
-				if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hv7) {
-					var zero struct {
-						V0 cancellationLabel
-						V1 bool
-					}
-					return zero, false
-				}
-				var hv13 struct {
+			// Rule DeferredLiteral (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:28).
+			var hv11 *cancellationClassifier = hv2
+			var hv12 *hyruleImport1.Defer = hv6
+			hv7part0, hv7part1 := (*cancellationClassifier).deferredLiteralLabel(hv11, hv12)
+			hv7 := struct {
+				V0 cancellationLabel
+				V1 bool
+			}{V0: hv7part0, V1: hv7part1}
+			_ = hv7
+			if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hv7) {
+				var zero struct {
 					V0 cancellationLabel
 					V1 bool
 				}
-				switch hv7.V1 {
-				case true:
-					hv8 := hv7.V0
-					_ = hv8
-					hv13 = struct {
-						V0 cancellationLabel
-						V1 bool
-					}{V0: hv8, V1: true}
-				case false:
-					var hv14 hyruleImport1.Instruction = hv6
-					var hv15 *cancellationClassifier = hv2
-					hv9part0, hv9part1 := recognizeCancellationDeferredUse(hv14, hv15)
-					hv9 := struct {
-						V0 cancellationLabel
-						V1 bool
-					}{V0: hv9part0, V1: hv9part1}
-					_ = hv9
-					if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hv9) {
-						var zero struct {
-							V0 cancellationLabel
-							V1 bool
-						}
-						return zero, false
-					}
-					var hv16 struct {
-						V0 cancellationLabel
-						V1 bool
-					}
-					switch hv9.V1 {
-					case true:
-						hv16 = hv9
-					case false:
-						hv16 = hv9
-					}
-					hv13 = hv16
-				}
-				hresult := hv13
-				if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hresult) {
-					var zero struct {
-						V0 cancellationLabel
-						V1 bool
-					}
-					return zero, false
-				}
-				return hresult, true
+				return zero, false
 			}
+			var hv13 struct {
+				V0 cancellationLabel
+				V1 bool
+			}
+			switch hv7.V1 {
+			case true:
+				hv8 := hv7.V0
+				_ = hv8
+				hv13 = struct {
+					V0 cancellationLabel
+					V1 bool
+				}{V0: hv8, V1: true}
+			case false:
+				var hv14 hyruleImport1.Instruction = hv6
+				var hv15 *cancellationClassifier = hv2
+				hv9part0, hv9part1 := recognizeCancellationDeferredUse(hv14, hv15)
+				hv9 := struct {
+					V0 cancellationLabel
+					V1 bool
+				}{V0: hv9part0, V1: hv9part1}
+				_ = hv9
+				if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hv9) {
+					var zero struct {
+						V0 cancellationLabel
+						V1 bool
+					}
+					return zero, false
+				}
+				var hv16 struct {
+					V0 cancellationLabel
+					V1 bool
+				}
+				switch hv9.V1 {
+				case true:
+					hv16 = hv9
+				case false:
+					hv16 = hv9
+				}
+				hv13 = hv16
+			}
+			hresult := hv13
+			if !hyrulehyrulerecognizeCancellationDirectRecognizeUnion1Valid(hresult) {
+				var zero struct {
+					V0 cancellationLabel
+					V1 bool
+				}
+				return zero, false
+			}
+			return hresult, true
 		}
 		// Rule Remaining (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:38).
 		var hv17 hyruleImport1.Instruction = hv1

@@ -2,7 +2,6 @@
 
 package recognition
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleBindingRootRecognize applies rules in source order; false means no rule matched.
@@ -14,20 +13,9 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Global:
+			if hv1 != (*hyruleImport0.Global)(nil) {
 				// Rule Global (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:3).
 				return struct {
 					V0 AddressKind
@@ -35,40 +23,17 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 					V2 *hyruleImport0.FieldAddr
 				}{V0: AddressGlobal, V1: nil, V2: nil}, true
 			}
-		}
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			if hok {
-				{
-					hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FreeVar, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.FreeVar)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv3)
-					_ = hv4
-					if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv2 := hs1.Op
+				_ = hv2
+				hv3 := hs1.X
+				_ = hv3
+				switch hs2 := hv3.(type) {
+				case *hyruleImport0.FreeVar:
+					if hs2 != nil {
+						hv4 := hs2
+						_ = hv4
 						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:8).
 						return struct {
 							V0 AddressKind
@@ -76,22 +41,10 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 							V2 *hyruleImport0.FieldAddr
 						}{V0: AddressCapture, V1: hv4, V2: nil}, true
 					}
-				}
-				{
-					hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv3)
-					_ = hv5
-					if hok {
+				case *hyruleImport0.FieldAddr:
+					if hs2 != nil {
+						hv5 := hs2
+						_ = hv5
 						// Rule Field (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:11).
 						return struct {
 							V0 AddressKind

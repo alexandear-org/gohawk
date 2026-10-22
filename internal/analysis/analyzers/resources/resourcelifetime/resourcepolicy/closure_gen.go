@@ -23,82 +23,69 @@ func hyruleClosureRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
+		if hs1, hok := hv2.(*hyruleImport0.Defer); hok && hs1 != nil {
+			hv5 := hs1
 			_ = hv5
-			if hok {
-				// Rule Deferred (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules:11).
-				var hv11 ClosureQueries = hv1
-				var hv12 *hyruleImport0.Defer = hv5
-				hv6 := (ClosureQueries).Deferred(hv11, hv12)
-				_ = hv6
-				if !hyrulehyruleClosureRecognizeUnion0Valid(hv6) {
-					var zero struct {
-						V0 Reason
-						V1 bool
-					}
-					return zero, false
-				}
-				var hv13 struct {
+			// Rule Deferred (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules:11).
+			var hv11 ClosureQueries = hv1
+			var hv12 *hyruleImport0.Defer = hv5
+			hv6 := (ClosureQueries).Deferred(hv11, hv12)
+			_ = hv6
+			if !hyrulehyruleClosureRecognizeUnion0Valid(hv6) {
+				var zero struct {
 					V0 Reason
 					V1 bool
 				}
-				switch hv6.State {
-				case evidenceDisproven:
-					var hv14 ClosureQueries = hv1
-					var hv15 hyruleImport0.Instruction = hv5
-					var hv16 *hyruleImport0.MakeClosure = hv3
-					var hv17 bool = hv4
-					hv7part0, hv7part1 := ClosureBody(hv14, hv15, hv16, hv17)
-					hv7 := struct {
-						V0 Reason
-						V1 bool
-					}{V0: hv7part0, V1: hv7part1}
-					_ = hv7
-					if !hyrulehyruleClosureRecognizeUnion2Valid(hv7) {
-						var zero struct {
-							V0 Reason
-							V1 bool
-						}
-						return zero, false
-					}
-					hv13 = hv7
-				case evidenceProven:
-					hv8 := hv6.Reason
-					_ = hv8
-					hv13 = struct {
-						V0 Reason
-						V1 bool
-					}{V0: hv8, V1: true}
-				case evidenceUnknown:
-					hv9 := hv6.Reason
-					_ = hv9
-					hv13 = struct {
-						V0 Reason
-						V1 bool
-					}{V0: hv9, V1: true}
-				}
-				hresult := hv13
-				if !hyrulehyruleClosureRecognizeUnion2Valid(hresult) {
+				return zero, false
+			}
+			var hv13 struct {
+				V0 Reason
+				V1 bool
+			}
+			switch hv6.State {
+			case evidenceDisproven:
+				var hv14 ClosureQueries = hv1
+				var hv15 hyruleImport0.Instruction = hv5
+				var hv16 *hyruleImport0.MakeClosure = hv3
+				var hv17 bool = hv4
+				hv7part0, hv7part1 := ClosureBody(hv14, hv15, hv16, hv17)
+				hv7 := struct {
+					V0 Reason
+					V1 bool
+				}{V0: hv7part0, V1: hv7part1}
+				_ = hv7
+				if !hyrulehyruleClosureRecognizeUnion2Valid(hv7) {
 					var zero struct {
 						V0 Reason
 						V1 bool
 					}
 					return zero, false
 				}
-				return hresult, true
+				hv13 = hv7
+			case evidenceProven:
+				hv8 := hv6.Reason
+				_ = hv8
+				hv13 = struct {
+					V0 Reason
+					V1 bool
+				}{V0: hv8, V1: true}
+			case evidenceUnknown:
+				hv9 := hv6.Reason
+				_ = hv9
+				hv13 = struct {
+					V0 Reason
+					V1 bool
+				}{V0: hv9, V1: true}
 			}
+			hresult := hv13
+			if !hyrulehyruleClosureRecognizeUnion2Valid(hresult) {
+				var zero struct {
+					V0 Reason
+					V1 bool
+				}
+				return zero, false
+			}
+			return hresult, true
 		}
 		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules:21).
 		var hv18 ClosureQueries = hv1

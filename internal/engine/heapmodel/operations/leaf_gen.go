@@ -14,110 +14,19 @@ func hyruleLeafRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hv1.(type) {
+		case *hyruleImport0.Parameter, *hyruleImport0.FreeVar, *hyruleImport0.Global:
+			if hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) && hv1 != (*hyruleImport0.Global)(nil) {
 				// Rule External (internal/engine/heapmodel/operations/rules/leaf.rules:24).
 				return struct{ V0 LeafKind }{V0: LeafExternal}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule External (internal/engine/heapmodel/operations/rules/leaf.rules:24).
-				return struct{ V0 LeafKind }{V0: LeafExternal}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule External (internal/engine/heapmodel/operations/rules/leaf.rules:24).
-				return struct{ V0 LeafKind }{V0: LeafExternal}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.Const:
+			if hv1 != (*hyruleImport0.Const)(nil) {
 				// Rule Constant (internal/engine/heapmodel/operations/rules/leaf.rules:28).
 				return struct{ V0 LeafKind }{V0: LeafNil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Function)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Callable (internal/engine/heapmodel/operations/rules/leaf.rules:31).
-				return struct{ V0 LeafKind }{V0: LeafOpaque}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Builtin)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.Function, *hyruleImport0.Builtin:
+			if hv1 != (*hyruleImport0.Function)(nil) && hv1 != (*hyruleImport0.Builtin)(nil) {
 				// Rule Callable (internal/engine/heapmodel/operations/rules/leaf.rules:31).
 				return struct{ V0 LeafKind }{V0: LeafOpaque}, true
 			}

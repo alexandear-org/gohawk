@@ -2,7 +2,6 @@
 
 package calls
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleclassifyCallUseRecognize applies rules in source order; false means no rule matched.
@@ -18,197 +17,89 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.DebugRef:
+			if hv2 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Debug (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:52).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: nil}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv3)}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.IndexAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv4)}, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Slice, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv5)}, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.ChangeType, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ChangeType)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.ChangeType:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv6)}, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeInterface, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.MakeInterface:
+			if hs1 != nil {
+				hv7 := hs1
+				_ = hv7
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv7)}, true
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.ChangeInterface, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.ChangeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv8
-			if hok {
+		case *hyruleImport0.ChangeInterface:
+			if hs1 != nil {
+				hv8 := hs1
+				_ = hv8
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv8)}, true
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Phi, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Phi)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv9
-			if hok {
+		case *hyruleImport0.Phi:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: effectAlias(hv9)}, true
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				return hr0, true
-			})(hv2)
-			_ = hv10
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv10 := hs1.Op
+				_ = hv10
 				if hv10 == useLoadToken {
 					// Rule Read (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:62).
 					return struct {
@@ -217,23 +108,10 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 					}{V0: EffectRead, V1: nil}, true
 				}
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				return hr0, true
-			})(hv2)
-			_ = hv11
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv11 := hs1.Op
+				_ = hv11
 				if hv11 == useEqualToken {
 					// Rule Read (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:62).
 					return struct {
@@ -249,25 +127,12 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 					}{V0: EffectRead, V1: nil}, true
 				}
 			}
-		}
-		{
-			hv12, hv13, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				hr1 = hvalue.Val
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv12
-			_ = hv13
-			if hok {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv12 := hs1.Addr
+				_ = hv12
+				hv13 := hs1.Val
+				_ = hv13
 				{
 					if sameEffectValue(hv12, hv1) {
 						{
@@ -305,44 +170,18 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 					V1 hyruleImport0.Value
 				}{V0: 0, V1: nil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		case *hyruleImport0.Return:
+			if hv2 != (*hyruleImport0.Return)(nil) {
 				// Rule Returned (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:90).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
 				}{V0: EffectRetain, V1: nil}, true
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv14
-			if hok {
+		case *hyruleImport0.Send:
+			if hs1 != nil {
+				hv14 := hs1.X
+				_ = hv14
 				{
 					if sameEffectValue(hv14, hv1) {
 						// Rule SentValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:93).
@@ -358,25 +197,12 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 					V1 hyruleImport0.Value
 				}{V0: EffectMutate, V1: nil}, true
 			}
-		}
-		{
-			hv15, hv16, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Key
-				hr1 = hvalue.Value
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv15
-			_ = hv16
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv15 := hs1.Key
+				_ = hv15
+				hv16 := hs1.Value
+				_ = hv16
 				{
 					if sameEffectValue(hv15, hv1) {
 						// Rule MapKey (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:102).

@@ -9,58 +9,16 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Go, *hyruleImport0.Send:
+			if hv1 != (*hyruleImport0.Go)(nil) && hv1 != (*hyruleImport0.Send)(nil) {
 				// Rule Concurrent (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:26).
 				return struct{ V0 bool }{V0: false}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Concurrent (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:26).
-				return struct{ V0 bool }{V0: false}, true
-			}
-		}
-		{
-			hv2, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		case *hyruleImport0.MakeInterface:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
 				{
 					if callbackValue(hv2) {
 						// Rule Box (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:29).
@@ -68,23 +26,10 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 					}
 				}
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv3 := hs1.Value
+				_ = hv3
 				{
 					if callbackValue(hv3) {
 						// Rule Map (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:35).
@@ -92,22 +37,10 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 					}
 				}
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Return, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Return:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				{
 					if returnedCallback(hv4) {
 						// Rule Return (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:41).
@@ -115,25 +48,12 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 					}
 				}
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Val
-				hr1 = hvalue.Addr
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv5 := hs1.Val
+				_ = hv5
+				hv6 := hs1.Addr
+				_ = hv6
 				{
 					if callbackValue(hv5) {
 						{

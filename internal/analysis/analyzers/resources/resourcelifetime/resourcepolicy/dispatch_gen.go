@@ -40,147 +40,98 @@ func hyruleDispatchRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		{
-			hv5, hok := (func(hinput *hyruleImport0.CallCommon) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv3)
+		if hs1 := hv3; hs1 != nil {
+			hv5 := hs1.Value
 			_ = hv5
-			if hok {
-				{
-					hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Builtin, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Builtin)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv5)
+			switch hs2 := hv5.(type) {
+			case *hyruleImport0.Builtin:
+				if hs2 != nil {
+					hv6 := hs2
 					_ = hv6
-					if hok {
-						if hv4 == true {
-							{
-								if appendBuiltin(hv6) {
-									// Rule Append (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:19).
-									hresult := struct {
+					if hv4 == true {
+						{
+							if appendBuiltin(hv6) {
+								// Rule Append (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:19).
+								hresult := struct {
+									V0 Reason
+									V1 bool
+								}{V0: Appended, V1: true}
+								if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
+									var zero struct {
 										V0 Reason
 										V1 bool
-									}{V0: Appended, V1: true}
-									if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
-										var zero struct {
-											V0 Reason
-											V1 bool
-										}
-										return zero, false
 									}
-									return hresult, true
+									return zero, false
 								}
+								return hresult, true
 							}
 						}
 					}
-				}
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Builtin)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv5)
-					if hok {
-						// Rule Builtin (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:26).
-						hresult := struct {
+					// Rule Builtin (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:26).
+					hresult := struct {
+						V0 Reason
+						V1 bool
+					}{V0: Appended, V1: false}
+					if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
+						var zero struct {
 							V0 Reason
 							V1 bool
-						}{V0: Appended, V1: false}
-						if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
-							var zero struct {
-								V0 Reason
-								V1 bool
-							}
-							return zero, false
 						}
-						return hresult, true
+						return zero, false
 					}
+					return hresult, true
 				}
-				{
-					hv7, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv5)
+			case *hyruleImport0.MakeClosure:
+				if hs2 != nil {
+					hv7 := hs2
 					_ = hv7
-					if hok {
-						// Rule Closure (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:29).
-						var hv14 CallQueries = hv1
-						var hv15 hyruleImport0.Instruction = hv2
-						var hv16 *hyruleImport0.MakeClosure = hv7
-						var hv17 bool = hv4
-						hv8part0, hv8part1 := (CallQueries).Closure(hv14, hv15, hv16, hv17)
-						hv8 := struct {
-							V0 Reason
-							V1 bool
-						}{V0: hv8part0, V1: hv8part1}
-						_ = hv8
-						if !hyrulehyruleDispatchRecognizeUnion2Valid(hv8) {
-							var zero struct {
-								V0 Reason
-								V1 bool
-							}
-							return zero, false
-						}
-						var hv18 struct {
+					// Rule Closure (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:29).
+					var hv14 CallQueries = hv1
+					var hv15 hyruleImport0.Instruction = hv2
+					var hv16 *hyruleImport0.MakeClosure = hv7
+					var hv17 bool = hv4
+					hv8part0, hv8part1 := (CallQueries).Closure(hv14, hv15, hv16, hv17)
+					hv8 := struct {
+						V0 Reason
+						V1 bool
+					}{V0: hv8part0, V1: hv8part1}
+					_ = hv8
+					if !hyrulehyruleDispatchRecognizeUnion2Valid(hv8) {
+						var zero struct {
 							V0 Reason
 							V1 bool
 						}
-						switch hv8.V1 {
-						case true:
-							hv9 := hv8.V0
-							_ = hv9
-							hv18 = struct {
-								V0 Reason
-								V1 bool
-							}{V0: hv9, V1: true}
-						case false:
-							hv10 := hv8.V0
-							_ = hv10
-							hv18 = struct {
-								V0 Reason
-								V1 bool
-							}{V0: hv10, V1: false}
-						}
-						hresult := hv18
-						if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
-							var zero struct {
-								V0 Reason
-								V1 bool
-							}
-							return zero, false
-						}
-						return hresult, true
+						return zero, false
 					}
+					var hv18 struct {
+						V0 Reason
+						V1 bool
+					}
+					switch hv8.V1 {
+					case true:
+						hv9 := hv8.V0
+						_ = hv9
+						hv18 = struct {
+							V0 Reason
+							V1 bool
+						}{V0: hv9, V1: true}
+					case false:
+						hv10 := hv8.V0
+						_ = hv10
+						hv18 = struct {
+							V0 Reason
+							V1 bool
+						}{V0: hv10, V1: false}
+					}
+					hresult := hv18
+					if !hyrulehyruleDispatchRecognizeUnion2Valid(hresult) {
+						var zero struct {
+							V0 Reason
+							V1 bool
+						}
+						return zero, false
+					}
+					return hresult, true
 				}
 			}
 		}

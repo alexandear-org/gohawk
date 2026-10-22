@@ -22,41 +22,18 @@ func hyruledecideRequestUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv4)
-			if hok {
+		switch hs1 := hv4.(type) {
+		case *hyruleImport0.DebugRef:
+			if hv4 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:10).
 				return struct{ V0 bool }{V0: true}, true
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv4)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv5 := hs1.Call
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
 				{
 					if requestDo(hv6, hv3) {
 						// Rule Do (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:13).
@@ -82,24 +59,12 @@ func hyruledecideRequestUseRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv7, hv8, hok := (func(hinput hyruleImport0.Instruction) (hr0 int, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Field
-				return hr0, hvalue, true
-			})(hv4)
-			_ = hv7
-			_ = hv8
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv7 := hs1.Field
+				_ = hv7
+				hv8 := hs1
+				_ = hv8
 				{
 					if requestHeader(hv8) {
 						// Rule Header (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:28).

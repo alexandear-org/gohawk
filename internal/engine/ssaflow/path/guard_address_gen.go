@@ -2,7 +2,6 @@
 
 package path
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyrulerecognizeGuardAddressRecognize applies rules in source order; false means no rule matched.
@@ -13,173 +12,31 @@ func hyrulerecognizeGuardAddressRecognize(harg0 struct{ P0 hyruleImport0.Value }
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Alloc, *hyruleImport0.Parameter, *hyruleImport0.FreeVar, *hyruleImport0.Global, *hyruleImport0.Call, *hyruleImport0.Extract:
+			if hv1 != (*hyruleImport0.Alloc)(nil) && hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) && hv1 != (*hyruleImport0.Global)(nil) && hv1 != (*hyruleImport0.Call)(nil) && hv1 != (*hyruleImport0.Extract)(nil) {
 				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
 				return struct {
 					V0 guardAddressKind
 					V1 hyruleImport0.Value
 				}{V0: guardAddressRoot, V1: nil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
-				return struct {
-					V0 guardAddressKind
-					V1 hyruleImport0.Value
-				}{V0: guardAddressRoot, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
-				return struct {
-					V0 guardAddressKind
-					V1 hyruleImport0.Value
-				}{V0: guardAddressRoot, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
-				return struct {
-					V0 guardAddressKind
-					V1 hyruleImport0.Value
-				}{V0: guardAddressRoot, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
-				return struct {
-					V0 guardAddressKind
-					V1 hyruleImport0.Value
-				}{V0: guardAddressRoot, V1: nil}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
-				return struct {
-					V0 guardAddressKind
-					V1 hyruleImport0.Value
-				}{V0: guardAddressRoot, V1: nil}, true
-			}
-		}
-		{
-			hv2, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
 				// Rule Projection (internal/engine/ssaflow/path/rules/guard_address.rules:14).
 				return struct {
 					V0 guardAddressKind
 					V1 hyruleImport0.Value
 				}{V0: guardAddressProjection, V1: hv2}, true
 			}
-		}
-		{
-			hv3, hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv3
-			_ = hv4
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv3 := hs1.X
+				_ = hv3
+				hv4 := hs1.Op
+				_ = hv4
 				if hv4 == guardLoadToken {
 					// Rule Projection (internal/engine/ssaflow/path/rules/guard_address.rules:14).
 					return struct {

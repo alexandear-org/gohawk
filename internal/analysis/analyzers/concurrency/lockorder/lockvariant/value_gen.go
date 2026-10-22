@@ -3,7 +3,6 @@
 package lockvariant
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/ssaflow"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideValueRecognize applies rules in source order; false means no rule matched.
@@ -16,21 +15,11 @@ func hyruledecideValueRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:11).
 				var hv25 hyruleImport0.Instruction = hv3
 				hv4 := cycle(hv25)
@@ -44,22 +33,10 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv26, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Phi, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Phi)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Phi:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Phi (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:17).
 				var hv27 hyruleImport0.Instruction = hv4
 				hv5 := cycle(hv27)
@@ -73,26 +50,14 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv28, true
 			}
-		}
-		{
-			hv5, hv6, hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hwhole *hyruleImport0.Extract, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				hr1 = hvalue.Index
-				return hr0, hr1, hvalue, true
-			})(hv2)
-			_ = hv5
-			_ = hv6
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv5 := hs1.Tuple
+				_ = hv5
+				hv6 := hs1.Index
+				_ = hv6
+				hv7 := hs1
+				_ = hv7
 				// Rule Extract (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:23).
 				var hv29 hyruleImport2.ReachingWalk = hv1
 				var hv30 *hyruleImport0.Extract = hv7
@@ -107,26 +72,14 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv31, true
 			}
-		}
-		{
-			hv8, hv9, hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, hvalue, true
-			})(hv2)
-			_ = hv8
-			_ = hv9
-			_ = hv10
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv8 := hs1.Op
+				_ = hv8
+				hv9 := hs1.X
+				_ = hv9
+				hv10 := hs1
+				_ = hv10
 				if hv8 == receiveToken {
 					// Rule Receive (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:32).
 					var hv32 hyruleImport0.Instruction = hv10
@@ -141,26 +94,10 @@ func hyruledecideValueRecognize(harg0 struct {
 					}
 					return hv33, true
 				}
-			}
-		}
-		{
-			hv11, hv12, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv11
-			_ = hv12
-			if hok {
+				hv11 := hs1.Op
+				_ = hv11
+				hv12 := hs1.X
+				_ = hv12
 				// Rule Unary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:38).
 				var hv34 hyruleImport2.ReachingWalk = hv1
 				var hv35 hyruleImport0.Value = hv12
@@ -175,25 +112,12 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv36, true
 			}
-		}
-		{
-			hv13, hv14, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv13
-			_ = hv14
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv13 := hs1.X
+				_ = hv13
+				hv14 := hs1.Index
+				_ = hv14
 				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:45).
 				var hv37 hyruleImport2.ReachingWalk = hv1
 				var hv38 hyruleImport0.Value = hv14
@@ -219,25 +143,12 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv39, true
 			}
-		}
-		{
-			hv15, hv16, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv15
-			_ = hv16
-			if hok {
+		case *hyruleImport0.Index:
+			if hs1 != nil {
+				hv15 := hs1.X
+				_ = hv15
+				hv16 := hs1.Index
+				_ = hv16
 				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:45).
 				var hv43 hyruleImport2.ReachingWalk = hv1
 				var hv44 hyruleImport0.Value = hv16
@@ -263,23 +174,10 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv45, true
 			}
-		}
-		{
-			hv17, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv17
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv17 := hs1.X
+				_ = hv17
 				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:53).
 				var hv49 hyruleImport2.ReachingWalk = hv1
 				var hv50 hyruleImport0.Value = hv17
@@ -294,23 +192,10 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv51, true
 			}
-		}
-		{
-			hv18, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Field)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv18
-			if hok {
+		case *hyruleImport0.Field:
+			if hs1 != nil {
+				hv18 := hs1.X
+				_ = hv18
 				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:53).
 				var hv52 hyruleImport2.ReachingWalk = hv1
 				var hv53 hyruleImport0.Value = hv18
@@ -325,25 +210,12 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv54, true
 			}
-		}
-		{
-			hv19, hv20, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Y
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv19
-			_ = hv20
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv19 := hs1.X
+				_ = hv19
+				hv20 := hs1.Y
+				_ = hv20
 				// Rule Binary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:60).
 				var hv55 hyruleImport2.ReachingWalk = hv1
 				var hv56 hyruleImport0.Value = hv19
@@ -369,22 +241,10 @@ func hyruledecideValueRecognize(harg0 struct {
 				}
 				return hv57, true
 			}
-		}
-		{
-			hv21, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv21
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv21 := hs1
+				_ = hv21
 				// Rule Call (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:71).
 				var hv61 hyruleImport2.ReachingWalk = hv1
 				var hv62 *hyruleImport0.Call = hv21

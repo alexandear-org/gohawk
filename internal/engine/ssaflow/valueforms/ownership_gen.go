@@ -2,7 +2,6 @@
 
 package valueforms
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleOwnershipSourceRecognize applies rules in source order; false means no rule matched.
@@ -13,254 +12,113 @@ func hyruleOwnershipSourceRecognize(harg0 struct{ P0 hyruleImport0.Value }) (str
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv2, V1: true}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Field)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.Field:
+			if hs1 != nil {
+				hv3 := hs1.X
+				_ = hv3
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv3, V1: true}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv4, V1: true}, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Index:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv5, V1: true}, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Lookup)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Lookup:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv6, V1: true}, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
 				// Rule Aggregate (internal/engine/ssaflow/valueforms/rules/ownership.rules:41).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv7, V1: true}, true
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport0.TypeAssert:
+			if hs1 != nil {
+				hv8 := hs1.X
+				_ = hv8
 				// Rule AssertedOrExtracted (internal/engine/ssaflow/valueforms/rules/ownership.rules:47).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv8, V1: true}, true
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				return hr0, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv9 := hs1.Tuple
+				_ = hv9
 				// Rule AssertedOrExtracted (internal/engine/ssaflow/valueforms/rules/ownership.rules:47).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv9, V1: true}, true
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Next)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Iter
-				return hr0, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport0.Next:
+			if hs1 != nil {
+				hv10 := hs1.Iter
+				_ = hv10
 				// Rule Iterated (internal/engine/ssaflow/valueforms/rules/ownership.rules:53).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv10, V1: true}, true
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Range)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv11
-			if hok {
+		case *hyruleImport0.Range:
+			if hs1 != nil {
+				hv11 := hs1.X
+				_ = hv11
 				// Rule Iterated (internal/engine/ssaflow/valueforms/rules/ownership.rules:53).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv11, V1: true}, true
 			}
-		}
-		{
-			hv12, hv13, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv12
-			_ = hv13
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv12 := hs1.X
+				_ = hv12
+				hv13 := hs1.Op
+				_ = hv13
 				if hv13 == loadToken {
 					// Rule LoadedOrReceived (internal/engine/ssaflow/valueforms/rules/ownership.rules:58).
 					return struct {

@@ -15,21 +15,11 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.Call:
+			if hs1 != nil {
+				hv2 := hs1
+				_ = hv2
 				{
 					var hv3 *hyruleImport1.CallCommon = (*referenceCall).Common(hv2)
 					_ = hv3
@@ -51,22 +41,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					V2 bool
 				}{V0: ReferenceRejected, V1: hv2, V2: false}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Parameter, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport1.Parameter:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				{
 					var hv5 hyruleImport2.Type = (referenceValue).Type(hv4)
 					_ = hv5
@@ -78,22 +56,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					}{V0: ReferenceExact, V1: hv4, V2: hyruleImport0.CancellationType(hv5)}, true
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.FreeVar, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport1.FreeVar:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				{
 					var hv7 hyruleImport2.Type = (referenceValue).Type(hv6)
 					_ = hv7
@@ -105,22 +71,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					}{V0: ReferenceExact, V1: hv6, V2: hyruleImport0.CancellationType(hv7)}, true
 				}
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.MakeChan, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MakeChan)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport1.MakeChan:
+			if hs1 != nil {
+				hv8 := hs1
+				_ = hv8
 				{
 					var hv9 hyruleImport2.Type = (referenceValue).Type(hv8)
 					_ = hv9
@@ -132,22 +86,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					}{V0: ReferenceExact, V1: hv8, V2: hyruleImport0.CancellationType(hv9)}, true
 				}
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport1.Alloc:
+			if hs1 != nil {
+				hv10 := hs1
+				_ = hv10
 				{
 					var hv11 hyruleImport2.Type = (referenceValue).Type(hv10)
 					_ = hv11
@@ -163,22 +105,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					}
 				}
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Global, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv12
-			if hok {
+		case *hyruleImport1.Global:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				{
 					var hv13 hyruleImport2.Type = (referenceValue).Type(hv12)
 					_ = hv13
@@ -194,22 +124,10 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					}
 				}
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv14
-			if hok {
+		case *hyruleImport1.FieldAddr:
+			if hs1 != nil {
+				hv14 := hs1
+				_ = hv14
 				{
 					var hv15 hyruleImport2.Type = (referenceValue).Type(hv14)
 					_ = hv15

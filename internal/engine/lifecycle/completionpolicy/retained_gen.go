@@ -13,21 +13,11 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv2 := hs1
+				_ = hv2
 				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/retained.rules:19).
 				return struct {
 					V0 CapabilityKind
@@ -35,22 +25,10 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 					V2 []hyruleImport0.Value
 				}{V0: CapabilityClosure, V1: hv2, V2: nil}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/retained.rules:22).
 				return struct {
 					V0 CapabilityKind
@@ -58,23 +36,10 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 					V2 []hyruleImport0.Value
 				}{V0: CapabilityStorage, V1: hv3, V2: nil}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
 				// Rule StoredSource (internal/engine/lifecycle/completionpolicy/rules/retained.rules:27).
 				return struct {
 					V0 CapabilityKind
@@ -82,23 +47,10 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 					V2 []hyruleImport0.Value
 				}{V0: CapabilityStorage, V1: hv4, V2: nil}, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv5 := hs1.Call
+				_ = hv5
 				{
 					var hv6 []hyruleImport0.Value = hv5.Args
 					_ = hv6

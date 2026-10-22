@@ -20,82 +20,44 @@ func hyruledecideMutexTransferRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
-				{
-					hv5, hv6, hok := (func(hinput mutexEffect) (hr0 mutexOperation, hwhole mutexEffect, hok bool) {
-						hvalue := hinput
-						_ = hvalue
-						hr0 = hvalue.operation
-						return hr0, hvalue, true
-					})(hv3)
-					_ = hv5
-					_ = hv6
-					if hok {
-						if hv5 == mutexRelease {
-							// Rule DeferredRelease (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:24).
-							var hv16 lockFlowContext = hv1
-							var hv17 mutexEffect = hv6
-							var hv18 lockFlowState = hv4
-							hv7 := (lockFlowContext).deferMutexRelease(hv16, hv17, hv18)
-							_ = hv7
-							return struct{ V0 lockFlowState }{V0: hv7}, true
-						}
-					}
+		if hs1, hok := hv2.(*hyruleImport0.Defer); hok && hs1 != nil {
+			{
+				hs2 := hv3
+				hv5 := hs2.operation
+				_ = hv5
+				hv6 := hs2
+				_ = hv6
+				if hv5 == mutexRelease {
+					// Rule DeferredRelease (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:24).
+					var hv16 lockFlowContext = hv1
+					var hv17 mutexEffect = hv6
+					var hv18 lockFlowState = hv4
+					hv7 := (lockFlowContext).deferMutexRelease(hv16, hv17, hv18)
+					_ = hv7
+					return struct{ V0 lockFlowState }{V0: hv7}, true
 				}
 			}
 		}
 		{
-			hv7, hv8, hok := (func(hinput mutexEffect) (hr0 mutexOperation, hwhole mutexEffect, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.operation
-				return hr0, hvalue, true
-			})(hv3)
+			hs3 := hv3
+			hv7 := hs3.operation
 			_ = hv7
+			hv8 := hs3
 			_ = hv8
-			if hok {
-				if hv7 == mutexRelease {
-					// Rule Release (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:30).
-					var hv19 lockFlowContext = hv1
-					var hv20 hyruleImport0.Instruction = hv2
-					var hv21 mutexEffect = hv8
-					var hv22 lockFlowState = hv4
-					hv9 := (lockFlowContext).releaseMutex(hv19, hv20, hv21, hv22)
-					_ = hv9
-					return struct{ V0 lockFlowState }{V0: hv9}, true
-				}
+			if hv7 == mutexRelease {
+				// Rule Release (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:30).
+				var hv19 lockFlowContext = hv1
+				var hv20 hyruleImport0.Instruction = hv2
+				var hv21 mutexEffect = hv8
+				var hv22 lockFlowState = hv4
+				hv9 := (lockFlowContext).releaseMutex(hv19, hv20, hv21, hv22)
+				_ = hv9
+				return struct{ V0 lockFlowState }{V0: hv9}, true
 			}
 		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
-				// Rule DeferredAcquisition (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:39).
-				return struct{ V0 lockFlowState }{V0: hv4}, true
-			}
+		if hs4, hok := hv2.(*hyruleImport0.Defer); hok && hs4 != nil {
+			// Rule DeferredAcquisition (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:39).
+			return struct{ V0 lockFlowState }{V0: hv4}, true
 		}
 		// Rule Acquire (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:49).
 		var hv23 lockFlowContext = hv1

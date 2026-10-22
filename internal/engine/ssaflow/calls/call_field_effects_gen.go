@@ -3,7 +3,6 @@
 package calls
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/ssaflow"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleclassifyFieldUseRecognize applies rules in source order; false means no rule matched.
@@ -19,42 +18,19 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.DebugRef:
+			if hv2 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Debug (internal/engine/ssaflow/calls/rules/call_field_effects.rules:22).
 				return struct {
 					V0 CallEffect
 					V1 *hyruleImport0.FieldAddr
 				}{V0: 0, V1: nil}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				{
 					if selectedEffectField(hv1, hv3) {
 						// Rule SelectedField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:27).
@@ -64,45 +40,16 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 						}{V0: 0, V1: hv3}, true
 					}
 				}
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
 				// Rule OtherField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:33).
 				return struct {
 					V0 CallEffect
 					V1 *hyruleImport0.FieldAddr
 				}{V0: 0, V1: nil}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				return hr0, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv4 := hs1.Op
+				_ = hv4
 				if hv4 == useLoadToken {
 					// Rule Read (internal/engine/ssaflow/calls/rules/call_field_effects.rules:36).
 					return struct {
@@ -111,23 +58,10 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 					}{V0: EffectRead, V1: nil}, true
 				}
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				return hr0, true
-			})(hv2)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv5 := hs1.Addr
+				_ = hv5
 				{
 					var hv6 hyruleImport0.Value = hv1.Root
 					_ = hv6

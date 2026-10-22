@@ -23,36 +23,31 @@ func hyruleFoldPathRecognize(harg0 struct {
 			return struct{ V0 Paths }{V0: hv7}, true
 		}
 		{
-			hv4, hv5, hv6, hok := (func(hinput Paths) (hr0 string, hr1 bool, hwhole Paths, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Path
-				hr1 = hvalue.Seen
-				return hr0, hr1, hvalue, true
-			})(hv1)
+			hs1 := hv1
+			hv4 := hs1.Path
 			_ = hv4
+			hv5 := hs1.Seen
 			_ = hv5
+			hv6 := hs1
 			_ = hv6
-			if hok {
-				if hv5 == false {
-					if hv3 == true {
-						// Rule First (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:18).
-						var hv8 Paths = hv6
-						hv8.Path = hv2
-						hv8.Seen = true
-						hv8.Exact = true
-						return struct{ V0 Paths }{V0: hv8}, true
-					}
-				}
+			if hv5 == false {
 				if hv3 == true {
-					{
-						if differentPath(hv4, hv2) {
-							// Rule Conflict (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:22).
-							var hv9 Paths = hv6
-							hv9.Seen = true
-							hv9.Exact = false
-							return struct{ V0 Paths }{V0: hv9}, true
-						}
+					// Rule First (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:18).
+					var hv8 Paths = hv6
+					hv8.Path = hv2
+					hv8.Seen = true
+					hv8.Exact = true
+					return struct{ V0 Paths }{V0: hv8}, true
+				}
+			}
+			if hv3 == true {
+				{
+					if differentPath(hv4, hv2) {
+						// Rule Conflict (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:22).
+						var hv9 Paths = hv6
+						hv9.Seen = true
+						hv9.Exact = false
+						return struct{ V0 Paths }{V0: hv9}, true
 					}
 				}
 			}

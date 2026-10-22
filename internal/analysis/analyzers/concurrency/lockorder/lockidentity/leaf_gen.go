@@ -19,21 +19,11 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Getter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:47).
 				var hv16 hyruleImport1.ReachingWalk = hv1
 				var hv17 *hyruleImport0.Call = hv4
@@ -59,41 +49,17 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				}
 				return hv19, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Global, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Global)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Global:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				// Rule Global (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:53).
 				return struct{ V0 string }{V0: globalName(hv5)}, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				// Rule Address (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:56).
 				var hv20 hyruleImport1.ReachingWalk = hv1
 				var hv21 *hyruleImport0.FieldAddr = hv6
@@ -119,22 +85,10 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				}
 				return hv23, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Field, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Field)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Field:
+			if hs1 != nil {
+				hv7 := hs1
+				_ = hv7
 				// Rule Copied (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:62).
 				var hv24 hyruleImport1.ReachingWalk = hv1
 				var hv25 *hyruleImport0.Field = hv7
@@ -160,25 +114,12 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				}
 				return hv27, true
 			}
-		}
-		{
-			hv8, hv9, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv8
-			_ = hv9
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv8 := hs1.X
+				_ = hv8
+				hv9 := hs1.Index
+				_ = hv9
 				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:69).
 				var hv28 hyruleImport1.ReachingWalk = hv1
 				var hv29 hyruleImport0.Value = hv8
@@ -205,25 +146,12 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				}
 				return hv32, true
 			}
-		}
-		{
-			hv10, hv11, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv10
-			_ = hv11
-			if hok {
+		case *hyruleImport0.Index:
+			if hs1 != nil {
+				hv10 := hs1.X
+				_ = hv10
+				hv11 := hs1.Index
+				_ = hv11
 				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:69).
 				var hv33 hyruleImport1.ReachingWalk = hv1
 				var hv34 hyruleImport0.Value = hv10
@@ -250,79 +178,31 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				}
 				return hv37, true
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Parameter, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Parameter)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv12
-			if hok {
+		case *hyruleImport0.Parameter:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				// Rule Parameter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:75).
 				return struct{ V0 string }{V0: parameterName(hv12)}, true
 			}
-		}
-		{
-			hv13, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FreeVar, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FreeVar)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv13
-			if hok {
+		case *hyruleImport0.FreeVar:
+			if hs1 != nil {
+				hv13 := hs1
+				_ = hv13
 				// Rule Free (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:80).
 				return struct{ V0 string }{V0: freeName(hv13)}, true
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv14
-			if hok {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv14 := hs1
+				_ = hv14
 				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:84).
 				return struct{ V0 string }{V0: allocationName(hv14)}, true
 			}
-		}
-		{
-			hv15, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Const, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Const)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv15
-			if hok {
+		case *hyruleImport0.Const:
+			if hs1 != nil {
+				hv15 := hs1
+				_ = hv15
 				{
 					if hasLiteral(hv15) {
 						// Rule Constant (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:87).

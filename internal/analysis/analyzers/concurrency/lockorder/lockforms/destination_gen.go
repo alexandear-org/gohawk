@@ -12,68 +12,31 @@ func hyruleDestinationRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (s
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv2 := hs1.Addr
+				_ = hv2
 				// Rule Store (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:17).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv2, V1: true}, true
 			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Map
-				return hr0, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv3 := hs1.Map
+				_ = hv3
 				// Rule Map (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:20).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
 				}{V0: hv3, V1: false}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv4 := hs1.Call
+				_ = hv4
 				{
 					hv5, hv6, hok := builtinArguments(hv4)
 					_ = hv5

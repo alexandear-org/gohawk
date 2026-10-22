@@ -2,7 +2,6 @@
 
 package recognition
 
-import hyruleImport0 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruleFixedLoadRecognize applies rules in source order; false means no rule matched.
@@ -14,67 +13,34 @@ func hyruleFixedLoadRecognize(harg0 struct{ P0 *hyruleImport1.UnOp }) (struct {
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput *hyruleImport1.UnOp) (hr0 hyruleImport0.Token, hr1 hyruleImport1.Value, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
+		if hs1 := hv1; hs1 != nil {
+			hv2 := hs1.Op
 			_ = hv2
+			hv3 := hs1.X
 			_ = hv3
-			if hok {
-				if hv2 == dereferenceToken {
-					{
-						hv4, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.FreeVar, hok bool) {
-							hvalue, hok := hinput.(*hyruleImport1.FreeVar)
-							if !hok {
-								return
-							}
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							return hvalue, true
-						})(hv3)
+			if hv2 == dereferenceToken {
+				switch hs2 := hv3.(type) {
+				case *hyruleImport1.FreeVar:
+					if hs2 != nil {
+						hv4 := hs2
 						_ = hv4
-						if hok {
-							// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:3).
-							return struct {
-								V0 AddressKind
-								V1 *hyruleImport1.FreeVar
-								V2 *hyruleImport1.FieldAddr
-							}{V0: AddressCapture, V1: hv4, V2: nil}, true
-						}
+						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:3).
+						return struct {
+							V0 AddressKind
+							V1 *hyruleImport1.FreeVar
+							V2 *hyruleImport1.FieldAddr
+						}{V0: AddressCapture, V1: hv4, V2: nil}, true
 					}
-					{
-						hv5, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.FieldAddr, hok bool) {
-							hvalue, hok := hinput.(*hyruleImport1.FieldAddr)
-							if !hok {
-								return
-							}
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							return hvalue, true
-						})(hv3)
+				case *hyruleImport1.FieldAddr:
+					if hs2 != nil {
+						hv5 := hs2
 						_ = hv5
-						if hok {
-							// Rule Field (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:7).
-							return struct {
-								V0 AddressKind
-								V1 *hyruleImport1.FreeVar
-								V2 *hyruleImport1.FieldAddr
-							}{V0: AddressField, V1: nil, V2: hv5}, true
-						}
+						// Rule Field (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:7).
+						return struct {
+							V0 AddressKind
+							V1 *hyruleImport1.FreeVar
+							V2 *hyruleImport1.FieldAddr
+						}{V0: AddressField, V1: nil, V2: hv5}, true
 					}
 				}
 			}

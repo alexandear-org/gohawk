@@ -14,41 +14,18 @@ func hyruleNotificationRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Go:
+			if hv1 != (*hyruleImport0.Go)(nil) {
 				// Rule Detached (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:14).
 				return struct{ V0 hyruleImport0.Value }{V0: nil}, true
 			}
-		}
-		{
-			hv3, hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.Send, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Chan
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv3
-			_ = hv4
-			if hok {
+		case *hyruleImport0.Send:
+			if hs1 != nil {
+				hv3 := hs1.Chan
+				_ = hv3
+				hv4 := hs1
+				_ = hv4
 				// Rule Sent (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:20).
 				var hv11 func(hyruleImport0.Instruction) bool = hv2
 				var hv12 hyruleImport0.Instruction = hv4
@@ -63,22 +40,10 @@ func hyruleNotificationRecognize(harg0 struct {
 				}
 				return hv13, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Defer:
+			if hs1 != nil {
+				hv5 := hs1
+				_ = hv5
 				// Rule DeferredClose (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:29).
 				var hv14 struct{ V0 hyruleImport0.Value }
 				hv14answered := false

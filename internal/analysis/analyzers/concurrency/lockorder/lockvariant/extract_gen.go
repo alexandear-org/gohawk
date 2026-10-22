@@ -15,113 +15,64 @@ func hyruledecideExtractRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hv4, hok := (func(hinput *hyruleImport0.Extract) (hr0 hyruleImport0.Value, hr1 int, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv2)
+		if hs1 := hv2; hs1 != nil {
+			hv3 := hs1.Tuple
 			_ = hv3
+			hv4 := hs1.Index
 			_ = hv4
-			if hok {
-				{
-					hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Next, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Next)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv3)
+			switch hs2 := hv3.(type) {
+			case *hyruleImport0.Next:
+				if hs2 != nil {
+					hv5 := hs2
 					_ = hv5
-					if hok {
-						// Rule Iterated (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:7).
-						var hv9 hyruleImport0.Instruction = hv5
-						hv6 := cycle(hv9)
-						_ = hv6
-						var hv10 struct{ V0 bool }
-						switch hv6 {
-						case true:
-							hv10 = struct{ V0 bool }{V0: true}
-						case false:
-							hv10 = struct{ V0 bool }{V0: false}
-						}
-						return hv10, true
-					}
-				}
-				{
-					hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Select, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Select)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv3)
+					// Rule Iterated (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:7).
+					var hv9 hyruleImport0.Instruction = hv5
+					hv6 := cycle(hv9)
 					_ = hv6
-					if hok {
-						if hv4 >= 2 {
-							// Rule Payload (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:15).
-							var hv11 hyruleImport0.Instruction = hv6
-							hv7 := cycle(hv11)
-							_ = hv7
-							var hv12 struct{ V0 bool }
-							switch hv7 {
-							case true:
-								hv12 = struct{ V0 bool }{V0: true}
-							case false:
-								hv12 = struct{ V0 bool }{V0: false}
-							}
-							return hv12, true
-						}
+					var hv10 struct{ V0 bool }
+					switch hv6 {
+					case true:
+						hv10 = struct{ V0 bool }{V0: true}
+					case false:
+						hv10 = struct{ V0 bool }{V0: false}
 					}
+					return hv10, true
 				}
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Select)
-						if !hok {
-							return
+			case *hyruleImport0.Select:
+				if hs2 != nil {
+					hv6 := hs2
+					_ = hv6
+					if hv4 >= 2 {
+						// Rule Payload (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:15).
+						var hv11 hyruleImport0.Instruction = hv6
+						hv7 := cycle(hv11)
+						_ = hv7
+						var hv12 struct{ V0 bool }
+						switch hv7 {
+						case true:
+							hv12 = struct{ V0 bool }{V0: true}
+						case false:
+							hv12 = struct{ V0 bool }{V0: false}
 						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv3)
-					if hok {
-						// Rule Metadata (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:23).
-						return struct{ V0 bool }{V0: false}, true
+						return hv12, true
 					}
+					// Rule Metadata (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:23).
+					return struct{ V0 bool }{V0: false}, true
 				}
-				// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:26).
-				var hv13 hyruleImport1.ReachingWalk = hv1
-				var hv14 hyruleImport0.Value = hv3
-				hv8 := Value(hv13, hv14)
-				_ = hv8
-				var hv15 struct{ V0 bool }
-				switch hv8 {
-				case true:
-					hv15 = struct{ V0 bool }{V0: true}
-				case false:
-					hv15 = struct{ V0 bool }{V0: false}
-				}
-				return hv15, true
 			}
+			// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:26).
+			var hv13 hyruleImport1.ReachingWalk = hv1
+			var hv14 hyruleImport0.Value = hv3
+			hv8 := Value(hv13, hv14)
+			_ = hv8
+			var hv15 struct{ V0 bool }
+			switch hv8 {
+			case true:
+				hv15 = struct{ V0 bool }{V0: true}
+			case false:
+				hv15 = struct{ V0 bool }{V0: false}
+			}
+			return hv15, true
 		}
 	}
 	var zero struct{ V0 bool }

@@ -20,24 +20,13 @@ func hyruleEscapesRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				hr1 = hvalue.Val
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv5
-			_ = hv6
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv5 := hs1.Addr
+				_ = hv5
+				hv6 := hs1.Val
+				_ = hv6
 				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
 				var hv16 func(hyruleImport0.Value) bool = hv3
 				var hv17 hyruleImport0.Value = hv6
@@ -52,23 +41,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv18, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Send:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
 				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
 				var hv19 func(hyruleImport0.Value) bool = hv3
 				var hv20 hyruleImport0.Value = hv7
@@ -83,23 +59,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv21, true
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv8 := hs1.Value
+				_ = hv8
 				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
 				var hv22 func(hyruleImport0.Value) bool = hv3
 				var hv23 hyruleImport0.Value = hv8
@@ -114,22 +77,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv24, true
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport0.Select:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:18).
 				var hv25 *hyruleImport0.Select = hv9
 				var hv26 hyruleImport0.Value = hv2
@@ -144,22 +95,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv27, true
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv10 := hs1
+				_ = hv10
 				// Rule Captured (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:24).
 				var hv28 *hyruleImport0.MakeClosure = hv10
 				var hv29 func(hyruleImport0.Value) bool = hv3
@@ -174,22 +113,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv30, true
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Return, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv11
-			if hok {
+		case *hyruleImport0.Return:
+			if hs1 != nil {
+				hv11 := hs1
+				_ = hv11
 				// Rule Returned (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:33).
 				var hv31 *hyruleImport0.Return = hv11
 				var hv32 hyruleImport0.Value = hv2
@@ -205,22 +132,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv34, true
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv12
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
 				var hv35 func(hyruleImport0.Instruction) bool = hv4
 				var hv36 hyruleImport0.Instruction = hv12
@@ -235,22 +150,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv37, true
 			}
-		}
-		{
-			hv13, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv13
-			if hok {
+		case *hyruleImport0.Defer:
+			if hs1 != nil {
+				hv13 := hs1
+				_ = hv13
 				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
 				var hv38 func(hyruleImport0.Instruction) bool = hv4
 				var hv39 hyruleImport0.Instruction = hv13
@@ -265,22 +168,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hv40, true
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Go, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv14
-			if hok {
+		case *hyruleImport0.Go:
+			if hs1 != nil {
+				hv14 := hs1
+				_ = hv14
 				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
 				var hv41 func(hyruleImport0.Instruction) bool = hv4
 				var hv42 hyruleImport0.Instruction = hv14

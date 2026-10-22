@@ -12,49 +12,25 @@ func hyruleRecognizeAggregateRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Alloc:
+			if hv1 != (*hyruleImport0.Alloc)(nil) {
 				// Rule Root (internal/engine/lifecycle/completionpolicy/rules/aggregate.rules:9).
 				return struct {
 					V0 AggregateKind
 					V1 hyruleImport0.Value
 				}{V0: AggregateRoot, V1: nil}, true
 			}
-		}
-		{
-			hv2, hv3, hv4, hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hr2 hyruleImport0.Value, hr3 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Low
-				hr2 = hvalue.High
-				hr3 = hvalue.Max
-				return hr0, hr1, hr2, hr3, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			_ = hv4
-			_ = hv5
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
+				hv3 := hs1.Low
+				_ = hv3
+				hv4 := hs1.High
+				_ = hv4
+				hv5 := hs1.Max
+				_ = hv5
 				if hv3 == nil {
 					if hv4 == nil {
 						if hv5 == nil {

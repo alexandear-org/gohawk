@@ -17,103 +17,31 @@ func hyruleEscapesRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv4 := hs1.Call
+				_ = hv4
 				{
-					hv5, hok := (func(hinput hyruleImport0.CallCommon) (hr0 hyruleImport0.Value, hok bool) {
-						hvalue := hinput
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, true
-					})(hv4)
+					hs2 := hv4
+					hv5 := hs2.Value
 					_ = hv5
-					if hok {
-						{
-							if sameValue(hv1, hv5) {
-								// Rule InPlace (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:37).
-								hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
-								if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {
-									var zero struct{ V0 EscapeUse }
-									return zero, false
-								}
-								return hresult, true
+					{
+						if sameValue(hv1, hv5) {
+							// Rule InPlace (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:37).
+							hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
+							if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {
+								var zero struct{ V0 EscapeUse }
+								return zero, false
 							}
+							return hresult, true
 						}
 					}
 				}
-			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, true
-			})(hv2)
-			_ = hv6
-			if hok {
-				{
-					hv7, hok := (func(hinput hyruleImport0.CallCommon) (hr0 hyruleImport0.Value, hok bool) {
-						hvalue := hinput
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, true
-					})(hv6)
-					_ = hv7
-					if hok {
-						{
-							if sameValue(hv1, hv7) {
-								// Rule InPlace (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:37).
-								hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
-								if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {
-									var zero struct{ V0 EscapeUse }
-									return zero, false
-								}
-								return hresult, true
-							}
-						}
-					}
-				}
-			}
-		}
-		{
-			hv8, hv9, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv8
-			_ = hv9
-			if hok {
+				hv8 := hs1.Call
+				_ = hv8
+				hv9 := hs1
+				_ = hv9
 				// Rule Called (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:43).
 				var hv17 EscapeUse = EscapeUse{Kind: EscapeCall, Instruction: hv9}
 				hresult := struct{ V0 EscapeUse }{V0: hv17}
@@ -123,24 +51,30 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv10, hv11, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.CallCommon, hwhole *hyruleImport0.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Defer)
-				if !hok {
-					return
+		case *hyruleImport0.Defer:
+			if hs1 != nil {
+				hv6 := hs1.Call
+				_ = hv6
+				{
+					hs3 := hv6
+					hv7 := hs3.Value
+					_ = hv7
+					{
+						if sameValue(hv1, hv7) {
+							// Rule InPlace (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:37).
+							hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
+							if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {
+								var zero struct{ V0 EscapeUse }
+								return zero, false
+							}
+							return hresult, true
+						}
+					}
 				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Call
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv10
-			_ = hv11
-			if hok {
+				hv10 := hs1.Call
+				_ = hv10
+				hv11 := hs1
+				_ = hv11
 				// Rule Called (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:43).
 				var hv18 EscapeUse = EscapeUse{Kind: EscapeCall, Instruction: hv11}
 				hresult := struct{ V0 EscapeUse }{V0: hv18}
@@ -150,21 +84,8 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		case *hyruleImport0.Return:
+			if hv2 != (*hyruleImport0.Return)(nil) {
 				if hv3 == true {
 					// Rule ReturnedStrict (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:46).
 					hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
@@ -199,22 +120,11 @@ func hyruleEscapesRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		{
-			hv13, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				return hr0, true
-			})(hv2)
-			_ = hv13
-			if hok {
+		switch hs4 := hv2.(type) {
+		case *hyruleImport0.Store:
+			if hs4 != nil {
+				hv13 := hs4.Addr
+				_ = hv13
 				{
 					if sameValue(hv1, hv13) {
 						// Rule StoreIntoSelf (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:57).
@@ -226,25 +136,10 @@ func hyruleEscapesRecognize(harg0 struct {
 						return hresult, true
 					}
 				}
-			}
-		}
-		{
-			hv14, hv15, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.Store, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Addr
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv14
-			_ = hv15
-			if hok {
+				hv14 := hs4.Addr
+				_ = hv14
+				hv15 := hs4
+				_ = hv15
 				// Rule Stored (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:65).
 				var hv20 EscapeUse = EscapeUse{Kind: EscapeStore, Store: hv15}
 				hresult := struct{ V0 EscapeUse }{V0: hv20}
@@ -254,22 +149,10 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv16, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv16
-			if hok {
+		case *hyruleImport0.MakeClosure:
+			if hs4 != nil {
+				hv16 := hs4
+				_ = hv16
 				// Rule Captured (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:68).
 				var hv21 EscapeUse = EscapeUse{Kind: EscapeFollow, Source: hv16}
 				hresult := struct{ V0 EscapeUse }{V0: hv21}
@@ -279,44 +162,8 @@ func hyruleEscapesRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
-				// Rule Ignored (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:71).
-				hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
-				if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {
-					var zero struct{ V0 EscapeUse }
-					return zero, false
-				}
-				return hresult, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
+		case *hyruleImport0.UnOp, *hyruleImport0.DebugRef:
+			if hv2 != (*hyruleImport0.UnOp)(nil) && hv2 != (*hyruleImport0.DebugRef)(nil) {
 				// Rule Ignored (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules:71).
 				hresult := struct{ V0 EscapeUse }{V0: EscapeUse{Kind: EscapeIgnored}}
 				if !hyrulehyruleEscapesRecognizeRecord9Valid(hresult) {

@@ -35,171 +35,90 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv2)
-			if hok {
-				// Rule Launched (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:23).
-				var hv11 *spawnAnalysis = hv1
-				var hv12 *hyruleImport0.CallCommon = hv3
-				var hv13 goroutineOwnershipReason = reasonLabelLaunchedHelper
-				hv4 := (*spawnAnalysis).opaqueCallAction(hv11, hv12, hv13)
-				_ = hv4
-				if !hyrulehyrulerecognizeSpawnCallRecognizeUnion0Valid(hv4) {
-					var zero struct {
-						V0 helperCallProof
-						V1 bool
-					}
-					return zero, false
-				}
-				var hv14 struct {
+		if hs1, hok := hv2.(*hyruleImport0.Go); hok && hs1 != nil {
+			// Rule Launched (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:23).
+			var hv11 *spawnAnalysis = hv1
+			var hv12 *hyruleImport0.CallCommon = hv3
+			var hv13 goroutineOwnershipReason = reasonLabelLaunchedHelper
+			hv4 := (*spawnAnalysis).opaqueCallAction(hv11, hv12, hv13)
+			_ = hv4
+			if !hyrulehyrulerecognizeSpawnCallRecognizeUnion0Valid(hv4) {
+				var zero struct {
 					V0 helperCallProof
 					V1 bool
 				}
-				switch hv4.action {
-				case actionNone:
-					hv14 = struct {
-						V0 helperCallProof
-						V1 bool
-					}{V0: hv4, V1: true}
-				case actionJoin:
-					hv14 = struct {
-						V0 helperCallProof
-						V1 bool
-					}{V0: hv4, V1: true}
-				case actionTransfer:
-					hv14 = struct {
-						V0 helperCallProof
-						V1 bool
-					}{V0: hv4, V1: true}
-				case actionUnknown:
-					hv14 = struct {
-						V0 helperCallProof
-						V1 bool
-					}{V0: hv4, V1: true}
-				}
-				hresult := hv14
-				if !hyrulehyrulerecognizeSpawnCallRecognizeUnion1Valid(hresult) {
-					var zero struct {
-						V0 helperCallProof
-						V1 bool
-					}
-					return zero, false
-				}
-				return hresult, true
+				return zero, false
 			}
-		}
-		{
-			hv4, hv5, hok := (func(hinput *hyruleImport0.CallCommon) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.CallCommon, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
+			var hv14 struct {
+				V0 helperCallProof
+				V1 bool
+			}
+			switch hv4.action {
+			case actionNone:
+				hv14 = struct {
+					V0 helperCallProof
+					V1 bool
+				}{V0: hv4, V1: true}
+			case actionJoin:
+				hv14 = struct {
+					V0 helperCallProof
+					V1 bool
+				}{V0: hv4, V1: true}
+			case actionTransfer:
+				hv14 = struct {
+					V0 helperCallProof
+					V1 bool
+				}{V0: hv4, V1: true}
+			case actionUnknown:
+				hv14 = struct {
+					V0 helperCallProof
+					V1 bool
+				}{V0: hv4, V1: true}
+			}
+			hresult := hv14
+			if !hyrulehyrulerecognizeSpawnCallRecognizeUnion1Valid(hresult) {
+				var zero struct {
+					V0 helperCallProof
+					V1 bool
 				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, hvalue, true
-			})(hv3)
+				return zero, false
+			}
+			return hresult, true
+		}
+		if hs2 := hv3; hs2 != nil {
+			hv4 := hs2.Value
 			_ = hv4
+			hv5 := hs2
 			_ = hv5
-			if hok {
+			if hs3, hok := hv4.(*hyruleImport0.Builtin); hok && hs3 != nil {
+				hv6 := hs3
+				_ = hv6
 				{
-					hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Builtin, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Builtin)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv4)
-					_ = hv6
-					if hok {
-						{
-							var hv7 string = (*callBuiltin).Name(hv6)
-							_ = hv7
-							if hv7 == "append" {
-								// Rule Appended (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:35).
-								var hv15 *spawnAnalysis = hv1
-								var hv16 *hyruleImport0.CallCommon = hv5
-								hv8 := (*spawnAnalysis).anyArgumentConsumes(hv15, hv16)
-								_ = hv8
-								var hv17 struct {
-									V0 helperCallProof
-									V1 bool
-								}
-								switch hv8 {
-								case true:
-									hv17 = struct {
-										V0 helperCallProof
-										V1 bool
-									}{V0: helperCallProof{action: actionUnknown, reason: reasonLabelAppended}, V1: true}
-								case false:
-									hv17 = struct {
-										V0 helperCallProof
-										V1 bool
-									}{V0: helperCallProof{action: actionNone, reason: reasonNone}, V1: true}
-								}
-								hresult := hv17
-								if !hyrulehyrulerecognizeSpawnCallRecognizeUnion1Valid(hresult) {
-									var zero struct {
-										V0 helperCallProof
-										V1 bool
-									}
-									return zero, false
-								}
-								return hresult, true
-							}
-						}
-					}
-				}
-			}
-		}
-		{
-			hv8, hok := (func(hinput *hyruleImport0.CallCommon) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv3)
-			_ = hv8
-			if hok {
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Builtin)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv8)
-					if hok {
-						// Rule OtherBuiltin (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:44).
-						hresult := struct {
+					var hv7 string = (*callBuiltin).Name(hv6)
+					_ = hv7
+					if hv7 == "append" {
+						// Rule Appended (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:35).
+						var hv15 *spawnAnalysis = hv1
+						var hv16 *hyruleImport0.CallCommon = hv5
+						hv8 := (*spawnAnalysis).anyArgumentConsumes(hv15, hv16)
+						_ = hv8
+						var hv17 struct {
 							V0 helperCallProof
 							V1 bool
-						}{V0: helperCallProof{action: actionNone, reason: reasonNone}, V1: true}
+						}
+						switch hv8 {
+						case true:
+							hv17 = struct {
+								V0 helperCallProof
+								V1 bool
+							}{V0: helperCallProof{action: actionUnknown, reason: reasonLabelAppended}, V1: true}
+						case false:
+							hv17 = struct {
+								V0 helperCallProof
+								V1 bool
+							}{V0: helperCallProof{action: actionNone, reason: reasonNone}, V1: true}
+						}
+						hresult := hv17
 						if !hyrulehyrulerecognizeSpawnCallRecognizeUnion1Valid(hresult) {
 							var zero struct {
 								V0 helperCallProof
@@ -210,6 +129,25 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 						return hresult, true
 					}
 				}
+			}
+		}
+		if hs4 := hv3; hs4 != nil {
+			hv8 := hs4.Value
+			_ = hv8
+			if hs5, hok := hv8.(*hyruleImport0.Builtin); hok && hs5 != nil {
+				// Rule OtherBuiltin (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:44).
+				hresult := struct {
+					V0 helperCallProof
+					V1 bool
+				}{V0: helperCallProof{action: actionNone, reason: reasonNone}, V1: true}
+				if !hyrulehyrulerecognizeSpawnCallRecognizeUnion1Valid(hresult) {
+					var zero struct {
+						V0 helperCallProof
+						V1 bool
+					}
+					return zero, false
+				}
+				return hresult, true
 			}
 		}
 		// Rule Direct (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:47).

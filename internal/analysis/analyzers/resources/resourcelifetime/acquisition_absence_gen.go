@@ -22,142 +22,129 @@ func hyruledecideAbsentAcquisitionRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		{
-			hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
+		if hs1, hok := hv2.(*hyruleImport0.Call); hok && hs1 != nil {
+			hv5 := hs1
 			_ = hv5
-			if hok {
-				// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules:33).
-				var hv18 struct{ V0 resourceProof }
-				hv18answered := false
-				if !hv18answered {
-					var hv19 hyruleImport0.Value = hv5
-					var hv20 hyruleImport0.Value = hv3
-					var hv21 *hyruleImport2.SearchBudget = hv4
-					hv6 := errorTypeAssertionSucceeded(hv19, hv20, hv21)
-					_ = hv6
-					var hv22 struct{ V0 resourceProof }
-					switch hv6 {
-					case true:
-						hv18answered = true
-						hv22 = struct{ V0 resourceProof }{V0: carriedValueProof(true, resourceReasonErrorTypeAssertionSucceeded, hv4)}
-					}
-					if hv18answered {
-						hv18 = hv22
-					}
-				}
-				if !hv18answered {
-					var hv23 hyruleImport0.Value = hv5
-					var hv24 hyruleImport0.Value = hv3
-					var hv25 *hyruleImport2.SearchBudget = hv4
-					hv7part0, hv7part1 := errorsIsNonNilSentinel(hv23, hv24, hv25)
-					hv7 := struct {
-						V0 resourceLifetimeReason
-						V1 bool
-					}{V0: hv7part0, V1: hv7part1}
-					_ = hv7
-					if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion0Valid(hv7) {
-						var zero struct{ V0 resourceProof }
-						return zero, false
-					}
-					var hv26 struct{ V0 resourceProof }
-					switch hv7.V1 {
-					case true:
-						hv8 := hv7.V0
-						_ = hv8
-						hv18answered = true
-						hv26 = struct{ V0 resourceProof }{V0: carriedValueProof(true, hv8, hv4)}
-					}
-					if hv18answered {
-						hv18 = hv26
-					}
-				}
-				if !hv18answered {
-					var hv27 *hyruleImport0.Call = hv5
-					var hv28 hyruleImport0.Value = hv3
-					hv9 := exactErrorsAs(hv27, hv28)
-					_ = hv9
-					var hv29 struct{ V0 resourceProof }
-					switch hv9 {
-					case true:
-						hv18answered = true
-						hv29 = struct{ V0 resourceProof }{V0: carriedValueProof(true, resourceReasonErrorsAsExactAcquisitionError, hv4)}
-					}
-					if hv18answered {
-						hv18 = hv29
-					}
-				}
-				if !hv18answered {
-					var hv30 *hyruleImport1.Provider = hv1
-					var hv31 *hyruleImport0.Call = hv5
-					var hv32 hyruleImport0.Value = hv3
-					var hv33 *hyruleImport2.SearchBudget = hv4
-					hv10part0, hv10part1 := predicateWitness(hv30, hv31, hv32, hv33)
-					hv10 := struct {
-						V0 resourceProof
-						V1 bool
-					}{V0: hv10part0, V1: hv10part1}
-					_ = hv10
-					if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion1Valid(hv10) {
-						var zero struct{ V0 resourceProof }
-						return zero, false
-					}
-					var hv34 struct{ V0 resourceProof }
-					switch hv10.V1 {
-					case true:
-						hv11 := hv10.V0
-						_ = hv11
-						hv18answered = true
-						hv34 = struct{ V0 resourceProof }{V0: hv11}
-					}
-					if hv18answered {
-						hv18 = hv34
-					}
-				}
-				if !hv18answered {
-					var hv35 *hyruleImport0.Call = hv5
-					var hv36 hyruleImport0.Value = hv3
-					var hv37 *hyruleImport2.SearchBudget = hv4
-					hv12part0, hv12part1 := legacyErrorPredicate(hv35, hv36, hv37)
-					hv12 := struct {
-						V0 resourceLifetimeReason
-						V1 bool
-					}{V0: hv12part0, V1: hv12part1}
-					_ = hv12
-					if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion0Valid(hv12) {
-						var zero struct{ V0 resourceProof }
-						return zero, false
-					}
-					var hv38 struct{ V0 resourceProof }
-					switch hv12.V1 {
-					case true:
-						hv13 := hv12.V0
-						_ = hv13
-						hv18answered = true
-						hv38 = struct{ V0 resourceProof }{V0: carriedValueProof(true, hv13, hv4)}
-					}
-					if hv18answered {
-						hv18 = hv38
-					}
-				}
-				if !hv18answered {
+			// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules:33).
+			var hv18 struct{ V0 resourceProof }
+			hv18answered := false
+			if !hv18answered {
+				var hv19 hyruleImport0.Value = hv5
+				var hv20 hyruleImport0.Value = hv3
+				var hv21 *hyruleImport2.SearchBudget = hv4
+				hv6 := errorTypeAssertionSucceeded(hv19, hv20, hv21)
+				_ = hv6
+				var hv22 struct{ V0 resourceProof }
+				switch hv6 {
+				case true:
 					hv18answered = true
-					if hv18answered {
-						hv18 = struct{ V0 resourceProof }{V0: carriedValueProof(false, resourceReasonNone, hv4)}
-					}
+					hv22 = struct{ V0 resourceProof }{V0: carriedValueProof(true, resourceReasonErrorTypeAssertionSucceeded, hv4)}
 				}
-				return hv18, true
+				if hv18answered {
+					hv18 = hv22
+				}
 			}
+			if !hv18answered {
+				var hv23 hyruleImport0.Value = hv5
+				var hv24 hyruleImport0.Value = hv3
+				var hv25 *hyruleImport2.SearchBudget = hv4
+				hv7part0, hv7part1 := errorsIsNonNilSentinel(hv23, hv24, hv25)
+				hv7 := struct {
+					V0 resourceLifetimeReason
+					V1 bool
+				}{V0: hv7part0, V1: hv7part1}
+				_ = hv7
+				if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion0Valid(hv7) {
+					var zero struct{ V0 resourceProof }
+					return zero, false
+				}
+				var hv26 struct{ V0 resourceProof }
+				switch hv7.V1 {
+				case true:
+					hv8 := hv7.V0
+					_ = hv8
+					hv18answered = true
+					hv26 = struct{ V0 resourceProof }{V0: carriedValueProof(true, hv8, hv4)}
+				}
+				if hv18answered {
+					hv18 = hv26
+				}
+			}
+			if !hv18answered {
+				var hv27 *hyruleImport0.Call = hv5
+				var hv28 hyruleImport0.Value = hv3
+				hv9 := exactErrorsAs(hv27, hv28)
+				_ = hv9
+				var hv29 struct{ V0 resourceProof }
+				switch hv9 {
+				case true:
+					hv18answered = true
+					hv29 = struct{ V0 resourceProof }{V0: carriedValueProof(true, resourceReasonErrorsAsExactAcquisitionError, hv4)}
+				}
+				if hv18answered {
+					hv18 = hv29
+				}
+			}
+			if !hv18answered {
+				var hv30 *hyruleImport1.Provider = hv1
+				var hv31 *hyruleImport0.Call = hv5
+				var hv32 hyruleImport0.Value = hv3
+				var hv33 *hyruleImport2.SearchBudget = hv4
+				hv10part0, hv10part1 := predicateWitness(hv30, hv31, hv32, hv33)
+				hv10 := struct {
+					V0 resourceProof
+					V1 bool
+				}{V0: hv10part0, V1: hv10part1}
+				_ = hv10
+				if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion1Valid(hv10) {
+					var zero struct{ V0 resourceProof }
+					return zero, false
+				}
+				var hv34 struct{ V0 resourceProof }
+				switch hv10.V1 {
+				case true:
+					hv11 := hv10.V0
+					_ = hv11
+					hv18answered = true
+					hv34 = struct{ V0 resourceProof }{V0: hv11}
+				}
+				if hv18answered {
+					hv18 = hv34
+				}
+			}
+			if !hv18answered {
+				var hv35 *hyruleImport0.Call = hv5
+				var hv36 hyruleImport0.Value = hv3
+				var hv37 *hyruleImport2.SearchBudget = hv4
+				hv12part0, hv12part1 := legacyErrorPredicate(hv35, hv36, hv37)
+				hv12 := struct {
+					V0 resourceLifetimeReason
+					V1 bool
+				}{V0: hv12part0, V1: hv12part1}
+				_ = hv12
+				if !hyrulehyruledecideAbsentAcquisitionRecognizeUnion0Valid(hv12) {
+					var zero struct{ V0 resourceProof }
+					return zero, false
+				}
+				var hv38 struct{ V0 resourceProof }
+				switch hv12.V1 {
+				case true:
+					hv13 := hv12.V0
+					_ = hv13
+					hv18answered = true
+					hv38 = struct{ V0 resourceProof }{V0: carriedValueProof(true, hv13, hv4)}
+				}
+				if hv18answered {
+					hv18 = hv38
+				}
+			}
+			if !hv18answered {
+				hv18answered = true
+				if hv18answered {
+					hv18 = struct{ V0 resourceProof }{V0: carriedValueProof(false, resourceReasonNone, hv4)}
+				}
+			}
+			return hv18, true
 		}
 		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules:52).
 		var hv39 struct{ V0 resourceProof }

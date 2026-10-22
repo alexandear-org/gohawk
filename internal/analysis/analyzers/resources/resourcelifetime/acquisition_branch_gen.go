@@ -31,30 +31,25 @@ func hyruledecideResourceSuccessBranchRecognize(harg0 struct {
 		hv6 := harg0.P5
 		_ = hv6
 		{
-			hv7, hv8, hok := (func(hinput resourceProof) (hr0 hyruleImport0.EvidenceState, hwhole resourceProof, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.State
-				return hr0, hvalue, true
-			})(hv1)
+			hs1 := hv1
+			hv7 := hs1.State
 			_ = hv7
+			hv8 := hs1
 			_ = hv8
-			if hok {
-				if hv7 == resourceUnknown {
-					// Rule Unavailable (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:22).
+			if hv7 == resourceUnknown {
+				// Rule Unavailable (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:22).
+				return struct {
+					V0 resourceBranchProof
+					V1 bool
+				}{V0: branchProof(hv8, false), V1: false}, true
+			}
+			if hv7 == resourceProven {
+				if hv2 == true {
+					// Rule FailedAcquisition (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:27).
 					return struct {
 						V0 resourceBranchProof
 						V1 bool
-					}{V0: branchProof(hv8, false), V1: false}, true
-				}
-				if hv7 == resourceProven {
-					if hv2 == true {
-						// Rule FailedAcquisition (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:27).
-						return struct {
-							V0 resourceBranchProof
-							V1 bool
-						}{V0: branchProof(hv8, false), V1: true}, true
-					}
+					}{V0: branchProof(hv8, false), V1: true}, true
 				}
 			}
 		}

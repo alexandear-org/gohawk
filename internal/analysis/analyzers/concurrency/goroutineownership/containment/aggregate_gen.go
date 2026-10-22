@@ -2,7 +2,6 @@
 
 package containment
 
-import hyruleImport0 "go/token"
 import hyruleImport1 "golang.org/x/tools/go/ssa"
 
 // hyruleAggregateSourceRecognize applies rules in source order; false means no rule matched.
@@ -13,24 +12,13 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport0.Token, hr1 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.UnOp:
+			if hs1 != nil {
+				hv2 := hs1.Op
+				_ = hv2
+				hv3 := hs1.X
+				_ = hv3
 				if hv2 == loadToken {
 					// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 					return struct {
@@ -39,115 +27,50 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 					}{V0: hv3, V1: true}, true
 				}
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport1.FieldAddr:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
 				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
 				}{V0: hv4, V1: true}, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport1.IndexAddr:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
 				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
 				}{V0: hv5, V1: true}, true
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Field)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport1.Field:
+			if hs1 != nil {
+				hv6 := hs1.X
+				_ = hv6
 				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
 				}{V0: hv6, V1: true}, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv7
-			if hok {
+		case *hyruleImport1.Index:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
 				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
 				}{V0: hv7, V1: true}, true
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Lookup)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv8
-			if hok {
+		case *hyruleImport1.Lookup:
+			if hs1 != nil {
+				hv8 := hs1.X
+				_ = hv8
 				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
 				return struct {
 					V0 hyruleImport1.Value

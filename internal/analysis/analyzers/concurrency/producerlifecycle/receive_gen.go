@@ -5,7 +5,6 @@ package producerlifecycle
 import hyruleImport3 "github.com/kojah/gohawk/internal/analysis/passes/concurrencyfacts"
 import hyruleImport0 "github.com/kojah/gohawk/internal/engine/heapmodel"
 import hyruleImport4 "github.com/kojah/gohawk/internal/engine/proof"
-import hyruleImport1 "go/token"
 import hyruleImport2 "golang.org/x/tools/go/ssa"
 
 // hyruleinstructionReceivesRecognize applies rules in source order; false means no rule matched.
@@ -58,24 +57,13 @@ func hyruleinstructionReceivesRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		{
-			hv7, hv8, hok := (func(hinput hyruleImport2.Instruction) (hr0 hyruleImport1.Token, hr1 hyruleImport2.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv7
-			_ = hv8
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport2.UnOp:
+			if hs1 != nil {
+				hv7 := hs1.Op
+				_ = hv7
+				hv8 := hs1.X
+				_ = hv8
 				if hv7 == receiveToken {
 					// Rule Receive (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:27).
 					var hv17 hyruleImport2.Value = hv8
@@ -99,22 +87,10 @@ func hyruleinstructionReceivesRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport2.Instruction) (hwhole *hyruleImport2.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport2.Select:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				// Rule Select (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:35).
 				var hv22 *hyruleImport2.Select = hv9
 				var hv23 hyruleImport2.Value = hv2

@@ -18,21 +18,11 @@ func hyruleConsumeRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Return, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Return)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv3
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport1.Return:
+			if hs1 != nil {
+				hv3 := hs1
+				_ = hv3
 				// Rule Returned (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:15).
 				var hv16 InstructionQueries = hv1
 				var hv17 *hyruleImport1.Return = hv3
@@ -58,22 +48,10 @@ func hyruleConsumeRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Store, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		case *hyruleImport1.Store:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Stored (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:21).
 				var hv18 InstructionQueries = hv1
 				var hv19 *hyruleImport1.Store = hv4
@@ -100,24 +78,12 @@ func hyruleConsumeRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport1.Instruction) (hr0 hyruleImport1.Value, hwhole *hyruleImport1.Send, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Send)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport1.Send:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
 				// Rule Sent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:27).
 				var hv20 InstructionQueries = hv1
 				var hv21 hyruleImport1.Value = hv5
@@ -145,23 +111,10 @@ func hyruleConsumeRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport1.Instruction) (hr0 hyruleImport1.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Value
-				return hr0, true
-			})(hv2)
-			_ = hv7
-			if hok {
+		case *hyruleImport1.MapUpdate:
+			if hs1 != nil {
+				hv7 := hs1.Value
+				_ = hv7
 				// Rule Mapped (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:33).
 				var hv23 InstructionQueries = hv1
 				var hv24 hyruleImport1.Value = hv7
@@ -189,22 +142,10 @@ func hyruleConsumeRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv8, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Select, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Select)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv8
-			if hok {
+		case *hyruleImport1.Select:
+			if hs1 != nil {
+				hv8 := hs1
+				_ = hv8
 				// Rule Selected (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:39).
 				var hv26 InstructionQueries = hv1
 				var hv27 *hyruleImport1.Select = hv8
@@ -231,22 +172,10 @@ func hyruleConsumeRecognize(harg0 struct {
 				}
 				return hresult, true
 			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv9
-			if hok {
+		case *hyruleImport1.Call:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				{
 					var hv10 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv9)
 					_ = hv10
@@ -278,22 +207,10 @@ func hyruleConsumeRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv11, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Defer, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Defer)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv11
-			if hok {
+		case *hyruleImport1.Defer:
+			if hs1 != nil {
+				hv11 := hs1
+				_ = hv11
 				{
 					var hv12 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv11)
 					_ = hv12
@@ -325,22 +242,10 @@ func hyruleConsumeRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv13, hok := (func(hinput hyruleImport1.Instruction) (hwhole *hyruleImport1.Go, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Go)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv13
-			if hok {
+		case *hyruleImport1.Go:
+			if hs1 != nil {
+				hv13 := hs1
+				_ = hv13
 				{
 					var hv14 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv13)
 					_ = hv14

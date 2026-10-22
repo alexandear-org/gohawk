@@ -14,21 +14,11 @@ func hyruleContextOriginRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struc
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv2
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport1.Call:
+			if hs1 != nil {
+				hv2 := hs1
+				_ = hv2
 				{
 					var hv3 *hyruleImport1.CallCommon = (*contextCall).Common(hv2)
 					_ = hv3
@@ -44,53 +34,27 @@ func hyruleContextOriginRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struc
 					}
 				}
 			}
-		}
-		{
-			hv4, hv5, hok := (func(hinput hyruleImport1.Value) (hr0 hyruleImport1.Value, hr1 int, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport1.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				hr1 = hvalue.Index
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv4
-			_ = hv5
-			if hok {
-				{
-					hv6, hok := (func(hinput hyruleImport1.Value) (hwhole *hyruleImport1.Call, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport1.Call)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv4)
+		case *hyruleImport1.Extract:
+			if hs1 != nil {
+				hv4 := hs1.Tuple
+				_ = hv4
+				hv5 := hs1.Index
+				_ = hv5
+				if hs2, hok := hv4.(*hyruleImport1.Call); hok && hs2 != nil {
+					hv6 := hs2
 					_ = hv6
-					if hok {
-						if hv5 <= 1 {
+					if hv5 <= 1 {
+						{
+							var hv7 *hyruleImport1.CallCommon = (*contextCall).Common(hv6)
+							_ = hv7
 							{
-								var hv7 *hyruleImport1.CallCommon = (*contextCall).Common(hv6)
-								_ = hv7
-								{
-									if CancelConstructor(hv7) {
-										// Rule Constructed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:27).
-										return struct {
-											V0 OriginKind
-											V1 *hyruleImport1.Call
-											V2 hyruleImport1.Value
-										}{V0: OriginFresh, V1: hv6, V2: nil}, true
-									}
+								if CancelConstructor(hv7) {
+									// Rule Constructed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:27).
+									return struct {
+										V0 OriginKind
+										V1 *hyruleImport1.Call
+										V2 hyruleImport1.Value
+									}{V0: OriginFresh, V1: hv6, V2: nil}, true
 								}
 							}
 						}

@@ -2,7 +2,6 @@
 
 package admission
 
-import hyruleImport1 "go/token"
 import hyruleImport2 "go/types"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
@@ -11,23 +10,13 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
+				hv3 := hs1
+				_ = hv3
 				{
 					var hv4 hyruleImport2.Type = (node).Type(hv2)
 					_ = hv4
@@ -45,25 +34,12 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv6, hv7, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Val
-				hr1 = hvalue.Addr
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv6
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Store:
+			if hs1 != nil {
+				hv6 := hs1.Val
+				_ = hv6
+				hv7 := hs1.Addr
+				_ = hv7
 				{
 					var hv8 hyruleImport2.Type = (node).Type(hv6)
 					_ = hv8
@@ -79,58 +55,15 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeMap)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.MakeMap, *hyruleImport0.MakeSlice:
+			if hv1 != (*hyruleImport0.MakeMap)(nil) && hv1 != (*hyruleImport0.MakeSlice)(nil) {
 				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:68).
 				return struct{ V0 bool }{V0: true}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeSlice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:68).
-				return struct{ V0 bool }{V0: true}, true
-			}
-		}
-		{
-			hv9, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.IndexAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv9
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv9 := hs1
+				_ = hv9
 				{
 					if Address(hv9) {
 						// Rule Indexed (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:71).
@@ -138,22 +71,10 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv10, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Slice, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv10
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs1 != nil {
+				hv10 := hs1
+				_ = hv10
 				{
 					var hv11 hyruleImport2.Type = (node).Type(hv10)
 					_ = hv11
@@ -165,22 +86,10 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.Lookup, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Lookup)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv12
-			if hok {
+		case *hyruleImport0.Lookup:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				{
 					var hv13 hyruleImport2.Type = lookupElement(hv12)
 					_ = hv13
@@ -192,22 +101,10 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport0.Instruction) (hwhole *hyruleImport0.TypeAssert, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv14
-			if hok {
+		case *hyruleImport0.TypeAssert:
+			if hs1 != nil {
+				hv14 := hs1
+				_ = hv14
 				{
 					var hv15 hyruleImport2.Type = lookupElement(hv14)
 					_ = hv15
@@ -219,60 +116,18 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv16, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv16 := hs1.Tuple
+				_ = hv16
+				if hs2, hok := hv16.(*hyruleImport0.Select); hok && hs2 != nil {
+					// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:94).
+					return struct{ V0 bool }{V0: false}, true
 				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				return hr0, true
-			})(hv1)
-			_ = hv16
-			if hok {
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Select)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv16)
-					if hok {
-						// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:94).
-						return struct{ V0 bool }{V0: false}, true
-					}
-				}
-			}
-		}
-		{
-			hv17, hv18, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.Extract, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				return hr0, hvalue, true
-			})(hv1)
-			_ = hv17
-			_ = hv18
-			if hok {
+				hv17 := hs1.Tuple
+				_ = hv17
+				hv18 := hs1
+				_ = hv18
 				{
 					var hv19 hyruleImport2.Type = (node).Type(hv18)
 					_ = hv19
@@ -284,25 +139,12 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv20, hv21, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MapUpdate)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Key
-				hr1 = hvalue.Value
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv20
-			_ = hv21
-			if hok {
+		case *hyruleImport0.MapUpdate:
+			if hs1 != nil {
+				hv20 := hs1.Key
+				_ = hv20
+				hv21 := hs1.Value
+				_ = hv21
 				{
 					var hv22 hyruleImport2.Type = (node).Type(hv20)
 					_ = hv22
@@ -322,27 +164,14 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					}
 				}
 			}
-		}
-		{
-			hv24, hv25, hv26, hok := (func(hinput hyruleImport0.Instruction) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hr2 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				hr2 = hvalue.Y
-				return hr0, hr1, hr2, true
-			})(hv1)
-			_ = hv24
-			_ = hv25
-			_ = hv26
-			if hok {
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv24 := hs1.Op
+				_ = hv24
+				hv25 := hs1.X
+				_ = hv25
+				hv26 := hs1.Y
+				_ = hv26
 				if hv24 == equalToken {
 					{
 						if nilConstant(hv25) {

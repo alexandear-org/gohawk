@@ -30,89 +30,43 @@ func hyruleCapturedRecognize(harg0 struct {
 		hv5 := harg0.P4
 		_ = hv5
 		{
-			hv6, hv7, hok := (func(hinput Context) (hr0 bool, hwhole Context, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Exact
-				return hr0, hvalue, true
-			})(hv1)
+			hs1 := hv1
+			hv6 := hs1.Exact
 			_ = hv6
+			hv7 := hs1
 			_ = hv7
-			if hok {
-				if hv6 == true {
-					{
-						hv8, hok := (func(hinput hyruleImport2.Value) (hwhole *hyruleImport2.Alloc, hok bool) {
-							hvalue, hok := hinput.(*hyruleImport2.Alloc)
-							if !hok {
-								return
-							}
-							if hvalue == nil {
-								hok = false
-								return
-							}
-							_ = hvalue
-							return hvalue, true
-						})(hv3)
-						_ = hv8
-						if hok {
-							// Rule ExactCell (internal/engine/lifecycle/completionmapping/rules/capture.rules:7).
-							var hv23 Context = hv7
-							var hv24 hyruleImport2.Value = hv8
-							var hv25 hyruleImport2.Instruction = hv5
-							hv9 := stable(hv23, hv24, hv25)
-							_ = hv9
-							var hv26 hyruleImport1.StoredValue = hv9
-							hv10 := (storedValue).Proven(hv26)
-							_ = hv10
-							var hv27 struct {
-								V0 Local
-								V1 bool
-							}
-							switch hv10 {
-							case true:
-								var hv28 Local = Local{Kind: Exact, Local: hv2, Supplied: hv9.Value, Path: nil}
-								var hv29 bool = identical(hv9.Value, hv4)
-								hv27 = struct {
-									V0 Local
-									V1 bool
-								}{V0: hv28, V1: hv29}
-							case false:
-								hv27 = struct {
-									V0 Local
-									V1 bool
-								}{V0: emptyLocal(), V1: false}
-							}
-							hresult := hv27
-							if !hyrulehyruleCapturedRecognizeRecord3Valid(hresult) {
-								var zero struct {
-									V0 Local
-									V1 bool
-								}
-								return zero, false
-							}
-							return hresult, true
-						}
-					}
-				}
-			}
-		}
-		{
-			hv9, hok := (func(hinput Context) (hr0 bool, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Exact
-				return hr0, true
-			})(hv1)
-			_ = hv9
-			if hok {
-				if hv9 == true {
-					// Rule ExactValue (internal/engine/lifecycle/completionmapping/rules/capture.rules:16).
-					var hv30 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
-					var hv31 bool = identical(hv3, hv4)
-					hresult := struct {
+			if hv6 == true {
+				if hs2, hok := hv3.(*hyruleImport2.Alloc); hok && hs2 != nil {
+					hv8 := hs2
+					_ = hv8
+					// Rule ExactCell (internal/engine/lifecycle/completionmapping/rules/capture.rules:7).
+					var hv23 Context = hv7
+					var hv24 hyruleImport2.Value = hv8
+					var hv25 hyruleImport2.Instruction = hv5
+					hv9 := stable(hv23, hv24, hv25)
+					_ = hv9
+					var hv26 hyruleImport1.StoredValue = hv9
+					hv10 := (storedValue).Proven(hv26)
+					_ = hv10
+					var hv27 struct {
 						V0 Local
 						V1 bool
-					}{V0: hv30, V1: hv31}
+					}
+					switch hv10 {
+					case true:
+						var hv28 Local = Local{Kind: Exact, Local: hv2, Supplied: hv9.Value, Path: nil}
+						var hv29 bool = identical(hv9.Value, hv4)
+						hv27 = struct {
+							V0 Local
+							V1 bool
+						}{V0: hv28, V1: hv29}
+					case false:
+						hv27 = struct {
+							V0 Local
+							V1 bool
+						}{V0: emptyLocal(), V1: false}
+					}
+					hresult := hv27
 					if !hyrulehyruleCapturedRecognizeRecord3Valid(hresult) {
 						var zero struct {
 							V0 Local
@@ -122,6 +76,28 @@ func hyruleCapturedRecognize(harg0 struct {
 					}
 					return hresult, true
 				}
+			}
+		}
+		{
+			hs3 := hv1
+			hv9 := hs3.Exact
+			_ = hv9
+			if hv9 == true {
+				// Rule ExactValue (internal/engine/lifecycle/completionmapping/rules/capture.rules:16).
+				var hv30 Local = Local{Kind: Exact, Local: hv2, Supplied: hv3, Path: nil}
+				var hv31 bool = identical(hv3, hv4)
+				hresult := struct {
+					V0 Local
+					V1 bool
+				}{V0: hv30, V1: hv31}
+				if !hyrulehyruleCapturedRecognizeRecord3Valid(hresult) {
+					var zero struct {
+						V0 Local
+						V1 bool
+					}
+					return zero, false
+				}
+				return hresult, true
 			}
 		}
 		// Rule Capture (internal/engine/lifecycle/completionmapping/rules/capture.rules:22).

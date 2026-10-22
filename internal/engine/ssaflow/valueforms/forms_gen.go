@@ -6,22 +6,11 @@ import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // Unwrap applies rules in source order; false means no rule matched.
 func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
-	{
-		hv1, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.ChangeInterface)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.X
-			return hr0, true
-		})(harg0)
-		_ = hv1
-		if hok {
+	switch hs1 := harg0.(type) {
+	case *hyruleImport0.ChangeInterface:
+		if hs1 != nil {
+			hv1 := hs1.X
+			_ = hv1
 			{
 				if harg1.allows(ChangeInterface) {
 					// Rule ChangedInterface (internal/engine/ssaflow/valueforms/rules/forms.rules:29).
@@ -29,23 +18,10 @@ func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
 				}
 			}
 		}
-	}
-	{
-		hv2, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.ChangeType)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.X
-			return hr0, true
-		})(harg0)
-		_ = hv2
-		if hok {
+	case *hyruleImport0.ChangeType:
+		if hs1 != nil {
+			hv2 := hs1.X
+			_ = hv2
 			{
 				if harg1.allows(ChangeType) {
 					// Rule ChangedType (internal/engine/ssaflow/valueforms/rules/forms.rules:35).
@@ -53,23 +29,10 @@ func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
 				}
 			}
 		}
-	}
-	{
-		hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.Convert)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.X
-			return hr0, true
-		})(harg0)
-		_ = hv3
-		if hok {
+	case *hyruleImport0.Convert:
+		if hs1 != nil {
+			hv3 := hs1.X
+			_ = hv3
 			{
 				if harg1.allows(Convert) {
 					// Rule Converted (internal/engine/ssaflow/valueforms/rules/forms.rules:41).
@@ -77,23 +40,10 @@ func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
 				}
 			}
 		}
-	}
-	{
-		hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.MakeInterface)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.X
-			return hr0, true
-		})(harg0)
-		_ = hv4
-		if hok {
+	case *hyruleImport0.MakeInterface:
+		if hs1 != nil {
+			hv4 := hs1.X
+			_ = hv4
 			{
 				if harg1.allows(MakeInterface) {
 					// Rule Boxed (internal/engine/ssaflow/valueforms/rules/forms.rules:47).
@@ -101,25 +51,12 @@ func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
 				}
 			}
 		}
-	}
-	{
-		hv5, hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 bool, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.X
-			hr1 = hvalue.CommaOk
-			return hr0, hr1, true
-		})(harg0)
-		_ = hv5
-		_ = hv6
-		if hok {
+	case *hyruleImport0.TypeAssert:
+		if hs1 != nil {
+			hv5 := hs1.X
+			_ = hv5
+			hv6 := hs1.CommaOk
+			_ = hv6
 			if hv6 == false {
 				{
 					if harg1.allows(TypeAssert) {
@@ -129,49 +66,22 @@ func Unwrap(harg0 hyruleImport0.Value, harg1 Form) (hyruleImport0.Value, bool) {
 				}
 			}
 		}
-	}
-	{
-		hv7, hv8, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 int, hok bool) {
-			hvalue, hok := hinput.(*hyruleImport0.Extract)
-			if !hok {
-				return
-			}
-			if hvalue == nil {
-				hok = false
-				return
-			}
-			_ = hvalue
-			hr0 = hvalue.Tuple
-			hr1 = hvalue.Index
-			return hr0, hr1, true
-		})(harg0)
-		_ = hv7
-		_ = hv8
-		if hok {
-			{
-				hv9, hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 bool, hok bool) {
-					hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-					if !hok {
-						return
-					}
-					if hvalue == nil {
-						hok = false
-						return
-					}
-					_ = hvalue
-					hr0 = hvalue.X
-					hr1 = hvalue.CommaOk
-					return hr0, hr1, true
-				})(hv7)
+	case *hyruleImport0.Extract:
+		if hs1 != nil {
+			hv7 := hs1.Tuple
+			_ = hv7
+			hv8 := hs1.Index
+			_ = hv8
+			if hs2, hok := hv7.(*hyruleImport0.TypeAssert); hok && hs2 != nil {
+				hv9 := hs2.X
 				_ = hv9
+				hv10 := hs2.CommaOk
 				_ = hv10
-				if hok {
-					if hv8 == 0 {
-						{
-							if harg1.allows(TypeAssert) {
-								// Rule ExtractedAssertion (internal/engine/ssaflow/valueforms/rules/forms.rules:61).
-								return hv9, true
-							}
+				if hv8 == 0 {
+					{
+						if harg1.allows(TypeAssert) {
+							// Rule ExtractedAssertion (internal/engine/ssaflow/valueforms/rules/forms.rules:61).
+							return hv9, true
 						}
 					}
 				}

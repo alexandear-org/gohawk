@@ -12,42 +12,17 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hv2, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Index
-				return hr0, true
-			})(hv1)
-			_ = hv2
-			if hok {
-				{
-					hok := (func(hinput hyruleImport0.Value) (hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return true
-					})(hv2)
-					if hok {
-						// Rule ConstantAddress (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:26).
-						return struct {
-							V0 IndexStep
-							V1 hyruleImport0.Value
-						}{V0: IndexStopped, V1: nil}, true
-					}
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv2 := hs1.Index
+				_ = hv2
+				if hs2, hok := hv2.(*hyruleImport0.Const); hok && hs2 != nil {
+					// Rule ConstantAddress (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:26).
+					return struct {
+						V0 IndexStep
+						V1 hyruleImport0.Value
+					}{V0: IndexStopped, V1: nil}, true
 				}
 				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:29).
 				return struct {
@@ -55,111 +30,38 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 					V1 hyruleImport0.Value
 				}{V0: IndexDynamic, V1: nil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Index)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport0.Index, *hyruleImport0.Lookup:
+			if hv1 != (*hyruleImport0.Index)(nil) && hv1 != (*hyruleImport0.Lookup)(nil) {
 				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:29).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
 				}{V0: IndexDynamic, V1: nil}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Lookup)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:29).
-				return struct {
-					V0 IndexStep
-					V1 hyruleImport0.Value
-				}{V0: IndexDynamic, V1: nil}, true
-			}
-		}
-		{
-			hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				return hr0, true
-			})(hv1)
-			_ = hv3
-			if hok {
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv3 := hs1.Tuple
+				_ = hv3
 				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
 				}{V0: IndexFollow, V1: hv3}, true
 			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
 				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
 				}{V0: IndexFollow, V1: hv4}, true
 			}
-		}
-		{
-			hv5, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv1)
-			_ = hv5
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv5 := hs1.X
+				_ = hv5
 				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
 				return struct {
 					V0 IndexStep

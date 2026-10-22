@@ -28,182 +28,140 @@ func hyrulelockTransitionRecognize(harg0 struct {
 			}
 		}
 		{
-			hv3, hv4, hok := (func(hinput hyruleImport0.Operation) (hr0 hyruleImport0.Kind, hr1 hyruleImport0.Reference, hok bool) {
-				hvalue := hinput
-				_ = hvalue
-				hr0 = hvalue.Kind
-				hr1 = hvalue.Resource
-				return hr0, hr1, true
-			})(hv1)
+			hs1 := hv1
+			hv3 := hs1.Kind
 			_ = hv3
+			hv4 := hs1.Resource
 			_ = hv4
-			if hok {
-				if hv3 == lock {
-					{
-						hv5, hv6, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv5
-						_ = hv6
-						if hok {
-							if hv6 == true {
-								// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
-								return struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectUnknown, V1: nil}, true
-							}
-						}
+			if hv3 == lock {
+				{
+					hs2 := hv4
+					hv5 := hs2.Value
+					_ = hv5
+					hv6 := hs2.Indirect
+					_ = hv6
+					if hv6 == true {
+						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
+						return struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectUnknown, V1: nil}, true
 					}
 				}
-				if hv3 == unlock {
-					{
-						hv7, hv8, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv7
-						_ = hv8
-						if hok {
-							if hv8 == true {
-								// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
-								return struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectUnknown, V1: nil}, true
-							}
-						}
+			}
+			if hv3 == unlock {
+				{
+					hs3 := hv4
+					hv7 := hs3.Value
+					_ = hv7
+					hv8 := hs3.Indirect
+					_ = hv8
+					if hv8 == true {
+						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
+						return struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectUnknown, V1: nil}, true
 					}
 				}
-				if hv3 == lock {
-					{
-						hv9, hv10, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv9
-						_ = hv10
-						if hok {
-							if hv9 == nil {
-								// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
-								return struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectUnknown, V1: nil}, true
-							}
-						}
+			}
+			if hv3 == lock {
+				{
+					hs4 := hv4
+					hv9 := hs4.Value
+					_ = hv9
+					hv10 := hs4.Indirect
+					_ = hv10
+					if hv9 == nil {
+						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
+						return struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectUnknown, V1: nil}, true
 					}
 				}
-				if hv3 == unlock {
-					{
-						hv11, hv12, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv11
-						_ = hv12
-						if hok {
-							if hv11 == nil {
-								// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
-								return struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectUnknown, V1: nil}, true
-							}
-						}
+			}
+			if hv3 == unlock {
+				{
+					hs5 := hv4
+					hv11 := hs5.Value
+					_ = hv11
+					hv12 := hs5.Indirect
+					_ = hv12
+					if hv11 == nil {
+						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
+						return struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectUnknown, V1: nil}, true
 					}
 				}
-				if hv3 == lock {
-					{
-						hv13, hv14, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv13
-						_ = hv14
-						if hok {
-							// Rule Acquire (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:39).
-							return struct {
-								V0 lockEffect
-								V1 hyruleImport1.Value
-							}{V0: lockEffectAcquire, V1: hv13}, true
-						}
-					}
-				}
-				if hv3 == unlock {
-					{
-						hv15, hv16, hok := (func(hinput hyruleImport0.Reference) (hr0 hyruleImport1.Value, hr1 bool, hok bool) {
-							hvalue := hinput
-							_ = hvalue
-							hr0 = hvalue.Value
-							hr1 = hvalue.Indirect
-							return hr0, hr1, true
-						})(hv4)
-						_ = hv15
-						_ = hv16
-						if hok {
-							// Rule Release (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:43).
-							var hv18 *lockRegion = hv2
-							var hv19 hyruleImport1.Value = hv15
-							hv17 := (*lockRegion).holds(hv18, hv19)
-							_ = hv17
-							var hv20 struct {
-								V0 lockEffect
-								V1 hyruleImport1.Value
-							}
-							switch hv17 {
-							case true:
-								hv20 = struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectRelease, V1: hv15}
-							case false:
-								hv20 = struct {
-									V0 lockEffect
-									V1 hyruleImport1.Value
-								}{V0: lockEffectUnknown, V1: nil}
-							}
-							return hv20, true
-						}
-					}
-				}
-				if hv3 == condWait {
-					// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+			}
+			if hv3 == lock {
+				{
+					hs6 := hv4
+					hv13 := hs6.Value
+					_ = hv13
+					hv14 := hs6.Indirect
+					_ = hv14
+					// Rule Acquire (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:39).
 					return struct {
 						V0 lockEffect
 						V1 hyruleImport1.Value
-					}{V0: lockEffectUnknown, V1: nil}, true
+					}{V0: lockEffectAcquire, V1: hv13}, true
 				}
-				if hv3 == readLock {
-					// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
-					return struct {
+			}
+			if hv3 == unlock {
+				{
+					hs7 := hv4
+					hv15 := hs7.Value
+					_ = hv15
+					hv16 := hs7.Indirect
+					_ = hv16
+					// Rule Release (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:43).
+					var hv18 *lockRegion = hv2
+					var hv19 hyruleImport1.Value = hv15
+					hv17 := (*lockRegion).holds(hv18, hv19)
+					_ = hv17
+					var hv20 struct {
 						V0 lockEffect
 						V1 hyruleImport1.Value
-					}{V0: lockEffectUnknown, V1: nil}, true
+					}
+					switch hv17 {
+					case true:
+						hv20 = struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectRelease, V1: hv15}
+					case false:
+						hv20 = struct {
+							V0 lockEffect
+							V1 hyruleImport1.Value
+						}{V0: lockEffectUnknown, V1: nil}
+					}
+					return hv20, true
 				}
-				if hv3 == readUnlock {
-					// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
-					return struct {
-						V0 lockEffect
-						V1 hyruleImport1.Value
-					}{V0: lockEffectUnknown, V1: nil}, true
-				}
+			}
+			if hv3 == condWait {
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				return struct {
+					V0 lockEffect
+					V1 hyruleImport1.Value
+				}{V0: lockEffectUnknown, V1: nil}, true
+			}
+			if hv3 == readLock {
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				return struct {
+					V0 lockEffect
+					V1 hyruleImport1.Value
+				}{V0: lockEffectUnknown, V1: nil}, true
+			}
+			if hv3 == readUnlock {
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				return struct {
+					V0 lockEffect
+					V1 hyruleImport1.Value
+				}{V0: lockEffectUnknown, V1: nil}, true
 			}
 		}
 	}

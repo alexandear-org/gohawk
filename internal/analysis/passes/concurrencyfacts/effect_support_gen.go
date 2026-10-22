@@ -27,147 +27,16 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				return struct{ V0 Reason }{V0: ReasonNone}, true
 			}
 		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.If)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport2.If, *hyruleImport2.Jump, *hyruleImport2.DebugRef, *hyruleImport2.Alloc, *hyruleImport2.MakeClosure, *hyruleImport2.MakeInterface, *hyruleImport2.ChangeInterface:
+			if hv1 != (*hyruleImport2.If)(nil) && hv1 != (*hyruleImport2.Jump)(nil) && hv1 != (*hyruleImport2.DebugRef)(nil) && hv1 != (*hyruleImport2.Alloc)(nil) && hv1 != (*hyruleImport2.MakeClosure)(nil) && hv1 != (*hyruleImport2.MakeInterface)(nil) && hv1 != (*hyruleImport2.ChangeInterface)(nil) {
 				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
 				return struct{ V0 Reason }{V0: ReasonNone}, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Jump)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.DebugRef)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.MakeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.ChangeInterface)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Structural (internal/analysis/passes/concurrencyfacts/rules/passive.rules:51).
-				return struct{ V0 Reason }{V0: ReasonNone}, true
-			}
-		}
-		{
-			hv4, hok := (func(hinput hyruleImport2.Instruction) (hwhole *hyruleImport2.Phi, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Phi)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv4
-			if hok {
+		case *hyruleImport2.Phi:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				{
 					var hv5 hyruleImport4.Type = (passiveValue).Type(hv4)
 					_ = hv5
@@ -179,22 +48,10 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport2.Instruction) (hwhole *hyruleImport2.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport2.FieldAddr:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				// Rule Field (internal/analysis/passes/concurrencyfacts/rules/passive.rules:63).
 				var hv17 *hyruleImport2.FieldAddr = hv6
 				var hv18 *hyruleImport3.SearchBudget = hv3
@@ -209,52 +66,24 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				}
 				return hv19, true
 			}
-		}
-		{
-			hv7, hv8, hv9, hok := (func(hinput hyruleImport2.Instruction) (hr0 hyruleImport2.Value, hr1 hyruleImport2.Value, hwhole *hyruleImport2.Store, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Val
-				hr1 = hvalue.Addr
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv7
-			_ = hv8
-			_ = hv9
-			if hok {
+		case *hyruleImport2.Store:
+			if hs1 != nil {
+				hv7 := hs1.Val
+				_ = hv7
+				hv8 := hs1.Addr
+				_ = hv8
+				hv9 := hs1
+				_ = hv9
 				{
 					if localSynchronizationPointerStore(hv9) {
 						// Rule PointerSpill (internal/analysis/passes/concurrencyfacts/rules/passive.rules:70).
 						return struct{ V0 Reason }{V0: ReasonNone}, true
 					}
 				}
-			}
-		}
-		{
-			hv10, hv11, hok := (func(hinput hyruleImport2.Instruction) (hr0 hyruleImport2.Value, hr1 hyruleImport2.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.Store)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Val
-				hr1 = hvalue.Addr
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv10
-			_ = hv11
-			if hok {
+				hv10 := hs1.Val
+				_ = hv10
+				hv11 := hs1.Addr
+				_ = hv11
 				{
 					if localAddress(hv11) {
 						{
@@ -282,22 +111,10 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hv16, hok := (func(hinput hyruleImport2.Instruction) (hwhole *hyruleImport2.ChangeType, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.ChangeType)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv16
-			if hok {
+		case *hyruleImport2.ChangeType:
+			if hs1 != nil {
+				hv16 := hs1
+				_ = hv16
 				{
 					if hyruleImport1.ChannelType(hv16) {
 						// Rule ChannelRepresentation (internal/analysis/passes/concurrencyfacts/rules/passive.rules:89).
@@ -305,21 +122,8 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 					}
 				}
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport2.Instruction) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport2.MakeChan)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		case *hyruleImport2.MakeChan:
+			if hv1 != (*hyruleImport2.MakeChan)(nil) {
 				if hv2 == true {
 					// Rule RootChannel (internal/analysis/passes/concurrencyfacts/rules/passive.rules:96).
 					return struct{ V0 Reason }{V0: ReasonNone}, true

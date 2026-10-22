@@ -3,8 +3,6 @@
 package completionpolicy
 
 import hyruleImport3 "github.com/kojah/gohawk/internal/engine/ssaflow/calls"
-import hyruleImport2 "go/constant"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleRecognizeConditionRecognize applies rules in source order; false means no rule matched.
@@ -17,223 +15,160 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		{
-			hv3, hv4, hv5, hok := (func(hinput *hyruleImport0.BinOp) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hr2 hyruleImport1.Token, hok bool) {
-				hvalue := hinput
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Y
-				hr2 = hvalue.Op
-				return hr0, hr1, hr2, true
-			})(hv1)
+		if hs1 := hv1; hs1 != nil {
+			hv3 := hs1.X
 			_ = hv3
+			hv4 := hs1.Y
 			_ = hv4
+			hv5 := hs1.Op
 			_ = hv5
-			if hok {
-				{
-					hv6, hv7, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport2.Value, hwhole *hyruleImport0.Const, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, hvalue, true
-					})(hv4)
+			switch hs2 := hv4.(type) {
+			case *hyruleImport0.Const:
+				if hs2 != nil {
+					hv6 := hs2.Value
 					_ = hv6
+					hv7 := hs2
 					_ = hv7
-					if hok {
-						if hv5 == conditionEqualToken {
-							{
-								if errorNilComparison(hv7, hv3) {
-									// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
-									var hv14 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
-									var hv15 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv14}
-									hresult := struct{ V0 ConditionStep }{V0: hv15}
-									if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-										var zero struct{ V0 ConditionStep }
-										return zero, false
-									}
-									return hresult, true
+					if hv5 == conditionEqualToken {
+						{
+							if errorNilComparison(hv7, hv3) {
+								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
+								var hv14 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
+								var hv15 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv14}
+								hresult := struct{ V0 ConditionStep }{V0: hv15}
+								if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+									var zero struct{ V0 ConditionStep }
+									return zero, false
 								}
-							}
-						}
-						if hv5 == conditionNotEqualToken {
-							{
-								if errorNilComparison(hv7, hv3) {
-									// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
-									var hv16 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
-									var hv17 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv16}
-									hresult := struct{ V0 ConditionStep }{V0: hv17}
-									if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-										var zero struct{ V0 ConditionStep }
-										return zero, false
-									}
-									return hresult, true
-								}
+								return hresult, true
 							}
 						}
 					}
-				}
-				{
-					hv8, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport2.Value, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
+					if hv5 == conditionNotEqualToken {
+						{
+							if errorNilComparison(hv7, hv3) {
+								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
+								var hv16 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
+								var hv17 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv16}
+								hresult := struct{ V0 ConditionStep }{V0: hv17}
+								if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+									var zero struct{ V0 ConditionStep }
+									return zero, false
+								}
+								return hresult, true
+							}
 						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, true
-					})(hv4)
+					}
+					hv8 := hs2.Value
 					_ = hv8
-					if hok {
-						{
-							hv9, hok := conditionBoolean(hv8)
-							_ = hv9
-							if hok {
-								if hv5 == conditionEqualToken {
-									// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
-									var hv18 bool = comparisonOperandTruth(hv5, hv2, hv9)
-									var hv19 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv18}
-									hresult := struct{ V0 ConditionStep }{V0: hv19}
-									if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-										var zero struct{ V0 ConditionStep }
-										return zero, false
-									}
-									return hresult, true
+					{
+						hv9, hok := conditionBoolean(hv8)
+						_ = hv9
+						if hok {
+							if hv5 == conditionEqualToken {
+								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
+								var hv18 bool = comparisonOperandTruth(hv5, hv2, hv9)
+								var hv19 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv18}
+								hresult := struct{ V0 ConditionStep }{V0: hv19}
+								if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+									var zero struct{ V0 ConditionStep }
+									return zero, false
 								}
-								if hv5 == conditionNotEqualToken {
-									// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
-									var hv20 bool = comparisonOperandTruth(hv5, hv2, hv9)
-									var hv21 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv20}
-									hresult := struct{ V0 ConditionStep }{V0: hv21}
-									if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-										var zero struct{ V0 ConditionStep }
-										return zero, false
-									}
-									return hresult, true
+								return hresult, true
+							}
+							if hv5 == conditionNotEqualToken {
+								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
+								var hv20 bool = comparisonOperandTruth(hv5, hv2, hv9)
+								var hv21 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv20}
+								hresult := struct{ V0 ConditionStep }{V0: hv21}
+								if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+									var zero struct{ V0 ConditionStep }
+									return zero, false
 								}
+								return hresult, true
 							}
 						}
 					}
 				}
-				{
-					hv10, hv11, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport2.Value, hwhole *hyruleImport0.Const, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, hvalue, true
-					})(hv3)
+			}
+			switch hs3 := hv3.(type) {
+			case *hyruleImport0.Const:
+				if hs3 != nil {
+					hv10 := hs3.Value
 					_ = hv10
+					hv11 := hs3
 					_ = hv11
-					if hok {
-						if hv5 == conditionEqualToken {
-							{
-								if nonconstantOperand(hv4) {
-									{
-										if errorNilComparison(hv11, hv4) {
-											// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
-											var hv22 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
-											var hv23 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv22}
-											hresult := struct{ V0 ConditionStep }{V0: hv23}
-											if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-												var zero struct{ V0 ConditionStep }
-												return zero, false
-											}
-											return hresult, true
+					if hv5 == conditionEqualToken {
+						{
+							if nonconstantOperand(hv4) {
+								{
+									if errorNilComparison(hv11, hv4) {
+										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
+										var hv22 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
+										var hv23 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv22}
+										hresult := struct{ V0 ConditionStep }{V0: hv23}
+										if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+											var zero struct{ V0 ConditionStep }
+											return zero, false
 										}
-									}
-								}
-							}
-						}
-						if hv5 == conditionNotEqualToken {
-							{
-								if nonconstantOperand(hv4) {
-									{
-										if errorNilComparison(hv11, hv4) {
-											// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
-											var hv24 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
-											var hv25 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv24}
-											hresult := struct{ V0 ConditionStep }{V0: hv25}
-											if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-												var zero struct{ V0 ConditionStep }
-												return zero, false
-											}
-											return hresult, true
-										}
+										return hresult, true
 									}
 								}
 							}
 						}
 					}
-				}
-				{
-					hv12, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport2.Value, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.Value
-						return hr0, true
-					})(hv3)
-					_ = hv12
-					if hok {
+					if hv5 == conditionNotEqualToken {
 						{
-							hv13, hok := conditionBoolean(hv12)
-							_ = hv13
-							if hok {
-								if hv5 == conditionEqualToken {
-									{
-										if nonconstantOperand(hv4) {
-											// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
-											var hv26 bool = comparisonOperandTruth(hv5, hv2, hv13)
-											var hv27 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv26}
-											hresult := struct{ V0 ConditionStep }{V0: hv27}
-											if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-												var zero struct{ V0 ConditionStep }
-												return zero, false
-											}
-											return hresult, true
+							if nonconstantOperand(hv4) {
+								{
+									if errorNilComparison(hv11, hv4) {
+										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
+										var hv24 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
+										var hv25 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv24}
+										hresult := struct{ V0 ConditionStep }{V0: hv25}
+										if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+											var zero struct{ V0 ConditionStep }
+											return zero, false
 										}
+										return hresult, true
 									}
 								}
-								if hv5 == conditionNotEqualToken {
-									{
-										if nonconstantOperand(hv4) {
-											// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
-											var hv28 bool = comparisonOperandTruth(hv5, hv2, hv13)
-											var hv29 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv28}
-											hresult := struct{ V0 ConditionStep }{V0: hv29}
-											if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
-												var zero struct{ V0 ConditionStep }
-												return zero, false
-											}
-											return hresult, true
+							}
+						}
+					}
+					hv12 := hs3.Value
+					_ = hv12
+					{
+						hv13, hok := conditionBoolean(hv12)
+						_ = hv13
+						if hok {
+							if hv5 == conditionEqualToken {
+								{
+									if nonconstantOperand(hv4) {
+										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
+										var hv26 bool = comparisonOperandTruth(hv5, hv2, hv13)
+										var hv27 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv26}
+										hresult := struct{ V0 ConditionStep }{V0: hv27}
+										if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+											var zero struct{ V0 ConditionStep }
+											return zero, false
 										}
+										return hresult, true
+									}
+								}
+							}
+							if hv5 == conditionNotEqualToken {
+								{
+									if nonconstantOperand(hv4) {
+										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
+										var hv28 bool = comparisonOperandTruth(hv5, hv2, hv13)
+										var hv29 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv28}
+										hresult := struct{ V0 ConditionStep }{V0: hv29}
+										if !hyrulehyruleRecognizeConditionRecognizeRecord3Valid(hresult) {
+											var zero struct{ V0 ConditionStep }
+											return zero, false
+										}
+										return hresult, true
 									}
 								}
 							}

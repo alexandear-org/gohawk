@@ -3,7 +3,6 @@
 package containment
 
 import hyruleImport2 "github.com/kojah/gohawk/internal/engine/ssaflow"
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruledecideContainmentRecognize applies rules in source order; false means no rule matched.
@@ -19,21 +18,11 @@ func hyruledecideContainmentRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.MakeClosure, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv4
-			if hok {
+		switch hs1 := hv2.(type) {
+		case *hyruleImport0.MakeClosure:
+			if hs1 != nil {
+				hv4 := hs1
+				_ = hv4
 				// Rule Closure (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:10).
 				var hv17 hyruleImport2.ReachingWalk = hv1
 				var hv18 *hyruleImport0.MakeClosure = hv4
@@ -49,25 +38,12 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv20, true
 			}
-		}
-		{
-			hv5, hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport1.Token, hr1 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Op
-				hr1 = hvalue.X
-				return hr0, hr1, true
-			})(hv2)
-			_ = hv5
-			_ = hv6
-			if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv5 := hs1.Op
+				_ = hv5
+				hv6 := hs1.X
+				_ = hv6
 				if hv5 == loadToken {
 					// Rule Load (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:17).
 					var hv21 hyruleImport2.ReachingWalk = hv1
@@ -85,22 +61,10 @@ func hyruledecideContainmentRecognize(harg0 struct {
 					return hv24, true
 				}
 			}
-		}
-		{
-			hv7, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv7
-			if hok {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv7 := hs1
+				_ = hv7
 				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
 				var hv25 hyruleImport2.ReachingWalk = hv1
 				var hv26 hyruleImport0.Value = hv7
@@ -116,24 +80,12 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv28, true
 			}
-		}
-		{
-			hv8, hv9, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.FieldAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv8
-			_ = hv9
-			if hok {
+		case *hyruleImport0.FieldAddr:
+			if hs1 != nil {
+				hv8 := hs1.X
+				_ = hv8
+				hv9 := hs1
+				_ = hv9
 				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
 				var hv29 hyruleImport2.ReachingWalk = hv1
 				var hv30 hyruleImport0.Value = hv9
@@ -149,24 +101,12 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv32, true
 			}
-		}
-		{
-			hv10, hv11, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hwhole *hyruleImport0.IndexAddr, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, hvalue, true
-			})(hv2)
-			_ = hv10
-			_ = hv11
-			if hok {
+		case *hyruleImport0.IndexAddr:
+			if hs1 != nil {
+				hv10 := hs1.X
+				_ = hv10
+				hv11 := hs1
+				_ = hv11
 				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
 				var hv33 hyruleImport2.ReachingWalk = hv1
 				var hv34 hyruleImport0.Value = hv11
@@ -182,22 +122,10 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv36, true
 			}
-		}
-		{
-			hv12, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.TypeAssert, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.TypeAssert)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv12
-			if hok {
+		case *hyruleImport0.TypeAssert:
+			if hs1 != nil {
+				hv12 := hs1
+				_ = hv12
 				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
 				var hv37 hyruleImport2.ReachingWalk = hv1
 				var hv38 hyruleImport0.Value = hv12
@@ -213,23 +141,10 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv40, true
 			}
-		}
-		{
-			hv13, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Slice)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				return hr0, true
-			})(hv2)
-			_ = hv13
-			if hok {
+		case *hyruleImport0.Slice:
+			if hs1 != nil {
+				hv13 := hs1.X
+				_ = hv13
 				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:32).
 				var hv41 hyruleImport2.ReachingWalk = hv1
 				var hv42 hyruleImport0.Value = hv13
@@ -245,23 +160,10 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv44, true
 			}
-		}
-		{
-			hv14, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Extract)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.Tuple
-				return hr0, true
-			})(hv2)
-			_ = hv14
-			if hok {
+		case *hyruleImport0.Extract:
+			if hs1 != nil {
+				hv14 := hs1.Tuple
+				_ = hv14
 				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:32).
 				var hv45 hyruleImport2.ReachingWalk = hv1
 				var hv46 hyruleImport0.Value = hv14
@@ -277,22 +179,10 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				}
 				return hv48, true
 			}
-		}
-		{
-			hv15, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Call, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Call)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv2)
-			_ = hv15
-			if hok {
+		case *hyruleImport0.Call:
+			if hs1 != nil {
+				hv15 := hs1
+				_ = hv15
 				// Rule Call (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:38).
 				var hv49 hyruleImport2.ReachingWalk = hv1
 				var hv50 *hyruleImport0.Call = hv15

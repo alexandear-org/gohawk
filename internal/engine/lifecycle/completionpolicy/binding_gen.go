@@ -2,7 +2,6 @@
 
 package completionpolicy
 
-import hyruleImport1 "go/token"
 import hyruleImport0 "golang.org/x/tools/go/ssa"
 
 // hyruleRecognizeBindingRecognize applies rules in source order; false means no rule matched.
@@ -10,20 +9,9 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Function)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.Function, *hyruleImport0.MakeClosure:
+			if hv1 != (*hyruleImport0.Function)(nil) && hv1 != (*hyruleImport0.MakeClosure)(nil) {
 				// Rule Exact (internal/engine/lifecycle/completionpolicy/rules/binding.rules:12).
 				hresult := struct{ V0 BindingStep }{V0: BindingStep{Kind: BindingExact}}
 				if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {
@@ -32,63 +20,17 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 				}
 				return hresult, true
 			}
-		}
-		{
-			hok := (func(hinput hyruleImport0.Value) (hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.MakeClosure)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return true
-			})(hv1)
-			if hok {
-				// Rule Exact (internal/engine/lifecycle/completionpolicy/rules/binding.rules:12).
-				hresult := struct{ V0 BindingStep }{V0: BindingStep{Kind: BindingExact}}
-				if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {
-					var zero struct{ V0 BindingStep }
-					return zero, false
-				}
-				return hresult, true
-			}
-		}
-		{
-			hv2, hv3, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, true
-			})(hv1)
-			_ = hv2
-			_ = hv3
-			if hok {
-				{
-					hv4, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.FieldAddr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.FieldAddr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv4
-					if hok {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv2 := hs1.X
+				_ = hv2
+				hv3 := hs1.Op
+				_ = hv3
+				switch hs2 := hv2.(type) {
+				case *hyruleImport0.FieldAddr:
+					if hs2 != nil {
+						hv4 := hs2
+						_ = hv4
 						if hv3 == bindingLoadToken {
 							// Rule Field (internal/engine/lifecycle/completionpolicy/rules/binding.rules:15).
 							var hv7 BindingStep = BindingStep{Kind: BindingField, Field: hv4}
@@ -100,22 +42,10 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 							return hresult, true
 						}
 					}
-				}
-				{
-					hv5, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.IndexAddr, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.IndexAddr)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv2)
-					_ = hv5
-					if hok {
+				case *hyruleImport0.IndexAddr:
+					if hs2 != nil {
+						hv5 := hs2
+						_ = hv5
 						if hv3 == bindingLoadToken {
 							// Rule Element (internal/engine/lifecycle/completionpolicy/rules/binding.rules:19).
 							var hv8 BindingStep = BindingStep{Kind: BindingElement, Element: hv5}
@@ -139,22 +69,10 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv6, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Alloc, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.Alloc)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				return hvalue, true
-			})(hv1)
-			_ = hv6
-			if hok {
+		case *hyruleImport0.Alloc:
+			if hs1 != nil {
+				hv6 := hs1
+				_ = hv6
 				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/binding.rules:27).
 				var hv10 BindingStep = BindingStep{Kind: BindingCell, Source: hv6}
 				hresult := struct{ V0 BindingStep }{V0: hv10}

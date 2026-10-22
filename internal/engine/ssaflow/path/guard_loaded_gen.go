@@ -23,25 +23,15 @@ func hyruleloadedGuardRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		{
-			hv4, hv5, hv6, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hwhole *hyruleImport0.UnOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.UnOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Op
-				return hr0, hr1, hvalue, true
-			})(hv1)
-			_ = hv4
-			_ = hv5
-			_ = hv6
-			if hok {
+		switch hs1 := hv1.(type) {
+		case *hyruleImport0.UnOp:
+			if hs1 != nil {
+				hv4 := hs1.X
+				_ = hv4
+				hv5 := hs1.Op
+				_ = hv5
+				hv6 := hs1
+				_ = hv6
 				if hv5 == guardLoadToken {
 					// Rule Load (internal/engine/ssaflow/path/rules/guard_loaded.rules:6).
 					var hv19 hyruleImport0.Value = hv6
@@ -88,281 +78,219 @@ func hyruleloadedGuardRecognize(harg0 struct {
 					return hresult, true
 				}
 			}
-		}
-		{
-			hv7, hv8, hv9, hv10, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport0.Value, hr2 hyruleImport1.Token, hwhole *hyruleImport0.BinOp, hok bool) {
-				hvalue, hok := hinput.(*hyruleImport0.BinOp)
-				if !hok {
-					return
-				}
-				if hvalue == nil {
-					hok = false
-					return
-				}
-				_ = hvalue
-				hr0 = hvalue.X
-				hr1 = hvalue.Y
-				hr2 = hvalue.Op
-				return hr0, hr1, hr2, hvalue, true
-			})(hv1)
-			_ = hv7
-			_ = hv8
-			_ = hv9
-			_ = hv10
-			if hok {
-				{
-					hv11, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Const, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.Const)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						return hvalue, true
-					})(hv7)
-					_ = hv11
-					if hok {
-						{
-							hv12, hv13, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-								hvalue, hok := hinput.(*hyruleImport0.UnOp)
-								if !hok {
-									return
-								}
-								if hvalue == nil {
-									hok = false
-									return
-								}
-								_ = hvalue
-								hr0 = hvalue.X
-								hr1 = hvalue.Op
-								return hr0, hr1, true
-							})(hv8)
+		case *hyruleImport0.BinOp:
+			if hs1 != nil {
+				hv7 := hs1.X
+				_ = hv7
+				hv8 := hs1.Y
+				_ = hv8
+				hv9 := hs1.Op
+				_ = hv9
+				hv10 := hs1
+				_ = hv10
+				switch hs2 := hv7.(type) {
+				case *hyruleImport0.Const:
+					if hs2 != nil {
+						hv11 := hs2
+						_ = hv11
+						if hs3, hok := hv8.(*hyruleImport0.UnOp); hok && hs3 != nil {
+							hv12 := hs3.X
 							_ = hv12
+							hv13 := hs3.Op
 							_ = hv13
-							if hok {
-								if hv13 == guardLoadToken {
-									if hv9 == guardEqualToken {
-										// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
-										var hv26 hyruleImport0.Value = hv10
-										var hv27 hyruleImport0.Value = hv12
-										var hv28 *hyruleImport0.Const = hv11
-										var hv29 hyruleImport1.Token = hv9
-										var hv30 *hyruleImport2.SearchBudget = hv2
-										var hv31 *guardFormats = hv3
-										hv14part0, hv14part1, hv14part2 := guardLoadedAddress(hv26, hv27, hv28, hv29, hv30, hv31)
-										hv14 := struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}{V0: hv14part0, V1: hv14part1, V2: hv14part2}
-										_ = hv14
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv14) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										var hv32 struct {
+							if hv13 == guardLoadToken {
+								if hv9 == guardEqualToken {
+									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
+									var hv26 hyruleImport0.Value = hv10
+									var hv27 hyruleImport0.Value = hv12
+									var hv28 *hyruleImport0.Const = hv11
+									var hv29 hyruleImport1.Token = hv9
+									var hv30 *hyruleImport2.SearchBudget = hv2
+									var hv31 *guardFormats = hv3
+									hv14part0, hv14part1, hv14part2 := guardLoadedAddress(hv26, hv27, hv28, hv29, hv30, hv31)
+									hv14 := struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}{V0: hv14part0, V1: hv14part1, V2: hv14part2}
+									_ = hv14
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv14) {
+										var zero struct {
 											V0 string
 											V1 bool
 											V2 bool
 										}
-										switch hv14.V2 {
-										case true:
-											hv32 = hv14
-										case false:
-											hv32 = hv14
-										}
-										hresult := hv32
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										return hresult, true
+										return zero, false
 									}
-									if hv9 == guardNotEqualToken {
-										// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
-										var hv33 hyruleImport0.Value = hv10
-										var hv34 hyruleImport0.Value = hv12
-										var hv35 *hyruleImport0.Const = hv11
-										var hv36 hyruleImport1.Token = hv9
-										var hv37 *hyruleImport2.SearchBudget = hv2
-										var hv38 *guardFormats = hv3
-										hv15part0, hv15part1, hv15part2 := guardLoadedAddress(hv33, hv34, hv35, hv36, hv37, hv38)
-										hv15 := struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}{V0: hv15part0, V1: hv15part1, V2: hv15part2}
-										_ = hv15
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv15) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										var hv39 struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}
-										switch hv15.V2 {
-										case true:
-											hv39 = hv15
-										case false:
-											hv39 = hv15
-										}
-										hresult := hv39
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										return hresult, true
+									var hv32 struct {
+										V0 string
+										V1 bool
+										V2 bool
 									}
+									switch hv14.V2 {
+									case true:
+										hv32 = hv14
+									case false:
+										hv32 = hv14
+									}
+									hresult := hv32
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									return hresult, true
+								}
+								if hv9 == guardNotEqualToken {
+									// Rule LiteralLeft (internal/engine/ssaflow/path/rules/guard_loaded.rules:16).
+									var hv33 hyruleImport0.Value = hv10
+									var hv34 hyruleImport0.Value = hv12
+									var hv35 *hyruleImport0.Const = hv11
+									var hv36 hyruleImport1.Token = hv9
+									var hv37 *hyruleImport2.SearchBudget = hv2
+									var hv38 *guardFormats = hv3
+									hv15part0, hv15part1, hv15part2 := guardLoadedAddress(hv33, hv34, hv35, hv36, hv37, hv38)
+									hv15 := struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}{V0: hv15part0, V1: hv15part1, V2: hv15part2}
+									_ = hv15
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv15) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									var hv39 struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}
+									switch hv15.V2 {
+									case true:
+										hv39 = hv15
+									case false:
+										hv39 = hv15
+									}
+									hresult := hv39
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									return hresult, true
 								}
 							}
 						}
 					}
-				}
-				{
-					hv14, hv15, hok := (func(hinput hyruleImport0.Value) (hr0 hyruleImport0.Value, hr1 hyruleImport1.Token, hok bool) {
-						hvalue, hok := hinput.(*hyruleImport0.UnOp)
-						if !hok {
-							return
-						}
-						if hvalue == nil {
-							hok = false
-							return
-						}
-						_ = hvalue
-						hr0 = hvalue.X
-						hr1 = hvalue.Op
-						return hr0, hr1, true
-					})(hv7)
-					_ = hv14
-					_ = hv15
-					if hok {
+				case *hyruleImport0.UnOp:
+					if hs2 != nil {
+						hv14 := hs2.X
+						_ = hv14
+						hv15 := hs2.Op
+						_ = hv15
 						if hv15 == guardLoadToken {
-							{
-								hv16, hok := (func(hinput hyruleImport0.Value) (hwhole *hyruleImport0.Const, hok bool) {
-									hvalue, hok := hinput.(*hyruleImport0.Const)
-									if !hok {
-										return
-									}
-									if hvalue == nil {
-										hok = false
-										return
-									}
-									_ = hvalue
-									return hvalue, true
-								})(hv8)
+							if hs4, hok := hv8.(*hyruleImport0.Const); hok && hs4 != nil {
+								hv16 := hs4
 								_ = hv16
-								if hok {
-									if hv9 == guardEqualToken {
-										// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
-										var hv40 hyruleImport0.Value = hv10
-										var hv41 hyruleImport0.Value = hv14
-										var hv42 *hyruleImport0.Const = hv16
-										var hv43 hyruleImport1.Token = hv9
-										var hv44 *hyruleImport2.SearchBudget = hv2
-										var hv45 *guardFormats = hv3
-										hv17part0, hv17part1, hv17part2 := guardLoadedAddress(hv40, hv41, hv42, hv43, hv44, hv45)
-										hv17 := struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}{V0: hv17part0, V1: hv17part1, V2: hv17part2}
-										_ = hv17
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv17) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										var hv46 struct {
+								if hv9 == guardEqualToken {
+									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
+									var hv40 hyruleImport0.Value = hv10
+									var hv41 hyruleImport0.Value = hv14
+									var hv42 *hyruleImport0.Const = hv16
+									var hv43 hyruleImport1.Token = hv9
+									var hv44 *hyruleImport2.SearchBudget = hv2
+									var hv45 *guardFormats = hv3
+									hv17part0, hv17part1, hv17part2 := guardLoadedAddress(hv40, hv41, hv42, hv43, hv44, hv45)
+									hv17 := struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}{V0: hv17part0, V1: hv17part1, V2: hv17part2}
+									_ = hv17
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv17) {
+										var zero struct {
 											V0 string
 											V1 bool
 											V2 bool
 										}
-										switch hv17.V2 {
-										case true:
-											hv46 = hv17
-										case false:
-											hv46 = hv17
-										}
-										hresult := hv46
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										return hresult, true
+										return zero, false
 									}
-									if hv9 == guardNotEqualToken {
-										// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
-										var hv47 hyruleImport0.Value = hv10
-										var hv48 hyruleImport0.Value = hv14
-										var hv49 *hyruleImport0.Const = hv16
-										var hv50 hyruleImport1.Token = hv9
-										var hv51 *hyruleImport2.SearchBudget = hv2
-										var hv52 *guardFormats = hv3
-										hv18part0, hv18part1, hv18part2 := guardLoadedAddress(hv47, hv48, hv49, hv50, hv51, hv52)
-										hv18 := struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}{V0: hv18part0, V1: hv18part1, V2: hv18part2}
-										_ = hv18
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv18) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										var hv53 struct {
-											V0 string
-											V1 bool
-											V2 bool
-										}
-										switch hv18.V2 {
-										case true:
-											hv53 = hv18
-										case false:
-											hv53 = hv18
-										}
-										hresult := hv53
-										if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
-											var zero struct {
-												V0 string
-												V1 bool
-												V2 bool
-											}
-											return zero, false
-										}
-										return hresult, true
+									var hv46 struct {
+										V0 string
+										V1 bool
+										V2 bool
 									}
+									switch hv17.V2 {
+									case true:
+										hv46 = hv17
+									case false:
+										hv46 = hv17
+									}
+									hresult := hv46
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									return hresult, true
+								}
+								if hv9 == guardNotEqualToken {
+									// Rule LiteralRight (internal/engine/ssaflow/path/rules/guard_loaded.rules:24).
+									var hv47 hyruleImport0.Value = hv10
+									var hv48 hyruleImport0.Value = hv14
+									var hv49 *hyruleImport0.Const = hv16
+									var hv50 hyruleImport1.Token = hv9
+									var hv51 *hyruleImport2.SearchBudget = hv2
+									var hv52 *guardFormats = hv3
+									hv18part0, hv18part1, hv18part2 := guardLoadedAddress(hv47, hv48, hv49, hv50, hv51, hv52)
+									hv18 := struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}{V0: hv18part0, V1: hv18part1, V2: hv18part2}
+									_ = hv18
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hv18) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									var hv53 struct {
+										V0 string
+										V1 bool
+										V2 bool
+									}
+									switch hv18.V2 {
+									case true:
+										hv53 = hv18
+									case false:
+										hv53 = hv18
+									}
+									hresult := hv53
+									if !hyrulehyruleloadedGuardRecognizeUnion0Valid(hresult) {
+										var zero struct {
+											V0 string
+											V1 bool
+											V2 bool
+										}
+										return zero, false
+									}
+									return hresult, true
 								}
 							}
 						}
