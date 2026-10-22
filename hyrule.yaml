@@ -49,6 +49,27 @@ targets:
     function: decideProcessRemainder
     rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_remainder.rules]
     out: internal/analysis/analyzers/resources/processownership/action_remainder_gen.go
+  - name: process_start_decision
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/prestart.go
+    signature: startDecisionSignature
+    function: proveProcessStart
+    rules: [internal/analysis/analyzers/resources/processownership/prestart.rules, internal/analysis/analyzers/resources/processownership/proof_schema.rules]
+    out: internal/analysis/analyzers/resources/processownership/prestart_gen.go
+  - name: process_return_admission
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/flow.go
+    signature: returnAdmissionSignature
+    function: admitProcessReturn
+    rules: [internal/analysis/analyzers/resources/processownership/return_admission.rules]
+    out: internal/analysis/analyzers/resources/processownership/return_admission_gen.go
+  - name: process_wait_handoff
+    package: internal/analysis/analyzers/resources/processownership
+    bindings: internal/analysis/analyzers/resources/processownership/handoff.go
+    signature: waitHandoffSignature
+    function: provePossibleWaitHandoff
+    rules: [internal/analysis/analyzers/resources/processownership/handoff.rules, internal/analysis/analyzers/resources/processownership/proof_schema.rules]
+    out: internal/analysis/analyzers/resources/processownership/handoff_gen.go
   - name: goroutine_call_recognition
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go

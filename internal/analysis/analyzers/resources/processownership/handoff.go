@@ -15,65 +15,74 @@ import (
 // receivers and nonreturning waiters leave ownership uncertain; none proves
 // exact reaping. Discovery and completion draw on the supplied allowance.
 
-// A callback supplied to an opaque runner may own the wait. This is a reason
-// to decline loss, not evidence that the runner invokes or joins the callback.
-// A started worker with no normal return also remains opaque when it contains
-// a positive Wait witness: every-return completion deliberately excludes it.
-// https://github.com/la5nta/pat/blob/2e6a8d14baf0268f4e2aa4d01784a54ca935cf52/internal/prehook/prehook.go#L109-L114
-func provePossibleWaitHandoff(instruction ssa.Instruction, command ssa.Value, budget *proofs.SearchBudget) proofs.Proof {
-	missing := proofs.Proof{State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound}
+// Handoff rules select uncertainty from the same identity, return and
+// completion evidence. Native queries keep exact proof payloads and budgets.
+type waitHandoffSignature func(ssa.Instruction, ssa.Value, *proofs.SearchBudget) proofs.Proof
+
+var _ waitHandoffSignature = provePossibleWaitHandoff
+
+func handoffCall(instruction ssa.Instruction) (*ssa.CallCommon, bool) {
 	common := ssaflow.InstructionCall(instruction)
-	if common == nil {
-		return missing
-	}
-	// A merged receiver may select the successfully started command. The
-	// flow does not retain acquisition-error/receiver correlation, so possible
-	// identity makes this action unknown, never a guaranteed Wait. An earlier
-	// return that bypasses the action is still checked by the ordinary flow.
-	// https://github.com/raskrebs/sonar/blob/9c963b8447d6ca08dd4a3c0bc6c0bf27527cd793/internal/runs/runs_test.go#L117-L130
-	if ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "os/exec", Receiver: "Cmd", Name: "Wait"})) {
-		receiver := ssaflow.CallReceiver(common)
-		_, merged := receiver.(*ssa.Phi)
-		if merged && heapmodel.MayAlias(receiver, command) && !heapmodel.NewStorage(nil).Same(receiver, command).Proven() {
-			return proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnknownPointee}
-		}
-		return missing
-	}
+	return common, common != nil
+}
+
+func handoffWait(common *ssa.CallCommon) bool {
+	return ssacall.CallMatchesSymbol(common, syntax.PackageMethod(syntax.MethodSymbol{PackagePath: "os/exec", Receiver: "Cmd", Name: "Wait"}))
+}
+
+func mergedWaitReceiver(common *ssa.CallCommon, command ssa.Value) bool {
+	receiver := ssaflow.CallReceiver(common)
+	_, merged := receiver.(*ssa.Phi)
+	return merged && heapmodel.MayAlias(receiver, command) && !heapmodel.NewStorage(nil).Same(receiver, command).Proven()
+}
+
+func handoffBody(common *ssa.CallCommon) (*ssa.Function, bool) {
 	callee, _ := ssacall.DirectCallee(common)
-	if _, spawned := instruction.(*ssa.Go); spawned && callee != nil && len(callee.Blocks) != 0 {
-		returns := ssapath.ProveNormalReturnWithin(callee.Blocks[0], nil, budget)
-		if returns.Reason == proofs.EvidenceBudgetExhausted {
-			return returns.Proof
-		}
-		if returns.Proven() {
-			return missing
-		}
-		completion := lifecycle.ProveCompletion(lifecycle.CompletionRequest{
-			Instruction: instruction, Target: command, Methods: []string{"Wait"},
-			Coverage: lifecycle.CoverageAnywhere, Budget: budget,
-		})
-		if completion.Proven() || completion.Reason == proofs.EvidenceBudgetExhausted {
-			completion.State = proofs.EvidenceUnknown
-			return completion.Proof
-		}
-		return missing
-	}
-	if callee != nil && len(callee.Blocks) != 0 {
-		return missing
-	}
-	// Imported and unresolved runners can retain the same callback whether
-	// called synchronously or launched. The launch does not make their missing
-	// invocation guarantee evidence that the captured command stays local.
-	// https://github.com/unstablebuild/rune/blob/3e2165f8983280542c985947378dfa740a397d03/internal/workspace/file_scheme.go#L458-L467
-	if result := provePossibleCallbackCapture(common.Value, command, budget); result.State == proofs.EvidenceUnknown {
-		return result
-	}
+	return callee, callee != nil && len(callee.Blocks) != 0
+}
+
+func handoffStarted(instruction ssa.Instruction) bool {
+	_, started := instruction.(*ssa.Go)
+	return started
+}
+
+func handoffReturns(function *ssa.Function, budget *proofs.SearchBudget) proofs.Proof {
+	return ssapath.ProveNormalReturnWithin(function.Blocks[0], nil, budget).Proof
+}
+
+func handoffCompletion(instruction ssa.Instruction, command ssa.Value, budget *proofs.SearchBudget) proofs.Proof {
+	return lifecycle.ProveCompletion(lifecycle.CompletionRequest{
+		Instruction: instruction, Target: command, Methods: []string{"Wait"},
+		Coverage: lifecycle.CoverageAnywhere, Budget: budget,
+	}).Proof
+}
+
+func processProofCutoff(proof proofs.Proof) bool {
+	return proof.Reason == proofs.EvidenceBudgetExhausted
+}
+
+func missingHandoff() proofs.Proof {
+	return proofs.Proof{State: proofs.EvidenceDisproven, Reason: proofs.EvidenceNotFound}
+}
+
+func uncertainHandoff(proof proofs.Proof) proofs.Proof {
+	proof.State = proofs.EvidenceUnknown
+	return proof
+}
+
+func mergedHandoff() proofs.Proof {
+	return proofs.Proof{State: proofs.EvidenceUnknown, Reason: proofs.EvidenceUnknownPointee}
+}
+
+// Callback arguments retain their native census and first-unknown payload.
+// The generated caller asks the callback value before starting this scan.
+func handoffArguments(common *ssa.CallCommon, command ssa.Value, budget *proofs.SearchBudget) proofs.Proof {
 	for _, argument := range common.Args {
 		if result := provePossibleCallbackCapture(argument, command, budget); result.State == proofs.EvidenceUnknown {
 			return result
 		}
 	}
-	return missing
+	return missingHandoff()
 }
 
 // A possible capture makes Wait participation unknown. The shared query proves

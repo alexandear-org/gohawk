@@ -1,0 +1,21 @@
+signature total fallback outputs reasonNone false;
+query startFailureReturn;
+query owner = lifecycle.ReturnedValueOwnsValue;
+query returnsProcessHandle, returnedMergedOwner;
+const reasonNone, reasonStartFailureReturn, reasonReturnedOwner, reasonReturnedHandle, reasonReturnedMergedOwner;
+
+// Returning an aggregate that contains the command transfers Wait responsibility
+// just as returning *exec.Cmd does. The lower-level os.Process can also be waited
+// on by the caller. Select one reason before the flow emits its evidence event.
+// https://github.com/apache/casbin-gateway/blob/e3606894348d8cd52d85abc29cfb4d3ae99595cb/util/daemon.go#L121-L131
+rule Return:
+  inputs $returned $start $command $merged
+  => query startFailureReturn $returned $start
+           select true => outputs reasonStartFailureReturn true
+     <|> query owner $returned $command
+           select true => outputs reasonReturnedOwner true
+     <|> query returnsProcessHandle $returned $command
+           select true => outputs reasonReturnedHandle true
+     <|> query returnedMergedOwner $returned $merged
+           select true => outputs reasonReturnedMergedOwner true
+     <|> pure outputs reasonNone false;

@@ -1,0 +1,59 @@
+signature total fallback outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
+record Decision = processDecision {
+  state;
+  reason;
+};
+query prefix = commandProof.startPrefix;
+query commandReturnedByHelper, callerCommand;
+query aggregate = ssaflow.ElementOfAggregate;
+query processOwnershipDominatesStart, processOwnerDominatesStart, commandStoredExternallyBeforeStart;
+query returns = commandProof.startCannotReturn;
+const reasonPreStartEvidenceUnavailable, reasonPreStartCutoff, reasonHelperOwnershipUnknown;
+const reasonCallerCommandOwnershipUnknown, reasonAggregateCommandOwnershipUnknown, reasonPreStartOwnershipUnknown;
+const reasonSuccessfulStartCannotReturn, reasonLocalWaitObligation;
+
+// A helper returning *exec.Cmd may already have registered cleanup or wait
+// ownership. Reporting without that interprocedural contract loses precision.
+// https://github.com/containerd/containerd/blob/716cbaf51212adb5e80ca1c30b644bfeb9c9d779/cmd/containerd-shim-runc-v2/process/io.go#L288-L330
+// The caller retains its parameter or external command after this helper.
+// Another reader can wait through a different element load that the flow
+// cannot correlate with this one. Shared elements remain unknown.
+// https://github.com/cocoonstack/cocoon/blob/51ff88bcf8f175a2d82b162d9bf9f65604a607b5/cmd/storebench/main.go#L123-L138
+// Cleanup can be registered before Start, including by a returned teardown
+// owner. Keep registration and external-store evidence in their prior order.
+rule Start:
+  inputs $proof $function $start $command
+  => do {
+       $prefix <- query prefix $proof $start $command;
+       true <- query proven $prefix.Proof
+         else query cutoff $prefix.Proof {
+                true => outputs (Decision state:decisionUnknown reason:reasonPreStartCutoff);
+                false => outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
+              };
+       false <- query commandReturnedByHelper $command
+         else outputs (Decision state:decisionUnknown reason:reasonHelperOwnershipUnknown);
+       false <- query callerCommand $function $command
+         else outputs (Decision state:decisionUnknown reason:reasonCallerCommandOwnershipUnknown);
+       false <- query aggregate $command
+         else outputs (Decision state:decisionUnknown reason:reasonAggregateCommandOwnershipUnknown);
+       false <- query processOwnershipDominatesStart $proof $prefix.instructions $command
+         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
+       false <- query processOwnerDominatesStart
+                        $proof
+                        $function
+                        $start
+                        $prefix.owners
+                        $prefix.instructions
+         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
+       false <- query commandStoredExternallyBeforeStart $prefix.instructions $command
+         else outputs (Decision state:decisionUnknown reason:reasonPreStartOwnershipUnknown);
+       $returns <- query returns $proof $start;
+       false <- query cutoff $returns
+         else outputs (Decision state:decisionUnknown reason:reasonPreStartCutoff);
+       true <- query proven $returns
+         else query known $returns {
+                true => outputs (Decision state:decisionProven reason:reasonLocalWaitObligation);
+                false => outputs (Decision state:decisionUnknown reason:reasonPreStartEvidenceUnavailable);
+              };
+       pure outputs (Decision state:decisionDisproven reason:reasonSuccessfulStartCannotReturn);
+     };

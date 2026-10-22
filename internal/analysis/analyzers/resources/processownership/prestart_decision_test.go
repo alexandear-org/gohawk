@@ -7,6 +7,7 @@ import (
 	proofs "github.com/kojah/gohawk/internal/engine/proof"
 	"github.com/kojah/gohawk/internal/engine/ssaflow"
 	"github.com/kojah/gohawk/internal/engine/ssaflow/ssaflowtest"
+	"golang.org/x/tools/go/ssa"
 )
 
 func TestProcessStartDecision(t *testing.T) {
@@ -58,5 +59,48 @@ func TestProcessStartDecision(t *testing.T) {
 	got := proveProcessStart(proof, nil, nil, nil)
 	if got.state != proofs.EvidenceUnknown || got.reason != reasonPreStartEvidenceUnavailable {
 		t.Fatalf("unavailable = %+v", got)
+	}
+}
+
+func TestReturnAdmissionReasonPrecedence(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "returnadmission", `package returnadmission
+import("os";"os/exec")
+func owner()(*exec.Cmd,error){cmd:=exec.Command("tool");if err:=cmd.Start();err!=nil{return cmd,err};return cmd,nil}
+func handle()(*os.Process,error){cmd:=exec.Command("tool");if err:=cmd.Start();err!=nil{return nil,err};return cmd.Process,nil}
+func unowned()error{cmd:=exec.Command("tool");if err:=cmd.Start();err!=nil{return err};return nil}
+`)
+	for _, test := range []struct {
+		name   string
+		reason processReason
+	}{
+		{"owner", reasonReturnedOwner},
+		{"handle", reasonReturnedHandle},
+		{"unowned", reasonNone},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			function := pkg.Func(test.name)
+			start := startupTestCall(t, function)
+			command := ssaflow.CallReceiver(start.Common())
+			var sawFailure, sawSuccess bool
+			for _, returned := range ssaflow.InstructionsOf[*ssa.Return](function) {
+				reason, allowed := admitProcessReturn(returned, start, command, nil)
+				if startFailureReturn(returned, start) {
+					// owner returns the command even on failure: failure must
+					// win over returned ownership and emit only its own reason.
+					sawFailure = true
+					if !allowed || reason != reasonStartFailureReturn {
+						t.Fatalf("failure admission = %v/%v", reason, allowed)
+					}
+					continue
+				}
+				sawSuccess = true
+				if reason != test.reason || allowed != (test.reason != reasonNone) {
+					t.Fatalf("success admission = %v/%v, want reason %v", reason, allowed, test.reason)
+				}
+			}
+			if !sawFailure || !sawSuccess {
+				t.Fatal("fixture lacks failure or success return")
+			}
+		})
 	}
 }

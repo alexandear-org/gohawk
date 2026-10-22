@@ -4,6 +4,25 @@ The public page is [processownership](../../analyzers/). This note keeps every p
 boundary: what the analyzer accepts or reports at the edge of its proof, and
 why. Update it with the fixtures when a boundary changes.
 
+## Decision ownership
+
+`prestart.rules` owns suppression order after a complete prefix census. Native
+query methods retain the same child-budget allocation points. An unavailable
+prefix supplies no owner evidence; a cutoff remains unknown.
+
+`return_admission.rules` selects the first return exception and its stable
+reason. The flow callback emits that reason once instead of building a table
+of closures. A failed Start wins even when the same return carries the command.
+Return witnesses, merged-command identity and successor feasibility stay native.
+
+`handoff.rules` selects possible Wait participation. Direct Wait, noncall and
+visible synchronous paths retain their early exits. Spawned-body reachability
+and completion share the original budget, and uncertainty retains the original
+Method, Reason and Provenance. Opaque capture inspection still asks the callback
+value before its arguments. Native code owns those searches and censuses.
+`prestart_decision_test.go`, `handoff_test.go`, the action-order tests and existing
+trace fixtures pin these contracts alongside accepted and diagnostic scenarios.
+
 ## Detection boundaries
 
 Fire-and-forget alone does not establish a defect: opening a browser or

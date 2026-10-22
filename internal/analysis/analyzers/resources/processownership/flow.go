@@ -42,31 +42,13 @@ func proveProcessReturns(pass *analysis.Pass, proof *commandProof, function *ssa
 	}
 	probe := analysisTrace.For(pass, "processownership", string(check.ProcessWait), start.Pos())
 	allowReturn := func(returned *ssa.Return) bool {
-		// Returning an aggregate that contains the command transfers Wait
-		// responsibility just as directly as returning *exec.Cmd itself, and
-		// so does returning the started os.Process, which the caller can
-		// Wait on directly. Casbin's daemon launcher returns cmd.Process:
-		// https://github.com/apache/casbin-gateway/blob/e3606894348d8cd52d85abc29cfb4d3ae99595cb/util/daemon.go#L121-L131
-		// Each rule that excuses a return is traced by name, so a return the
-		// flow accepted can be attributed to the rule that accepted it.
-		for _, rule := range []struct {
-			reason processReason
-			holds  func() bool
-		}{
-			{reasonStartFailureReturn, func() bool { return startFailureReturn(returned, start) }},
-			{reasonReturnedOwner, func() bool { return lifecycle.ReturnedValueOwnsValue(returned, command) }},
-			{reasonReturnedHandle, func() bool { return returnsProcessHandle(returned, command) }},
-			{reasonReturnedMergedOwner, func() bool {
-				return merged != nil && (lifecycle.ReturnedValueOwnsValue(returned, merged) || returnsProcessHandle(returned, merged))
-			}},
-		} {
-			if rule.holds() {
-				probe.Evidence(analysisTrace.Step{Reason: rule.reason.String(), Outcome: analysisTrace.OutcomeAccepted, Pos: returned.Pos()})
-				return true
-			}
+		reason, allowed := admitProcessReturn(returned, start, command, merged)
+		if allowed {
+			probe.Evidence(analysisTrace.Step{Reason: reason.String(), Outcome: analysisTrace.OutcomeAccepted, Pos: returned.Pos()})
 		}
-		return false
+		return allowed
 	}
+
 	var witness *ssa.Return
 	// Fix only the immediate success-edge load. A later Process load may have
 	// changed, so this branch fact must not imply stable handle identity or
@@ -106,4 +88,14 @@ func emitImmediateProcessGuard(probe analysisTrace.Probe, function *ssa.Function
 	probe.Evidence(analysisTrace.Step{
 		Reason: guard.Reason.String(), Outcome: analysisTrace.OutcomeAccepted, Pos: guard.NonNil.Pos(), Function: function.String(),
 	})
+}
+
+// Return admission selects one reason before the flow callback emits it.
+// It does not supply a return witness or alter the flow's feasible successors.
+type returnAdmissionSignature func(*ssa.Return, *ssa.Call, ssa.Value, *ssa.Phi) (processReason, bool)
+
+var _ returnAdmissionSignature = admitProcessReturn
+
+func returnedMergedOwner(returned *ssa.Return, merged *ssa.Phi) bool {
+	return merged != nil && (lifecycle.ReturnedValueOwnsValue(returned, merged) || returnsProcessHandle(returned, merged))
 }

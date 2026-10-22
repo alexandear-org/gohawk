@@ -1,0 +1,9 @@
+union Proof = processUseEvidence tag State {
+  Proven = decisionProven;
+  Rejected = decisionDisproven;
+  Unknown = decisionUnknown;
+};
+const decisionProven, decisionDisproven, decisionUnknown;
+query proven = processUseEvidence.Proven;
+query known = processUseEvidence.Known;
+query cutoff = processProofCutoff;

@@ -265,15 +265,38 @@ caller results, so source rules establish those consumers.
 | Defer argument-use evidence | **Pending strong fit:** `resourceUseStatus` selects wrapper uncertainty, exact release and unavailable-callee use from ordered alias/containment/summary evidence. Keep the argument census and trace emission native; migrate the per-argument decision without moving the trace before its alias/containment queries. |
 | Defer obligation and flow | Exact standard lock-pair table, acquisition/store censuses, storage identity, live-backedge traversal, iterator exhaustion, monotone status and witnesses. These remain with the flow/search algorithms. Final unknown-versus-live precedence is compact; no general rule engine should replace the keyed walk. |
 | Process instruction action and final return outcome | Existing action entry/settlement/remainder rules and `decision.rules` own substantial precedence. Native code binds lifecycle requests, allocates query allowances, memoizes candidate actions and projects the selected decision to tracing/reporting. |
-| Process pre-Start decision | **Pending strong fit:** `proveProcessStart` orders completed-prefix availability/cutoff, helper/caller/aggregate ownership, pre-registration and successful-return evidence. Preserve the prefix census before the suppression queries and the same query-pool allocation points. |
-| Process return admission | **Pending strong fit:** `proveProcessReturns` builds a four-entry closure table for failed Start, returned command owner, returned process handle and merged owner. A generated reason-bearing decision can remove those closures while the flow callback emits the selected reason exactly once. Keep return witness and feasibility collection native. |
-| Possible Wait participation | **Pending strong fit:** `provePossibleWaitHandoff` sequences exact Wait/merged identity, visible spawned-body reachability/completion and opaque callback capture. Preserve cutoff proof payloads, early visible-body exits and callback-value-before-argument capture order. |
+| Process pre-Start decision | `prestart.rules` now orders completed-prefix availability/cutoff, helper/caller/aggregate ownership, pre-registration and successful-return evidence. The native query methods allocate the original child allowance only when reached; the prefix census still precedes suppression queries. |
+| Process return admission | `return_admission.rules` now selects failed Start, returned command owner, returned process handle and merged owner in order. The former closure table is removed. The flow callback emits the selected reason once and retains witness/feasibility collection. |
+| Possible Wait participation | `handoff.rules` now sequences exact Wait/merged identity, visible spawned-body reachability/completion and opaque callback capture. Native queries retain cutoff proof payloads, early visible-body exits and callback-value-before-argument capture order. Uncertain completion keeps Method and Provenance. |
 | Process local searches | Deferred capture/argument censuses, command-use/handle provenance, registered-owner discovery, domination and returned-handle containment remain native. Their small shape switches feed bounded searches rather than form independent rule pipelines. The immediate Process guard validates an indexed four-instruction block plus identity/edge evidence; a rule adapter would still need that native block decoding. |
 | Symbol contracts and presentation | Exact library-symbol lists, pipe/Wait type contracts, reason tables, names, report construction and trace projections remain direct Go. No second catalog or source rendering layer is needed. |
 
-These two source reviews are complete. Their scopes remain open for the five
-confirmed decision migrations above; the recorded traversal and presentation
-families are not reopened without an affecting change.
+These two source reviews are complete. The process scope is closed after its
+three migrations; the defer scope remains open for transfer and argument-use
+policy. The recorded traversal and presentation families are not reopened
+without an affecting change.
+
+## Cancellation source review
+
+All 11 authored `cancellationownership` files and all eight rule/schema files
+were read. The graph returned all 44 indexed paths, including fixtures/tests;
+exact-path metadata was clean at generation `2026-10-22T00:15:39Z`. Seven scope
+gaps were ignored generated classifiers, covered by direct rule/schema reads.
+Same-named method edges such as `Parent` and `Common` resolve unreliably; the
+exact source establishes parent-frame identity and reached-query order.
+
+| Family | Disposition |
+| --- | --- |
+| Instruction/call/return classification | Seven generated policies already own ordinary, direct, argument, deferred, call-contract and return-label precedence. Preserve those rules and native request binding. |
+| Parent context origin | **Pending strong fit:** `parentCancellationClassifier` selects a standard-context child, resolves its parent's acquisition-time load, requires exact result zero in the same function and binds the constructor's cancel result. The ordinary context-origin recognizer has a different contract and cannot replace these checks. Preserve snapshot resolution and observer/budget placement while extracting the ordered origin policy. |
+| Directly deferred literal | **Pending strong fit:** `deferredLiteralLabel` sequences closure capture availability, result-guard membership, completion and cutoff. Keep the capture/guard censuses native, retaining their shared child budget, while generating the release/unknown/unrecognized selection. |
+| Constructor-owner evidence | Cached field/store/closure-use inventories require one once-written cell, initialization before capture, one owner field and a complete visible-use census. Budget cutoff discards all accumulated holds. Small structural branches select what to add to those inventories rather than an independent decision pipeline. |
+| Result guards and local uses | Guard discovery/retention, per-return reachability/completion, memoized every-use resolution and exact local wrapper/load folds. These keep native iteration, aggregation and recursive query state. The selected Done edge is a narrow query over existing select recognition. |
+| Flow and action orchestration | Classifier construction, parent/return label combination, candidate-local memoization, one obligation flow and compact outcome/lattice projection. Retain these with the cache and flow; the substantial classifiers already use rules. |
+| Contracts and presentation | Exact standard constructor table, callback/cleanup/Done symbol contracts, small instruction-to-reason and outcome mappings, naming, tracing and reporting. These are compact declarations or rendering rather than substantial standalone recognizers. |
+
+The cancellation source review is complete; its two confirmed policy migrations
+remain open. Other families are not reopened without an affecting change.
 
 ## Non-Go integration inventory
 
@@ -325,9 +348,9 @@ completion criterion, and marginal conversions do not extend this checklist.
 | `analyzers/concurrency/goroutineownership` | 23 | Pending review |
 | `analyzers/concurrency/lockorder` | 24 | Pending review |
 | `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing migrated |
-| `analyzers/resources/cancellationownership` | 11 | Pending review |
+| `analyzers/resources/cancellationownership` | 11 | Reviewed; parent-origin and deferred-literal policies pending migration |
 | `analyzers/resources/deferinloop` | 6 | Reviewed; transfer/argument policies pending migration |
-| `analyzers/resources/processownership` | 13 | Reviewed; three decision families pending migration |
+| `analyzers/resources/processownership` | 13 | Reviewed; three decision families migrated |
 | `analyzers/resources/resourcelifetime` | 28 | Pending review |
 | `passes/concurrencyfacts` | 25 | Pending review |
 | `engine/heapmodel` | 22 | Pending review |
@@ -340,15 +363,15 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. Current source totals are 362 authored files: 196 reviewed and 166 still
-awaiting review across 7 source scopes. Lifecycle evidence composition and the
-five confirmed defer/process policies remain migration items separately.
+policy. Current source totals are 362 authored files: 207 reviewed and 155 still
+awaiting review across 6 source scopes. Lifecycle evidence composition, two
+defer policies and two cancellation policies remain migration items separately.
 
 The remaining completion steps are finite:
 
 - Close each remaining source scope above with a disposition per policy family.
-- Migrate lifecycle evidence composition and the five confirmed defer/process
-  policies above. Record any other confirmed fit under its existing scope and
+- Migrate lifecycle evidence composition and the two confirmed policies each
+  in defer and cancellation above. Record any other confirmed fit under its existing scope and
   close it with that scope.
 - Preserve the completed source-build/pre-commit integration corrections above
   during the remaining migrations; reuse their current validation.

@@ -75,7 +75,7 @@ path is removed; generator support and examples alone do not qualify.
 | Lifecycle completion/transfer recognition and outcome selection | Generated launch, exact/retained callback, binding/enclosing steps, context admission, conditional tests and unproven-completion decisions, plus capture/argument/deferred/receiver mapping, path translation/agreement, local completion strategy and conditional-return plans; recursive coverage, storage queries, invocation environments and the existing transfer table stay in Go |
 | Goroutine ownership instruction/call labels | Generated arm-entry, receive, publication, containment, worker-completion instruction plans and helper-escape cases plus ordered call contracts; reaching, callee binding, caches and searches remain in Go |
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
-| Process ownership decision selection | Generated post-Start return policy and ordered instruction ownership actions; lower-level handle scans, caches and flow remain in Go |
+| Process ownership decision selection | Generated pre-Start, return-admission, possible-handoff, post-Start outcome and instruction action policies; handle scans, caches, request binding and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated instruction and opaque-consumption/storage/call policies, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves, identity/loop-origin cases, budgeted copy sequencing and mutex-transfer sequencing; storage/reaching searches, collection mutation and cycle queries stay in Go |
@@ -301,6 +301,16 @@ on compiled SSA, including early uncertainty and late positive evidence. Separat
 remainder cases distinguish a truly exhausted handle query from an empty unused
 allowance and check fallback retention. Existing action-cache and analyzer tests
 retain command identity, fresh-candidate and flow controls.
+
+`processownership/prestart.rules` selects prefix availability, external/helper
+ownership, prior registration and successful-return evidence. Native methods
+create child budgets only when reached. `return_admission.rules` replaces the
+per-return closure table with one selected reason; the flow emits its evidence
+event once. `handoff.rules` orders possible Wait participation while native
+queries retain identity, reachability, completion and callback-argument scans.
+Its uncertain completion retains the original reason, Method and Provenance.
+The immediate noncall/Wait/visible synchronous cases retain their unspent-budget
+behavior even when the caller supplies an already exhausted allowance.
 
 ## Resource lifetime instruction classification
 
