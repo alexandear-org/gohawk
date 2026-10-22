@@ -1491,7 +1491,7 @@ single resource-flow verdict remain the authoritative production paths.
 
 ## Generated acquisition policy
 
-`httpacquire/head.rules`, `endpoint.rules` and `effects.rules` select outcomes
+`httpacquire/rules/head.rules`, `endpoint.rules` and `effects.rules` select outcomes
 over the same exact HEAD/local-endpoint evidence and effect searches. The helper
 owns those bounded searches and their protocol vocabulary; the analyzer maps
 that vocabulary onto its existing resource reasons at one boundary. Every

@@ -24,6 +24,11 @@ standalone GoHawk module, including its supported Go floor. The manifest
 records generated-file ownership and hashes. Edit rules or bindings and
 regenerate, never patch generated Go.
 
+Each package keeps its rule sources in a `rules/` folder beside the Go file
+holding its bindings. Generated `*_gen.go` output stays in the package directory
+itself, since it calls unexported host functions; it is ignored by Git and does
+not count toward the directory file limit.
+
 ## Equation frontend
 
 Rules use compact equations, `host` blocks, whitespace application and named
@@ -145,7 +150,7 @@ recognition result, and traversal stops there. `ExternallyOwnedValue` and
 `ElementOfAggregate` consume this same generated recognition through their
 existing reaching walks; the rules neither traverse nor establish ownership.
 
-`ssaflow/identity.rules` owns `ProveIdentityWithin`: structural identity wins
+`ssaflow/rules/identity.rules` owns `ProveIdentityWithin`: structural identity wins
 before requiring a nameable access path, then left and right path searches run
 in order before step comparison. Missing operands or unavailable paths yield
 unknown without imported provenance; exhaustion retains the budget reason.
@@ -169,7 +174,7 @@ was summarized only after no earlier argument settled or obscured the resource.
 
 ## Concurrency admission
 
-`concurrencyfacts/admission/data.rules` owns inert-data instruction admission.
+`concurrencyfacts/admission/rules/data.rules` owns inert-data instruction admission.
 The child package also owns the existing inert value/container, builtin/atomic
 and standard resource-type contracts. It cannot call back into the enclosing
 pass. `passive.rules` owns the remaining instruction/root decision; its field
@@ -232,7 +237,7 @@ its outcomes require different follow-up evidence.
 
 ## Call-use effects
 
-`calls/call_effect_uses.rules` classifies direct effects and the exact transparent
+`calls/rules/call_effect_uses.rules` classifies direct effects and the exact transparent
 alias forms. Its native result contains effect bits and an optional alias;
 `CallEffects` retains call/closure dispatch, every-use traversal, visited state,
 budgets and memoization. The alias result is one step, not a recursive proof.
@@ -243,7 +248,7 @@ asynchronous and incomplete; map keys and values retain the original uncertainty
 Loads read the slot without following its pointee. Unsupported operations remain
 unknown rather than being inferred harmless.
 
-`calls/call_field_effects.rules` selects the matching embedded field projection
+`calls/rules/call_field_effects.rules` selects the matching embedded field projection
 and classifies loads, whole-owner writes and publication. The Go caller rebases
 the selected child path and resumes the same bounded walk. Other fields cannot
 replace the selected slot. A whole-owner write still includes that slot.
@@ -256,7 +261,7 @@ allowance tests continue to cover late matching arguments and captures.
 
 ## Goroutine instruction labels
 
-`goroutineownership/entry.rules` preserves the precedence of a stored testing
+`goroutineownership/rules/entry.rules` preserves the precedence of a stored testing
 receiver, an exact selected receive and a possible selected receive before an
 instruction's own effect. `classify.rules` handles ordered receive evidence and
 channel/map publication. All identity, containment and selected-case questions
@@ -305,17 +310,17 @@ group receivers and direct waits. Contract tests pin terminal `none` for group
 bookkeeping and testing cleanup. Existing summary and retained-owner tests keep
 candidate attribution, cutoff precedence and fresh-cache recovery controls.
 
-`proofpolicy/caller_lifetime.rules` sequences the four caller-lifetime bounds
+`proofpolicy/rules/caller_lifetime.rules` sequences the four caller-lifetime bounds
 under one native allowance. Each observation retains its witness and post-query
 cutoff; unavailable evidence returns the original attributed cutoff proof before
-considering a partial positive result. `proofpolicy/edge.rules` chooses exact
+considering a partial positive result. `proofpolicy/rules/edge.rules` chooses exact
 selected receives, counted drains, possible receives and retained-context
 ownership in order. A counted drain's exact or unknown action is terminal.
 Native query methods retain the original trace timing and keyed edge evidence.
 
-`containment/aggregate.rules` extracts only the aggregate operand of the admitted
+`containment/rules/aggregate.rules` extracts only the aggregate operand of the admitted
 load/field/index/lookup forms. Wrapper peeling, iteration and per-step charges
-stay in the native root walk. `completionsteps/notification.rules` selects send
+stay in the native root walk. `completionsteps/rules/notification.rules` selects send
 and close notification evidence for all three existing callers. Only sends ask
 the native terminal-coverage callback; a launched notification is excluded before
 any query, and an ordinary close in a cycle remains per-item cleanup. Deferred
@@ -349,7 +354,7 @@ remainder cases distinguish a truly exhausted handle query from an empty unused
 allowance and check fallback retention. Existing action-cache and analyzer tests
 retain command identity, fresh-candidate and flow controls.
 
-`processownership/prestart.rules` selects prefix availability, external/helper
+`processownership/rules/prestart.rules` selects prefix availability, external/helper
 ownership, prior registration and successful-return evidence. Native methods
 create child budgets only when reached. `return_admission.rules` replaces the
 per-return closure table with one selected reason; the flow emits its evidence
@@ -361,7 +366,7 @@ behavior even when the caller supplies an already exhausted allowance.
 
 ## Resource lifetime instruction classification
 
-`resourcelifetime/classify.rules` owns the ordered instruction policy. Collection
+`resourcelifetime/rules/classify.rules` owns the ordered instruction policy. Collection
 and result-guard labels stop the chain even when they select no action. Compressor
 abandonment, SQL parent cleanup and transaction cancellation precede release
 recognition; ambiguous cleanup, paired-error cleanup, loop-only release and opaque
@@ -388,7 +393,7 @@ wrapper regressions continue to guard the underlying proof boundaries.
 
 ## Static result guarantees
 
-`resultfacts/leaf.rules` classifies the original SSA value after the existing
+`resultfacts/rules/leaf.rules` classifies the original SSA value after the existing
 leaf allowance and call-result summary path. Nil and Boolean literals retain
 priority; concrete interface boxing is nonnil even for a typed nil payload.
 Interface/type-parameter payloads remain unknown. Allocations, channel/map/slice
@@ -427,7 +432,7 @@ checking the generated plan shape.
 
 ## Completion outcomes
 
-`lifecycle/completionpolicy/outcome.rules` selects the existing proof after a
+`lifecycle/completionpolicy/rules/outcome.rules` selects the existing proof after a
 completion search fails to prove its target. Budget exhaustion precedes loop
 uncertainty, which precedes incomplete nested work, then a completed negative
 search. Body availability supplies local SSA provenance even at a cutoff. An
@@ -450,7 +455,7 @@ alias queries execute only for reached receive forms. Select counting retains
 the existing may-alias policy. Block traversal, partial-count accumulation,
 cycle uncertainty and shared helper allowances remain unchanged.
 
-`producerlifecycle/abandoned.rules` sequences the normal-return witness,
+`producerlifecycle/rules/abandoned.rules` sequences the normal-return witness,
 producer count, receive availability and count comparison. Unknown producer
 proofs return before receiving queries. `helper_receive.rules` keeps launch and
 builtin exclusions ahead of summary lookup, then sequences complete summaries,
@@ -461,7 +466,7 @@ the channel keeps its false uncertainty payload and helper-unknown reason.
 
 ## Capture guards and exclusive-lock transitions
 
-`concurrentcapture/mutation.rules` owns the authoritative guard order after the
+`concurrentcapture/rules/mutation.rules` owns the authoritative guard order after the
 existing ordered lock proof. A known held guard precedes the unknown-lock syntax
 fallback; worker and channel queries remain lazy in that order. The rules return
 the existing mutation proof, so reporting and tracing keep one decision path.
@@ -504,14 +509,14 @@ ordering, imported facts and ownership publication. Existing owned-result tests
 now also pin comparisons and a deliberately opaque retyping, alongside fresh,
 borrowed, retained, previously closed and callback-owned results.
 
-`lifecyclefacts/returned_view.rules` sequences unchanged-return, possible-release
+`lifecyclefacts/rules/returned_view.rules` sequences unchanged-return, possible-release
 and parameter/result cleanup-capability queries in their original order. Type-only
 view evidence wins before receiver-method completeness is needed. The final
 stored-field query requires complete method knowledge before scanning; an
 unavailable method cannot establish that a field is never released. Field
 collection and lifecycle/type searches stay in Go.
 
-`lifecyclefacts/evidence.rules` keeps local and imported source precedence
+`lifecyclefacts/rules/evidence.rules` keeps local and imported source precedence
 together; `selected_mask.rules` owns mask selection. Native facades retain their
 original signatures. The generated policies return the selected whole proof
 with a decision flag; optional-request binding, local searches and fact lookup
@@ -589,7 +594,7 @@ visit, branch admission and proof's success-bit availability.
 
 ## Completion launch and callback recognition
 
-`completionpolicy/launch.rules` selects synchronous calls, defers, goroutine
+`completionpolicy/rules/launch.rules` selects synchronous calls, defers, goroutine
 launches, exact WaitGroup.Go callbacks and testing Cleanup registrations. The
 plan carries the original call/callback and launch kind into the existing body
 resolver. Only an actual defer permits OnceFunc unwrapping: an immediate call
@@ -755,7 +760,7 @@ the consuming tests for these generated policies.
 
 ## Lock-state copy and transfer sequencing
 
-`lockorder/copy.rules` sequences the existing charged slice, guard and origin
+`lockorder/rules/copy.rules` sequences the existing charged slice, guard and origin
 copies. An exhausted copy exposes no partial successor; nil and nonnil empty
 slices remain distinct, and copied maps are writable even from nil inputs.
 `transfer.rules` distinguishes direct/deferred release, deferred acquisition,
@@ -765,7 +770,7 @@ new held lock or origin. Alias searches and collection updates remain Go queries
 
 ## Concurrency resource-reference policy
 
-`concurrencyfacts/recognition/reference.rules` selects storage-resolved symbolic
+`concurrencyfacts/recognition/rules/reference.rules` selects storage-resolved symbolic
 resources, standard condition constructors and mutex addresses. Cancellation
 provenance is still queried first; an unrecognized call retains its SSA value
 alongside false availability. Root-binding, fixed-load and embedded-path rules
@@ -817,7 +822,7 @@ instruction classification, cache, traversal and reporting boundaries remain.
 
 ## Local completion evidence and path agreement
 
-`lifecycle/completion_local.rules` selects direct callback invocation, nested
+`lifecycle/rules/completion_local.rules` selects direct callback invocation, nested
 callback completion, exact target invocation, and ordinary nested completion in
 that order for each mapped local. Callback failure never falls through to the
 ordinary target search. A nested owner or contained target must name the exact

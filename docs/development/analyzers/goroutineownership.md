@@ -61,7 +61,7 @@ parent mapping. Its facade delegates notification recognition to the same
 generated policy for direct and nested discovery. Unknown channel capacity supplies possible buffering,
 not a proof that an unbuffered join obligation exists.
 
-`containment/aggregate.rules` selects the load, field, index and map source
+`containment/rules/aggregate.rules` selects the load, field, index and map source
 operand. The native root walk still peels its selected transparent wrappers
 and charges each step. It never follows a selection index, a receive, a slice
 or an unrelated tuple result. Real-SSA tests retain copied-parameter roots and

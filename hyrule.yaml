@@ -5,1013 +5,1013 @@ targets:
     bindings: internal/reporting/check/report_admission.go
     signature: admissionSignature
     function: DiagnosticAdmission
-    rules: [internal/reporting/check/report_admission.rules]
+    rules: [internal/reporting/check/rules/report_admission.rules]
     out: internal/reporting/check/report_admission_gen.go
   - name: structural_identity_evidence
     package: internal/engine/ssaflow
     bindings: internal/engine/ssaflow/value_identity.go
     signature: identitySignature
     function: ProveIdentityWithin
-    rules: [internal/engine/ssaflow/identity.rules]
+    rules: [internal/engine/ssaflow/rules/identity.rules]
     out: internal/engine/ssaflow/identity_gen.go
   - name: defer_resource_transfer
     package: internal/analysis/analyzers/resources/deferinloop
     bindings: internal/analysis/analyzers/resources/deferinloop/classify.go
     signature: transferSignature
     function: transfersResource
-    rules: [internal/analysis/analyzers/resources/deferinloop/transfer.rules]
+    rules: [internal/analysis/analyzers/resources/deferinloop/rules/transfer.rules]
     out: internal/analysis/analyzers/resources/deferinloop/transfer_gen.go
   - name: defer_argument_use
     package: internal/analysis/analyzers/resources/deferinloop
     bindings: internal/analysis/analyzers/resources/deferinloop/classify.go
     signature: argumentUseSignature
     function: classifyArgumentUse
-    rules: [internal/analysis/analyzers/resources/deferinloop/argument.rules]
+    rules: [internal/analysis/analyzers/resources/deferinloop/rules/argument.rules]
     out: internal/analysis/analyzers/resources/deferinloop/argument_gen.go
   - name: cancellation_parent_origin
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/parent_context.go
     signature: parentOriginSignature
     function: classifyParentOrigin
-    rules: [internal/analysis/analyzers/resources/cancellationownership/parent.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/parent.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/parent_gen.go
   - name: cancellation_deferred_literal
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/result_guards.go
     signature: deferredLiteralSignature
     function: classifyDeferredLiteral
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/literal.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/literal.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/literal_gen.go
   - name: result_leaf
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/results.go
     signature: resultLeafSignature
     function: classifyResultLeaf
-    rules: [internal/analysis/passes/resultfacts/leaf.rules]
+    rules: [internal/analysis/passes/resultfacts/rules/leaf.rules]
     out: internal/analysis/passes/resultfacts/leaf_gen.go
   - name: resource_classification
     package: internal/analysis/analyzers/resources/resourcelifetime
     bindings: internal/analysis/analyzers/resources/resourcelifetime/classify.go
     signature: resourceClassifySignature
     function: classifyResource
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/classify.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/rules/classify.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/classify_gen.go
   - name: process_action_entry
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/ownership.go
     signature: processActionPrefixSignature
     function: recognizeProcessAction
-    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_entry.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/action_schema.rules, internal/analysis/analyzers/resources/processownership/rules/action_entry.rules]
     out: internal/analysis/analyzers/resources/processownership/action_entry_gen.go
   - name: process_action_settlement
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/ownership.go
     signature: processSettlementSignature
     function: recognizeProcessSettlement
-    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_settlement.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/action_schema.rules, internal/analysis/analyzers/resources/processownership/rules/action_settlement.rules]
     out: internal/analysis/analyzers/resources/processownership/action_settlement_gen.go
   - name: process_action_remainder
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/ownership.go
     signature: processRemainderSignature
     function: decideProcessRemainder
-    rules: [internal/analysis/analyzers/resources/processownership/action_schema.rules, internal/analysis/analyzers/resources/processownership/action_remainder.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/action_schema.rules, internal/analysis/analyzers/resources/processownership/rules/action_remainder.rules]
     out: internal/analysis/analyzers/resources/processownership/action_remainder_gen.go
   - name: process_start_decision
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/prestart.go
     signature: startDecisionSignature
     function: proveProcessStart
-    rules: [internal/analysis/analyzers/resources/processownership/prestart.rules, internal/analysis/analyzers/resources/processownership/proof_schema.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/prestart.rules, internal/analysis/analyzers/resources/processownership/rules/proof_schema.rules]
     out: internal/analysis/analyzers/resources/processownership/prestart_gen.go
   - name: process_return_admission
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/flow.go
     signature: returnAdmissionSignature
     function: admitProcessReturn
-    rules: [internal/analysis/analyzers/resources/processownership/return_admission.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/return_admission.rules]
     out: internal/analysis/analyzers/resources/processownership/return_admission_gen.go
   - name: process_wait_handoff
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/handoff.go
     signature: waitHandoffSignature
     function: provePossibleWaitHandoff
-    rules: [internal/analysis/analyzers/resources/processownership/handoff.rules, internal/analysis/analyzers/resources/processownership/proof_schema.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/handoff.rules, internal/analysis/analyzers/resources/processownership/rules/proof_schema.rules]
     out: internal/analysis/analyzers/resources/processownership/handoff_gen.go
   - name: goroutine_call_recognition
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go
     signature: callLabelSignature
     function: recognizeSpawnCall
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/call_prefix.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/rules/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/call_prefix_gen.go
   - name: goroutine_call_contract
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/call_actions.go
     signature: callLabelSignature
     function: recognizeSpawnCallContract
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/call_contracts.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/rules/call_schema.rules, internal/analysis/analyzers/concurrency/goroutineownership/rules/call_contracts.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/call_contracts_gen.go
   - name: goroutine_instruction_label
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/classify.go
     signature: classifySignature
     function: classifySpawnInstruction
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/classify.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/classify_gen.go
   - name: goroutine_entry_recognition
     package: internal/analysis/analyzers/concurrency/goroutineownership
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/classify.go
     signature: recognizeSignature
     function: recognizeSpawnEntry
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/entry.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/rules/entry.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/entry_gen.go
   - name: call_effect_use
     package: internal/engine/ssaflow/calls
     bindings: internal/engine/ssaflow/calls/call_effect_uses.go
     signature: callUseSignature
     function: classifyCallUse
-    rules: [internal/engine/ssaflow/calls/call_effect_uses.rules]
+    rules: [internal/engine/ssaflow/calls/rules/call_effect_uses.rules]
     out: internal/engine/ssaflow/calls/call_effect_uses_gen.go
   - name: call_effect_field_use
     package: internal/engine/ssaflow/calls
     bindings: internal/engine/ssaflow/calls/call_field_effects.go
     signature: fieldUseSignature
     function: classifyFieldUse
-    rules: [internal/engine/ssaflow/calls/call_field_effects.rules]
+    rules: [internal/engine/ssaflow/calls/rules/call_field_effects.rules]
     out: internal/engine/ssaflow/calls/call_field_effects_gen.go
   - name: concurrency_context_call
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/context.go
     signature: ContextSignature
     function: ContextCall
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/context.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/context_gen.go
   - name: concurrency_context_origin
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/context.go
     signature: OriginSignature
     function: ContextOrigin
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/origin.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/origin_gen.go
   - name: concurrency_callback_input
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/callbacks.go
     signature: InputSignature
     function: CallbackInput
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/callback_input.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/callback_input_gen.go
   - name: concurrency_callback_call
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/callbacks.go
     signature: CallbackSignature
     function: CallbackCall
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/callback_call.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/callback_call_gen.go
   - name: concurrency_inert_data
     package: internal/analysis/passes/concurrencyfacts/admission
     bindings: internal/analysis/passes/concurrencyfacts/admission/data.go
     signature: DataSignature
     function: DataInstruction
-    rules: [internal/analysis/passes/concurrencyfacts/admission/data.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/admission/rules/data.rules]
     out: internal/analysis/passes/concurrencyfacts/admission/data_gen.go
   - name: concurrency_effect_support
     package: internal/analysis/passes/concurrencyfacts
     bindings: internal/analysis/passes/concurrencyfacts/effects.go
     signature: passiveSignature
     function: passiveInstruction
-    rules: [internal/analysis/passes/concurrencyfacts/passive.rules, internal/analysis/passes/concurrencyfacts/snapshots.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/rules/passive.rules, internal/analysis/passes/concurrencyfacts/rules/snapshots.rules]
     out: internal/analysis/passes/concurrencyfacts/effect_support_gen.go
   - name: select_comparison
     package: internal/engine/ssaflow/selection
     bindings: internal/engine/ssaflow/selection/comparison.go
     signature: ComparisonSignature
     function: Recognize
-    rules: [internal/engine/ssaflow/selection/comparison.rules]
+    rules: [internal/engine/ssaflow/selection/rules/comparison.rules]
     out: internal/engine/ssaflow/selection/comparison_gen.go
   - name: synchronization_primitives
     package: internal/engine/ssaflow/calls/synchronization
     bindings: internal/engine/ssaflow/calls/synchronization/primitives.go
     signature: PrimitiveSignature
     function: Recognize
-    rules: [internal/engine/ssaflow/calls/synchronization/primitives.rules]
+    rules: [internal/engine/ssaflow/calls/synchronization/rules/primitives.rules]
     out: internal/engine/ssaflow/calls/synchronization/primitives_gen.go
   - name: mutex_storage_contract
     package: internal/engine/ssaflow/calls/synchronization
     bindings: internal/engine/ssaflow/calls/synchronization/mutex.go
     signature: MutexEffectSignature
     function: MutexEffect
-    rules: [internal/engine/ssaflow/calls/synchronization/mutex.rules]
+    rules: [internal/engine/ssaflow/calls/synchronization/rules/mutex.rules]
     out: internal/engine/ssaflow/calls/synchronization/mutex_gen.go
   - name: process_return_decision
     package: internal/analysis/analyzers/resources/processownership
     bindings: internal/analysis/analyzers/resources/processownership/decision_bindings.go
     signature: processReturnSignature
     function: decideProcessReturn
-    rules: [internal/analysis/analyzers/resources/processownership/decision.rules]
+    rules: [internal/analysis/analyzers/resources/processownership/rules/decision.rules]
     out: internal/analysis/analyzers/resources/processownership/decision_gen.go
   - name: transparent_value_form
     package: internal/engine/ssaflow/valueforms
     bindings: internal/engine/ssaflow/valueforms/forms.go
     signature: Signature
     function: Unwrap
-    rules: [internal/engine/ssaflow/valueforms/forms.rules]
+    rules: [internal/engine/ssaflow/valueforms/rules/forms.rules]
     out: internal/engine/ssaflow/valueforms/forms_gen.go
   - name: ownership_value_source
     package: internal/engine/ssaflow/valueforms
     bindings: internal/engine/ssaflow/valueforms/ownership.go
     signature: OwnershipSignature
     function: OwnershipSource
-    rules: [internal/engine/ssaflow/valueforms/ownership.rules]
+    rules: [internal/engine/ssaflow/valueforms/rules/ownership.rules]
     out: internal/engine/ssaflow/valueforms/ownership_gen.go
   - name: deferred_resource_use
     package: internal/analysis/analyzers/resources/deferinloop
     bindings: internal/analysis/analyzers/resources/deferinloop/classify_bindings.go
     signature: useSignature
     function: classifyValueUse
-    rules: [internal/analysis/analyzers/resources/deferinloop/classify.rules]
+    rules: [internal/analysis/analyzers/resources/deferinloop/rules/classify.rules]
     out: internal/analysis/analyzers/resources/deferinloop/classify_gen.go
   - name: deferred_resource_acquisition
     package: internal/analysis/analyzers/resources/deferinloop
     bindings: internal/analysis/analyzers/resources/deferinloop/obligation.go
     signature: acquisitionSignature
     function: classifyResourceAcquisition
-    rules: [internal/analysis/analyzers/resources/deferinloop/acquisition.rules]
+    rules: [internal/analysis/analyzers/resources/deferinloop/rules/acquisition.rules]
     out: internal/analysis/analyzers/resources/deferinloop/acquisition_gen.go
   - name: cancellation_instruction_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: classifySignature
     function: classifyCancellation
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/classify.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/classify_gen.go
   - name: cancellation_call_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: callLabelSignature
     function: recognizeCancellationCall
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/call_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/call_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/call_label_gen.go
   - name: cancellation_argument_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: argumentLabelSignature
     function: recognizeCancellationArgument
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/argument_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/argument_label_gen.go
   - name: cancellation_recognized_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: callLabelSignature
     function: recognizeCancellation
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/recognized_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/recognized_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/recognized_label_gen.go
   - name: cancellation_direct_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: callLabelSignature
     function: recognizeCancellationDirect
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/direct_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/direct_label_gen.go
   - name: cancellation_deferred_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: argumentLabelSignature
     function: recognizeCancellationDeferredUse
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/deferred_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/deferred_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/deferred_label_gen.go
   - name: cancellation_return_label
     package: internal/analysis/analyzers/resources/cancellationownership
     bindings: internal/analysis/analyzers/resources/cancellationownership/classify_bindings.go
     signature: returnLabelSignature
     function: classifyCancellationReturn
-    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/return_label.rules]
+    rules: [internal/analysis/analyzers/resources/cancellationownership/rules/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/rules/return_label.rules]
     out: internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go
   - name: completion_unproven_outcome
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/outcome.go
     signature: signature
     function: decideUnproven
-    rules: [internal/engine/lifecycle/completionpolicy/outcome.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/outcome.rules]
     out: internal/engine/lifecycle/completionpolicy/outcome_gen.go
   - name: heap_value_definition
     package: internal/engine/heapmodel/operations
     bindings: internal/engine/heapmodel/operations/definition.go
     signature: definitionSignature
     function: Define
-    rules: [internal/engine/heapmodel/operations/definition.rules]
+    rules: [internal/engine/heapmodel/operations/rules/definition.rules]
     out: internal/engine/heapmodel/operations/definition_gen.go
   - name: heap_static_leaf
     package: internal/engine/heapmodel/operations
     bindings: internal/engine/heapmodel/operations/leaf.go
     signature: leafSignature
     function: Leaf
-    rules: [internal/engine/heapmodel/operations/leaf.rules]
+    rules: [internal/engine/heapmodel/operations/rules/leaf.rules]
     out: internal/engine/heapmodel/operations/leaf_gen.go
   - name: capture_mutation_root
     package: internal/analysis/analyzers/concurrency/concurrentcapture
     bindings: internal/analysis/analyzers/concurrency/concurrentcapture/syntax_bindings.go
     signature: rootStepSignature
     function: mutationRootStep
-    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/root.rules]
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules]
     out: internal/analysis/analyzers/concurrency/concurrentcapture/root_gen.go
   - name: capture_channel_statement
     package: internal/analysis/analyzers/concurrency/concurrentcapture
     bindings: internal/analysis/analyzers/concurrency/concurrentcapture/syntax_bindings.go
     signature: channelStatementSignature
     function: channelStatement
-    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement.rules]
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules]
     out: internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement_gen.go
   - name: producer_instruction_receive
     package: internal/analysis/analyzers/concurrency/producerlifecycle
     bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
     signature: receiveSignature
     function: instructionReceives
-    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive_schema.rules]
     out: internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go
   - name: producer_abandonment
     package: internal/analysis/analyzers/concurrency/producerlifecycle
     bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
     signature: abandonmentSignature
     function: abandonedProducerSend
-    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/abandoned.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/rules/abandoned.rules, internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive_schema.rules]
     out: internal/analysis/analyzers/concurrency/producerlifecycle/abandoned_gen.go
   - name: producer_helper_receive
     package: internal/analysis/analyzers/concurrency/producerlifecycle
     bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
     signature: helperReceiveSignature
     function: helperReceives
-    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive_schema.rules]
     out: internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive_gen.go
   - name: capture_mutation_guard
     package: internal/analysis/analyzers/concurrency/concurrentcapture
     bindings: internal/analysis/analyzers/concurrency/concurrentcapture/guard.go
     signature: mutationSignature
     function: decideMutationGuard
-    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/mutation.rules]
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules]
     out: internal/analysis/analyzers/concurrency/concurrentcapture/mutation_gen.go
   - name: capture_lock_transition
     package: internal/analysis/analyzers/concurrency/concurrentcapture
     bindings: internal/analysis/analyzers/concurrency/concurrentcapture/lock_region.go
     signature: lockTransitionSignature
     function: lockTransition
-    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition.rules]
+    rules: [internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules]
     out: internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition_gen.go
   - name: lock_write_destination
     package: internal/analysis/analyzers/concurrency/lockorder/lockforms
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/writes.go
     signature: destinationSignature
     function: Destination
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/destination.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockforms/destination_gen.go
   - name: lock_owner_address_step
     package: internal/analysis/analyzers/concurrency/lockorder/lockforms
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/writes.go
     signature: ownerStepSignature
     function: OwnerStep
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step_gen.go
   - name: lock_dynamic_index_step
     package: internal/analysis/analyzers/concurrency/lockorder/lockforms
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockforms/index.go
     signature: indexSignature
     function: DynamicIndex
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/index.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockforms/index_gen.go
   - name: lifecycle_response_body_leaf
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/response.go
     signature: responseSignature
     function: ResponseBody
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/response.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/response.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go
   - name: lifecycle_handoff_use
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff.go
     signature: handoffSignature
     function: Handoff
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff_gen.go
   - name: lifecycle_retention_use
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
     signature: retentionSignature
     function: Retains
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention_gen.go
   - name: lifecycle_escape_use
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
     signature: escapeSignature
     function: Escapes
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/escape.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_gen.go
   - name: lifecycle_escape_alias
     package: internal/analysis/passes/lifecyclefacts/lifecycleforms
     bindings: internal/analysis/passes/lifecyclefacts/lifecycleforms/retention.go
     signature: escapeAliasSignature
     function: EscapeAlias
-    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/escape_alias.rules]
     out: internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias_gen.go
   - name: http_head_acquisition
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head.go
     signature: headSignature
     function: decideHead
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/head.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head_gen.go
   - name: http_local_acquisition
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint.go
     signature: localSignature
     function: decideLocal
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/endpoint.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint_gen.go
   - name: http_acquisition_effects
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects.go
     signature: effectsSignature
     function: decideEffects
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/effects.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects_gen.go
   - name: completion_launch
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/launch.go
     signature: launchSignature
     function: RecognizeLaunch
-    rules: [internal/engine/lifecycle/completionpolicy/launch.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/launch.rules]
     out: internal/engine/lifecycle/completionpolicy/launch_gen.go
   - name: completion_callback_origin
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/callback.go
     signature: callbackSignature
     function: RecognizeCallback
-    rules: [internal/engine/lifecycle/completionpolicy/callback.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/callback.rules]
     out: internal/engine/lifecycle/completionpolicy/callback_gen.go
   - name: resource_acquisition_success
     package: internal/analysis/analyzers/resources/resourcelifetime
     bindings: internal/analysis/analyzers/resources/resourcelifetime/acquisition_errors.go
     signature: successBranchSignature
     function: decideResourceSuccessBranch
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch_gen.go
   - name: resource_acquisition_absence
     package: internal/analysis/analyzers/resources/resourcelifetime
     bindings: internal/analysis/analyzers/resources/resourcelifetime/acquisition_errors.go
     signature: absentAcquisitionSignature
     function: decideAbsentAcquisition
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence_gen.go
   - name: http_client
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: headClientSignature
     function: decideHeadClient
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client_gen.go
   - name: http_cell_use
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: clientCellUseSignature
     function: decideClientCellUse
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use_gen.go
   - name: http_request_origin
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: requestOriginSignature
     function: decideRequestOrigin
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin_gen.go
   - name: http_request_use
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: requestUseSignature
     function: decideRequestUse
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use_gen.go
   - name: http_server_use
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: serverUseSignature
     function: decideServerUse
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use_gen.go
   - name: http_writer_use
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: writerUseSignature
     function: decideWriterUse
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use_gen.go
   - name: http_default_use
     package: internal/analysis/analyzers/resources/resourcelifetime/httpacquire
     bindings: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses.go
     signature: defaultUseSignature
     function: decideDefaultUse
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/uses_schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules, internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/uses_schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use_gen.go
   - name: worker_containment
     package: internal/analysis/analyzers/concurrency/goroutineownership/containment
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
     signature: containmentSignature
     function: decideContainment
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf_gen.go
   - name: worker_stored_containment
     package: internal/analysis/analyzers/concurrency/goroutineownership/containment
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
     signature: storedUseSignature
     function: decideStoredUse
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use_gen.go
   - name: worker_helper_escape
     package: internal/analysis/analyzers/concurrency/goroutineownership/containment
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
     signature: escapeSignature
     function: Escapes
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/escape.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/containment/escape_gen.go
   - name: lock_identity
     package: internal/analysis/analyzers/concurrency/lockorder/lockidentity
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockidentity/identity.go
     signature: leafSignature
     function: decideIdentityLeaf
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf_gen.go
   - name: lock_loop_origin
     package: internal/analysis/analyzers/concurrency/lockorder/lockvariant
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockvariant/iteration.go
     signature: valueSignature
     function: decideValue
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/value.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockvariant/value_gen.go
   - name: lock_loop_extraction
     package: internal/analysis/analyzers/concurrency/lockorder/lockvariant
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockvariant/iteration.go
     signature: extractSignature
     function: decideExtract
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules, internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract_gen.go
   - name: worker_receive
     package: internal/analysis/analyzers/concurrency/goroutineownership/receives
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/receives/receives.go
     signature: fromSignature
     function: decideFrom
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/from.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/receives/from_gen.go
   - name: worker_guaranteed_receive
     package: internal/analysis/analyzers/concurrency/goroutineownership/receives
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/receives/receives.go
     signature: guaranteedSignature
     function: decideGuaranteed
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules, internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed_gen.go
   - name: call_fixed_outcome
     package: internal/engine/ssaflow/calls
     bindings: internal/engine/ssaflow/calls/call_constants.go
     signature: fixedOutcomeSignature
     function: decideFixedOutcome
-    rules: [internal/engine/ssaflow/calls/fixed_outcome.rules]
+    rules: [internal/engine/ssaflow/calls/rules/fixed_outcome.rules]
     out: internal/engine/ssaflow/calls/fixed_outcome_gen.go
   - name: result_return_relation
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/relations.go
     signature: returnHoldsSignature
     function: decideReturnHolds
-    rules: [internal/analysis/passes/resultfacts/return.rules]
+    rules: [internal/analysis/passes/resultfacts/rules/return.rules]
     out: internal/analysis/passes/resultfacts/return_gen.go
   - name: result_assumed_leaf
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/relations.go
     signature: assumedLeafSignature
     function: decideAssumedLeaf
-    rules: [internal/analysis/passes/resultfacts/assumed.rules]
+    rules: [internal/analysis/passes/resultfacts/rules/assumed.rules]
     out: internal/analysis/passes/resultfacts/assumed_gen.go
   - name: summary_result_condition
     package: internal/analysis/summaries
     bindings: internal/analysis/summaries/results.go
     signature: resultConditionSignature
     function: decideResultCondition
-    rules: [internal/analysis/summaries/condition.rules]
+    rules: [internal/analysis/summaries/rules/condition.rules]
     out: internal/analysis/summaries/condition_gen.go
   - name: summary_result_comparison
     package: internal/analysis/summaries
     bindings: internal/analysis/summaries/results.go
     signature: resultComparisonSignature
     function: decideResultComparison
-    rules: [internal/analysis/summaries/comparison.rules]
+    rules: [internal/analysis/summaries/rules/comparison.rules]
     out: internal/analysis/summaries/comparison_gen.go
   - name: path_stable_guard
     package: internal/engine/ssaflow/path
     bindings: internal/engine/ssaflow/path/flow_guards.go
     signature: stableGuardSignature
     function: decideStableGuard
-    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_stable.rules]
+    rules: [internal/engine/ssaflow/path/rules/guard_schema.rules, internal/engine/ssaflow/path/rules/guard_stable.rules]
     out: internal/engine/ssaflow/path/guard_stable_gen.go
   - name: path_loaded_guard
     package: internal/engine/ssaflow/path
     bindings: internal/engine/ssaflow/path/flow_guards.go
     signature: loadedGuardSignature
     function: loadedGuard
-    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_loaded.rules]
+    rules: [internal/engine/ssaflow/path/rules/guard_schema.rules, internal/engine/ssaflow/path/rules/guard_loaded.rules]
     out: internal/engine/ssaflow/path/guard_loaded_gen.go
   - name: path_guard_address
     package: internal/engine/ssaflow/path
     bindings: internal/engine/ssaflow/path/flow_guards.go
     signature: addressGuardSignature
     function: recognizeGuardAddress
-    rules: [internal/engine/ssaflow/path/guard_schema.rules, internal/engine/ssaflow/path/guard_address.rules]
+    rules: [internal/engine/ssaflow/path/rules/guard_schema.rules, internal/engine/ssaflow/path/rules/guard_address.rules]
     out: internal/engine/ssaflow/path/guard_address_gen.go
   - name: path_literal_comparison
     package: internal/engine/ssaflow/path
     bindings: internal/engine/ssaflow/path/flow_branch_literals.go
     signature: literalComparisonSignature
     function: decideLiteralComparison
-    rules: [internal/engine/ssaflow/path/branch_compare.rules]
+    rules: [internal/engine/ssaflow/path/rules/branch_compare.rules]
     out: internal/engine/ssaflow/path/branch_compare_gen.go
   - name: lifecycle_retained_callback
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/capability.go
     signature: capabilitySignature
     function: RetainedCallback
-    rules: [internal/engine/lifecycle/completionpolicy/retained.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/retained.rules]
     out: internal/engine/lifecycle/completionpolicy/retained_gen.go
   - name: lifecycle_callback_binding
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/binding.go
     signature: bindingSignature
     function: RecognizeBinding
-    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/binding.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/binding_schema.rules, internal/engine/lifecycle/completionpolicy/rules/binding.rules]
     out: internal/engine/lifecycle/completionpolicy/binding_gen.go
   - name: lifecycle_callback_aggregate
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/binding.go
     signature: aggregateSignature
     function: RecognizeAggregate
-    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/aggregate.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/binding_schema.rules, internal/engine/lifecycle/completionpolicy/rules/aggregate.rules]
     out: internal/engine/lifecycle/completionpolicy/aggregate_gen.go
   - name: lifecycle_enclosing_reference
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/binding.go
     signature: enclosingSignature
     function: RecognizeEnclosing
-    rules: [internal/engine/lifecycle/completionpolicy/binding_schema.rules, internal/engine/lifecycle/completionpolicy/enclosing.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/binding_schema.rules, internal/engine/lifecycle/completionpolicy/rules/enclosing.rules]
     out: internal/engine/lifecycle/completionpolicy/enclosing_gen.go
   - name: lifecycle_callback_context_safe
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/retention.go
     signature: contextSafeSignature
     function: ContextInstructionSafe
-    rules: [internal/engine/lifecycle/completionpolicy/context_safe.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/context_safe.rules]
     out: internal/engine/lifecycle/completionpolicy/context_safe_gen.go
   - name: lifecycle_condition_comparison
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/condition.go
     signature: conditionSignature
     function: RecognizeCondition
-    rules: [internal/engine/lifecycle/completionpolicy/condition.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/condition.rules]
     out: internal/engine/lifecycle/completionpolicy/condition_gen.go
   - name: lock_state_copy
     package: internal/analysis/analyzers/concurrency/lockorder
     bindings: internal/analysis/analyzers/concurrency/lockorder/state.go
     signature: lockStateCopySignature
     function: cloneLockStateWithin
-    rules: [internal/analysis/analyzers/concurrency/lockorder/copy.rules, internal/analysis/analyzers/concurrency/lockorder/state_schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/rules/copy.rules, internal/analysis/analyzers/concurrency/lockorder/rules/state_schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/copy_gen.go
   - name: lock_state_transfer
     package: internal/analysis/analyzers/concurrency/lockorder
     bindings: internal/analysis/analyzers/concurrency/lockorder/flow.go
     signature: mutexTransferSignature
     function: decideMutexTransfer
-    rules: [internal/analysis/analyzers/concurrency/lockorder/state_schema.rules, internal/analysis/analyzers/concurrency/lockorder/transfer.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/rules/state_schema.rules, internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/transfer_gen.go
   - name: concurrency_resource_reference
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/references.go
     signature: ReferenceSignature
     function: ResourceReference
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/reference.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/reference_gen.go
   - name: concurrency_binding_root
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/references.go
     signature: RootSignature
     function: BindingRoot
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/binding_root.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/binding_root_gen.go
   - name: concurrency_fixed_load
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/references.go
     signature: FixedLoadSignature
     function: FixedLoad
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/fixed_load.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/fixed_load_gen.go
   - name: concurrency_path_root
     package: internal/analysis/passes/concurrencyfacts/recognition
     bindings: internal/analysis/passes/concurrencyfacts/recognition/references.go
     signature: PathRootSignature
     function: PathRoot
-    rules: [internal/analysis/passes/concurrencyfacts/recognition/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/path_root.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/recognition/rules/address_schema.rules, internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules]
     out: internal/analysis/passes/concurrencyfacts/recognition/path_root_gen.go
   - name: concurrency_inert_builtin
     package: internal/analysis/passes/concurrencyfacts/admission
     bindings: internal/analysis/passes/concurrencyfacts/admission/inert.go
     signature: BuiltinSignature
     function: Builtin
-    rules: [internal/analysis/passes/concurrencyfacts/admission/builtin.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/admission/rules/builtin.rules]
     out: internal/analysis/passes/concurrencyfacts/admission/builtin_gen.go
   - name: lifecycle_capture_mapping
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: captureSignature
     function: Captured
-    rules: [internal/engine/lifecycle/completionmapping/capture.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/capture.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/capture_gen.go
   - name: lifecycle_capture_relation
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: relationSignature
     function: CaptureRelation
-    rules: [internal/engine/lifecycle/completionmapping/capture_relation.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/capture_relation.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/capture_relation_gen.go
   - name: lifecycle_argument_mapping
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: argumentSignature
     function: Argument
-    rules: [internal/engine/lifecycle/completionmapping/argument.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/argument.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/argument_gen.go
   - name: lifecycle_deferred_mapping
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: deferredSignature
     function: DeferredCell
-    rules: [internal/engine/lifecycle/completionmapping/deferred.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/deferred.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/deferred_gen.go
   - name: lifecycle_deferred_relation
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: relationCellSignature
     function: RelateCell
-    rules: [internal/engine/lifecycle/completionmapping/cell_relation.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/cell_relation.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/cell_relation_gen.go
   - name: lifecycle_receiver_mapping
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: receiverSignature
     function: Receives
-    rules: [internal/engine/lifecycle/completionmapping/receiver.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/receiver.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/receiver_gen.go
   - name: lifecycle_completion_path
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/mapping.go
     signature: pathSignature
     function: TranslatePath
-    rules: [internal/engine/lifecycle/completionmapping/path.rules, internal/engine/lifecycle/completionmapping/schema.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/path.rules, internal/engine/lifecycle/completionmapping/rules/schema.rules]
     out: internal/engine/lifecycle/completionmapping/path_gen.go
   - name: lifecycle_return_value
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/return.go
     signature: returnedValueSignature
     function: ResolveReturnValue
-    rules: [internal/engine/lifecycle/completionpolicy/return_value.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/return_value.rules]
     out: internal/engine/lifecycle/completionpolicy/return_value_gen.go
   - name: lifecycle_return_result
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/return.go
     signature: returnedResultSignature
     function: ReturnResult
-    rules: [internal/engine/lifecycle/completionpolicy/return_result.rules, internal/engine/lifecycle/completionpolicy/return_schema.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/return_result.rules, internal/engine/lifecycle/completionpolicy/rules/return_schema.rules]
     out: internal/engine/lifecycle/completionpolicy/return_result_gen.go
   - name: lifecycle_conditional_return
     package: internal/engine/lifecycle/completionpolicy
     bindings: internal/engine/lifecycle/completionpolicy/return.go
     signature: returnedSignature
     function: RecognizeReturn
-    rules: [internal/engine/lifecycle/completionpolicy/return.rules, internal/engine/lifecycle/completionpolicy/return_schema.rules]
+    rules: [internal/engine/lifecycle/completionpolicy/rules/return.rules, internal/engine/lifecycle/completionpolicy/rules/return_schema.rules]
     out: internal/engine/lifecycle/completionpolicy/return_gen.go
   - name: goroutine_proof_policy
     package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
     signature: proofSignature
     function: Prove
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/proof.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/proof_gen.go
   - name: goroutine_proof_fallback
     package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
     signature: fallbackSignature
     function: Fallback
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/fallback.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/fallback.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/fallback_gen.go
   - name: goroutine_lifetime_policy
     package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
     signature: lifecycleSignature
     function: Lifecycle
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/lifecycle.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle_gen.go
   - name: lifecycle_local_completion
     package: internal/engine/lifecycle
     bindings: internal/engine/lifecycle/completion_search.go
     signature: localCompletionSignature
     function: recognizeLocalCompletion
-    rules: [internal/engine/lifecycle/completion_local.rules]
+    rules: [internal/engine/lifecycle/rules/completion_local.rules]
     out: internal/engine/lifecycle/completion_local_gen.go
   - name: lifecycle_completion_path_fold
     package: internal/engine/lifecycle/completionmapping
     bindings: internal/engine/lifecycle/completionmapping/accumulation.go
     signature: foldPathSignature
     function: FoldPath
-    rules: [internal/engine/lifecycle/completionmapping/accumulation.rules]
+    rules: [internal/engine/lifecycle/completionmapping/rules/accumulation.rules]
     out: internal/engine/lifecycle/completionmapping/accumulation_gen.go
   - name: resource_opacity_consume
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: consumeSignature
     function: Consume
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume_gen.go
   - name: resource_opacity_send
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: sendSignature
     function: Send
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/send.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send_gen.go
   - name: resource_opacity_call
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: callSignature
     function: Call
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/call.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call_gen.go
   - name: resource_opacity_after_callback
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: afterCallbackSignature
     function: AfterCallback
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/after_callback.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback_gen.go
   - name: resource_opacity_dispatch
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: dispatchSignature
     function: Dispatch
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch_gen.go
   - name: resource_opacity_function
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: functionSignature
     function: Function
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_gen.go
   - name: resource_opacity_function_tail
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: functionTailSignature
     function: FunctionTail
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function_tail.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail_gen.go
   - name: resource_opacity_store
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/model.go
     signature: storeSignature
     function: StoreConsumption
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/store.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store_gen.go
   - name: resource_opacity_closure
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
     signature: closureSignature
     function: Closure
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_gen.go
   - name: resource_opacity_closure_body
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
     signature: closureSignature
     function: ClosureBody
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_body.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body_gen.go
   - name: resource_opacity_closure_capture
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
     signature: closureSignature
     function: ClosureCapture
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_capture.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture_gen.go
   - name: resource_opacity_closure_finish
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure.go
     signature: closureFinishSignature
     function: ClosureFinish
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish_gen.go
   - name: resource_evaluation_policy
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
     signature: evaluationSignature
     function: Evaluate
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/evaluation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_gen.go
   - name: resource_acquisition_policy
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
     signature: acquisitionSignature
     function: Acquire
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/acquisition.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition_gen.go
   - name: resource_final_flow_policy
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
     signature: finalFlowSignature
     function: Finalize
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/final_flow.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/evaluation_schema.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow_gen.go
   - name: resource_preparation_policy
     package: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy
     bindings: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation.go
     signature: preparationSignature
     function: PrepareFlow
-    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/schema.rules]
+    rules: [internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/preparation.rules, internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/schema.rules]
     out: internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation_gen.go
   - name: lock_missing_release_policy
     package: internal/analysis/analyzers/concurrency/lockorder/lockpolicy
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/model.go
     signature: missingSignature
     function: MissingRelease
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/missing.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing_gen.go
   - name: lock_read_write_policy
     package: internal/analysis/analyzers/concurrency/lockorder/lockpolicy
     bindings: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/model.go
     signature: readWriteSignature
     function: ReadWrite
-    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/read_write.rules, internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write_gen.go
   - name: worker_completion_terminal
     package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
     signature: terminalSignature
     function: Terminal
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal_gen.go
   - name: worker_completion_tail
     package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
     signature: tailSignature
     function: Tail
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail_gen.go
   - name: lifecycle_returned_view_policy
     package: internal/analysis/passes/lifecyclefacts
     bindings: internal/analysis/passes/lifecyclefacts/returned_views.go
     signature: parameterViewSignature
     function: parameterIsView
-    rules: [internal/analysis/passes/lifecyclefacts/returned_view.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/rules/returned_view.rules]
     out: internal/analysis/passes/lifecyclefacts/returned_view_gen.go
   - name: lifecycle_evidence_policy
     package: internal/analysis/passes/lifecyclefacts
     bindings: internal/analysis/passes/lifecyclefacts/evidence.go
     signature: evidencePolicySignature
     function: decideLifecycleEvidence
-    rules: [internal/analysis/passes/lifecyclefacts/evidence.rules, internal/analysis/passes/lifecyclefacts/evidence_schema.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/rules/evidence.rules, internal/analysis/passes/lifecyclefacts/rules/evidence_schema.rules]
     out: internal/analysis/passes/lifecyclefacts/evidence_gen.go
   - name: lifecycle_selected_mask_policy
     package: internal/analysis/passes/lifecyclefacts
     bindings: internal/analysis/passes/lifecyclefacts/evidence.go
     signature: selectedMaskSignature
     function: decideSelectedMaskEvidence
-    rules: [internal/analysis/passes/lifecyclefacts/selected_mask.rules, internal/analysis/passes/lifecyclefacts/evidence_schema.rules]
+    rules: [internal/analysis/passes/lifecyclefacts/rules/selected_mask.rules, internal/analysis/passes/lifecyclefacts/rules/evidence_schema.rules]
     out: internal/analysis/passes/lifecyclefacts/selected_mask_gen.go
   - name: worker_caller_lifetime
     package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
     signature: callerLifetimeSignature
     function: CallerLifetime
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/caller_lifetime.rules, internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime_gen.go
   - name: worker_edge_precedence
     package: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/model.go
     signature: edgeSignature
     function: Edge
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/edge.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge_gen.go
   - name: worker_aggregate_source
     package: internal/analysis/analyzers/concurrency/goroutineownership/containment
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/containment/rules.go
     signature: aggregateSourceSignature
     function: AggregateSource
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules, internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate_gen.go
   - name: worker_completion_notification
     package: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps
     bindings: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/model.go
     signature: notificationSignature
     function: Notification
-    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/schema.rules]
+    rules: [internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules, internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/schema.rules]
     out: internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification_gen.go
