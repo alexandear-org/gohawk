@@ -87,38 +87,43 @@ func (classifier *cancellationClassifier) invokeRequest() lifecycle.CompletionRe
 	return lifecycle.CompletionRequest{Target: classifier.cancel, InvokeTarget: true, Budget: classifier.budget()}
 }
 
-// deferredLiteralLabel labels a directly deferred literal that captures the
-// cancel function through a cell only such literals read.
+// The generated literal policy selects the label; capture/guard censuses and
+// completion retain one child allowance allocated after closure recognition.
+type (
+	deferredLiteralSignature func(*cancellationClassifier, *ssa.Defer) (cancellationLabel, bool)
+	deferredEvidence         = proofs.Proof
+)
+
+var _ deferredLiteralSignature = classifyDeferredLiteral
+
 func (classifier *cancellationClassifier) deferredLiteralLabel(deferred *ssa.Defer) (cancellationLabel, bool) {
+	return classifyDeferredLiteral(classifier, deferred)
+}
+
+func deferredLiteralClosure(deferred *ssa.Defer) (*ssa.MakeClosure, bool) {
 	closure, ok := deferred.Call.Value.(*ssa.MakeClosure)
-	if !ok {
-		return cancellationLabel{}, false
-	}
-	budget := classifier.budget()
-	capture := classifier.proveDeferredCaptureWithin(closure, budget)
-	if capture.State == proofs.EvidenceUnknown {
-		return labelled(cancellationActionUnknown, reasonLabelDeferredClosure), true
-	}
-	if !capture.Proven() {
-		return cancellationLabel{}, false
-	}
+	return closure, ok
+}
+
+func (classifier *cancellationClassifier) deferredLiteralGuard(deferred *ssa.Defer, budget *proofs.SearchBudget) proofs.Proof {
 	for _, guard := range classifier.guards {
 		if !budget.Spend() {
-			return labelled(cancellationActionUnknown, reasonLabelDeferredClosure), true
+			return proofs.Proof{Reason: proofs.EvidenceBudgetExhausted}
 		}
 		if guard.Defer == deferred {
-			return labelled(cancellationActionNone, reasonLabelResultGuardedDefer), true
+			return proofs.Proof{State: proofs.EvidenceProven}
 		}
 	}
+	return proofs.Proof{State: proofs.EvidenceDisproven}
+}
+
+func (classifier *cancellationClassifier) deferredLiteralCompletion(deferred *ssa.Defer, budget *proofs.SearchBudget) proofs.Proof {
 	request := lifecycle.CompletionRequest{Target: classifier.cancel, InvokeTarget: true, Budget: budget, Instruction: deferred}
-	proof := lifecycle.ProveCompletion(request)
-	if proof.Proven() {
-		return labelled(cancellationActionRelease, reasonLabelDeferredLiteralRelease), true
-	}
-	if budget.Exhausted() || budget.PoolExhausted() {
-		return labelled(cancellationActionUnknown, reasonLabelDeferredClosure), true
-	}
-	return cancellationLabel{}, false
+	return lifecycle.ProveCompletion(request).Proof
+}
+
+func deferredLiteralCutoff(budget *proofs.SearchBudget) bool {
+	return budget.Exhausted() || budget.PoolExhausted()
 }
 
 func (classifier *cancellationClassifier) proveDeferredCaptureWithin(closure *ssa.MakeClosure, budget *proofs.SearchBudget) proofs.Proof {

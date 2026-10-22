@@ -20,6 +20,18 @@ controls pass against the original recursive walk and the shared fold. Shared
 sibling-policy propagation and exhausted allowances. Default reaching folds
 continue to inspect phi alternatives.
 
+## Decision ownership
+
+`parent.rules` consumes the acquisition-time parent snapshot after the native
+standard-child contract. It requires result zero of a recognized cancellation
+constructor in the same function and binds that constructor's cancel result.
+Other result slots, wrappers, merges and foreign frames remain opaque.
+`literal.rules` selects deferred capture/guard/completion outcomes with one
+shared child budget created after closure recognition. Native censuses retain
+their visits and cutoff boundaries. `classify_rules_test.go` pins the exact
+parent origin and nonliteral early exit; existing capture-budget, parent-context
+and trace fixtures retain their accepted, diagnostic and unknown contracts.
+
 ## Detection boundaries
 
 For a standard context derived directly from a fresh local cancelable context,

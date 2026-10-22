@@ -1,0 +1,35 @@
+signature total fallback outputs (NoAction reasonCancellationNone) false;
+match deferredLiteralClosure;
+query allowance = cancellationClassifier.budget;
+query capture = cancellationClassifier.proveDeferredCaptureWithin;
+query guarded = cancellationClassifier.deferredLiteralGuard;
+query completes = cancellationClassifier.deferredLiteralCompletion;
+query known = deferredEvidence.Known;
+query proven = deferredEvidence.Proven;
+query deferredLiteralCutoff;
+const reasonLabelResultGuardedDefer, reasonLabelDeferredLiteralRelease;
+
+// A directly deferred closure is exact only after its captured cell is proven
+// stable. A result guard defers judgment to each return; unknown capture, guard
+// census or completion cannot become evidence that cancel is uncalled.
+rule Literal:
+  inputs $classifier $deferred:(deferredLiteralClosure $closure)
+  => do {
+       $budget <- query allowance $classifier;
+       $capture <- query capture $classifier $closure $budget;
+       true <- query known $capture
+         else outputs (Opaque reasonLabelDeferredClosure) true;
+       true <- query proven $capture
+         else outputs (NoAction reasonCancellationNone) false;
+       $guard <- query guarded $classifier $deferred $budget;
+       true <- query known $guard
+         else outputs (Opaque reasonLabelDeferredClosure) true;
+       false <- query proven $guard
+         else outputs (NoAction reasonLabelResultGuardedDefer) true;
+       $completion <- query completes $classifier $deferred $budget;
+       false <- query proven $completion
+         else outputs (Release reasonLabelDeferredLiteralRelease) true;
+       true <- query deferredLiteralCutoff $budget
+         else outputs (NoAction reasonCancellationNone) false;
+       pure outputs (Opaque reasonLabelDeferredClosure) true;
+     };

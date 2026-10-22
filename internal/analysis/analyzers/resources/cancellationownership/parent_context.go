@@ -26,21 +26,28 @@ func parentCancellationClassifier(call *ssa.Call, observer proofs.Observer) *can
 	if resolved := heapmodel.NewStorage(proofs.NewSearchBudget(cancellationCompletionBudget).Observed(observer)).Resolve(parentValue); resolved.Proven() {
 		parentValue = resolved.Value
 	}
-	parent, ok := parentValue.(*ssa.Extract)
-	if !ok || parent.Index != 0 {
-		return nil
+	return classifyParentOrigin(parentValue, call, observer)
+}
+
+// Parent origin recognition uses the resolved acquisition-time value only.
+// It never follows wrappers or merges and does not resolve storage again.
+type parentOriginSignature func(ssa.Value, *ssa.Call, proofs.Observer) *cancellationClassifier
+
+var _ parentOriginSignature = classifyParentOrigin
+
+func sameParentFrame(constructor, child *ssa.Call) bool {
+	return constructor.Parent() == child.Parent()
+}
+
+func parentCancelResult(constructor *ssa.Call) (ssa.Value, bool) {
+	contract, known := cancellationContractFor(constructor.Common())
+	if !known {
+		return nil, false
 	}
-	constructor, ok := parent.Tuple.(*ssa.Call)
-	if !ok || constructor.Parent() != call.Parent() {
-		return nil
-	}
-	parentContract, ok := cancellationContractFor(constructor.Common())
-	if !ok {
-		return nil
-	}
-	cancel := ssacall.CallResult(constructor, parentContract.result)
-	if cancel == nil {
-		return nil
-	}
+	cancel := ssacall.CallResult(constructor, contract.result)
+	return cancel, cancel != nil
+}
+
+func newParentClassifier(cancel ssa.Value, observer proofs.Observer) *cancellationClassifier {
 	return &cancellationClassifier{cancel: cancel, actions: make(map[ssa.Instruction]cancellationAction), observer: observer}
 }

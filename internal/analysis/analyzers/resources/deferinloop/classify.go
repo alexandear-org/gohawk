@@ -33,24 +33,6 @@ func classifyResourceInstruction(
 	return classifyValueUse(evidence, probe, instruction, deferObligation{target: obligation.owner})
 }
 
-// Transfers reuse the shared structural ownership vocabulary, including
-// imported facts for callees that retain the exact resource beyond the call.
-func transfersResource(
-	evidence *lifecyclefacts.LifecycleEvidence,
-	instruction ssa.Instruction,
-	target ssa.Value,
-) bool {
-	if lifecycle.StoresValueInGlobal(instruction, target) ||
-		lifecycle.StoresValueInEscapingField(instruction, target) ||
-		lifecycle.SendsValue(instruction, target) ||
-		lifecycle.CallTransfersArgumentToReturnedOwner(instruction, target) ||
-		lifecycle.CallTransfersArgumentToReceiver(instruction, target) ||
-		lifecycle.CallTransfersArgumentToLifecycleOwner(instruction, target) {
-		return true
-	}
-	return evidence.ArgumentRetainedByCallee(instruction, target)
-}
-
 // A source-visible callee summarized as neither releasing nor retaining the
 // argument is an ordinary use. An unreadable callee that receives the value
 // makes the lifetime unknown, preserving the precision-first reporting rule.
@@ -70,37 +52,10 @@ func resourceUseStatus(
 	}
 	used := false
 	for index, argument := range common.Args {
-		alias := heapmodel.ProveMayAlias(argument, target)
-		contains := !alias.Aliases && lifecycle.MayContainValue(argument, target)
-		if probe.Enabled() {
-			probe.Evidence(analysisTrace.Step{
-				Reason: reasonArgumentCarriesResource.String(), Outcome: analysisTrace.OutcomeObserved, Pos: instruction.Pos(),
-				Details: map[string]string{
-					"argument": argument.Name(), "alias": strconv.FormatBool(alias.Aliases), "alias-reason": alias.Reason.String(),
-					"contains": strconv.FormatBool(contains),
-				},
-			})
-		}
-		if contains {
-			// The callee received a wrapper holding the resource, not the
-			// resource itself. Its summary describes the argument, so it can
-			// neither release nor be proven to leave the contents alone:
-			// unknown, not cleanup. Constructing the wrapper alone does not
-			// settle the obligation either.
-			// https://github.com/replicatedhq/troubleshoot/blob/eacd376c1245fe2ebcc3581f015f692d77d89af4/pkg/supportbundle/aftercollection.go#L39-L53
-			return resourceUnknown, reasonWrapperPassedToCallee
-		}
-		if !alias.Aliases {
-			if syntax.PointerStruct(argument.Type()) != nil && heapmodel.ValueDerivesFrom(argument, target) {
-				return resourceUnknown, reasonWrapperPassedToCallee
-			}
-			continue
-		}
-		used = true
-		if released, summarized := evidence.CalleeClaims(instruction, index, lifecyclefacts.ClaimReleases); summarized {
-			if released {
-				return resourceSettled, reasonCalleeReleasesArgument
-			}
+		status, reason, aliased := classifyArgumentUse(evidence, probe, instruction, argument, target, index)
+		used = used || aliased
+		if status != resourceLive {
+			return status, reason
 		}
 	}
 	if used && !evidence.CalleeSummarized(instruction) {
@@ -139,3 +94,41 @@ func opaqueResourceUse(instruction ssa.Instruction, target ssa.Value) bool {
 }
 
 var lengthBuiltins = []syntax.Symbol{syntax.Builtin("len"), syntax.Builtin("cap")}
+
+// The argument census keeps trace emission after alias/containment evidence and
+// before the generated policy selects wrapper uncertainty or exact release.
+type (
+	argumentUseSignature func(
+		*lifecyclefacts.LifecycleEvidence, analysisTrace.Probe, ssa.Instruction, ssa.Value, ssa.Value, int,
+	) (resourceStatus, deferReason, bool)
+	transferSignature func(*lifecyclefacts.LifecycleEvidence, ssa.Instruction, ssa.Value) bool
+)
+
+var (
+	_ argumentUseSignature = classifyArgumentUse
+	_ transferSignature    = transfersResource
+)
+
+func argumentEvidence(probe analysisTrace.Probe, instruction ssa.Instruction, argument, target ssa.Value) (bool, bool) {
+	alias := heapmodel.ProveMayAlias(argument, target)
+	contains := !alias.Aliases && lifecycle.MayContainValue(argument, target)
+	if probe.Enabled() {
+		probe.Evidence(analysisTrace.Step{
+			Reason: reasonArgumentCarriesResource.String(), Outcome: analysisTrace.OutcomeObserved, Pos: instruction.Pos(),
+			Details: map[string]string{
+				"argument": argument.Name(), "alias": strconv.FormatBool(alias.Aliases), "alias-reason": alias.Reason.String(),
+				"contains": strconv.FormatBool(contains),
+			},
+		})
+	}
+	return alias.Aliases, contains
+}
+
+func wrappedArgument(contains bool, argument, target ssa.Value) bool {
+	return contains || syntax.PointerStruct(argument.Type()) != nil && heapmodel.ValueDerivesFrom(argument, target)
+}
+
+func argumentReleased(evidence *lifecyclefacts.LifecycleEvidence, instruction ssa.Instruction, index int) bool {
+	released, summarized := evidence.CalleeClaims(instruction, index, lifecyclefacts.ClaimReleases)
+	return summarized && released
+}

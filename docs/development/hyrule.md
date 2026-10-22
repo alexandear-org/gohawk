@@ -77,7 +77,7 @@ path is removed; generator support and examples alone do not qualify.
 | Cancellation ownership instruction/call labels | Generated instruction, direct/deferred, call-contract, exact-argument and return decisions; owner discovery, searches, cache and flow stay in Go |
 | Process ownership decision selection | Generated pre-Start, return-admission, possible-handoff, post-Start outcome and instruction action policies; handle scans, caches, request binding and flow remain in Go |
 | Resource lifetime classification and acquisition-boundary patterns | Generated instruction and opaque-consumption/storage/call policies, HTTP acquisition/effect/use decisions and acquisition-error policies; optional correlation searches stay in Go; catalog collection stays a table |
-| Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
+| Defer-in-loop resource classification | Generated per-value, transfer, argument and acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves, identity/loop-origin cases, budgeted copy sequencing and mutex-transfer sequencing; storage/reaching searches, collection mutation and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
 | Producer lifecycle evidence | Generated receive instruction, helper fallback and abandoned-send decisions; binding scans, count collection, capture inventories and cycle queries stay in Go |
@@ -136,6 +136,20 @@ unknown without imported provenance; exhaustion retains the budget reason.
 Native traversal and every search charge remain unchanged. The caller must
 already have established equivalent roots. This policy does not replace the
 path-only contract of `SameAccessPathWithin`.
+
+Cancellation parent-origin rules operate on the already resolved acquisition
+snapshot. Only exact result zero of a recognized cancellation constructor in
+the same function supplies its cancel result; wrappers, merges and foreign
+frames remain opaque. The standard-child contract and observed storage query
+stay in Go. Deferred-literal rules sequence capture, guard membership and
+completion using the same child budget, created only after closure recognition.
+Native censuses retain loop visits; uncertainty never credits cancellation.
+
+Defer resource-transfer rules preserve the structural contracts before imported
+retention. Argument rules consume native alias/containment evidence after its
+trace event, then distinguish an exact releasing argument from a wrapper.
+The native loop accumulates use across arguments and asks whether the callee
+was summarized only after no earlier argument settled or obscured the resource.
 
 ## Concurrency admission
 

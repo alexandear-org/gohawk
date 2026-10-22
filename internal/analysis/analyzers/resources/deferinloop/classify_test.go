@@ -47,4 +47,31 @@ func TestResourceUseDecisionPrecedence(t *testing.T) {
 	if got != resourceSettled || why != reasonResourceTransferred {
 		t.Fatalf("global transfer lost to opaque storage: %v/%v", got, why)
 	}
+	if !transfersResource(nil, stores[0], fn.Params[0]) {
+		t.Fatal("exact global transfer must not reach imported-retention lookup")
+	}
+}
+
+func TestArgumentUseDefersUnavailableSummaryUntilCensusEnds(t *testing.T) {
+	pkg := ssaflowtest.BuildPackage(t, "arguments", `package arguments
+type resource struct{}
+func consume(*resource,int){}
+func subject(value *resource){consume(value,7)}
+`)
+	function := pkg.Func("subject")
+	call := ssaflow.InstructionsOf[*ssa.Call](function)[0]
+	pass := &analysis.Pass{Fset: pkg.Prog.Fset, Pkg: pkg.Pkg, ResultOf: map[*analysis.Analyzer]any{
+		lifecyclefacts.Analyzer: lifecyclefacts.Summaries{},
+	}}
+	evidence := lifecyclefacts.NewLifecycleEvidence(pass, "deferinloop", "")
+	for index, argument := range call.Call.Args {
+		status, reason, used := classifyArgumentUse(evidence, analysisTrace.Probe{}, call, argument, function.Params[0], index)
+		if status != resourceLive || reason != reasonNone || used != (index == 0) {
+			t.Fatalf("argument %d: status=%v reason=%v used=%v", index, status, reason, used)
+		}
+	}
+	status, reason := resourceUseStatus(evidence, analysisTrace.Probe{}, call, function.Params[0])
+	if status != resourceUnknown || reason != reasonUnsummarizedCalleeUse {
+		t.Fatalf("final unavailable-summary decision = %v/%v", status, reason)
+	}
 }

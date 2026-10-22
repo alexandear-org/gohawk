@@ -1,0 +1,28 @@
+signature total fallback outputs nil;
+view Result = *ssa.Extract {
+  tuple: Tuple;
+  index: Index;
+};
+view Constructor = *ssa.Call {
+};
+guard sameParentFrame;
+query parentCancelResult;
+build newParentClassifier;
+// The caller already admitted a standard-context child and resolved its parent
+// at acquisition. Only exact context result zero in this frame supplies a
+// parent classifier. Signal and ordinary constructor contracts keep their own
+// cancel-result indexes; wrappers and phi merges remain opaque.
+union Cancel = (ssa.Value, bool) tag 1 {
+  Available = true {
+    value: 0;
+  };
+  Missing = false;
+};
+
+rule Parent:
+  inputs (Result tuple:$constructor:(Constructor) index:0) $child $observer
+  && sameParentFrame $constructor $child
+  => query parentCancelResult $constructor {
+       Available value:$cancel => outputs (newParentClassifier $cancel $observer);
+       Missing => outputs nil;
+     };

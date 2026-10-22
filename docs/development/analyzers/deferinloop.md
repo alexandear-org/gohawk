@@ -4,6 +4,17 @@ The public page is [deferinloop](../../analyzers/). This note keeps every precis
 boundary: what the analyzer accepts or reports at the edge of its proof, and
 why. Update it with the fixtures when a boundary changes.
 
+## Decision ownership
+
+`transfer.rules` orders structural transfers before imported retention.
+`argument.rules` selects per-argument release or wrapper uncertainty after the
+native alias/containment query emits its original trace event. The argument
+census still runs in order, stops at the first settled/unknown result and asks
+about an unavailable callee only after retaining use from all arguments.
+`classify_test.go` pins exact-transfer short-circuiting, the per-argument used
+flag and the delayed unavailable-summary decision. Existing accepted and
+diagnostic fixtures retain the resource, wrapper and cleanup boundaries.
+
 ## Detection boundaries
 
 Storing the resource in a containing aggregate makes its iteration-local

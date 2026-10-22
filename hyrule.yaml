@@ -14,6 +14,34 @@ targets:
     function: ProveIdentityWithin
     rules: [internal/engine/ssaflow/identity.rules]
     out: internal/engine/ssaflow/identity_gen.go
+  - name: defer_resource_transfer
+    package: internal/analysis/analyzers/resources/deferinloop
+    bindings: internal/analysis/analyzers/resources/deferinloop/classify.go
+    signature: transferSignature
+    function: transfersResource
+    rules: [internal/analysis/analyzers/resources/deferinloop/transfer.rules]
+    out: internal/analysis/analyzers/resources/deferinloop/transfer_gen.go
+  - name: defer_argument_use
+    package: internal/analysis/analyzers/resources/deferinloop
+    bindings: internal/analysis/analyzers/resources/deferinloop/classify.go
+    signature: argumentUseSignature
+    function: classifyArgumentUse
+    rules: [internal/analysis/analyzers/resources/deferinloop/argument.rules]
+    out: internal/analysis/analyzers/resources/deferinloop/argument_gen.go
+  - name: cancellation_parent_origin
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/parent_context.go
+    signature: parentOriginSignature
+    function: classifyParentOrigin
+    rules: [internal/analysis/analyzers/resources/cancellationownership/parent.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/parent_gen.go
+  - name: cancellation_deferred_literal
+    package: internal/analysis/analyzers/resources/cancellationownership
+    bindings: internal/analysis/analyzers/resources/cancellationownership/result_guards.go
+    signature: deferredLiteralSignature
+    function: classifyDeferredLiteral
+    rules: [internal/analysis/analyzers/resources/cancellationownership/label_schema.rules, internal/analysis/analyzers/resources/cancellationownership/literal.rules]
+    out: internal/analysis/analyzers/resources/cancellationownership/literal_gen.go
   - name: result_leaf
     package: internal/analysis/passes/resultfacts
     bindings: internal/analysis/passes/resultfacts/results.go
