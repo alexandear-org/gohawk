@@ -111,46 +111,22 @@ type receiveProof struct {
 	reason  producerReason
 }
 
-func helperReceives(
-	call ssa.CallInstruction, channel ssa.Value, origin *ssa.Go,
-	engine *concurrencyfacts.Engine, budget *proofs.SearchBudget,
-) receiveProof {
-	if call == origin {
-		return receiveProof{reason: reasonProducerLaunch}
-	}
+// opaqueReceives conservatively inventories consumers of an incomplete
+// protocol. The callback query remains lazy after the argument census, sharing
+// its allowance; false carries no exact receive-count guarantee.
+func opaqueReceives(call ssa.CallInstruction, channel ssa.Value, budget *proofs.SearchBudget) bool {
 	common := call.Common()
-	if _, builtin := common.Value.(*ssa.Builtin); builtin {
-		return receiveProof{reason: reasonBuiltinNotReceive}
+	// An opaque callback may receive later, including registered cleanup.
+	// We cannot prove its execution paths from a captured channel alone.
+	// https://github.com/kubernetes/registry.k8s.io/blob/b5e7d92a3819fcd24ed35b174db0ce6291e88e7f/cmd/archeio/main_test.go#L73-L80
+	consumes := func(value ssa.Value) bool {
+		return lifecycle.MayContainValue(value, channel) || heapmodel.CapturedBindingMatches(value, channel) ||
+			lifecycle.ProvePossibleClosureCaptureWithin(value, channel, budget).Proven()
 	}
-	summary := engine.AtCall(call, budget)
-	if budget.Exhausted() {
-		return receiveProof{unknown: true, reason: reasonReceiverBudgetExhausted}
-	}
-	_, launched := call.(*ssa.Go)
-	if !summary.Complete() {
-		if launched && nonReceivingUses(call, channel, budget).Proven() {
-			return receiveProof{reason: reasonWorkerChannelUsesComplete}
-		}
-		if budget.Exhausted() {
-			return receiveProof{unknown: true, reason: reasonReceiverBudgetExhausted}
-		}
-		// An opaque callback may receive later, including registered cleanup.
-		// We cannot prove its execution paths from a captured channel alone.
-		// https://github.com/kubernetes/registry.k8s.io/blob/b5e7d92a3819fcd24ed35b174db0ce6291e88e7f/cmd/archeio/main_test.go#L73-L80
-		consumes := func(value ssa.Value) bool {
-			return lifecycle.MayContainValue(value, channel) || heapmodel.CapturedBindingMatches(value, channel) ||
-				lifecycle.ProvePossibleClosureCaptureWithin(value, channel, budget).Proven()
-		}
-		uncertain := slices.ContainsFunc(common.Args, consumes)
-		// A selected callback can drain too. Capture evidence leaves the
-		// receiver unknown; it never contributes an exact receive count.
-		uncertain = uncertain || lifecycle.ProvePossibleClosureCaptureWithin(common.Value, channel, budget).Proven()
-		if budget.Exhausted() {
-			return receiveProof{unknown: true, reason: reasonReceiverBudgetExhausted}
-		}
-		return receiveProof{unknown: uncertain, reason: reasonReceiverHelperUnknown}
-	}
-	return summaryReceives(summary, channel, launched, budget)
+	uncertain := slices.ContainsFunc(common.Args, consumes)
+	// A selected callback can drain too. Capture evidence leaves the receiver
+	// unknown; it never contributes an exact receive count.
+	return uncertain || lifecycle.ProvePossibleClosureCaptureWithin(common.Value, channel, budget).Proven()
 }
 
 // A complete protocol still needs exact channel binding. Losing that identity

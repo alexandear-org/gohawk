@@ -1,0 +1,10 @@
+union Receives = receiveProof tag unknown {
+  Known = false {
+    count;
+    reason;
+  };
+  Unknown = true {
+    count;
+    reason;
+  };
+};

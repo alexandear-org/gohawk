@@ -79,9 +79,9 @@ repos:
       - id: gohawk
 ```
 
-The hook uses pre-commit's isolated Go environment and caches the compiled
-binary. Add analyzer flags through `args`, keeping `./...` as the final
-argument:
+Install the CLI first and keep `gohawk` on `PATH` wherever pre-commit runs,
+including CI. The hook runs that installed binary; it does not compile GoHawk.
+Add analyzer flags through `args`, keeping `./...` as the final argument:
 
 ```yaml
       - id: gohawk

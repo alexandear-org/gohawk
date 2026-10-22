@@ -80,7 +80,7 @@ path is removed; generator support and examples alone do not qualify.
 | Defer-in-loop resource classification | Generated per-value and per-acquisition decisions; call discovery and loop traversal remain in Go |
 | Lock operation, write-target, and held-state transition families | Generated write destinations, owner-address steps, dynamic-index leaves, identity/loop-origin cases, budgeted copy sequencing and mutex-transfer sequencing; storage/reaching searches, collection mutation and cycle queries stay in Go |
 | Concurrent capture syntax and guard decisions | Generated mutation-root steps, channel statements, guard decisions and exclusive-lock transitions; prefix collection and effect application stay in Go |
-| Producer lifecycle use classification | Generated receiver instruction classification; helper inference, binding scans, counting and cycle policy stay in Go |
+| Producer lifecycle evidence | Generated receive instruction, helper fallback and abandoned-send decisions; binding scans, count collection, capture inventories and cycle queries stay in Go |
 | Result and lifecycle summary leaf recognition | Generated static result leaves, fixed argument outcomes, assumed leaves, conditional return decisions and branch comparisons, plus response-body leaves, freshness, retention and escape-use classification; summary inference and reaching walks stay in Go |
 | Path guards and literal comparison | Generated stable-guard, loaded-condition, address-step and literal-operator decisions; traversal, cycle queries, rendering memos, invalidation and flow application stay in Go |
 | Diagnostic admission | Generated ordered withdrawn/unknown/selection/suppression/test-file decisions; trace emission, error accumulation, callback restoration and publishing stay in Go |
@@ -391,6 +391,15 @@ states. Helper outcomes retain their count, uncertainty and reason intact, and
 alias queries execute only for reached receive forms. Select counting retains
 the existing may-alias policy. Block traversal, partial-count accumulation,
 cycle uncertainty and shared helper allowances remain unchanged.
+
+`producerlifecycle/abandoned.rules` sequences the normal-return witness,
+producer count, receive availability and count comparison. Unknown producer
+proofs return before receiving queries. `helper_receive.rules` keeps launch and
+builtin exclusions ahead of summary lookup, then sequences complete summaries,
+nonreceiving worker evidence and opaque consumption with the same allowance.
+`receive_schema.rules` shares native count/uncertainty/reason storage across
+these policies and instruction recognition. An unavailable helper unrelated to
+the channel keeps its false uncertainty payload and helper-unknown reason.
 
 ## Capture guards and exclusive-lock transitions
 

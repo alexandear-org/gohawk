@@ -1,13 +1,19 @@
 """Check Make's instrumentation guard without running instrumented Go builds."""
 
 import os
+import importlib.util
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 MAKEFILE = Path(__file__).resolve().parents[1] / "Makefile"
+REPOSITORY = MAKEFILE.parent
+REPLAY_SPEC = importlib.util.spec_from_file_location("precision_regression", REPOSITORY / "scripts/precision-regression.py")
+REPLAY = importlib.util.module_from_spec(REPLAY_SPEC)
+REPLAY_SPEC.loader.exec_module(REPLAY)
 
 
 class CIPolicyTest(unittest.TestCase):
@@ -70,6 +76,61 @@ class CIPolicyTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.marker.read_text(), "run ./tools/gendocs -generated-markdown\ntest ./...\n")
         self.assertEqual((self.root / "generation-invoked").read_text(), "generate\n")
+
+
+class GeneratedSourceBuildTest(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
+        (self.root / "scripts").mkdir()
+        (self.root / "benchmarks").mkdir()
+        (self.root / "benchmarks/repositories.tsv").touch()
+        self.marker = self.root / "order"
+        self.generator = self.root / "scripts/hyrule.sh"
+        self.fake_go = self.root / "go"
+        self.fake_go.write_text('#!/bin/sh\nprintf "build\\n" >> "$BUILD_ORDER"\nexit "${BUILD_STATUS:-0}"\n')
+        self.fake_go.chmod(0o700)
+        self.environment = dict(os.environ, PATH=str(self.root) + os.pathsep + os.environ["PATH"], BUILD_ORDER=str(self.marker))
+        for name in ("BUILD_STATUS", "GENERATION_STATUS"):
+            self.environment.pop(name, None)
+        self.generator.write_text('#!/bin/sh\nprintf "generate\\n" >> "$BUILD_ORDER"\nexit "${GENERATION_STATUS:-0}"\n')
+
+    def run_replay_build(self):
+        def run(command, **kwargs):
+            return subprocess.run(command, env=self.environment, text=True, capture_output=True, **kwargs)
+        with patch.object(REPLAY, "run", side_effect=run):
+            REPLAY.build_gohawk(self.root, self.root / "binary")
+
+    def test_replay_generates_before_building(self):
+        self.run_replay_build()
+        self.assertEqual(self.marker.read_text(), "generate\nbuild\n")
+
+    def test_replay_stops_when_generation_fails(self):
+        self.environment["GENERATION_STATUS"] = "19"
+        with self.assertRaisesRegex(SystemExit, "source generation failed"):
+            self.run_replay_build()
+        self.assertEqual(self.marker.read_text(), "generate\n")
+
+    def test_replay_keeps_build_failure(self):
+        self.environment["BUILD_STATUS"] = "23"
+        with self.assertRaisesRegex(SystemExit, "build failed"):
+            self.run_replay_build()
+        self.assertEqual(self.marker.read_text(), "generate\nbuild\n")
+
+    def test_benchmark_generation_gates_its_build(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True, capture_output=True)
+        for generation_status, expected in (("19", "generate\n"), ("0", "generate\nbuild\n")):
+            with self.subTest(generation_status=generation_status):
+                self.marker.unlink(missing_ok=True)
+                result = subprocess.run(
+                    ["bash", str(REPOSITORY / "scripts/benchmark-dogfood.sh"), "--output", str(self.root / generation_status)],
+                    cwd=self.root,
+                    env=dict(self.environment, GENERATION_STATUS=generation_status, BUILD_STATUS="23"),
+                    text=True, capture_output=True, timeout=10,
+                )
+                self.assertEqual(result.returncode, 19 if generation_status == "19" else 23, result.stderr)
+                self.assertEqual(self.marker.read_text(), expected)
 
 
 if __name__ == "__main__":

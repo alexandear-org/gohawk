@@ -1,0 +1,36 @@
+signature total fallback outputs (Producer state:producerUnknown reason:reasonNone);
+record Producer = producerProof {
+  state: State;
+  reason: Reason;
+};
+query callerReturns, countProducerSends, channelReceives, producerExceeds, zeroReceives;
+query known = producerProof.Known;
+const producerUnknown, producerProven, producerDisproven, reasonNone;
+const reasonReceiverDoesNotReturn, reasonReceiverObligationUnknown;
+const reasonProducerExceedsReceives, reasonProducerWithinReceiveCount;
+
+// No normal caller return puts a continuing or terminated caller outside
+// this finite consumer-count check (for example log.Fatal(<-results)).
+// https://github.com/saljam/webwormhole/blob/abf852af0458ba79772d9c26ef01434165f217d8/cmd/ww/server.go#L458-L470
+rule Abandoned:
+  inputs $function $send $sends $engine
+  => do {
+       true <- query callerReturns $send
+         else outputs (Producer state:producerUnknown reason:reasonReceiverDoesNotReturn);
+       $count <- query countProducerSends $send $sends;
+       true <- query known $count.producerProof
+         else outputs $count.producerProof;
+       Known count:$receives reason:_ <- query channelReceives
+                                                 $function
+                                                 $send.channel
+                                                 $send.spawn
+                                                 $engine
+         else {
+           Unknown reason:$reason => outputs (Producer state:producerUnknown reason:$reason);
+         };
+       false <- query zeroReceives $receives
+         else outputs (Producer state:producerUnknown reason:reasonReceiverObligationUnknown);
+       true <- query producerExceeds $count.count $receives
+         else outputs (Producer state:producerDisproven reason:reasonProducerWithinReceiveCount);
+       pure outputs (Producer state:producerProven reason:reasonProducerExceedsReceives);
+     };

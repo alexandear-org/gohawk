@@ -236,14 +236,44 @@ even though the graph has no incoming call edge for that generated consumer.
 | Family | Disposition |
 | --- | --- |
 | Instruction receive recognition | Already generated. Direct receives, select-state census and helper results preserve count, uncertainty and reason. |
-| Abandoned-send decision | **Pending strong fit:** `abandonedProducerSend` orders reachable-return evidence, producer-count availability, receive-count uncertainty/zero and the final excess comparison. The count and return searches remain native; a generated policy can own the evidence precedence and proof selection. |
-| Helper receive evidence | **Pending strong fit:** `helperReceives` orders launch/builtin exclusions, summary availability/cutoff, nonreceiving-worker evidence and opaque channel consumption. Preserve short-circuit capture queries, exact counts, reached-query order and the existing uncertainty reason, including its false payload. |
+| Abandoned-send decision | `abandoned.rules` now owns reachable-return, producer-count availability, receive-count uncertainty/zero and final excess precedence. The count and return searches remain native. Unknown count proofs retain their complete payload; later receive queries are skipped. |
+| Helper receive evidence | `helper_receive.rules` now owns launch/builtin exclusions, summary availability/cutoff, nonreceiving-worker evidence and opaque channel consumption. Native capture inventories retain short-circuit queries; exact counts and the opaque-helper uncertainty reason survive, including its false payload. |
 | Producer/receiver census | Worker discovery, parameter/capture mapping, complete protocol filtering, source attribution, dominance chains, per-worker send order and shared-budget exact receive counts. The collection loops and storage/call-effect searches remain native. |
 | Rendering and reporting | Stable reason table, proof carriers, tracing and position deduplication need no additional rule layer. |
 
-The source review is complete, but this scope remains open until the two
-confirmed evidence sequences are migrated and their production consumers use
-the generated paths.
+Both confirmed sequences now have generated production consumers and their
+former Go decision paths are removed. Focused tests retain cold/warm budget
+boundaries and pin early origin/builtin exclusions, caller-return/count
+precedence and the false uncertainty payload of an unrelated opaque helper.
+Existing trace tests pin the original reason/outcome pairs. This scope is closed.
+
+## Defer and process source review
+
+All six authored `deferinloop` files and all 13 authored `processownership`
+files were read, alongside their two and five rule files respectively. The
+bounded graph query returned all 68 indexed paths across the two scopes,
+including tests/fixtures. Exact-path coverage for the 19 implementation paths
+was clean at generation `2026-10-22T00:04:48Z`. The six scope gaps were ignored
+generated outputs; all source policies and their shared schemas were read
+directly. Generated calls into defer classification are absent from the graph's
+caller results, so source rules establish those consumers.
+
+| Family | Disposition |
+| --- | --- |
+| Defer classification and acquisition | `classify.rules` owns transfer/opaque/cleanup/argument precedence; `acquisition.rules` owns typed-resource, response-body and imported-owned-result selection. Keep the existing rules. The wrapper that optionally classifies the owning response is compact composition. |
+| Defer transfer evidence | **Pending strong fit:** `transfersResource` orders six structural handoff queries and imported argument retention. This can become lazy ordered alternatives using the existing query APIs and original Boolean result. |
+| Defer argument-use evidence | **Pending strong fit:** `resourceUseStatus` selects wrapper uncertainty, exact release and unavailable-callee use from ordered alias/containment/summary evidence. Keep the argument census and trace emission native; migrate the per-argument decision without moving the trace before its alias/containment queries. |
+| Defer obligation and flow | Exact standard lock-pair table, acquisition/store censuses, storage identity, live-backedge traversal, iterator exhaustion, monotone status and witnesses. These remain with the flow/search algorithms. Final unknown-versus-live precedence is compact; no general rule engine should replace the keyed walk. |
+| Process instruction action and final return outcome | Existing action entry/settlement/remainder rules and `decision.rules` own substantial precedence. Native code binds lifecycle requests, allocates query allowances, memoizes candidate actions and projects the selected decision to tracing/reporting. |
+| Process pre-Start decision | **Pending strong fit:** `proveProcessStart` orders completed-prefix availability/cutoff, helper/caller/aggregate ownership, pre-registration and successful-return evidence. Preserve the prefix census before the suppression queries and the same query-pool allocation points. |
+| Process return admission | **Pending strong fit:** `proveProcessReturns` builds a four-entry closure table for failed Start, returned command owner, returned process handle and merged owner. A generated reason-bearing decision can remove those closures while the flow callback emits the selected reason exactly once. Keep return witness and feasibility collection native. |
+| Possible Wait participation | **Pending strong fit:** `provePossibleWaitHandoff` sequences exact Wait/merged identity, visible spawned-body reachability/completion and opaque callback capture. Preserve cutoff proof payloads, early visible-body exits and callback-value-before-argument capture order. |
+| Process local searches | Deferred capture/argument censuses, command-use/handle provenance, registered-owner discovery, domination and returned-handle containment remain native. Their small shape switches feed bounded searches rather than form independent rule pipelines. The immediate Process guard validates an indexed four-instruction block plus identity/edge evidence; a rule adapter would still need that native block decoding. |
+| Symbol contracts and presentation | Exact library-symbol lists, pipe/Wait type contracts, reason tables, names, report construction and trace projections remain direct Go. No second catalog or source rendering layer is needed. |
+
+These two source reviews are complete. Their scopes remain open for the five
+confirmed decision migrations above; the recorded traversal and presentation
+families are not reopened without an affecting change.
 
 ## Non-Go integration inventory
 
@@ -262,22 +292,22 @@ site package scripts were inspected. Hosted jobs generate before switching to
 standalone module dependencies; the release build and CI's direct binary build
 follow that preparation. The pin still matches the local compiler source.
 
-Three existing integration gaps are confirmed and remain in this checklist:
+The three confirmed integration gaps are corrected:
 
-- `scripts/benchmark-dogfood.sh` directly builds GoHawk without first generating
-  its ignored sources; the `benchmark` Make target does not supply generation.
-- `scripts/precision-regression.py` similarly builds its own binary without
-  generation when no existing binary is supplied. Its Make target does not
-  supply generation either.
-- `.pre-commit-hooks.yaml` still asks pre-commit's Go environment to compile the
-  repository, which cannot contain ignored generated Go on a fresh checkout.
-  The installation guide still describes that isolated-build contract.
+- `scripts/benchmark-dogfood.sh` generates ignored sources before its own binary
+  builds, including when invoked directly instead of through Make.
+- `scripts/precision-regression.py` does the same when it builds a replay binary.
+  Supplying an existing binary retains the existing no-build path.
+- `.pre-commit-hooks.yaml` uses `language: system` and runs the installed CLI.
+  The installation guide explicitly requires that binary on `PATH`, including
+  in CI, instead of promising an isolated Go source build.
 
-The first two entry points need generation before their own source builds.
-The pre-commit hook needs an explicit supported installation contract. These
-are integration corrections within the existing final-check scope, not new
-analyzer conversions. The source-install limitation itself is already documented
-in `docs/installation.md`; release archives are generated before compilation.
+The CI policy tests exercise successful generation-before-build ordering and
+failure propagation for both script entry points with isolated command stubs.
+No corpus checkout or instrumented Go build is needed for those tests. The
+source-install limitation itself remains documented in `docs/installation.md`;
+release archives are generated before compilation. This integration review is
+closed; no cross-language migration is planned.
 
 ## Fixed completion checklist
 
@@ -294,10 +324,10 @@ completion criterion, and marginal conversions do not extend this checklist.
 | `analyzers/concurrency/concurrentcapture` | 5 | Reviewed; existing rules cover substantial policies |
 | `analyzers/concurrency/goroutineownership` | 23 | Pending review |
 | `analyzers/concurrency/lockorder` | 24 | Pending review |
-| `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing pending migration |
+| `analyzers/concurrency/producerlifecycle` | 4 | Reviewed; evidence sequencing migrated |
 | `analyzers/resources/cancellationownership` | 11 | Pending review |
-| `analyzers/resources/deferinloop` | 6 | Pending review |
-| `analyzers/resources/processownership` | 13 | Pending review |
+| `analyzers/resources/deferinloop` | 6 | Reviewed; transfer/argument policies pending migration |
+| `analyzers/resources/processownership` | 13 | Reviewed; three decision families pending migration |
 | `analyzers/resources/resourcelifetime` | 28 | Pending review |
 | `passes/concurrencyfacts` | 25 | Pending review |
 | `engine/heapmodel` | 22 | Pending review |
@@ -310,17 +340,18 @@ rules, which need review rather than automatic conversion.
 
 The shared-flow review closes 40 frozen paths; the small channel-type file was
 merged into channel alias mechanics to leave room for the generated identity
-policy. Current source totals are 362 authored files: 177 reviewed and 185 still
-awaiting review across 9 source scopes. Lifecycle evidence composition and
-producer evidence sequencing remain open migration items separately.
+policy. Current source totals are 362 authored files: 196 reviewed and 166 still
+awaiting review across 7 source scopes. Lifecycle evidence composition and the
+five confirmed defer/process policies remain migration items separately.
 
 The remaining completion steps are finite:
 
 - Close each remaining source scope above with a disposition per policy family.
-- Migrate the confirmed lifecycle evidence-composition and producer evidence
-  sequencing families. Record any other confirmed fit under its existing scope and close it with that scope.
-- Correct the three confirmed source-build/pre-commit integration gaps above.
-  The non-Go inventory review is complete; no cross-language migration is planned.
+- Migrate lifecycle evidence composition and the five confirmed defer/process
+  policies above. Record any other confirmed fit under its existing scope and
+  close it with that scope.
+- Preserve the completed source-build/pre-commit integration corrections above
+  during the remaining migrations; reuse their current validation.
 - Run final integration validation after the remaining cohesive migrations,
   record the outcome and close the audit. Unchanged reviewed scopes and
   compiler contracts reuse their existing evidence.
@@ -342,8 +373,8 @@ has been found. In particular:
 - Review remaining schema-copy/equality candidates against their actual mutable
   ownership contracts. A generic deep copy is not equivalent to intentional
   borrowing or branch-local detachment.
-- Close the three confirmed non-Go integration gaps recorded above; reuse the
-  inspected generation/build/CI paths unless their inputs change.
+- Reuse the completed non-Go integration review and its validation unless the
+  generation/build/CI inputs change.
 - After remaining migrations, verify consumers and removed decision paths,
   generation, relevant behavior and the final repository gate. Reuse unchanged
   validation rather than repeatedly running a broad gate during discovery.

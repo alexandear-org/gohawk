@@ -135,6 +135,7 @@ trap cleanup EXIT
 
 gohawk_binary="$work_directory/gohawk"
 measure_binary="$work_directory/measure"
+sh "$repository_root/scripts/hyrule.sh" generate
 go build -trimpath -o "$gohawk_binary" "$repository_root"
 go build -trimpath -o "$measure_binary" "$repository_root/tools/measure"
 

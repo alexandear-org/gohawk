@@ -278,8 +278,22 @@ targets:
     bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
     signature: receiveSignature
     function: instructionReceives
-    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/receive.rules]
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
     out: internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go
+  - name: producer_abandonment
+    package: internal/analysis/analyzers/concurrency/producerlifecycle
+    bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
+    signature: abandonmentSignature
+    function: abandonedProducerSend
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/abandoned.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
+    out: internal/analysis/analyzers/concurrency/producerlifecycle/abandoned_gen.go
+  - name: producer_helper_receive
+    package: internal/analysis/analyzers/concurrency/producerlifecycle
+    bindings: internal/analysis/analyzers/concurrency/producerlifecycle/receive_bindings.go
+    signature: helperReceiveSignature
+    function: helperReceives
+    rules: [internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive.rules, internal/analysis/analyzers/concurrency/producerlifecycle/receive_schema.rules]
+    out: internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive_gen.go
   - name: capture_mutation_guard
     package: internal/analysis/analyzers/concurrency/concurrentcapture
     bindings: internal/analysis/analyzers/concurrency/concurrentcapture/guard.go

@@ -20,6 +20,16 @@ def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str
     return subprocess.run(command, text=True, check=False, **kwargs)
 
 
+def build_gohawk(repository_root: Path, binary: Path) -> None:
+    """Generate ignored sources before compiling the replay's own analyzer."""
+    generated = run(["sh", str(repository_root / "scripts/hyrule.sh"), "generate"], cwd=repository_root)
+    if generated.returncode:
+        fail("gohawk source generation failed")
+    built = run(["go", "build", "-trimpath", "-o", str(binary), "."], cwd=repository_root)
+    if built.returncode:
+        fail("gohawk build failed")
+
+
 def read_manifest(path: Path) -> list[tuple[str, str]]:
     rows = []
     with path.open(newline="") as source:
@@ -443,9 +453,7 @@ def main() -> None:
     try:
         gohawk = args.gohawk.resolve() if args.gohawk else temporary / "gohawk"
         if not args.gohawk:
-            result = run(["go", "build", "-trimpath", "-o", str(gohawk), "."], cwd=repository_root)
-            if result.returncode:
-                fail("gohawk build failed")
+            build_gohawk(repository_root, gohawk)
         checkout_root = args.checkout_root.resolve() if args.checkout_root else temporary / "repositories"
         checkout_root.mkdir(parents=True, exist_ok=True)
         # The revision names the code that produced these findings, so read it

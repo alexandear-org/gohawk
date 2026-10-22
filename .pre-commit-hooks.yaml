@@ -2,7 +2,7 @@
   name: gohawk
   description: Run gohawk static analysis
   entry: gohawk
-  language: golang
+  language: system
   args: [./...]
   pass_filenames: false
   types: [go]

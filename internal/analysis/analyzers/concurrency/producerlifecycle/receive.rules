@@ -1,14 +1,4 @@
 signature total fallback outputs (Known count:0 reason:reasonNone);
-union Receives = receiveProof tag unknown {
-  Known = false {
-    count;
-    reason;
-  };
-  Unknown = true {
-    count;
-    reason;
-  };
-};
 view Unary = *ssa.UnOp {
   op: Op;
   channel: X;

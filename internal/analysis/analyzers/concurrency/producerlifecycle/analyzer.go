@@ -117,30 +117,10 @@ func producerSends(function *ssa.Function, engine *concurrencyfacts.Engine) []pr
 	return sends
 }
 
-func abandonedProducerSend(
-	function *ssa.Function, send producerSend, sends []producerSend, engine *concurrencyfacts.Engine,
-) producerProof {
-	// No normal caller return puts a continuing or terminated caller outside
-	// this finite consumer-count check (for example log.Fatal(<-results)).
-	// https://github.com/saljam/webwormhole/blob/abf852af0458ba79772d9c26ef01434165f217d8/cmd/ww/server.go#L458-L470
-	if ssapath.UnownedReturn(ssapath.UnownedReturnQuery{After: send.spawn, Owns: func(ssa.Instruction) bool { return false }}) == nil {
-		return producerProof{Reason: reasonReceiverDoesNotReturn}
-	}
-	count := countProducerSends(send, sends)
-	if !count.Known() {
-		return count.producerProof
-	}
-	receives := channelReceives(function, send.channel, send.spawn, engine)
-	if receives.unknown {
-		return producerProof{Reason: receives.reason}
-	}
-	if receives.count == 0 {
-		return producerProof{Reason: reasonReceiverObligationUnknown}
-	}
-	if count.count > receives.count {
-		return producerProof{State: proofs.EvidenceProven, Reason: reasonProducerExceedsReceives}
-	}
-	return producerProof{State: proofs.EvidenceDisproven, Reason: reasonProducerWithinReceiveCount}
+// callerReturns asks only whether the caller has an uncovered normal return;
+// producer/receiver evidence is selected separately by abandoned.rules.
+func callerReturns(send producerSend) bool {
+	return ssapath.UnownedReturn(ssapath.UnownedReturnQuery{After: send.spawn, Owns: func(ssa.Instruction) bool { return false }}) != nil
 }
 
 type producerCountProof struct {

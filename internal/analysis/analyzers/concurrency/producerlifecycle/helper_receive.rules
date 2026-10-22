@@ -1,0 +1,47 @@
+signature total fallback outputs (Unknown count:0 reason:reasonReceiverHelperUnknown);
+guard producerOrigin, producerBuiltin;
+query receiverSummary, receiverExhausted, receiverComplete, receiverLaunched;
+query nonReceivingUses, opaqueReceives, summaryReceives;
+query proven = producerProof.Proven;
+build opaqueReceiver;
+const reasonProducerLaunch, reasonBuiltinNotReceive, reasonReceiverBudgetExhausted;
+const reasonWorkerChannelUsesComplete, reasonReceiverHelperUnknown;
+
+rule Origin:
+  inputs $call _ $origin _ _
+  && producerOrigin $call $origin
+  => outputs (Known count:0 reason:reasonProducerLaunch);
+
+rule Builtin:
+  inputs $call _ _ _ _
+  && producerBuiltin $call
+  => outputs (Known count:0 reason:reasonBuiltinNotReceive);
+
+rule Helper:
+  inputs $call $channel _ $engine $budget
+  => do {
+       $summary <- query receiverSummary $engine $call $budget;
+       false <- query receiverExhausted $budget
+         else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
+       true <- query receiverComplete $summary
+         else do {
+                    true <- query receiverLaunched $call
+                      else decline;
+                    $uses <- query nonReceivingUses $call $channel $budget;
+                    true <- query proven $uses
+                      else decline;
+                    pure outputs (Known count:0 reason:reasonWorkerChannelUsesComplete);
+                  }
+              <|> do {
+                    false <- query receiverExhausted $budget
+                      else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
+                    $uncertain <- query opaqueReceives $call $channel $budget;
+                    false <- query receiverExhausted $budget
+                      else outputs (Unknown count:0 reason:reasonReceiverBudgetExhausted);
+                    pure outputs (opaqueReceiver $uncertain);
+                  }
+              <|> pure outputs (Unknown count:0 reason:reasonReceiverHelperUnknown);
+       $launched <- query receiverLaunched $call;
+       $answer <- query summaryReceives $summary $channel $launched $budget;
+       pure outputs $answer;
+     };

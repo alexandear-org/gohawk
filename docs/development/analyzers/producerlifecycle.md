@@ -4,6 +4,18 @@ The public page is [producerlifecycle](../../analyzers/). This note keeps every 
 boundary: what the analyzer accepts or reports at the edge of its proof, and
 why. Update it with the fixtures when a boundary changes.
 
+## Decision ownership
+
+`abandoned.rules` selects the final send proof after the caller-return witness,
+producer count and receive evidence. `helper_receive.rules` selects helper
+receive evidence; `receive.rules` retains instruction recognition. The native
+code owns summary lookup, exact channel binding, count inventories, capture
+searches and cycle queries. The generated functions keep native proof payloads,
+query order and the same shared allowances. `receiver_budget_test.go` also pins
+origin/builtin exclusions before lookup, early caller/count exits and the
+unrelated opaque helper's false uncertainty payload. Existing trace fixtures
+retain the diagnostic, accepted and unknown reason/outcome contracts.
+
 ## Detection boundaries
 
 Complete shared concurrency summaries expose sends and receives hidden in
