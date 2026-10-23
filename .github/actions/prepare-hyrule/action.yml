@@ -1,5 +1,5 @@
 name: Generate Hyrule sources
-description: Verify committed Hyrule Go is fresh, generate ignored Markdown with the pinned compiler, then use standalone module dependencies.
+description: Verify committed Hyrule Go is fresh, generate ignored Markdown with the pinned compiler, then use standalone module dependencies. Hyrule is pinned independently.
 runs:
   using: composite
   steps:
@@ -12,6 +12,6 @@ runs:
         GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         # Check committed output before any target regenerates it.
         GOTOOLCHAIN=go1.27.0 sh scripts/boiler.sh generate --check
-        GOTOOLCHAIN=go1.27.0 sh scripts/hyrule.sh generate --check
+        HYRULE_PINNED=1 GOTOOLCHAIN=go1.27.0 sh scripts/hyrule.sh generate --check
         GOTOOLCHAIN=go1.27.0 make generated-markdown
         echo 'GOWORK=off' >> "$GITHUB_ENV"

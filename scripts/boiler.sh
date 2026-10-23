@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the representation generator from the same workspace as Hyrule.
+# Build Boiler from the local Lockdoc workspace member.
 set -eu
 boiler_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 mkdir -p "$boiler_root/.build"

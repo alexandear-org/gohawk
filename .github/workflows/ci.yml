@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/prepare-hyrule
 
       - name: Run fast static checks and Hyrule contracts
-        run: make verify-static hyrule-tool-test
+        run: make verify-static
 
   lint:
     runs-on: ubuntu-latest

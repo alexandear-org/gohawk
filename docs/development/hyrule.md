@@ -9,22 +9,22 @@ regenerated output together with the rule change that produced it.
 
 ## Local development workspace
 
-`tools/hyrule` links to `../../lockdoc/tools/hyrule`. Create the ignored local
-workspace with `go work init . ../lockdoc`; it selects this repository and the
-adjacent `../lockdoc` module. This intentionally follows
-the generator on disk rather than pinning or copying it. The workspace requires
-Go 1.27; the standalone GoHawk module retains its own Go floor and dependencies.
-`make hyrule-generate` builds the workspace-selected generator and updates root
-`hyrule.yaml` targets. `make hyrule-generated-check` verifies freshly generated outputs;
-`make hyrule-tool-test` runs the linked compiler's contract tests.
+`tools/hyrule` links to `../../hyrule`, the standalone
+[Hyrule repository](https://github.com/kojah/hyrule). Keep `gohawk`, `hyrule`
+and `lockdoc` beside one another and create the ignored workspace with
+`go work init . ../hyrule ../lockdoc`. Lockdoc remains a workspace member for
+Boiler. The workspace uses Go 1.27; GoHawk's own module keeps its Go 1.26 floor.
 
-The expected checkout layout is a common parent containing `gohawk` and
-`lockdoc`. `make build` and other compilation targets generate from the adjacent checkout
-first. After generation, `GOWORK=off` builds against GoHawk's own dependencies.
-Each CI build job generates with a pinned Lockdoc revision, then tests the
-standalone GoHawk module, including its supported Go floor. The Hyrule manifest
-records generated-file ownership and hashes. Edit rules or bindings and
-regenerate, never patch generated Go.
+`make hyrule-generate` builds the local compiler and updates the root
+`hyrule.yaml` targets. `make hyrule-generated-check` checks output freshness.
+Compiler tests and standalone examples run in Hyrule's repository.
+
+On clean clones, `scripts/hyrule.sh` uses the compiler pinned in
+`tools/hyruletool/go.mod`; this separate tool module isolates its Go requirement.
+Set `HYRULE_PINNED=1` to exercise that version even with the local symlink present.
+CI checks committed output with the pinned Hyrule compiler, retains its pinned
+Lockdoc checkout for Boiler, and then tests with `GOWORK=off`, including GoHawk's
+supported Go floor. Edit rules or bindings and regenerate; never patch generated Go.
 
 Each package keeps its rule sources in a `rules/` folder beside the Go file
 holding its bindings. Generated `*_gen.go` output stays in the package directory
@@ -53,9 +53,9 @@ Arm captures and local values infer their types. `@Label` names remain stable,
 and `when` qualifiers preserve the original guard order.
 
 The handwritten parser is specified by
-[grammar.ebnf](../../tools/hyrule/grammar.ebnf) and
-[LAYOUT.md](../../tools/hyrule/LAYOUT.md). The
-[Hyrule reference](../../tools/hyrule/README.md) covers all language forms.
+[grammar.ebnf](https://github.com/kojah/hyrule/blob/main/grammar.ebnf) and
+[LAYOUT.md](https://github.com/kojah/hyrule/blob/main/LAYOUT.md). The
+[Hyrule reference](https://github.com/kojah/hyrule/blob/main/README.md) covers all language forms.
 `?` marks host matchers, `!` marks ordered queries, and unmarked aliases bind
 pure functions or constants. Concrete interface patterns use Go compatibility;
 there is no `implementers` declaration or claim that interfaces are closed.

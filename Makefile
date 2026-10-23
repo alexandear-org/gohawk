@@ -22,7 +22,7 @@ VERIFY_STATIC_TARGETS := $(strip $(VERIFY_BASE_TARGETS) lint dogfood $(if $(CI),
 VERIFY_CI_FAST_TARGETS := $(VERIFY_BASE_TARGETS) generated-check
 # Coverage and race instrumentation run only in GitHub Actions. Local
 # verification uses ordinary tests to avoid expensive instrumented builds.
-VERIFY_TARGETS := $(VERIFY_STATIC_TARGETS) test hyrule-tool-test
+VERIFY_TARGETS := $(VERIFY_STATIC_TARGETS) test
 # GNU Make before 4.0, including the version shipped with macOS, does not
 # support grouped parallel output. Parallel scheduling itself remains required.
 VERIFY_OUTPUT_SYNC := $(if $(filter output-sync,$(.FEATURES)),--output-sync=target)
@@ -249,7 +249,7 @@ site-links-external: site-build
 site-review:
 	$(PNPM) --dir site dev:review
 
-.PHONY: hyrule-generate hyrule-generated-check hyrule-tool-test boiler-generate boiler-generated-check
+.PHONY: hyrule-generate hyrule-generated-check boiler-generate boiler-generated-check
 boiler-generate:
 	sh scripts/boiler.sh generate
 
@@ -261,9 +261,6 @@ hyrule-generate: boiler-generate
 
 hyrule-generated-check: boiler-generated-check
 	sh scripts/hyrule.sh generate --check
-
-hyrule-tool-test:
-	cd -P tools/hyrule && GOWORK=off $(GO) test -p=1 -parallel=4 ./...
 
 # Direct Make invocations generate once before compilation. Verification exports
 # readiness to its recursive gates so parallel readers do not regenerate files.
