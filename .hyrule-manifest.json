@@ -3,583 +3,583 @@
   "targets": {
     "call_effect_field_use": {
       "path": "internal/engine/ssaflow/calls/call_field_effects_gen.go",
-      "sha256": "f326aa28b72d653f0421c471e0d033608dff14085532156801251aca19b0b6d8"
+      "sha256": "d6634bf270f22e68ba6292ec22bd979a68a69ac4b0a48708267eef40b65223aa"
     },
     "call_effect_use": {
       "path": "internal/engine/ssaflow/calls/call_effect_uses_gen.go",
-      "sha256": "9f041b1ee1166524cd3d099b979b69a4eb1c9eca7a8c0d730b9addac0493bcb5"
+      "sha256": "fb621c1cd990aac68cf4d4969d1c1da35685fc49042422e1751f5a4f9f6160ec"
     },
     "call_fixed_outcome": {
       "path": "internal/engine/ssaflow/calls/fixed_outcome_gen.go",
-      "sha256": "2dcac476e1f108c7471ffa23aadac9dc0e801e6be429a5312290eb482e7f5dd1"
+      "sha256": "be10720eb0090fe6cc747e60aa40c5d4286c078c8c63f62edaab61b08d147d92"
     },
     "cancellation_argument_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/argument_label_gen.go",
-      "sha256": "ecbd0d94a3b608c647027db6da8ce813929af632c9351e90cfae2f5b3a404106"
+      "sha256": "37beaabcddb5d3b5a9f13d69a31ed3040e20d0e0cc8a903fa64d3497aefe0c5f"
     },
     "cancellation_call_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/call_label_gen.go",
-      "sha256": "5b46ef308fb8cf598bade6f4d241f7884bcc0b425f11089972661d0633ed2105"
+      "sha256": "e98d9ed087761afa5507e9bf39dd95fc421016362676260b76c5b2146632d5ee"
     },
     "cancellation_deferred_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/deferred_label_gen.go",
-      "sha256": "02d642a2590c200b068b8bfa071c90a3eae614cfcd7654b06d3b40c281b4304f"
+      "sha256": "d1706960ad85d7f88d652696f7f8b475b8088549c22140817c516a93290dc571"
     },
     "cancellation_deferred_literal": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/literal_gen.go",
-      "sha256": "928065b19ee91ad886177079df10c157a9acae577fd6a8a211b17c7d3614f521"
+      "sha256": "5ad8e6b1ed69fce0d9c132c0168a99844fa89e412d2860e685455ec8cd43f08f"
     },
     "cancellation_direct_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/direct_label_gen.go",
-      "sha256": "2b5a3968cf2f7109192e8a6f581a8132f742f9fef570fd6349cae7dd2f92b887"
+      "sha256": "9adaa28abb2d5d0b6be30453e64e4da4bfcfdf1d0f11779e20a89bf9a959b50b"
     },
     "cancellation_instruction_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/classify_gen.go",
-      "sha256": "18f26c7735a21de6ec5622e19628d9d482709d5fd538e385c973c93bc26ef0f2"
+      "sha256": "6a08fc0e88d1f4fe63aca2ab3e9006de90cbc45fbe449ceab97bad284adb6fc6"
     },
     "cancellation_parent_origin": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/parent_gen.go",
-      "sha256": "1ce0e65219f895e7f034aa3cb695b41c33dac05a329cd3696557e7a48cf05400"
+      "sha256": "ed24feec5f88350fdfd038365df2d5be00d810aae8fe6ce4ec1dcc89410224fa"
     },
     "cancellation_recognized_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/recognized_label_gen.go",
-      "sha256": "a361fac4a1c34bd17407981304a43ec8d01b027f1d9b4909c8e316c4d5933bdb"
+      "sha256": "264e1b00eec656e17834ac3e9347f231e7679351dc36775862a3fa412e5b6ac4"
     },
     "cancellation_return_label": {
       "path": "internal/analysis/analyzers/resources/cancellationownership/return_label_gen.go",
-      "sha256": "d5752d39ee88c561b17ad22a0d69af9472643f8f0c04d937850d6732fe615af8"
+      "sha256": "b488573b5332e70c3eefd894a93338c2096354d57f413ac003831a9760c9f78a"
     },
     "capture_channel_statement": {
       "path": "internal/analysis/analyzers/concurrency/concurrentcapture/channel_statement_gen.go",
-      "sha256": "a604321fc42d9b7ca71b11fdbec849e652de0ae1b391984e68941d2dc24db9e2"
+      "sha256": "71b25c4f551d8be228599166797153e7b370ef7cc91bd9cbf6179aaf53161831"
     },
     "capture_lock_transition": {
       "path": "internal/analysis/analyzers/concurrency/concurrentcapture/lock_transition_gen.go",
-      "sha256": "d167d58e227b1bfd3f74d8ec6ca5e97b2ff39eb6e03e3435316e9544b31deaa3"
+      "sha256": "cd599be2f2fb611b965ddce6ff2d5a02d563ce0e53acc94605790023504e0b1d"
     },
     "capture_mutation_guard": {
       "path": "internal/analysis/analyzers/concurrency/concurrentcapture/mutation_gen.go",
-      "sha256": "714530f8a3eb514c4871b00cecb78cd6a3c62c28bfa0afd17e1965acfdc4f4ba"
+      "sha256": "02f09c0813947f64cfbcd0d80dfe2a89ec9a2f503ad110148cf2ad9c5677f2ec"
     },
     "capture_mutation_root": {
       "path": "internal/analysis/analyzers/concurrency/concurrentcapture/root_gen.go",
-      "sha256": "8041bc35390bdc168de7ec939fd9bd65c3b63ab640628ee657eebe8e09955d69"
+      "sha256": "5a9e33d2659309159871203347b2b77e9dcaad2bceb7d3b44508dee063fd280c"
     },
     "completion_callback_origin": {
       "path": "internal/engine/lifecycle/completionpolicy/callback_gen.go",
-      "sha256": "253e77033cfac1a06605a2332214305d617c34014403d3f5ea6f999b320a9e01"
+      "sha256": "36952627d70c7263f0bf2a8330baece40bfa3ca242d536ffdf60dc15de127200"
     },
     "completion_launch": {
       "path": "internal/engine/lifecycle/completionpolicy/launch_gen.go",
-      "sha256": "b006202a85aec29738fa6413ebef24cf44f8166da0a1be8af9c5665d55eaed2f"
+      "sha256": "180e5e8793fb3075784db46661e9298adadbd3bea59de36ae2ac3165b7425869"
     },
     "completion_unproven_outcome": {
       "path": "internal/engine/lifecycle/completionpolicy/outcome_gen.go",
-      "sha256": "58bc9e00d0f8aedb235678cccc3f6d399df6f6df237acee296ab4759dc9dabdc"
+      "sha256": "d144882731de19ca09ac6ac02af6a8208cf92309d7f6786aaf02da3d96fafa6f"
     },
     "concurrency_binding_root": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/binding_root_gen.go",
-      "sha256": "43c0dbd3ac335f0e8e081025a2340a79baaec430b36d34677cd1d633cbc54450"
+      "sha256": "64d4dff91356979ac6f2e0d152493bfa6c3a61262d53bf9c75ec4da2b84b9380"
     },
     "concurrency_callback_call": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_call_gen.go",
-      "sha256": "037da69ebabca4a40e7870226df1d2caf9e0a8cc97bcc4fced39f494e53ea94e"
+      "sha256": "3336bf9fbd6bbbd8026f9a9aae524f93adfddb4b5e083cd0e28ce7e76d20bd33"
     },
     "concurrency_callback_input": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/callback_input_gen.go",
-      "sha256": "90d4a084a21ac5d6dd24b2253710130151b668577847a5f3701567e0b6edeacd"
+      "sha256": "55d6d0630090e47f200f18eca0c8801d78903c2cac9a4df7b399dd345f442570"
     },
     "concurrency_context_call": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/context_gen.go",
-      "sha256": "eacab5c04864f6edb741e00b22f0ae44ccf196ffe9666ad6a68a3bad3860a43a"
+      "sha256": "5e2d99fb9dd3865e47c8e9196fe0b7ced0ca2aa5eb04925811c029f407fe834e"
     },
     "concurrency_context_origin": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/origin_gen.go",
-      "sha256": "6bf3950dc610f8196301cb92f680464c75f0c81d7b629c2ee9b228709ff7453c"
+      "sha256": "ec1a62e3fe726e9d859c641c1e474758b1a9b52f003a1ff50f91bcc7d5e6ba37"
     },
     "concurrency_effect_support": {
       "path": "internal/analysis/passes/concurrencyfacts/effect_support_gen.go",
-      "sha256": "4912e477ae2ba0bfcf9535506574fc88cc28e936a2a5e1e19e429e934d8d0ca9"
+      "sha256": "6fd43634ac22abce7efb37c5927dda665a614b9590f6b9cdb7602d296abb15fc"
     },
     "concurrency_fixed_load": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/fixed_load_gen.go",
-      "sha256": "52a6e0b3510c6b9ce620aebf9f6ee9d44b03a2b4d39ee0a8c9bd50a36b6dd0e1"
+      "sha256": "20ebdc835e53ce812289d52e5620b544750ad2d5d83e5e47e24bec16d0818f43"
     },
     "concurrency_inert_builtin": {
       "path": "internal/analysis/passes/concurrencyfacts/admission/builtin_gen.go",
-      "sha256": "096ebbcef104c8319f3ab66055b8b269c5bbc27e71f16792173b6efc6a729512"
+      "sha256": "7f97df972b66eadd9dfb627cb7b671335ae93ed3936f934d8452ca4b544e4bdb"
     },
     "concurrency_inert_data": {
       "path": "internal/analysis/passes/concurrencyfacts/admission/data_gen.go",
-      "sha256": "7d8257e01a0b8a5d8a807fba5f44d1a1e401865dcfbfc929bfa943402a3b1526"
+      "sha256": "cbe9d5d36bc8edac2a9b0d1a535aed4f14a6bef5158f1a1f2c8d91945015ffc7"
     },
     "concurrency_path_root": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/path_root_gen.go",
-      "sha256": "a53943a5b46e343c3db22a6685ef799eb3cb042eca237da0f4013a51176fd64d"
+      "sha256": "2b3380e0ad7f4dae43001dc6dea8756fa13540b796b75591494ccf1add823f3f"
     },
     "concurrency_resource_reference": {
       "path": "internal/analysis/passes/concurrencyfacts/recognition/reference_gen.go",
-      "sha256": "4dd863a2e4ad80cd8d991e9e0aa56f33f6d1cbede86a7c72a721f4198ef227bf"
+      "sha256": "609d393cbd17f8fe8acb2411870b329142fec48324d7f9110260c11ff5bd0a19"
     },
     "defer_argument_use": {
       "path": "internal/analysis/analyzers/resources/deferinloop/argument_gen.go",
-      "sha256": "10edeba782370fb5b0c2c55efac8b7efb5db913ec635042b13b96f694043da30"
+      "sha256": "e59a2f150c43f718ff284ad2ce2719f51b071ba1b14a044a152755f0ae89b49a"
     },
     "defer_resource_transfer": {
       "path": "internal/analysis/analyzers/resources/deferinloop/transfer_gen.go",
-      "sha256": "0b17ee190bd5cf3cf81210bdf9d90e94b55c7863e320715956a931b4f37108fc"
+      "sha256": "fdb8e32082f6e57bf182fe680715891e4757301126fe824fdd55c25d56676c7f"
     },
     "deferred_resource_acquisition": {
       "path": "internal/analysis/analyzers/resources/deferinloop/acquisition_gen.go",
-      "sha256": "820791f021618b01241693abd34490560901ada19fe35f813076444a3282bd55"
+      "sha256": "b3ddf464694ccea4985acf19048c321354c711c7bc091a4f22511f6266faf1eb"
     },
     "deferred_resource_use": {
       "path": "internal/analysis/analyzers/resources/deferinloop/classify_gen.go",
-      "sha256": "169391966d7bba7e51bf4345b4a9842402a28874886c2dc7e32053bcaef7fd01"
+      "sha256": "eb283c09ec77f60202c84581b819a0d246a8fbd78c74d2e5563baac0be3e7619"
     },
     "diagnostic_admission": {
       "path": "internal/reporting/check/report_admission_gen.go",
-      "sha256": "4ed0a461fd99413ad27c1530e8e070e3dd76f2b48a2ce91c57d69f33b4fcf0d6"
+      "sha256": "2a64cb780cff2e0957ec3d31f8b44dbfc7c4eacab2c27763c6aab118d68a6f11"
     },
     "goroutine_call_contract": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/call_contracts_gen.go",
-      "sha256": "460464b680ed682d27104aa93e05c97b29b69a5b6340313f529fb4494c40c15e"
+      "sha256": "7ca643e9b086b5f1f038c845196096043995b2d8d21d554029e50963a6fffd66"
     },
     "goroutine_call_recognition": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/call_prefix_gen.go",
-      "sha256": "e487257277a5430dec8effbaad0f030f63f4f689dadf4f1d5b87507d5ccf1533"
+      "sha256": "137718eff3b58e40cd62134ff58caf528c988db983549a820658aefb1ae23962"
     },
     "goroutine_entry_recognition": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/entry_gen.go",
-      "sha256": "7719bdf8af78153dc6f799d240c9b64842872283a8e8b2cd02a36294de41536c"
+      "sha256": "6bad97f30811f5d14dae870397ad1d6e7a40b114f8ab84037832c5cd7762aad4"
     },
     "goroutine_instruction_label": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/classify_gen.go",
-      "sha256": "f40f6a56cb84822708a44b9db65bed3df071a169cd9897a52d7e11e1355f1157"
+      "sha256": "f1975cbe56ec38525c558fb2460a9c502a6b7f02b08b56d193f85d83964f22ef"
     },
     "goroutine_lifetime_policy": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/lifecycle_gen.go",
-      "sha256": "f0afbfac02e3d54d5a0383c87559ff49017c3389c2afad1c7a6cdb20ae3e9f06"
+      "sha256": "5a4c4d6130631bc4386bf5ca6c2203aa6ed8ac8f2f66a6a71389ca2c4c37660a"
     },
     "goroutine_proof_fallback": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/fallback_gen.go",
-      "sha256": "368458bcd712a16f25dc10dc911d5c9fd9e15955413fda5bb5dc85597e6bc41f"
+      "sha256": "abf239c4f571cb15cb311899a0a69c8c90f4ccb3b9cd78f452dafe88c1249369"
     },
     "goroutine_proof_policy": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/proof_gen.go",
-      "sha256": "bf158e23e91ed608826dec9fe5fe7166e5d297455019d452aaa83f02a896326d"
+      "sha256": "04fe56462db394118fda901fa215783d359fdd3db8505f25df55606c3201af22"
     },
     "heap_static_leaf": {
       "path": "internal/engine/heapmodel/operations/leaf_gen.go",
-      "sha256": "1f936ad7881ca8485c7cbb13e19ae8d7b6dab6d38558c894840d42bab3cfb30e"
+      "sha256": "602418690bb39810e4e65fe8fee7f91570d204ec25609f3d456b5068a0614501"
     },
     "heap_value_definition": {
       "path": "internal/engine/heapmodel/operations/definition_gen.go",
-      "sha256": "6e8acaddc727ed80df3a7f820326642826e314513acc926192d272279d1bdb28"
+      "sha256": "21aceb23b280861ce42b1b6bf70ad2d30acda7196d2e926f0ef9998c9b73f632"
     },
     "http_acquisition_effects": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/effects_gen.go",
-      "sha256": "e6b2af5ab1c0b89c9da031ee581dd51e4503be5f4cbe0f2fec0e6e454bb52d73"
+      "sha256": "7d4ad4d36db30b472e1fabadb8359d4387ac5f46f74eb8f33e07977e9118741e"
     },
     "http_cell_use": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/cell_use_gen.go",
-      "sha256": "f18dff3915478ef62eed339a43b841677c7db4a8b82231d4b7372e844542edfe"
+      "sha256": "064dfd908cbaafe1c2749364e834d90bb9a96e6b1e397ae2691901613e61d7af"
     },
     "http_client": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/client_gen.go",
-      "sha256": "26fb460f6f8e8cdacec5f2cd5949ff8742c676cb9ab812208f8f4fecc91add63"
+      "sha256": "bbd64072316781bc65053fd8df9a727abdb685aa9455527de6bc6d15df4091e5"
     },
     "http_default_use": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/default_use_gen.go",
-      "sha256": "a14f4c2427043f2f586ea480091c8b21b373384c3c97badae75d8074a8a9c061"
+      "sha256": "6ae5f5e8784e2125eac9020900b216cd6d49e3e7fd50bba86dfbe0b5102df186"
     },
     "http_head_acquisition": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/head_gen.go",
-      "sha256": "20a6c36e37e1f9674164916b92242d0a33d316934c982a065c78dfe9415d0178"
+      "sha256": "d0382b718344f84d72e90541f1dfb53c48421a635d0926da8ca88662b8e492e6"
     },
     "http_local_acquisition": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/endpoint_gen.go",
-      "sha256": "03485fc3c51ccdbfcdabc60493a5af080047e3cb33dcba4676e30e96d62e6ee2"
+      "sha256": "f236a06451e3172e09eefdd30cb4f2dfdb03ba696cba2d00a38d23eca10ba37c"
     },
     "http_request_origin": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_origin_gen.go",
-      "sha256": "77e3939537fc76157a7aaf093d92acae1fb9e1979dcfdc6a65805b3676b533a0"
+      "sha256": "57b6f348d8312d81788306ff82649b2f35e96691e2c69d09b5088a49e4f48241"
     },
     "http_request_use": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/request_use_gen.go",
-      "sha256": "01c7641e8839699e6d9a3759fb0641a461ee0de2c2040992d8af75de3331cf4e"
+      "sha256": "9ecb9b40973dffb33068e7a6964eeaa0e55cfe047e7cb822008bfba454362bdb"
     },
     "http_server_use": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/server_use_gen.go",
-      "sha256": "a9851ce52aada348b5a010a7d9551db62328d11bc36468006cc512f8c529f89b"
+      "sha256": "a26b7d76f03184eb7e387782e4d15a148de0eaf6181d01a88308a504c48d083f"
     },
     "http_writer_use": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/httpacquire/writer_use_gen.go",
-      "sha256": "02838d2b5406e6d9ed81ce655228f8fa46fb9336d5de660d3201828aa0e4ab03"
+      "sha256": "19998a11880b1d1942892ba937aa960cbb09bf624945e10ba1b880aa842fa9fd"
     },
     "lifecycle_argument_mapping": {
       "path": "internal/engine/lifecycle/completionmapping/argument_gen.go",
-      "sha256": "77b0bade3c889296dfafba5956335fa33e8d7967034a6b0891efefd3e4265303"
+      "sha256": "56de22c0ceaa88e680530eb921c32ed3952358c9937c13a3ad6d8076ae560839"
     },
     "lifecycle_callback_aggregate": {
       "path": "internal/engine/lifecycle/completionpolicy/aggregate_gen.go",
-      "sha256": "92e3132b7860e3f301611e1edca78bb16f109d248f644765da3eeeed17924a73"
+      "sha256": "83c41895428beb2dcfb9612316030f44e257e16624ac2972b637f8e0b68015c6"
     },
     "lifecycle_callback_binding": {
       "path": "internal/engine/lifecycle/completionpolicy/binding_gen.go",
-      "sha256": "9fabf4c1ba457effba18044390d1da6acd8ee44da143187d5ca5f1f91d82ef6c"
+      "sha256": "5bae6133e6585bc059b7dc245affab61bf004854e1fa56e808e10b63cace7af2"
     },
     "lifecycle_callback_context_safe": {
       "path": "internal/engine/lifecycle/completionpolicy/context_safe_gen.go",
-      "sha256": "6ea8c2c32848fc0bedf80ef84fcd3e1755209ee88c0c0ce64ff32fff007d6849"
+      "sha256": "bd5a4b4eb067981984f1d65edc5f46e56ded96f33655fc799a2c2754030ced8e"
     },
     "lifecycle_capture_mapping": {
       "path": "internal/engine/lifecycle/completionmapping/capture_gen.go",
-      "sha256": "e268f8ac8f9cf9be6718a6c4463014457742bf9670b75f511615b920943cd87d"
+      "sha256": "11afd96bb98f4190cc32e3623cb87f338ff8f7ff19e4ce8b7886456d3a42c024"
     },
     "lifecycle_capture_relation": {
       "path": "internal/engine/lifecycle/completionmapping/capture_relation_gen.go",
-      "sha256": "338d39000d29fb080619220300f68b6f06b7cda0d68cde08d351795e638acffb"
+      "sha256": "5fdc96cfc3c9c6b058449b08f5d1e5ba10b48063724f430c65966d32da609ac2"
     },
     "lifecycle_completion_path": {
       "path": "internal/engine/lifecycle/completionmapping/path_gen.go",
-      "sha256": "c8d3eaf26fa4ff93a65b954ea253a22d5dae833720bf5b268d355f328f19b6d5"
+      "sha256": "f13256841b190a0e6ef96ec702efae489ac99e7a80f6c15cb6f8e881a1925a30"
     },
     "lifecycle_completion_path_fold": {
       "path": "internal/engine/lifecycle/completionmapping/accumulation_gen.go",
-      "sha256": "e14deb284c774ac1fee457c372e2c60a845b380214a0b8bcfe99111cf82a91ad"
+      "sha256": "b1388e5f83b71db3d1d2052976e709ae73d1de0b86fb31c60809d9cb45b3cddd"
     },
     "lifecycle_condition_comparison": {
       "path": "internal/engine/lifecycle/completionpolicy/condition_gen.go",
-      "sha256": "7ba81fdd8b29e9a4765b53fd7a52bb8ae7fd131e19f5cd98f9d660dadc7baa27"
+      "sha256": "d2e54699f910f3a80d1f6410cbf3b15d17207fb729f3061b1d5b3a143faf4015"
     },
     "lifecycle_conditional_return": {
       "path": "internal/engine/lifecycle/completionpolicy/return_gen.go",
-      "sha256": "82fdba8f3383f4ba4a4d870a8332a9ea2db5cf85eafd03678e14c3e24d5761c6"
+      "sha256": "c58ff7814237e5c11d143103a136f852a8361b2e51b20f82f47da35e5168e92a"
     },
     "lifecycle_deferred_mapping": {
       "path": "internal/engine/lifecycle/completionmapping/deferred_gen.go",
-      "sha256": "42e20ed3f968830ce472e80211151da3a547161e40bb70b693f7a8cba2f4015d"
+      "sha256": "231c147388a7998b57b108739b066da77e7a6999e3c09e46bfd7881f36331576"
     },
     "lifecycle_deferred_relation": {
       "path": "internal/engine/lifecycle/completionmapping/cell_relation_gen.go",
-      "sha256": "5692074bfe818538656d94a673442790d39d7f341ae29cf4f13fa86f0b9dc451"
+      "sha256": "5377c7c946a52372f4991af664a06e671e59e544e0f5db123d0e1252f234aae2"
     },
     "lifecycle_enclosing_reference": {
       "path": "internal/engine/lifecycle/completionpolicy/enclosing_gen.go",
-      "sha256": "a82b8c8d78cb9d1e1c30b39ac88a3d3ef9a4a173e730a1bf70f85529d475fcc8"
+      "sha256": "33e8ce7ec8f21c9c5a9ee2d9b0f4b6af3a2f4b17d655c29aa705d8f07201994d"
     },
     "lifecycle_escape_alias": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_alias_gen.go",
-      "sha256": "221c0fc10e056bfb76a74dae6589e33fbd30e1a56975c8b729573d72013e1be8"
+      "sha256": "4153704989cc78f02b91d64251b0bb02c228676e50b7646f7cf93f71a7b68173"
     },
     "lifecycle_escape_use": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/escape_gen.go",
-      "sha256": "6c3a58d1a7a9410c7a148c89c1e9d213818ee45759adf4edc46e44bc6d6b32de"
+      "sha256": "2084d7691a63cc1cf5243ee902f53c03a5847466e62d0614970f3646afb991a4"
     },
     "lifecycle_evidence_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/evidence_gen.go",
-      "sha256": "d8277b5070ab18617eb081e20c0bc0c3b9c31198f72d25480a89e3f7c3bec07f"
+      "sha256": "eafec64942b17387e39b35ae819d2e0c52c5cedf851017a4d734c0fb59fcf67d"
     },
     "lifecycle_handoff_use": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/handoff_gen.go",
-      "sha256": "78aa1fd9c738c980115603b0c50e7d0aa2b67a60d64f1d360ed43eed7aa278a0"
+      "sha256": "4705157936c94100bbaf265ce30c3648eeba5924c12f85798382db9d2350bd65"
     },
     "lifecycle_local_completion": {
       "path": "internal/engine/lifecycle/completion_local_gen.go",
-      "sha256": "56084c5ff7b8be961c4e1474148f7d41b3a8a845621ae31a8f8c5e21c83ceb0c"
+      "sha256": "2161c7288b9535ac9b700a816ba7adbdf44f8ea42a93d749a32400c977ef2d50"
     },
     "lifecycle_receiver_mapping": {
       "path": "internal/engine/lifecycle/completionmapping/receiver_gen.go",
-      "sha256": "f7b442feaebfb5f7d9660e021453058a81074414fe02e50e45fb416b0490855a"
+      "sha256": "bf1c7de4b0294bd38ec55682efcda0f09546ee18251b1c00b13c74d6f941b636"
     },
     "lifecycle_response_body_leaf": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/response_gen.go",
-      "sha256": "1b1d1e0f1898019f920b18a4ecf9c508e7e077408ef97600255341f47a8b3a26"
+      "sha256": "11151d44e9ac60594febea199df506905e6279247685d43a966dd5fc9ee08f4b"
     },
     "lifecycle_retained_callback": {
       "path": "internal/engine/lifecycle/completionpolicy/retained_gen.go",
-      "sha256": "e1f0a12961a04417c7d461f5f96586642130d75f926057075f039d4dc8f2b6db"
+      "sha256": "a8dbde8875cc2732f1006d19c4ae2ccdb4b8952312a27757232081c47c89849c"
     },
     "lifecycle_retention_use": {
       "path": "internal/analysis/passes/lifecyclefacts/lifecycleforms/retention_gen.go",
-      "sha256": "87ab422d514c549d6e86321f73206edfbc650bc51a4c9cf83bc5d4da65d39c4d"
+      "sha256": "908d6f24d45ede5641b4c5e5f5e7f17056f3d295ffc82bff61ac859812d53bcb"
     },
     "lifecycle_return_result": {
       "path": "internal/engine/lifecycle/completionpolicy/return_result_gen.go",
-      "sha256": "f252f75a12b016cea8f344f2493aa0c8bb158f0e973c6a2b39eb767bcb35e637"
+      "sha256": "bb12f61b196c30053f596e4bda705a8a38f0347723d9e7e61f5175101ab3587b"
     },
     "lifecycle_return_value": {
       "path": "internal/engine/lifecycle/completionpolicy/return_value_gen.go",
-      "sha256": "e92f592d030ac21d46c5f08c00ff2a7055590262e00d9be1f6c459d50c26785b"
+      "sha256": "75147f0a09c0ddd2736cfea80c8d69d8f4f6972993bcbbf17e4ca4e9d49376ea"
     },
     "lifecycle_returned_view_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/returned_view_gen.go",
-      "sha256": "fb467ce86253ee2ed068e5a93ae6dbe5ef75e138308dc26a81cc18ba7b58e69f"
+      "sha256": "55de23407400d90423745f60673f9f21745edc8dd49f40583df2182f3bedaea8"
     },
     "lifecycle_selected_mask_policy": {
       "path": "internal/analysis/passes/lifecyclefacts/selected_mask_gen.go",
-      "sha256": "cf94c5222555cc23863443e4caa64168c58027fec1a9dbe575909516a2577c92"
+      "sha256": "761b6dc23bfd41f17f8fc5d959c1dafb6fb91b0d3b7e7e902ba8b6046c42827a"
     },
     "lock_dynamic_index_step": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/index_gen.go",
-      "sha256": "01ab7dac828934cbeaba73d3f1b3eb4ba8a723f36b83a4d783992610ab63477a"
+      "sha256": "1e2d8e78da32146aa3a0dfc69e697d4a78971ecff2942f142462f3cc7b922638"
     },
     "lock_identity": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockidentity/leaf_gen.go",
-      "sha256": "95a1b86fd75aa92867b714e3e858b2b77af1b48386e31af7d3fc532bd2229e35"
+      "sha256": "efdcc0d9cbba159b77c38e928b226e43e1faff2e7d8aabbb5bbbed1ae317918e"
     },
     "lock_loop_extraction": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockvariant/extract_gen.go",
-      "sha256": "18f7fcc27ee6dab1d85d04e7c6a531fd77cb9bfb8bab3cbcf0273f461f602462"
+      "sha256": "94a8a433402344d5b9522c8a61cf635f5f8f37fd8458ed8c93d6c1b0995725fb"
     },
     "lock_loop_origin": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockvariant/value_gen.go",
-      "sha256": "837471c6eb51c4b186ff0a5e52f712704e1f6478c0825cd4e5ec5c6b58a61e85"
+      "sha256": "4b2d4993b564018d7b1e6ee6161a2b2efec0b3df63a31fcf2d0ed554f76a6206"
     },
     "lock_missing_release_policy": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockpolicy/missing_gen.go",
-      "sha256": "307835c5a73700752ea2e3f3aa74c4d8813e8d07ee527cb63bbdefc9c4730ca2"
+      "sha256": "9c4f6e367c4cb4e2431f634d9181d5a83ad21a27e0e2b3855e716b0c5797ebf3"
     },
     "lock_owner_address_step": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/owner_step_gen.go",
-      "sha256": "bb1a197daa89566c6a36732859b56918c18091a1148b353f1ddbc1d19aca5ad8"
+      "sha256": "cf29ac31f2d11b6cc5e9031f75f491bc4ed6609915993169430a13a07d1049ac"
     },
     "lock_read_write_policy": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockpolicy/read_write_gen.go",
-      "sha256": "46b8d81a85a93fc1bc3d868af55d2770d01fe0001f93a748546f9fc992b54480"
+      "sha256": "6ef14277349a398488e01783b053db3bee44769c068e2a63dccd8c214323fb9f"
     },
     "lock_state_copy": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/copy_gen.go",
-      "sha256": "5a0b2a038a07b15be27aa44322535040d50e1d1546e88509c3b7469aaf5ba70b"
+      "sha256": "2fbe39c5cd39b00e467b03aaeb39d67f0683a9ad85434632fd50aafa7a108c5b"
     },
     "lock_state_transfer": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/transfer_gen.go",
-      "sha256": "a619eb3bfe2326ca5cdf8063a713247bc214a3c9b57413b5b6f6bd840f776bf3"
+      "sha256": "f3d89cf4ed9f5db9b9b0b19ee24fb5ea186ca66cf09879252254816777767512"
     },
     "lock_write_destination": {
       "path": "internal/analysis/analyzers/concurrency/lockorder/lockforms/destination_gen.go",
-      "sha256": "e9104441f34995d5aea13c76ce6a40f46e6da6863406088a2373e54c4dd16929"
+      "sha256": "94e56c8646d23d2c70cbe6f9cae75ef35fb04243d586477a411e186c7aa51b7a"
     },
     "mutex_storage_contract": {
       "path": "internal/engine/ssaflow/calls/synchronization/mutex_gen.go",
-      "sha256": "a264909c3809e7008d0968c39452695c16f161628f5439466e5fa7bbc0889dc2"
+      "sha256": "d1558a0cb437bca149b2c7fa7559aeb21a8ab7904dbbbebef73a227c7185d68d"
     },
     "ownership_value_source": {
       "path": "internal/engine/ssaflow/valueforms/ownership_gen.go",
-      "sha256": "55d0a95654696edaf7a66bb17c37280b2ff32f3d35b456f5b84d7e0899d55da3"
+      "sha256": "60a663edc4e036bee6e16df7e98b2bce0fe01e90d2b67dadcc669cba830399f2"
     },
     "path_guard_address": {
       "path": "internal/engine/ssaflow/path/guard_address_gen.go",
-      "sha256": "d96c93b3e74292a1c3511e49654a4550550f3d9e905272184dde8c978303936b"
+      "sha256": "2a995c9b033e48452bce548d669e9c15d2827954a1915b25c8b123c7c091cccd"
     },
     "path_literal_comparison": {
       "path": "internal/engine/ssaflow/path/branch_compare_gen.go",
-      "sha256": "678c7d491daeed5810d5ef731ddfcda192498ebbb656529fe9468b187858f0d5"
+      "sha256": "d5b7761bdc1c3ae7162ad64ed39d2e13e75df6306b20f1710f5cbe7646f60128"
     },
     "path_loaded_guard": {
       "path": "internal/engine/ssaflow/path/guard_loaded_gen.go",
-      "sha256": "a84844f334448e20cb7a12bb1627298f2181643415ef5e4c565ed53ec26bce93"
+      "sha256": "026efec1a0a35cb2a150903c10f4fba85939cbc7b197c8147a417605ac6ae625"
     },
     "path_stable_guard": {
       "path": "internal/engine/ssaflow/path/guard_stable_gen.go",
-      "sha256": "2100ab2540cf08804b3d4f07df32805f4aafda1f857167ff894c9e8da11bd0d8"
+      "sha256": "99d4432e160c77718159fdc86c7b8677008a851fb88449b639970b556200b7ff"
     },
     "process_action_entry": {
       "path": "internal/analysis/analyzers/resources/processownership/action_entry_gen.go",
-      "sha256": "7a38dcefa7fdeae78c04f51f5adde72031a381acff8aaa193709f970a678c56c"
+      "sha256": "0271f907e57c762bc78b256dc63f70ad4d78aa3262a9052f15874b9ba5a2139e"
     },
     "process_action_remainder": {
       "path": "internal/analysis/analyzers/resources/processownership/action_remainder_gen.go",
-      "sha256": "6261fc36e1c82353ca4f95a3f2dd4242501205d001905d9ad8a006ee5bafa4db"
+      "sha256": "cdc39ded4a2ef6017738457a144c962aa7e7e3e719b0dc8653e2849d4be1ba84"
     },
     "process_action_settlement": {
       "path": "internal/analysis/analyzers/resources/processownership/action_settlement_gen.go",
-      "sha256": "88369d871849450eaaebeab78d6bb479260c58a6d5e5d95d2af8c79f0cca262b"
+      "sha256": "964b35bc5c513fdb6bdf0529c40cae7380d06cdfc002d0ee1742a838c27f07c9"
     },
     "process_return_admission": {
       "path": "internal/analysis/analyzers/resources/processownership/return_admission_gen.go",
-      "sha256": "44ab5840831b7d1c623586d69f7fcf53197b2c68113eecdb3b9b9e9e9545d0f8"
+      "sha256": "cc0677be012486019a12c3195b705bc77f745eb7176a821b961bfbfab7fde4d9"
     },
     "process_return_decision": {
       "path": "internal/analysis/analyzers/resources/processownership/decision_gen.go",
-      "sha256": "6ae5cf4985306fa5c641e01fdaf1c4fc40af2b4b4ddd609e6fd4344b1d26cfb0"
+      "sha256": "417a68d168f8619445aa068f3145d917abde1db7ce24801152bf5ae4170fc010"
     },
     "process_start_decision": {
       "path": "internal/analysis/analyzers/resources/processownership/prestart_gen.go",
-      "sha256": "265f102746306095c00033ac31cf877e52898532afa83e7f1834cb3219a95797"
+      "sha256": "72870725647312d8b9199bf2e6d8b7b193e5cf95231837a4785ec4db7b51a595"
     },
     "process_wait_handoff": {
       "path": "internal/analysis/analyzers/resources/processownership/handoff_gen.go",
-      "sha256": "08401f611c910228bb15a7d179993c241d44f3e8836938339a24405eb923b582"
+      "sha256": "a5c3fb363c94728f54147fa665876306bb3fe0c417c2742e4fb4f68c952101ba"
     },
     "producer_abandonment": {
       "path": "internal/analysis/analyzers/concurrency/producerlifecycle/abandoned_gen.go",
-      "sha256": "591794591b57b9d9e1fb77fa1feede2392ebbac709e9a71325ba4c59acf520a5"
+      "sha256": "10989f8a8afb7d8035da01217300f1a4de9facc32d8515b7f8c253592b665ffd"
     },
     "producer_helper_receive": {
       "path": "internal/analysis/analyzers/concurrency/producerlifecycle/helper_receive_gen.go",
-      "sha256": "f57c76260668eecab4573eb1830b0d0e73d890e4011800f4d01a651aea949313"
+      "sha256": "7ad45cb447c6477909d729b489293bd92a76c3177217f181a689ab93aded536c"
     },
     "producer_instruction_receive": {
       "path": "internal/analysis/analyzers/concurrency/producerlifecycle/receive_gen.go",
-      "sha256": "04335cb49b978806f5cbe5d5d58a840a96394724e29dedcad8e940a8e6a6b900"
+      "sha256": "c2a119e669c8311f5bef1cf2305cb20c8874b59e3e71dd2be30c68a225f3882c"
     },
     "resource_acquisition_absence": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/acquisition_absence_gen.go",
-      "sha256": "f4f7cafb11d278c9e011d0a1fad5c23716a092e50ea998fddb36be991fda9163"
+      "sha256": "5b14cefa3cc91b08b43fb645d229aafe49022002d630d4e857ab664661e1d39d"
     },
     "resource_acquisition_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/acquisition_gen.go",
-      "sha256": "db5ad44b28ee2de49a3213026bee01dfddf6742dd2f3712a57fd23aaf14ecf2a"
+      "sha256": "e6ef01e3432bbf067abd723aaa37011537cfae9977f3491dddac45e157b91e16"
     },
     "resource_acquisition_success": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/acquisition_branch_gen.go",
-      "sha256": "06cbb4cb460e11fabe513c6a3fcb408b29937440408e911e71777ff222e622c1"
+      "sha256": "fd15506dfd2e7fc047f5f6e15b08962bf8f355601a3de95b33b810934f729538"
     },
     "resource_classification": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/classify_gen.go",
-      "sha256": "040c698172405824d155370831e012166c86ae714d60cbffa82a7ef804a3d4c5"
+      "sha256": "dd109c6d79869ddd194027192ea2cf6d4e7a912fd1a8dcd6cd23ea1747ac40f4"
     },
     "resource_evaluation_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/evaluation_gen.go",
-      "sha256": "41efd73913fa694629169cd6dda776b930dfe2cf03f5db0100480061d29aad01"
+      "sha256": "842744b346c1c933b4bdcef16a5f45da771f9522c40c9d62669f548bf52cbd71"
     },
     "resource_final_flow_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/final_flow_gen.go",
-      "sha256": "d907024594ae33a36b4a4ac75b31a2e492e4d48ea4fcf4ce2560121ad7f69b9b"
+      "sha256": "a6b0e3113b789281a66c28432a48861638a35a3f85f8dbe23d3d185d502fcfcb"
     },
     "resource_opacity_after_callback": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/after_callback_gen.go",
-      "sha256": "9fbe118c922f64ecb706cdccfd0f4eb1ae8bb67fdba1925d2c72f20a53350f9f"
+      "sha256": "f333c0e7fa2708a066179ea75bfc587c3717017fe201d388060bc9ac7ac110dc"
     },
     "resource_opacity_call": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/call_gen.go",
-      "sha256": "c1cc0c08cae5f5a606c9bcb2ac0b6e5a8b16111fcf0552b70fe0f298d86f7cd3"
+      "sha256": "1bcd40f49af8e31f7404192ffbe9398ccec22d03a68f203165c359676e175627"
     },
     "resource_opacity_closure": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_gen.go",
-      "sha256": "5adc37c4e59f8173c3ad2ee8deba36de95f04948bcab791a4b2579ad8e73757e"
+      "sha256": "a24df5f22b52feb3ce63bc7f327e2d07c336b3158dfd625673a50f061a925d05"
     },
     "resource_opacity_closure_body": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_body_gen.go",
-      "sha256": "3c4289e828d99855ed63354d0bcde57cdd3815ce4c6b52d7c35cce58f589ff1a"
+      "sha256": "54a13b4df5dea6beedae48348fbe8d2bb23ac97cb3ce7a316741561f61503ce5"
     },
     "resource_opacity_closure_capture": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_capture_gen.go",
-      "sha256": "b7c7548d89e7cca99d58a271b3b6cdda01a7479bd6abe4352c3947ac0ee7c063"
+      "sha256": "f34017f1b6d0a1737b9d47488617fff01a65bd0a4e9ec8aa7f26bda8dacbcb55"
     },
     "resource_opacity_closure_finish": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/closure_finish_gen.go",
-      "sha256": "1c40c21dfa80549544c329a66707f422a36c1a8e4ddc486145026ece60bc56d8"
+      "sha256": "523642d1934c3fedc9ad23697adacac369df1e263b7f3be882f91de9a30ade1b"
     },
     "resource_opacity_consume": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/consume_gen.go",
-      "sha256": "997e247264df7390221ea231270e75a2daf99ec8a7cb0987e4411d79955aa5f9"
+      "sha256": "30cafab75e4e0655d1588c83dfa85f8f98c1824ffe7de83f44b78e397865d85b"
     },
     "resource_opacity_dispatch": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/dispatch_gen.go",
-      "sha256": "9a3d20e6d63393c71e26ef8e6fd80096ed33daa7c1a71e65c85836991a481157"
+      "sha256": "c0fd2512ed1231c52d73e81198573a86e7db0a7e7a0531ab9b57b423d9c22525"
     },
     "resource_opacity_function": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_gen.go",
-      "sha256": "a35ef8aae849a9d0d499caa3a00ef67ee091ae271b1ed176a1c72e18dd0bb5b8"
+      "sha256": "5e3b4137a2ed1f0f8ba8f608294b2929be7fb4cf8b197bb869d4f07793e140ca"
     },
     "resource_opacity_function_tail": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/function_tail_gen.go",
-      "sha256": "ab6d1eb8f8ec4267ab05328c2ae4e4eb80593d1d672cc92433977ffb46276165"
+      "sha256": "4d98a28bce640dbc302e05257359278a0ba3203d9266ff55523022762b0ce100"
     },
     "resource_opacity_send": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/send_gen.go",
-      "sha256": "87b7f3f23e7d51aca624bf15fc6b84218d083f21b4968f55e1b36507af85e540"
+      "sha256": "453191e256a8b515f248d94f3339f4159b3b9e99d2b5eaca11e9f4420b5fe241"
     },
     "resource_opacity_store": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/store_gen.go",
-      "sha256": "6459495c0bace6ff6ad27d5e851122373084ddd7035ff325028348776c09f49f"
+      "sha256": "e6bd0ee34289479c25930eff5f0046a598335c74e41cdb17afbfc910409c7fb7"
     },
     "resource_preparation_policy": {
       "path": "internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/preparation_gen.go",
-      "sha256": "581b9a27b8a0898f4720d6068bc17924b74fcfe16d6c2dcc4fff7043af1dfb9f"
+      "sha256": "6604c58de64df03df9f089e6f3ccc79b128156e7864d87b68017ee06ece5be61"
     },
     "result_assumed_leaf": {
       "path": "internal/analysis/passes/resultfacts/assumed_gen.go",
-      "sha256": "26f752675c51c92228b77611cabd1983a8c8b61efd04bb2a5f0203eb3ac65e61"
+      "sha256": "410d595859cf70ad614ec2b9dfad85500e3fdc182931163510e6b0465444f8a1"
     },
     "result_leaf": {
       "path": "internal/analysis/passes/resultfacts/leaf_gen.go",
-      "sha256": "496f2242c9d4d2e05dac852aac9703db0837d93fbf8ebf4eac9eb773f17f4507"
+      "sha256": "cabdce540d05f840af73b9ba1fe5ba6e0928c6e2012a26b307fac0c3d613ab31"
     },
     "result_return_relation": {
       "path": "internal/analysis/passes/resultfacts/return_gen.go",
-      "sha256": "7e2c45ad7d1c4be28f52485c838ab1a15b6d278abb50b87741daa0e2b2f70178"
+      "sha256": "6041d6e6a7e09de74882fd97a6553b1e3ad0d068b89b42573b149ed33fe1382a"
     },
     "select_comparison": {
       "path": "internal/engine/ssaflow/selection/comparison_gen.go",
-      "sha256": "d8035a01751cc06582900f51bc359e618408e2b1adb203175b2afd9c964ff1bc"
+      "sha256": "055ddfc3450af0ea5111d6d7e8e4684b1f73a82a1fe8801d2d9b14a6d8bc8316"
     },
     "structural_identity_evidence": {
       "path": "internal/engine/ssaflow/identity_gen.go",
-      "sha256": "14d3512e8241aa51f4c7c46902e37b5221963a439126633e2ea6bd6888b46e3d"
+      "sha256": "b82b82f58ce53c6a843297fc27bbdc4a9dc9e693bfa2139dbb5cf0b4068f8147"
     },
     "summary_result_comparison": {
       "path": "internal/analysis/summaries/comparison_gen.go",
-      "sha256": "ef097ef80487a106c0c37eae0bd7a96d678140a97c22e0509bd021b7ef61b562"
+      "sha256": "2f90fa150cf0ac19e61a0044d135e62e7b57a7aac0c2701fb5c83a3d94046115"
     },
     "summary_result_condition": {
       "path": "internal/analysis/summaries/condition_gen.go",
-      "sha256": "55899bbf470ec452076156e14baa85c4d18ef21155fc15a7b76d1d5a026fc8c6"
+      "sha256": "909e9b613dd106ebaa1948e1f2dbd0eff7bb750dda3aa9d66f9ac52b07266187"
     },
     "synchronization_primitives": {
       "path": "internal/engine/ssaflow/calls/synchronization/primitives_gen.go",
-      "sha256": "cc7e1c417dbb05bc2c4c3321d687ac5ced73ab2ce0fc24ba9061e6cc48b6a943"
+      "sha256": "7f2712e0a297826dc599ebbbc3eeb68baa15a30bde47fb639c861b23dad6fd6a"
     },
     "transparent_value_form": {
       "path": "internal/engine/ssaflow/valueforms/forms_gen.go",
-      "sha256": "219d01940e55d560155d92b7f809ca841017f1784cd61d67d568c89b4f8b28ed"
+      "sha256": "1af9ac2fbbf1ee69bdd9bbc3e26938ec9071008fbe47b6aec841ca2e3b7d4dea"
     },
     "worker_aggregate_source": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/aggregate_gen.go",
-      "sha256": "f98a0a034b4b8a187dfc4969f980c19ace23fae96a3c4053654ba7e4234a503c"
+      "sha256": "fd28a898c7fa1c63c0aed2e20166259e0d364adec1f78a08627ec4967b62bb3f"
     },
     "worker_caller_lifetime": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/caller_lifetime_gen.go",
-      "sha256": "4e3165e363bb2f263b47ed9e9bf6b2c11b02827c92e0d84cd74e5f020037cedf"
+      "sha256": "b239356219024dbe8e4036099b9234e00e849394ffb858228cb22a525d2a00e3"
     },
     "worker_completion_notification": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/notification_gen.go",
-      "sha256": "8ad55368d5508c2a6e7610dd36f2b48012893c0cc4b9caa1a7ed948730b81184"
+      "sha256": "703709f1662b720ba9d304aee1bd79282d86bd119418fd9c46d31f2046b7560c"
     },
     "worker_completion_tail": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/tail_gen.go",
-      "sha256": "6581c420358fcfe3903f09d0822e7953883b7306827a06f16a55046b63331902"
+      "sha256": "adb1d3864503fc5f0dc46949d69a7bce7999f9f893c07f3a0d9b9de0866e1dc7"
     },
     "worker_completion_terminal": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/terminal_gen.go",
-      "sha256": "ab0805ed17490d4ca69825095a346f7ca4d2a4fd629ffeaac7dae21c8b050f17"
+      "sha256": "ff2c70e0c538fdbe1422467c280393acc1625857819fc4a173b3229563cefad5"
     },
     "worker_containment": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/leaf_gen.go",
-      "sha256": "276cde1e69040ebc156001622d9c0f753f812e7d52c9e75f53c8e7b919e05199"
+      "sha256": "8ea30febedb3811e80645504e4f67fad80edd93fd28eed50b96e6c50b0fe11d7"
     },
     "worker_edge_precedence": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/edge_gen.go",
-      "sha256": "4eceb6a4e8b2eb83e7a9433db075c26b384653ce400d19826bf43613747d5cd3"
+      "sha256": "16aeca3c093be1bb49fb1ef54641377725fe32d00ed8ee648e30228405e49e2a"
     },
     "worker_guaranteed_receive": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/receives/guaranteed_gen.go",
-      "sha256": "4ba6625b4668b60ae12fe954047b550b8ab9b488bf9496916a7d5395331bf68f"
+      "sha256": "0704eb5b497945ac26f1ce63029d462e7fd91aedc8fe736e85db45fccd4b2c08"
     },
     "worker_helper_escape": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/escape_gen.go",
-      "sha256": "d3ccff5989bfa0b0eadf36fa1e33d4d910b3eb9e195209548997ee627cf797fd"
+      "sha256": "883404468759907790a57467e368dd6bebe62a7bad6a3b71b6fef63792d2066b"
     },
     "worker_receive": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/receives/from_gen.go",
-      "sha256": "5e07d246dcd8cc2b47fc537082a076dd5dc74cc290122c374d2bd8eea5e21120"
+      "sha256": "201e6df4beb4b88ec8e97fe0756e87c822101b47b26954d63295ac68fd478545"
     },
     "worker_stored_containment": {
       "path": "internal/analysis/analyzers/concurrency/goroutineownership/containment/stored_use_gen.go",
-      "sha256": "9611d173a9487d4ad8bdd879a566de0247b110daf21582cd5b88f120cfa59dc4"
+      "sha256": "67ca65843eac363d51d925d37226b0b319159cdabb54245807e202b548836942"
     }
   }
 }

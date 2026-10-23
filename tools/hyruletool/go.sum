@@ -1,7 +1,5 @@
 github.com/kojah/hyrule v0.1.0 h1:SgWmNuj6FSuqkmGxUKMWMso0ceZz6wQZR+Lw5aZNIYg=
 github.com/kojah/hyrule v0.1.0/go.mod h1:8PjeP97unwRjNEq/jG79buyBhDgtXAeSgcKaeBVkaME=
-github.com/kojah/hyrule v0.2.0 h1:VS2AXqYNVNVbDMJilwMGkLTV9HVEGFx/z0si9FxyQGY=
-github.com/kojah/hyrule v0.2.0/go.mod h1:8PjeP97unwRjNEq/jG79buyBhDgtXAeSgcKaeBVkaME=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
 go.yaml.in/yaml/v3 v3.0.5/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
 golang.org/x/mod v0.41.0 h1:qJmnOUb4YB+FsEuM3HcWucdZASCPGhsX6uljO6pog0c=
