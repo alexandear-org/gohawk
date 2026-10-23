@@ -1,5 +1,3 @@
-signature total = outputs (branchProof unknownBranch() false) false
-
 view Evidence = resourceProof
   state: State
 
@@ -19,26 +17,27 @@ type Guard = (bool, bool)
   GuardFound (success: 0) = true
   NoGuard = false
 
-@Unavailable
-rewrite (inputs proof@(Evidence (state: ^resourceUnknown)) _ _ _ _ _) =
-  outputs (branchProof proof false) false
-
-// A true documented nonnil-error guard excludes acquisition on this edge.
-@FailedAcquisition
-rewrite (inputs proof@(Evidence (state: ^resourceProven)) true _ _ _ _) =
-  outputs (branchProof proof false) true
-
-@OtherBranch
-rewrite (inputs _ _ branch successor error budget) =
-  do
-    GuardFound (success: success) <- testify branch successor error budget
-      else
+total fn rewrite
+  fallback outputs (branchProof unknownBranch() false) false
+  match inputs
+    @Unavailable
+    inputs proof@(Evidence (state: ^resourceUnknown)) _ _ _ _ _ ->
+      outputs (branchProof proof false) false
+    // A true documented nonnil-error guard excludes acquisition on this edge.
+    @FailedAcquisition
+    inputs proof@(Evidence (state: ^resourceProven)) true _ _ _ _ ->
+      outputs (branchProof proof false) true
+    @OtherBranch
+    inputs _ _ branch successor error budget ->
+      do
+        GuardFound (success: success) <- testify branch successor error budget
+          else
+            NoGuard() -> decline
+        true <- available budget
+          else
+            false -> decline
+        outputs (testifyResult success budget) success
+      <|> case flow branch successor error budget of
+        GuardFound (success: flowSuccess) -> outputs (flowResult flowSuccess true budget) false
         NoGuard() -> decline
-    true <- available budget
-      else
-        false -> decline
-    outputs (testifyResult success budget) success
-  <|> case flow branch successor error budget of
-    GuardFound (success: flowSuccess) -> outputs (flowResult flowSuccess true budget) false
-    NoGuard() -> decline
-  <|> outputs (flowResult false false budget) false
+      <|> outputs (flowResult false false budget) false

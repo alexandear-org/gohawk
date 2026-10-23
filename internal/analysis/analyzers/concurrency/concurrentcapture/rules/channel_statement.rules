@@ -1,5 +1,3 @@
-signature total = outputs ^channelStatementNone nil
-
 view Send = *ast.SendStmt
   channel: Chan
 
@@ -16,11 +14,14 @@ host
   channelStatementReceive
   channelReceiveToken
 
-@Send
-rewrite (inputs (Send (channel: channel))) = outputs ^channelStatementSend channel
-
-// Keep the direct expression-statement boundary: assignments and parenthesized
-// receive expressions are not part of this conservative semaphore recognizer.
-@Receive
-rewrite (inputs (Expression (expression: Unary (op: ^channelReceiveToken, operand: channel)))) =
-  outputs ^channelStatementReceive channel
+total fn rewrite
+  fallback outputs ^channelStatementNone nil
+  match inputs
+    @Send
+    inputs (Send (channel: channel)) ->
+      outputs ^channelStatementSend channel
+    // Keep the direct expression-statement boundary: assignments and parenthesized
+    // receive expressions are not part of this conservative semaphore recognizer.
+    @Receive
+    inputs (Expression (expression: Unary (op: ^channelReceiveToken, operand: channel))) ->
+      outputs ^channelStatementReceive channel

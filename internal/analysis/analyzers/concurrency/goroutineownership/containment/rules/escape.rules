@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   derived!
   captured!
@@ -7,37 +5,36 @@ host
   selected! = selectHandoff
   returned! = returnedHandoff
 
-@Consumed
-rewrite (inputs (Store (value: value) | Send (value: value) | Update (value: value)) _ derives _) =
-  case derived derives value of
-    true -> outputs true
-    false -> outputs false
-
-// Offering a send on the supplied owner's field may participate in shutdown.
-// It is uncertainty, never a join borrowed from another selected receive arm.
-@Selected
-rewrite (inputs choice@(Select()) local _ _) =
-  case selected choice local of
-    true -> outputs true
-    false -> outputs false
-
-@Captured
-rewrite (inputs closure@(Closure()) _ derives _) =
-  case captured closure derives of
-    true -> outputs true
-    false -> outputs false
-
-// Returning the owner's join handle exposes it to callers; it is not a join
-// performed by the accessor itself.
-// https://github.com/raviqqe/muffet/blob/ea33f85e5644c609a114b00e1f4dfc757b15c8ee/page_checker_test.go#L39-L46
-@Returned
-rewrite (inputs returned@(Return()) local derives _) =
-  case returned returned local derives of
-    true -> outputs true
-    false -> outputs false
-
-@Called
-rewrite (inputs instruction@(Call() | Defer() | Go()) _ _ calls) =
-  case called calls instruction of
-    true -> outputs true
-    false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    @Consumed
+    inputs (Store (value: value) | Send (value: value) | Update (value: value)) _ derives _ ->
+      case derived derives value of
+        true -> outputs true
+        false -> outputs false
+    // Offering a send on the supplied owner's field may participate in shutdown.
+    // It is uncertainty, never a join borrowed from another selected receive arm.
+    @Selected
+    inputs choice@(Select()) local _ _ ->
+      case selected choice local of
+        true -> outputs true
+        false -> outputs false
+    @Captured
+    inputs closure@(Closure()) _ derives _ ->
+      case captured closure derives of
+        true -> outputs true
+        false -> outputs false
+    // Returning the owner's join handle exposes it to callers; it is not a join
+    // performed by the accessor itself.
+    // https://github.com/raviqqe/muffet/blob/ea33f85e5644c609a114b00e1f4dfc757b15c8ee/page_checker_test.go#L39-L46
+    @Returned
+    inputs returned@(Return()) local derives _ ->
+      case returned returned local derives of
+        true -> outputs true
+        false -> outputs false
+    @Called
+    inputs instruction@(Call() | Defer() | Go()) _ _ calls ->
+      case called calls instruction of
+        true -> outputs true
+        false -> outputs false

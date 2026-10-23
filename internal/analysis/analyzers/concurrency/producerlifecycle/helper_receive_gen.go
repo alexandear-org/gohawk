@@ -27,7 +27,7 @@ func hyrulehelperReceivesRecognize(harg0 struct {
 		_ = hv5
 		{
 			if producerOrigin(hv1, hv3) {
-				// Rule Origin (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:21).
+				// Rule Origin (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:22).
 				var hv17 receiveProof = receiveProof{unknown: false, count: 0, reason: reasonProducerLaunch}
 				hresult := struct{ V0 receiveProof }{V0: hv17}
 				if !hyrulehyrulehelperReceivesRecognizeRecord1Valid(hresult) {
@@ -39,7 +39,7 @@ func hyrulehelperReceivesRecognize(harg0 struct {
 		}
 		{
 			if producerBuiltin(hv1) {
-				// Rule Builtin (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:27).
+				// Rule Builtin (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:26).
 				var hv18 receiveProof = receiveProof{unknown: false, count: 0, reason: reasonBuiltinNotReceive}
 				hresult := struct{ V0 receiveProof }{V0: hv18}
 				if !hyrulehyrulehelperReceivesRecognizeRecord1Valid(hresult) {
@@ -49,7 +49,7 @@ func hyrulehelperReceivesRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule Helper (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:33).
+		// Rule Helper (internal/analysis/analyzers/concurrency/producerlifecycle/rules/helper_receive.rules:30).
 		var hv19 *hyruleImport1.Engine = hv4
 		var hv20 hyruleImport0.CallInstruction = hv1
 		var hv21 *hyruleImport2.SearchBudget = hv5

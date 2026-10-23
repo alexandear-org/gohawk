@@ -23,7 +23,7 @@ func hyruleConsumeRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Returned (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:15).
+				// Rule Returned (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:16).
 				var hv16 InstructionQueries = hv1
 				var hv17 *hyruleImport1.Return = hv3
 				hv4 := (InstructionQueries).Returned(hv16, hv17)
@@ -84,7 +84,7 @@ func hyruleConsumeRecognize(harg0 struct {
 				_ = hv5
 				hv6 := hs1
 				_ = hv6
-				// Rule Sent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:27).
+				// Rule Sent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:26).
 				var hv20 InstructionQueries = hv1
 				var hv21 hyruleImport1.Value = hv5
 				var hv22 hyruleImport1.Instruction = hv6
@@ -115,7 +115,7 @@ func hyruleConsumeRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1.Value
 				_ = hv7
-				// Rule Mapped (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:33).
+				// Rule Mapped (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:31).
 				var hv23 InstructionQueries = hv1
 				var hv24 hyruleImport1.Value = hv7
 				var hv25 Reason = StoredInMap
@@ -146,7 +146,7 @@ func hyruleConsumeRecognize(harg0 struct {
 			if hs1 != nil {
 				hv8 := hs1
 				_ = hv8
-				// Rule Selected (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:39).
+				// Rule Selected (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:36).
 				var hv26 InstructionQueries = hv1
 				var hv27 *hyruleImport1.Select = hv8
 				hv9part0, hv9part1 := (InstructionQueries).Select(hv26, hv27)
@@ -179,7 +179,7 @@ func hyruleConsumeRecognize(harg0 struct {
 				{
 					var hv10 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv9)
 					_ = hv10
-					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:45).
+					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:41).
 					var hv28 InstructionQueries = hv1
 					var hv29 hyruleImport1.Instruction = hv9
 					var hv30 *hyruleImport1.CallCommon = hv10
@@ -214,7 +214,7 @@ func hyruleConsumeRecognize(harg0 struct {
 				{
 					var hv12 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv11)
 					_ = hv12
-					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:45).
+					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:41).
 					var hv31 InstructionQueries = hv1
 					var hv32 hyruleImport1.Instruction = hv11
 					var hv33 *hyruleImport1.CallCommon = hv12
@@ -249,7 +249,7 @@ func hyruleConsumeRecognize(harg0 struct {
 				{
 					var hv14 *hyruleImport1.CallCommon = hyruleImport0.InstructionCall(hv13)
 					_ = hv14
-					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:45).
+					// Rule Called (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/consume.rules:41).
 					var hv34 InstructionQueries = hv1
 					var hv35 hyruleImport1.Instruction = hv13
 					var hv36 *hyruleImport1.CallCommon = hv14

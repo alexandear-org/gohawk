@@ -1,5 +1,3 @@
-signature total = outputs "" false false
-
 view Local = mappedLocal
   kind: Kind
   value: Local
@@ -23,42 +21,44 @@ host
   mappedPath! = completionSearch.mappedCompletionPath
   requiresNestedPath = mappedLocal.requiresNestedPath
 
-// A callback bound to a method on the target completes when that exact local
-// is invoked directly or through a nested launch. A failed direct invocation
-// still permits the callback search, but never the ordinary local search.
-// https://github.com/openclaw/crabbox/blob/3ef3f98cbe27e6ddc814c11fde15b89c1639bcbe/internal/cli/ssh_forward_startup.go#L15-L22
-@Callback
-rewrite (inputs search candidate (Local (kind: ^localCallback, value: local)) _ called) =
-  do
-    true <- callbackInvoked called local
-      else
-        false -> decline
-    outputs "" false true
-  <|> do
-    nested <- forCallback search
-    Proven() <- completes nested candidate local
-      else
-        Unproven() -> outputs "" false false
-    outputs "" false true
-  <|> outputs "" false false
-
-// A nested path is beneath the local and must be translated onto the target.
-// An owner or contained target needs that exact path: cleaning a sibling does
-// not settle it. libovsdb locks rpc while its caller holds monitors.
-// https://github.com/ovn-kubernetes/libovsdb/blob/6acd868996b9393b932a1eeeec1ea4e6c722ebe8/client/client.go#L286-L299
-@Nested
-rewrite (inputs search candidate local@(Local (value: value)) target called) =
-  do
-    true <- exactInvoked search called local
-      else
-        false -> decline
-    outputs "" false true
-  <|> do
-    Proven (paths: paths) <- completes search candidate value
-      else
-        Unproven() -> outputs "" false false
-    Known (path: path) <- mappedPath search local target paths
-      else
-        Unknown (path: path) -> if requiresNestedPath local then outputs "" false false else outputs path false true
-    outputs path true true
-  <|> outputs "" false false
+total fn rewrite
+  fallback outputs "" false false
+  match inputs
+    // A callback bound to a method on the target completes when that exact local
+    // is invoked directly or through a nested launch. A failed direct invocation
+    // still permits the callback search, but never the ordinary local search.
+    // https://github.com/openclaw/crabbox/blob/3ef3f98cbe27e6ddc814c11fde15b89c1639bcbe/internal/cli/ssh_forward_startup.go#L15-L22
+    @Callback
+    inputs search candidate (Local (kind: ^localCallback, value: local)) _ called ->
+      do
+        true <- callbackInvoked called local
+          else
+            false -> decline
+        outputs "" false true
+      <|> do
+        nested <- forCallback search
+        Proven() <- completes nested candidate local
+          else
+            Unproven() -> outputs "" false false
+        outputs "" false true
+      <|> outputs "" false false
+    // A nested path is beneath the local and must be translated onto the target.
+    // An owner or contained target needs that exact path: cleaning a sibling does
+    // not settle it. libovsdb locks rpc while its caller holds monitors.
+    // https://github.com/ovn-kubernetes/libovsdb/blob/6acd868996b9393b932a1eeeec1ea4e6c722ebe8/client/client.go#L286-L299
+    @Nested
+    inputs search candidate local@(Local (value: value)) target called ->
+      do
+        true <- exactInvoked search called local
+          else
+            false -> decline
+        outputs "" false true
+      <|> do
+        Proven (paths: paths) <- completes search candidate value
+          else
+            Unproven() -> outputs "" false false
+        Known (path: path) <- mappedPath search local target paths
+          else
+            Unknown (path: path) -> if requiresNestedPath local then outputs "" false false else outputs path false true
+        outputs path true true
+      <|> outputs "" false false

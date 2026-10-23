@@ -1,5 +1,3 @@
-signature total = outputs nil
-
 view Load = *ssa.UnOp
   op: Op
   source: X
@@ -10,10 +8,12 @@ host
   responseBodyField
   loadToken
 
-// The exact Response type and its Body declaration supply the storage leaf.
-// This does not establish which response was acquired or whether Body changed.
-@Body
-rewrite (inputs (Load (op: ^loadToken, source: field@(Field()))))
-  | responseBodyField field
-  =
-  outputs field
+total fn rewrite
+  fallback outputs nil
+  match inputs
+    // The exact Response type and its Body declaration supply the storage leaf.
+    // This does not establish which response was acquired or whether Body changed.
+    @Body
+    inputs (Load (op: ^loadToken, source: field@(Field())))
+      when responseBodyField field ->
+      outputs field

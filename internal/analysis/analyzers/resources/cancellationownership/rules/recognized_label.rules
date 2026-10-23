@@ -1,13 +1,14 @@
-signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
-
 host
   direct! = recognizeCancellationDirect
   call! = recognizeCancellationCall
 
-@Recognized
-rewrite (inputs instruction classifier common) =
-  case direct instruction classifier common of
-    Decided (label: label) -> outputs label true
-    Unrecognized() -> do
-      result <- call instruction classifier common
-      result
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelHelperUndecided) true
+  match inputs
+    @Recognized
+    inputs instruction classifier common ->
+      case direct instruction classifier common of
+        Decided (label: label) -> outputs label true
+        Unrecognized() -> do
+          result <- call instruction classifier common
+          result

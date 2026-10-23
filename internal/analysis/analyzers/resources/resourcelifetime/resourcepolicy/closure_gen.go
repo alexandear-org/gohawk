@@ -26,7 +26,7 @@ func hyruleClosureRecognize(harg0 struct {
 		if hs1, hok := hv2.(*hyruleImport0.Defer); hok && hs1 != nil {
 			hv5 := hs1
 			_ = hv5
-			// Rule Deferred (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules:11).
+			// Rule Deferred (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure.rules:12).
 			var hv11 ClosureQueries = hv1
 			var hv12 *hyruleImport0.Defer = hv5
 			hv6 := (ClosureQueries).Deferred(hv11, hv12)

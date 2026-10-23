@@ -32,7 +32,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 					if hv5 == conditionEqualToken {
 						{
 							if errorNilComparison(hv7, hv3) {
-								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
+								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:29).
 								var hv14 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
 								var hv15 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv14}
 								hresult := struct{ V0 ConditionStep }{V0: hv15}
@@ -47,7 +47,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 					if hv5 == conditionNotEqualToken {
 						{
 							if errorNilComparison(hv7, hv3) {
-								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:28).
+								// Rule NilRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:29).
 								var hv16 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
 								var hv17 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv3, Outcome: hv16}
 								hresult := struct{ V0 ConditionStep }{V0: hv17}
@@ -66,7 +66,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 						_ = hv9
 						if hok {
 							if hv5 == conditionEqualToken {
-								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
+								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:33).
 								var hv18 bool = comparisonOperandTruth(hv5, hv2, hv9)
 								var hv19 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv18}
 								hresult := struct{ V0 ConditionStep }{V0: hv19}
@@ -77,7 +77,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 								return hresult, true
 							}
 							if hv5 == conditionNotEqualToken {
-								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:34).
+								// Rule BooleanRight (internal/engine/lifecycle/completionpolicy/rules/condition.rules:33).
 								var hv20 bool = comparisonOperandTruth(hv5, hv2, hv9)
 								var hv21 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv3, Truth: hv20}
 								hresult := struct{ V0 ConditionStep }{V0: hv21}
@@ -103,7 +103,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 							if nonconstantOperand(hv4) {
 								{
 									if errorNilComparison(hv11, hv4) {
-										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
+										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:36).
 										var hv22 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
 										var hv23 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv22}
 										hresult := struct{ V0 ConditionStep }{V0: hv23}
@@ -122,7 +122,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 							if nonconstantOperand(hv4) {
 								{
 									if errorNilComparison(hv11, hv4) {
-										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:38).
+										// Rule NilLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:36).
 										var hv24 hyruleImport3.Outcome = nilComparisonOutcome(hv5, hv2)
 										var hv25 ConditionStep = ConditionStep{Kind: ConditionOutcome, Value: hv4, Outcome: hv24}
 										hresult := struct{ V0 ConditionStep }{V0: hv25}
@@ -145,7 +145,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 							if hv5 == conditionEqualToken {
 								{
 									if nonconstantOperand(hv4) {
-										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
+										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:41).
 										var hv26 bool = comparisonOperandTruth(hv5, hv2, hv13)
 										var hv27 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv26}
 										hresult := struct{ V0 ConditionStep }{V0: hv27}
@@ -160,7 +160,7 @@ func hyruleRecognizeConditionRecognize(harg0 struct {
 							if hv5 == conditionNotEqualToken {
 								{
 									if nonconstantOperand(hv4) {
-										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:45).
+										// Rule BooleanLeft (internal/engine/lifecycle/completionpolicy/rules/condition.rules:41).
 										var hv28 bool = comparisonOperandTruth(hv5, hv2, hv13)
 										var hv29 ConditionStep = ConditionStep{Kind: ConditionFollow, Value: hv4, Truth: hv28}
 										hresult := struct{ V0 ConditionStep }{V0: hv29}

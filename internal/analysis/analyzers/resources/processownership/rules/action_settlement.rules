@@ -1,16 +1,17 @@
-signature total = outputs false ^decisionUnknown
-
 host
   waits = waitsForCommand
   released = releasedProcess
   ownership! = commandProof.commandOwnership
 
-// Direct witnesses precede the lifecycle query. Their existing identity checks
-// retain their own allowances and do not spend the prepared completion budget.
-@Settlement
-rewrite (inputs proof instruction command budget) =
-  if waits instruction command || released instruction command
-    then outputs true ^decisionDisproven
-    else do
-      answer <- ownership proof instruction command budget
-      answer
+total fn rewrite
+  fallback outputs false ^decisionUnknown
+  match inputs
+    // Direct witnesses precede the lifecycle query. Their existing identity checks
+    // retain their own allowances and do not spend the prepared completion budget.
+    @Settlement
+    inputs proof instruction command budget ->
+      if waits instruction command || released instruction command
+        then outputs true ^decisionDisproven
+        else do
+          answer <- ownership proof instruction command budget
+          answer

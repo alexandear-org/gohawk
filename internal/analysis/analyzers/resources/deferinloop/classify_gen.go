@@ -25,7 +25,7 @@ func hyruleclassifyValueUseRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule ResourceUse (internal/analysis/analyzers/resources/deferinloop/rules/classify.rules:27).
+		// Rule ResourceUse (internal/analysis/analyzers/resources/deferinloop/rules/classify.rules:28).
 		var hv12 *hyruleImport0.LifecycleEvidence = hv1
 		var hv13 hyruleImport2.Instruction = hv3
 		var hv14 hyruleImport2.Value = hv4.target

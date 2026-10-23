@@ -1,5 +1,3 @@
-signature total = outputs Absent()
-
 type Plan = Callee
   tag Kind
   Absent = CalleeAbsent
@@ -21,25 +19,24 @@ host
   LaunchCalled
   LaunchStarted
 
-// Only a defer may unwrap OnceFunc: an immediate call could have consumed the
-// wrapper before this completion question. Resolver/body searches remain Go.
-@Deferred
-rewrite (inputs instruction@(Defer())) =
-  outputs (Common (launch: ^LaunchDeferred, common: commonOf instruction, once: true))
-
-@Started
-rewrite (inputs instruction@(Go())) =
-  outputs (Common (launch: ^LaunchStarted, common: commonOf instruction, once: false))
-
-@WaitGroupGo
-rewrite (inputs (Call (common: groupCallback callback))) =
-  outputs (Callback (launch: ^LaunchStarted, callback: callback))
-
-// testing.TB guarantees registered cleanup runs after the test and subtests.
-@Cleanup
-rewrite (inputs (Call (common: cleanupCallback callback))) =
-  outputs (Callback (launch: ^LaunchDeferred, callback: callback))
-
-@Called
-rewrite (inputs instruction@(Call())) =
-  outputs (Common (launch: ^LaunchCalled, common: commonOf instruction, once: false))
+total fn rewrite
+  fallback outputs Absent()
+  match inputs
+    // Only a defer may unwrap OnceFunc: an immediate call could have consumed the
+    // wrapper before this completion question. Resolver/body searches remain Go.
+    @Deferred
+    inputs instruction@(Defer()) ->
+      outputs (Common (launch: ^LaunchDeferred, common: commonOf instruction, once: true))
+    @Started
+    inputs instruction@(Go()) ->
+      outputs (Common (launch: ^LaunchStarted, common: commonOf instruction, once: false))
+    @WaitGroupGo
+    inputs (Call (common: groupCallback callback)) ->
+      outputs (Callback (launch: ^LaunchStarted, callback: callback))
+    // testing.TB guarantees registered cleanup runs after the test and subtests.
+    @Cleanup
+    inputs (Call (common: cleanupCallback callback)) ->
+      outputs (Callback (launch: ^LaunchDeferred, callback: callback))
+    @Called
+    inputs instruction@(Call()) ->
+      outputs (Common (launch: ^LaunchCalled, common: commonOf instruction, once: false))

@@ -9,7 +9,7 @@ func hyruleAcquireRecognize(harg0 struct{ P0 AcquisitionQueries }) (struct{ V0 D
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Acquisition (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/acquisition.rules:21).
+		// Rule Acquisition (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/acquisition.rules:22).
 		var hv15 AcquisitionQueries = hv1
 		hv2 := (AcquisitionQueries).Error(hv15)
 		_ = hv2

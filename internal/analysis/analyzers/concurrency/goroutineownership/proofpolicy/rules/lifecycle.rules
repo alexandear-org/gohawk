@@ -1,23 +1,24 @@
-signature total = outputs emptyProof() false
-
-// Completion-handle ownership is independent of stop/context inputs. Factory
-// opacity precedes an external transfer claim; a lifetime bound is not a join.
-@Lifecycle
-rewrite (inputs queries) =
-  do
-    RelayMissing() <- relay queries
-      else
-        RelayFound() -> outputs (Unknown (reason: ^RelayDependency)) true
-        RelayCutoff (budget: budget) -> do
-          proof <- relayCutoff queries budget
-          outputs proof true
-    Undecided() <- handle queries
-      else
-        Decided (proof: proof) -> outputs proof true
-    Undecided() <- caller queries
-      else
-        Decided (proof: proof) -> outputs proof true
-    true <- synctest queries
-      else
-        false -> outputs emptyProof() false
-    outputs (Honored (reason: ^SynctestBubbleOwner)) true
+total fn rewrite
+  fallback outputs emptyProof() false
+  match inputs
+    // Completion-handle ownership is independent of stop/context inputs. Factory
+    // opacity precedes an external transfer claim; a lifetime bound is not a join.
+    @Lifecycle
+    inputs queries ->
+      do
+        RelayMissing() <- relay queries
+          else
+            RelayFound() -> outputs (Unknown (reason: ^RelayDependency)) true
+            RelayCutoff (budget: budget) -> do
+              proof <- relayCutoff queries budget
+              outputs proof true
+        Undecided() <- handle queries
+          else
+            Decided (proof: proof) -> outputs proof true
+        Undecided() <- caller queries
+          else
+            Decided (proof: proof) -> outputs proof true
+        true <- synctest queries
+          else
+            false -> outputs emptyProof() false
+        outputs (Honored (reason: ^SynctestBubbleOwner)) true

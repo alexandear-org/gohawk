@@ -1,8 +1,9 @@
-signature total = outputs nil false
-
-// Only the aggregate operand is followed. Selection indexes, tuple extracts,
-// slices and non-load unary operations retain their original boundary. The
-// caller owns transparent-wrapper peeling and charges every traversal step.
-@Source
-rewrite (inputs (Unary (op: ^loadToken, source: source) | FieldAddress (source: source) | IndexAddress (source: source) | Field (source: source) | Index (source: source) | Lookup (source: source))) =
-  outputs source true
+total fn rewrite
+  fallback outputs nil false
+  match inputs
+    // Only the aggregate operand is followed. Selection indexes, tuple extracts,
+    // slices and non-load unary operations retain their original boundary. The
+    // caller owns transparent-wrapper peeling and charges every traversal step.
+    @Source
+    inputs (Unary (op: ^loadToken, source: source) | FieldAddress (source: source) | IndexAddress (source: source) | Field (source: source) | Index (source: source) | Lookup (source: source)) ->
+      outputs source true

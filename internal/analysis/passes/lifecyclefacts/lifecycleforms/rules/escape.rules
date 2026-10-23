@@ -1,5 +1,3 @@
-signature total = outputs Escaped()
-
 type Use = EscapeUse
   tag Kind
   Ignore = EscapeIgnored
@@ -32,41 +30,41 @@ host
   EscapeAlias?
   sameValue
 
-// A literal only called or deferred in place does not escape. Passing it to a
-// different callee still asks that callee's retention proof.
-@InPlace
-rewrite (inputs value (Call (common: Common (value: called)) | Defer (common: Common (value: called))) _)
-  | sameValue value called
-  =
-  outputs Ignore()
-
-@Called
-rewrite (inputs _ instruction@(Call() | Defer()) _) = outputs (Called (instruction: instruction))
-
-@ReturnedStrict
-rewrite (inputs _ Return() true) = outputs Ignore()
-
-@ReturnedLoose
-rewrite (inputs _ Return() false) = outputs Escaped()
-
-// Converted and projected aggregates escape only when the derived value does.
-@Alias
-rewrite (inputs _ (EscapeAlias source) _) = outputs (Follow (source: source))
-
-// Storing into a value is not publication of the value itself.
-@StoreIntoSelf
-rewrite (inputs value (StoreValue (address: address)) _)
-  | sameValue value address
-  =
-  outputs Ignore()
-
-// Local storage must itself escape; a nonlocal destination is an escape.
-// The caller retains this storage search and the shared visited set.
-@Stored
-rewrite (inputs _ store@(StoreValue()) _) = outputs (Store (store: store))
-
-@Captured
-rewrite (inputs _ source@(Closure()) _) = outputs (Follow (source: source))
-
-@Ignored
-rewrite (inputs _ (Unary() | Debug()) _) = outputs Ignore()
+total fn rewrite
+  fallback outputs Escaped()
+  match inputs
+    // A literal only called or deferred in place does not escape. Passing it to a
+    // different callee still asks that callee's retention proof.
+    @InPlace
+    inputs value (Call (common: Common (value: called)) | Defer (common: Common (value: called))) _
+      when sameValue value called ->
+      outputs Ignore()
+    @Called
+    inputs _ instruction@(Call() | Defer()) _ ->
+      outputs (Called (instruction: instruction))
+    @ReturnedStrict
+    inputs _ Return() true ->
+      outputs Ignore()
+    @ReturnedLoose
+    inputs _ Return() false ->
+      outputs Escaped()
+    // Converted and projected aggregates escape only when the derived value does.
+    @Alias
+    inputs _ (EscapeAlias source) _ ->
+      outputs (Follow (source: source))
+    // Storing into a value is not publication of the value itself.
+    @StoreIntoSelf
+    inputs value (StoreValue (address: address)) _
+      when sameValue value address ->
+      outputs Ignore()
+    // Local storage must itself escape; a nonlocal destination is an escape.
+    // The caller retains this storage search and the shared visited set.
+    @Stored
+    inputs _ store@(StoreValue()) _ ->
+      outputs (Store (store: store))
+    @Captured
+    inputs _ source@(Closure()) _ ->
+      outputs (Follow (source: source))
+    @Ignored
+    inputs _ (Unary() | Debug()) _ ->
+      outputs Ignore()

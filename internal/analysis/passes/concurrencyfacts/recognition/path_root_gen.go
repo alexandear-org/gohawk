@@ -20,7 +20,7 @@ func hyrulePathRootRecognize(harg0 struct {
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Alloc, *hyruleImport0.Parameter, *hyruleImport0.FreeVar:
 			if hv1 != (*hyruleImport0.Alloc)(nil) && hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) {
-				// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:7).
+				// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:8).
 				return struct {
 					V0 bool
 					V1 *hyruleImport0.UnOp
@@ -29,7 +29,7 @@ func hyrulePathRootRecognize(harg0 struct {
 		case *hyruleImport0.Global:
 			if hv1 != (*hyruleImport0.Global)(nil) {
 				if hv2 == true {
-					// Rule GlobalMutex (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:12).
+					// Rule GlobalMutex (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:13).
 					return struct {
 						V0 bool
 						V1 *hyruleImport0.UnOp
@@ -44,7 +44,7 @@ func hyrulePathRootRecognize(harg0 struct {
 				_ = hv4
 				hv5 := hs1
 				_ = hv5
-				// Rule Unary (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:15).
+				// Rule Unary (internal/analysis/passes/concurrencyfacts/recognition/rules/path_root.rules:16).
 				return struct {
 					V0 bool
 					V1 *hyruleImport0.UnOp

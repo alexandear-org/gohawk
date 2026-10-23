@@ -1,5 +1,3 @@
-signature total = outputs ^None false
-
 host
   invokes
   appendBuiltin
@@ -8,32 +6,30 @@ host
   InterfaceMethod
   Appended
 
-// Being an interface receiver is not consumption. Only arguments carry this
-// resource into the dynamically selected method body.
-@Interface
-rewrite (inputs _ _ common carried)
-  | invokes common
-  =
-  outputs ^InterfaceMethod carried
-
-@Append
-rewrite (inputs _ _ (Common (value: builtin@(Builtin()))) true)
-  | appendBuiltin builtin
-  =
-  outputs ^Appended true
-
-// Preserve the inspected reason even when this builtin consumes nothing.
-@Builtin
-rewrite (inputs _ _ (Common (value: Builtin())) _) = outputs ^Appended false
-
-@Closure
-rewrite (inputs queries instruction (Common (value: closure@(Closure()))) carried) =
-  case closure queries instruction closure carried of
-    Opaque (reason: reason) -> outputs reason true
-    Transparent (reason: reason) -> outputs reason false
-
-@Function
-rewrite (inputs queries instruction common carried) =
-  case function queries instruction common carried of
-    Opaque (reason: reason) -> outputs reason true
-    Transparent (reason: reason) -> outputs reason false
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    // Being an interface receiver is not consumption. Only arguments carry this
+    // resource into the dynamically selected method body.
+    @Interface
+    inputs _ _ common carried
+      when invokes common ->
+      outputs ^InterfaceMethod carried
+    @Append
+    inputs _ _ (Common (value: builtin@(Builtin()))) true
+      when appendBuiltin builtin ->
+      outputs ^Appended true
+    // Preserve the inspected reason even when this builtin consumes nothing.
+    @Builtin
+    inputs _ _ (Common (value: Builtin())) _ ->
+      outputs ^Appended false
+    @Closure
+    inputs queries instruction (Common (value: closure@(Closure()))) carried ->
+      case closure queries instruction closure carried of
+        Opaque (reason: reason) -> outputs reason true
+        Transparent (reason: reason) -> outputs reason false
+    @Function
+    inputs queries instruction common carried ->
+      case function queries instruction common carried of
+        Opaque (reason: reason) -> outputs reason true
+        Transparent (reason: reason) -> outputs reason false

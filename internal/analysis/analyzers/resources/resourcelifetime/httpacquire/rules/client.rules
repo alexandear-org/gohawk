@@ -1,5 +1,3 @@
-signature total = outputs (Unknown (reason: ^None))
-
 host
   defaultClientValue
   direct! = onlyHTTPDoUsesWithin
@@ -7,31 +5,31 @@ host
   cell! = zeroClientCellWithin
   result = carriedProof
 
-@Allocation
-rewrite (inputs client@(Allocation()) _ budget) =
-  case direct client budget of
-    true -> outputs (result true budget)
-    false -> outputs (result false budget)
-
-// The default root's Do-only allowance must not enter strict helper memos.
-@Default
-rewrite (inputs client@(Unary (source: source, op: ^loadToken)) function budget)
-  | defaultClientValue source
-  =
-  case direct client budget of
-    false -> outputs (result false budget)
-    true -> do
-      proof <- unmodified function budget
-      case proof of
-        Unknown() -> outputs proof
-        Disproven() -> outputs proof
-        Proven() -> outputs proof
-
-@LocalCell
-rewrite (inputs (Unary (source: cell@(Allocation()), op: ^loadToken)) _ budget) =
-  case cell cell budget of
-    true -> outputs (result true budget)
-    false -> outputs (result false budget)
-
-@Other
-rewrite (inputs _ _ budget) = outputs (result false budget)
+total fn rewrite
+  fallback outputs (Unknown (reason: ^None))
+  match inputs
+    @Allocation
+    inputs client@(Allocation()) _ budget ->
+      case direct client budget of
+        true -> outputs (result true budget)
+        false -> outputs (result false budget)
+    // The default root's Do-only allowance must not enter strict helper memos.
+    @Default
+    inputs client@(Unary (source: source, op: ^loadToken)) function budget
+      when defaultClientValue source ->
+      case direct client budget of
+        false -> outputs (result false budget)
+        true -> do
+          proof <- unmodified function budget
+          case proof of
+            Unknown() -> outputs proof
+            Disproven() -> outputs proof
+            Proven() -> outputs proof
+    @LocalCell
+    inputs (Unary (source: cell@(Allocation()), op: ^loadToken)) _ budget ->
+      case cell cell budget of
+        true -> outputs (result true budget)
+        false -> outputs (result false budget)
+    @Other
+    inputs _ _ budget ->
+      outputs (result false budget)

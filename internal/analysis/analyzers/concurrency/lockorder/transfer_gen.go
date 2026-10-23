@@ -28,7 +28,7 @@ func hyruledecideMutexTransferRecognize(harg0 struct {
 				hv6 := hs2
 				_ = hv6
 				if hv5 == mutexRelease {
-					// Rule DeferredRelease (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:24).
+					// Rule DeferredRelease (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:25).
 					var hv16 lockFlowContext = hv1
 					var hv17 mutexEffect = hv6
 					var hv18 lockFlowState = hv4
@@ -56,10 +56,10 @@ func hyruledecideMutexTransferRecognize(harg0 struct {
 			}
 		}
 		if hs4, hok := hv2.(*hyruleImport0.Defer); hok && hs4 != nil {
-			// Rule DeferredAcquisition (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:39).
+			// Rule DeferredAcquisition (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:38).
 			return struct{ V0 lockFlowState }{V0: hv4}, true
 		}
-		// Rule Acquire (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:49).
+		// Rule Acquire (internal/analysis/analyzers/concurrency/lockorder/rules/transfer.rules:48).
 		var hv23 lockFlowContext = hv1
 		var hv24 hyruleImport0.Instruction = hv2
 		var hv25 mutexEffect = hv3

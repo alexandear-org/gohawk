@@ -14,7 +14,7 @@ func hyruleFinalizeRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Final (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/final_flow.rules:20).
+		// Rule Final (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/final_flow.rules:21).
 		var hv10 FlowQueries = hv1
 		var hv11 hyruleImport0.Value = hv2
 		hv3 := (FlowQueries).Flow(hv10, hv11)

@@ -1,6 +1,3 @@
-// Invalid host outcomes suppress the report without crediting cleanup.
-signature total = Unknown ^reasonNone
-
 host
   transferred! instruction = transfersResource evidence instruction obligation.target
   opaqueUse! instruction = opaqueResourceUse instruction obligation.target
@@ -24,21 +21,25 @@ type Decision = (resourceStatus, deferReason)
   Settled (reason: 1) = resourceSettled
   Unknown (reason: 1) = resourceUnknown
 
-@ResourceUse
-rewrite (inputs evidence probe instruction obligation) =
-  case transferred instruction of
-    true -> Settled ^reasonResourceTransferred
-    false -> case callDetails instruction of
-      NotCalled() -> case opaqueUse instruction of
-        true -> Unknown ^reasonResourceCapturedOrStored
-        false -> Live ^reasonNone
-      Called (common: common) -> case cleanupReceiver obligation common of
-        true -> case cleanupMethod obligation common of
-          true -> Settled ^reasonExplicitCleanup
-          false -> Live ^reasonNone
-        false -> do
-          decision <- argumentUse instruction
-          case decision of
-            Live() -> decision
-            Settled() -> decision
-            Unknown() -> decision
+// Invalid host outcomes suppress the report without crediting cleanup.
+total fn rewrite
+  fallback Unknown ^reasonNone
+  match inputs
+    @ResourceUse
+    inputs evidence probe instruction obligation ->
+      case transferred instruction of
+        true -> Settled ^reasonResourceTransferred
+        false -> case callDetails instruction of
+          NotCalled() -> case opaqueUse instruction of
+            true -> Unknown ^reasonResourceCapturedOrStored
+            false -> Live ^reasonNone
+          Called (common: common) -> case cleanupReceiver obligation common of
+            true -> case cleanupMethod obligation common of
+              true -> Settled ^reasonExplicitCleanup
+              false -> Live ^reasonNone
+            false -> do
+              decision <- argumentUse instruction
+              case decision of
+                Live() -> decision
+                Settled() -> decision
+                Unknown() -> decision

@@ -1,5 +1,3 @@
-signature total = outputs ^Unknown
-
 view Constant = *ssa.Const
   literal: Value
 
@@ -28,26 +26,25 @@ host
   AlwaysTrue
   AlwaysFalse
 
-@NilConstant
-rewrite (inputs constant@(Constant()))
-  | Nil constant
-  =
-  outputs ^AlwaysNil
-
-@TrueConstant
-rewrite (inputs (Constant (literal: Boolean true))) = outputs ^AlwaysTrue
-
-@FalseConstant
-rewrite (inputs (Constant (literal: Boolean false))) = outputs ^AlwaysFalse
-
-// Concrete boxing is nonnil even when its payload is a typed nil. Abstract
-// interface/type-parameter payloads retain Unknown through the total fallback.
-@ConcreteBox
-rewrite (inputs (Box (value: value)))
-  | Concrete value
-  =
-  outputs ^AlwaysNonNil
-
-@FreshValue
-rewrite (inputs (Allocation() | Channel() | Map() | Slice() | Function() | Closure())) =
-  outputs ^AlwaysNonNil
+total fn rewrite
+  fallback outputs ^Unknown
+  match inputs
+    @NilConstant
+    inputs constant@(Constant())
+      when Nil constant ->
+      outputs ^AlwaysNil
+    @TrueConstant
+    inputs (Constant (literal: Boolean true)) ->
+      outputs ^AlwaysTrue
+    @FalseConstant
+    inputs (Constant (literal: Boolean false)) ->
+      outputs ^AlwaysFalse
+    // Concrete boxing is nonnil even when its payload is a typed nil. Abstract
+    // interface/type-parameter payloads retain Unknown through the total fallback.
+    @ConcreteBox
+    inputs (Box (value: value))
+      when Concrete value ->
+      outputs ^AlwaysNonNil
+    @FreshValue
+    inputs (Allocation() | Channel() | Map() | Slice() | Function() | Closure()) ->
+      outputs ^AlwaysNonNil

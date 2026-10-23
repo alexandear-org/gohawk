@@ -24,7 +24,7 @@ func hyruleFunctionTailRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		if hv4 == false {
-			// Rule NotCarried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function_tail.rules:11).
+			// Rule NotCarried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function_tail.rules:12).
 			hresult := struct {
 				V0 Reason
 				V1 bool
@@ -39,7 +39,7 @@ func hyruleFunctionTailRecognize(harg0 struct {
 			return hresult, true
 		}
 		if hv4 == true {
-			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function_tail.rules:20).
+			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function_tail.rules:21).
 			var hv14 FunctionQueries = hv1
 			var hv15 hyruleImport0.Instruction = hv2
 			var hv16 *hyruleImport0.CallCommon = hv3

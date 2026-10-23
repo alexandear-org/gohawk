@@ -28,7 +28,7 @@ func hyruleDeferredCellRecognize(harg0 struct {
 		_ = hv4
 		hv5 := harg0.P4
 		_ = hv5
-		// Rule Deferred (internal/engine/lifecycle/completionmapping/rules/deferred.rules:22).
+		// Rule Deferred (internal/engine/lifecycle/completionmapping/rules/deferred.rules:23).
 		var hv13 struct {
 			V0 Local
 			V1 bool

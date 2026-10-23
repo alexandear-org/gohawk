@@ -1,24 +1,23 @@
-signature total = outputs emptyLocal() false
-
 host
   deferredExact
   deferredContains
   deferredUnknown
 
-@Exact
-rewrite (inputs _ local _ target _ ^deferredExact) =
-  outputs (Exact (local: local, supplied: target, path: nil)) true
-
-@Contains
-rewrite (inputs _ local cell _ _ ^deferredContains) =
-  outputs (Exact (local: local, supplied: cell, path: nil)) true
-
-// A merged cell may hold another value only on paths which never stored this
-// target. Require the target to survive on every path through its own store.
-@Other
-rewrite (inputs context local cell target invocation ^deferredUnknown) =
-  do
-    true <- storedOnPath context.Queries cell target invocation
-      else
-        false -> outputs emptyLocal() false
-    outputs (Exact (local: local, supplied: target, path: nil)) true
+total fn rewrite
+  fallback outputs emptyLocal() false
+  match inputs
+    @Exact
+    inputs _ local _ target _ ^deferredExact ->
+      outputs (Exact (local: local, supplied: target, path: nil)) true
+    @Contains
+    inputs _ local cell _ _ ^deferredContains ->
+      outputs (Exact (local: local, supplied: cell, path: nil)) true
+    // A merged cell may hold another value only on paths which never stored this
+    // target. Require the target to survive on every path through its own store.
+    @Other
+    inputs context local cell target invocation ^deferredUnknown ->
+      do
+        true <- storedOnPath context.Queries cell target invocation
+          else
+            false -> outputs emptyLocal() false
+        outputs (Exact (local: local, supplied: target, path: nil)) true

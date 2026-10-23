@@ -1,5 +1,3 @@
-signature total = outputs ^ReasonEffectUnknown
-
 view Branch = *ssa.If
 
 view Jump = *ssa.Jump
@@ -39,56 +37,48 @@ host
   ReasonNone
   ReasonEffectUnknown
 
-@EffectFree
-rewrite (inputs (instruction: instruction, root: root))
-  | free instruction root
-  =
-  outputs ^ReasonNone
-
-// The acyclic collector checks all successors and identical ordered effects.
-// Allocation/debug/closure creation and interface boxing publish no value by
-// themselves; every subsequent use still needs a complete modeled callee.
-@Structural
-rewrite (inputs (instruction: (Branch() | Jump() | Debug() | Allocation() | Closure() | Boxed() | ChangedInterface()))) =
-  outputs ^ReasonNone
-
-// Every incoming computation remains checked by the instruction whitelist.
-@InertMerge
-rewrite (inputs (instruction: phi@(Phi())))
-  | let type = typeOf phi
-  , inert type
-  =
-  outputs ^ReasonNone
-
-@Field
-rewrite (inputs (instruction: field@(FieldAddress()), budget: budget)) =
-  case fieldPath field budget of
-    true -> outputs ^ReasonNone
-    false -> outputs ^ReasonEffectUnknown
-
-// Spilling a primitive pointer into a local closure cell does not copy it.
-@PointerSpill
-rewrite (inputs (instruction: store@(Store())))
-  | localPointer store
-  =
-  outputs ^ReasonNone
-
-// Resetting or copying primitive state invalidates its counter/lock proof.
-@OrdinaryStore
-rewrite (inputs (instruction: Store (value: value, address: address)))
-  | local address
-  , not (contains (typeOf value))
-  , not (primitive (typeOf address))
-  =
-  outputs ^ReasonNone
-
-@ChannelRepresentation
-rewrite (inputs (instruction: value@(ChangedType())))
-  | channel value
-  =
-  outputs ^ReasonNone
-
-// Callee allocation sites cannot name runtime instances across separate calls.
-@RootChannel
-rewrite (inputs (instruction: Channel(), root: true)) = outputs ^ReasonNone
 // Unmodeled calls, publication, launch, panic and blocking remain unknown.
+total fn rewrite
+  fallback outputs ^ReasonEffectUnknown
+  match inputs
+    @EffectFree
+    inputs (instruction: instruction, root: root)
+      when free instruction root ->
+      outputs ^ReasonNone
+    // The acyclic collector checks all successors and identical ordered effects.
+    // Allocation/debug/closure creation and interface boxing publish no value by
+    // themselves; every subsequent use still needs a complete modeled callee.
+    @Structural
+    inputs (instruction: (Branch() | Jump() | Debug() | Allocation() | Closure() | Boxed() | ChangedInterface())) ->
+      outputs ^ReasonNone
+    // Every incoming computation remains checked by the instruction whitelist.
+    @InertMerge
+    inputs (instruction: phi@(Phi()))
+      when let type = typeOf phi
+      , inert type ->
+      outputs ^ReasonNone
+    @Field
+    inputs (instruction: field@(FieldAddress()), budget: budget) ->
+      case fieldPath field budget of
+        true -> outputs ^ReasonNone
+        false -> outputs ^ReasonEffectUnknown
+    // Spilling a primitive pointer into a local closure cell does not copy it.
+    @PointerSpill
+    inputs (instruction: store@(Store()))
+      when localPointer store ->
+      outputs ^ReasonNone
+    // Resetting or copying primitive state invalidates its counter/lock proof.
+    @OrdinaryStore
+    inputs (instruction: Store (value: value, address: address))
+      when local address
+      , not (contains (typeOf value))
+      , not (primitive (typeOf address)) ->
+      outputs ^ReasonNone
+    @ChannelRepresentation
+    inputs (instruction: value@(ChangedType()))
+      when channel value ->
+      outputs ^ReasonNone
+    // Callee allocation sites cannot name runtime instances across separate calls.
+    @RootChannel
+    inputs (instruction: Channel(), root: true) ->
+      outputs ^ReasonNone

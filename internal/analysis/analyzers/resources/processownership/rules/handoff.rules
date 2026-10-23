@@ -1,5 +1,3 @@
-signature total = outputs missingHandoff()
-
 host
   handoffCall!
   handoffWait!
@@ -34,40 +32,43 @@ type Body = (*ssa.Function, bool)
   Visible (function: 0) = true
   Opaque = false
 
-@Handoff
-rewrite (inputs instruction command budget) =
-  do
-    Called (common: common) <- handoffCall instruction
-      else
-        NotCalled() -> outputs missingHandoff()
-    false <- handoffWait common
-      else
-        true -> case mergedWaitReceiver common command of
-          true -> outputs mergedHandoff()
-          false -> outputs missingHandoff()
-    Visible (function: function) <- handoffBody common
-      else
-        Opaque() -> do
-          capture <- provePossibleCallbackCapture common.Value command budget
-          true <- known capture
-            else
-              false -> outputs capture
-          argument <- handoffArguments common command budget
-          outputs argument
-    true <- handoffStarted instruction
-      else
-        false -> outputs missingHandoff()
-    returns <- handoffReturns function budget
-    false <- cutoff returns
-      else
-        true -> outputs returns
-    false <- proven returns
-      else
-        true -> outputs missingHandoff()
-    completion <- handoffCompletion instruction command budget
-    true <- proven completion
-      else
-        false -> case cutoff completion of
-          true -> outputs (uncertainHandoff completion)
-          false -> outputs missingHandoff()
-    outputs (uncertainHandoff completion)
+total fn rewrite
+  fallback outputs missingHandoff()
+  match inputs
+    @Handoff
+    inputs instruction command budget ->
+      do
+        Called (common: common) <- handoffCall instruction
+          else
+            NotCalled() -> outputs missingHandoff()
+        false <- handoffWait common
+          else
+            true -> case mergedWaitReceiver common command of
+              true -> outputs mergedHandoff()
+              false -> outputs missingHandoff()
+        Visible (function: function) <- handoffBody common
+          else
+            Opaque() -> do
+              capture <- provePossibleCallbackCapture common.Value command budget
+              true <- known capture
+                else
+                  false -> outputs capture
+              argument <- handoffArguments common command budget
+              outputs argument
+        true <- handoffStarted instruction
+          else
+            false -> outputs missingHandoff()
+        returns <- handoffReturns function budget
+        false <- cutoff returns
+          else
+            true -> outputs returns
+        false <- proven returns
+          else
+            true -> outputs missingHandoff()
+        completion <- handoffCompletion instruction command budget
+        true <- proven completion
+          else
+            false -> case cutoff completion of
+              true -> outputs (uncertainHandoff completion)
+              false -> outputs missingHandoff()
+        outputs (uncertainHandoff completion)

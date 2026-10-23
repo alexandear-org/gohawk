@@ -22,7 +22,7 @@ func hyrulerecognizeSpawnCallContractRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		if hv3 == nil {
-			// Rule Missing (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_contracts.rules:17).
+			// Rule Missing (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_contracts.rules:18).
 			hresult := struct {
 				V0 helperCallProof
 				V1 bool
@@ -36,7 +36,7 @@ func hyrulerecognizeSpawnCallContractRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Contract (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_contracts.rules:22).
+		// Rule Contract (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_contracts.rules:23).
 		var hv15 struct {
 			V0 helperCallProof
 			V1 bool

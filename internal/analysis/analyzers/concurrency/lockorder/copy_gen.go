@@ -17,7 +17,7 @@ func hyrulecloneLockStateWithinRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Copy (internal/analysis/analyzers/concurrency/lockorder/rules/copy.rules:29).
+		// Rule Copy (internal/analysis/analyzers/concurrency/lockorder/rules/copy.rules:28).
 		var hv12 *hyruleImport0.SearchBudget = hv2
 		hv3 := lockCopyAvailable(hv12)
 		_ = hv3

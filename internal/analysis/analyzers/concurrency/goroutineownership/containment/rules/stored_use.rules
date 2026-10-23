@@ -1,22 +1,21 @@
-signature total = outputs false
-
 host
   sameValue
   stored! = storedCarries
   source! = Matches
 
-@Store
-rewrite (inputs walk (Store (address: address, value: value)) owner target)
-  | sameValue address owner
-  =
-  case source walk value target of
-    true -> outputs true
-    false -> outputs false
-
-// Each selected address has its own referrers. The surrounding walk retains
-// sibling selection and marking before these recursive use queries.
-@Selected
-rewrite (inputs walk value@(FieldAddress() | IndexAddress()) _ target) =
-  case stored walk value target of
-    true -> outputs true
-    false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    @Store
+    inputs walk (Store (address: address, value: value)) owner target
+      when sameValue address owner ->
+      case source walk value target of
+        true -> outputs true
+        false -> outputs false
+    // Each selected address has its own referrers. The surrounding walk retains
+    // sibling selection and marking before these recursive use queries.
+    @Selected
+    inputs walk value@(FieldAddress() | IndexAddress()) _ target ->
+      case stored walk value target of
+        true -> outputs true
+        false -> outputs false

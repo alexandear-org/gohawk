@@ -23,7 +23,7 @@ func hyruleClosureBodyRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Body (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_body.rules:12).
+		// Rule Body (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_body.rules:13).
 		var hv11 ClosureQueries = hv1
 		var hv12 hyruleImport0.Instruction = hv2
 		var hv13 *hyruleImport0.MakeClosure = hv3

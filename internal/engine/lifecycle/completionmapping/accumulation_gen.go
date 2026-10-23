@@ -16,7 +16,7 @@ func hyruleFoldPathRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		if hv3 == false {
-			// Rule Unnamed (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:15).
+			// Rule Unnamed (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:16).
 			var hv7 Paths = hv1
 			hv7.Seen = true
 			hv7.Exact = false
@@ -32,7 +32,7 @@ func hyruleFoldPathRecognize(harg0 struct {
 			_ = hv6
 			if hv5 == false {
 				if hv3 == true {
-					// Rule First (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:18).
+					// Rule First (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:19).
 					var hv8 Paths = hv6
 					hv8.Path = hv2
 					hv8.Seen = true
@@ -53,7 +53,7 @@ func hyruleFoldPathRecognize(harg0 struct {
 			}
 		}
 		if hv3 == true {
-			// Rule Same (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:29).
+			// Rule Same (internal/engine/lifecycle/completionmapping/rules/accumulation.rules:27).
 			var hv10 Paths = hv1
 			hv10.Seen = true
 			return struct{ V0 Paths }{V0: hv10}, true

@@ -20,7 +20,7 @@ func hyruledecideValueRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:11).
+				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:12).
 				var hv25 hyruleImport0.Instruction = hv3
 				hv4 := cycle(hv25)
 				_ = hv4
@@ -58,7 +58,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				_ = hv6
 				hv7 := hs1
 				_ = hv7
-				// Rule Extract (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:23).
+				// Rule Extract (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:22).
 				var hv29 hyruleImport2.ReachingWalk = hv1
 				var hv30 *hyruleImport0.Extract = hv7
 				hv8 := decideExtract(hv29, hv30)
@@ -81,7 +81,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				hv10 := hs1
 				_ = hv10
 				if hv8 == receiveToken {
-					// Rule Receive (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:32).
+					// Rule Receive (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:30).
 					var hv32 hyruleImport0.Instruction = hv10
 					hv11 := cycle(hv32)
 					_ = hv11
@@ -98,7 +98,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				_ = hv11
 				hv12 := hs1.X
 				_ = hv12
-				// Rule Unary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:38).
+				// Rule Unary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:35).
 				var hv34 hyruleImport2.ReachingWalk = hv1
 				var hv35 hyruleImport0.Value = hv12
 				hv13 := Value(hv34, hv35)
@@ -118,7 +118,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				_ = hv13
 				hv14 := hs1.Index
 				_ = hv14
-				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:45).
+				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:41).
 				var hv37 hyruleImport2.ReachingWalk = hv1
 				var hv38 hyruleImport0.Value = hv14
 				hv15 := Value(hv37, hv38)
@@ -149,7 +149,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				_ = hv15
 				hv16 := hs1.Index
 				_ = hv16
-				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:45).
+				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:41).
 				var hv43 hyruleImport2.ReachingWalk = hv1
 				var hv44 hyruleImport0.Value = hv16
 				hv17 := Value(hv43, hv44)
@@ -178,7 +178,7 @@ func hyruledecideValueRecognize(harg0 struct {
 			if hs1 != nil {
 				hv17 := hs1.X
 				_ = hv17
-				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:53).
+				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:48).
 				var hv49 hyruleImport2.ReachingWalk = hv1
 				var hv50 hyruleImport0.Value = hv17
 				hv19 := Value(hv49, hv50)
@@ -196,7 +196,7 @@ func hyruledecideValueRecognize(harg0 struct {
 			if hs1 != nil {
 				hv18 := hs1.X
 				_ = hv18
-				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:53).
+				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:48).
 				var hv52 hyruleImport2.ReachingWalk = hv1
 				var hv53 hyruleImport0.Value = hv18
 				hv20 := Value(hv52, hv53)
@@ -216,7 +216,7 @@ func hyruledecideValueRecognize(harg0 struct {
 				_ = hv19
 				hv20 := hs1.Y
 				_ = hv20
-				// Rule Binary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:60).
+				// Rule Binary (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:54).
 				var hv55 hyruleImport2.ReachingWalk = hv1
 				var hv56 hyruleImport0.Value = hv19
 				hv21 := Value(hv55, hv56)
@@ -245,7 +245,7 @@ func hyruledecideValueRecognize(harg0 struct {
 			if hs1 != nil {
 				hv21 := hs1
 				_ = hv21
-				// Rule Call (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:71).
+				// Rule Call (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:64).
 				var hv61 hyruleImport2.ReachingWalk = hv1
 				var hv62 *hyruleImport0.Call = hv21
 				hv23 := arguments(hv61, hv62)
@@ -264,7 +264,7 @@ func hyruledecideValueRecognize(harg0 struct {
 			hv22, hok := transparent(hv2)
 			_ = hv22
 			if hok {
-				// Rule Transparent (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:77).
+				// Rule Transparent (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/value.rules:69).
 				var hv64 hyruleImport2.ReachingWalk = hv1
 				var hv65 hyruleImport0.Value = hv22
 				hv24 := Value(hv64, hv65)

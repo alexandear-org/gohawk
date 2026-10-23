@@ -12,7 +12,7 @@ func hyruleTailRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struct{ 
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Return, *hyruleImport0.Jump, *hyruleImport0.DebugRef:
 			if hv1 != (*hyruleImport0.Return)(nil) && hv1 != (*hyruleImport0.Jump)(nil) && hv1 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
+				// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:14).
 				return struct{ V0 TailStep }{V0: Passive}, true
 			}
 		case *hyruleImport0.UnOp:
@@ -20,7 +20,7 @@ func hyruleTailRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struct{ 
 				hv2 := hs1.Op
 				_ = hv2
 				if hv2 == loadToken {
-					// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:13).
+					// Rule Passive (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:14).
 					return struct{ V0 TailStep }{V0: Passive}, true
 				}
 			}
@@ -30,14 +30,14 @@ func hyruleTailRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struct{ 
 				_ = hv3
 				{
 					if closes(hv3) {
-						// Rule Close (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:16).
+						// Rule Close (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:17).
 						return struct{ V0 TailStep }{V0: Passive}, true
 					}
 				}
 			}
 		case *hyruleImport0.RunDefers:
 			if hv1 != (*hyruleImport0.RunDefers)(nil) {
-				// Rule Deferred (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:22).
+				// Rule Deferred (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/tail.rules:21).
 				return struct{ V0 TailStep }{V0: Deferred}, true
 			}
 		}

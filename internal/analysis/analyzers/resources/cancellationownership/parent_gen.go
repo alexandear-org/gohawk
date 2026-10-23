@@ -29,7 +29,7 @@ func hyruleclassifyParentOriginRecognize(harg0 struct {
 				if hv5 == 0 {
 					{
 						if sameParentFrame(hv6, hv2) {
-							// Rule Parent (internal/analysis/analyzers/resources/cancellationownership/rules/parent.rules:23).
+							// Rule Parent (internal/analysis/analyzers/resources/cancellationownership/rules/parent.rules:24).
 							var hv9 *hyruleImport0.Call = hv6
 							hv7part0, hv7part1 := parentCancelResult(hv9)
 							hv7 := struct {

@@ -37,7 +37,7 @@ func hyruledecideReturnHoldsRecognize(harg0 struct {
 				hv8 := hv5.resultOutcome
 				_ = hv8
 				if hv7 == nilOutcome {
-					// Rule NilError (internal/analysis/passes/resultfacts/rules/return.rules:18).
+					// Rule NilError (internal/analysis/passes/resultfacts/rules/return.rules:19).
 					var hv14 *Engine = hv1
 					var hv15 hyruleImport0.Value = hv3
 					var hv16 Guarantee = AlwaysNonNil
@@ -102,13 +102,13 @@ func hyruledecideReturnHoldsRecognize(harg0 struct {
 					return hv23, true
 				}
 			}
-			// Rule VacuousNonNilError (internal/analysis/passes/resultfacts/rules/return.rules:33).
+			// Rule VacuousNonNilError (internal/analysis/passes/resultfacts/rules/return.rules:32).
 			return struct {
 				V0 bool
 				V1 bool
 			}{V0: true, V1: false}, true
 		}
-		// Rule OtherError (internal/analysis/passes/resultfacts/rules/return.rules:39).
+		// Rule OtherError (internal/analysis/passes/resultfacts/rules/return.rules:38).
 		var hv24 struct {
 			V0 bool
 			V1 bool

@@ -15,7 +15,7 @@ func hyruleclassifyCancellationReturnRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Return (internal/analysis/analyzers/resources/cancellationownership/rules/return_label.rules:9).
+		// Rule Return (internal/analysis/analyzers/resources/cancellationownership/rules/return_label.rules:10).
 		var hv9 *cancellationClassifier = hv2
 		var hv10 *hyruleImport1.Return = hv1
 		hv3part0, hv3part1 := (*cancellationClassifier).resultGuardedReturn(hv9, hv10)

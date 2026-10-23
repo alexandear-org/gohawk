@@ -1,23 +1,21 @@
-signature total = outputs false
-
 host
   builtin? = builtinName
   copiedElements
   deletedElement
 
-// Declaration identity is checked by the builtin matcher. Project-defined
-// functions with these names cannot enter the synchronization-free whitelist.
-@Scalar
-rewrite (inputs (builtin ("len" | "cap" | "min" | "max"))) = outputs true
-
-@Copy
-rewrite (inputs common@(builtin ("append" | "copy")))
-  | copiedElements common
-  =
-  outputs true
-
-@Delete
-rewrite (inputs common@(builtin "delete"))
-  | deletedElement common
-  =
-  outputs true
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Declaration identity is checked by the builtin matcher. Project-defined
+    // functions with these names cannot enter the synchronization-free whitelist.
+    @Scalar
+    inputs (builtin ("len" | "cap" | "min" | "max")) ->
+      outputs true
+    @Copy
+    inputs common@(builtin ("append" | "copy"))
+      when copiedElements common ->
+      outputs true
+    @Delete
+    inputs common@(builtin "delete")
+      when deletedElement common ->
+      outputs true

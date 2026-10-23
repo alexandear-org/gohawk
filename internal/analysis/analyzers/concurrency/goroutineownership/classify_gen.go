@@ -20,7 +20,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 		switch hs1 := hv2.(type) {
 		case *hyruleImport0.MakeClosure:
 			if hv2 != (*hyruleImport0.MakeClosure)(nil) {
-				// Rule ClosureCreation (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:36).
+				// Rule ClosureCreation (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:37).
 				return struct {
 					V0 ownershipAction
 					V1 goroutineOwnershipReason
@@ -30,7 +30,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
+				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:40).
 				var hv18 struct {
 					V0 ownershipAction
 					V1 goroutineOwnershipReason
@@ -135,7 +135,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
+				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:40).
 				var hv31 struct {
 					V0 ownershipAction
 					V1 goroutineOwnershipReason
@@ -240,7 +240,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 			if hs1 != nil {
 				hv5 := hs1
 				_ = hv5
-				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:39).
+				// Rule Reception (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:40).
 				var hv44 struct {
 					V0 ownershipAction
 					V1 goroutineOwnershipReason
@@ -372,7 +372,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1.Value
 				_ = hv7
-				// Rule Mapped (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:61).
+				// Rule Mapped (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:60).
 				var hv60 *spawnAnalysis = hv1
 				var hv61 hyruleImport0.Value = hv7
 				hv17 := (*spawnAnalysis).consumes(hv60, hv61)
@@ -396,7 +396,7 @@ func hyruleclassifySpawnInstructionRecognize(harg0 struct {
 				return hv62, true
 			}
 		}
-		// Rule Other (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:67).
+		// Rule Other (internal/analysis/analyzers/concurrency/goroutineownership/rules/classify.rules:65).
 		return struct {
 			V0 ownershipAction
 			V1 goroutineOwnershipReason

@@ -19,7 +19,7 @@ func hyruledecideLocalRecognize(harg0 struct {
 			hv3, hok := localURL(hv1)
 			_ = hv3
 			if hok {
-				// Rule Endpoint (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/endpoint.rules:21).
+				// Rule Endpoint (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/endpoint.rules:22).
 				var hv14 *hyruleImport1.SearchBudget = hv2
 				hv4 := spend(hv14)
 				_ = hv4

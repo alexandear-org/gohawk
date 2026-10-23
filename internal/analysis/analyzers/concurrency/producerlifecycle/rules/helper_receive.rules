@@ -1,5 +1,3 @@
-signature total = outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
-
 host
   producerOrigin
   producerBuiltin
@@ -18,46 +16,45 @@ host
   reasonWorkerChannelUsesComplete
   reasonReceiverHelperUnknown
 
-@Origin
-rewrite (inputs call _ origin _ _)
-  | producerOrigin call origin
-  =
-  outputs (Known (count: 0, reason: ^reasonProducerLaunch))
-
-@Builtin
-rewrite (inputs call _ _ _ _)
-  | producerBuiltin call
-  =
-  outputs (Known (count: 0, reason: ^reasonBuiltinNotReceive))
-
-@Helper
-rewrite (inputs call channel _ engine budget) =
-  do
-    summary <- receiverSummary engine call budget
-    false <- receiverExhausted budget
-      else
-        true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
-    true <- receiverComplete summary
-      else
-        false -> do
-          true <- receiverLaunched call
-            else
-              false -> decline
-          uses <- nonReceivingUses call channel budget
-          true <- proven uses
-            else
-              false -> decline
-          outputs (Known (count: 0, reason: ^reasonWorkerChannelUsesComplete))
-        <|> do
-          false <- receiverExhausted budget
-            else
-              true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
-          uncertain <- opaqueReceives call channel budget
-          false <- receiverExhausted budget
-            else
-              true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
-          outputs (opaqueReceiver uncertain)
-        <|> outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
-    launched <- receiverLaunched call
-    answer <- summaryReceives summary channel launched budget
-    outputs answer
+total fn rewrite
+  fallback outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
+  match inputs
+    @Origin
+    inputs call _ origin _ _
+      when producerOrigin call origin ->
+      outputs (Known (count: 0, reason: ^reasonProducerLaunch))
+    @Builtin
+    inputs call _ _ _ _
+      when producerBuiltin call ->
+      outputs (Known (count: 0, reason: ^reasonBuiltinNotReceive))
+    @Helper
+    inputs call channel _ engine budget ->
+      do
+        summary <- receiverSummary engine call budget
+        false <- receiverExhausted budget
+          else
+            true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+        true <- receiverComplete summary
+          else
+            false -> do
+              true <- receiverLaunched call
+                else
+                  false -> decline
+              uses <- nonReceivingUses call channel budget
+              true <- proven uses
+                else
+                  false -> decline
+              outputs (Known (count: 0, reason: ^reasonWorkerChannelUsesComplete))
+            <|> do
+              false <- receiverExhausted budget
+                else
+                  true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+              uncertain <- opaqueReceives call channel budget
+              false <- receiverExhausted budget
+                else
+                  true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+              outputs (opaqueReceiver uncertain)
+            <|> outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
+        launched <- receiverLaunched call
+        answer <- summaryReceives summary channel launched budget
+        outputs answer

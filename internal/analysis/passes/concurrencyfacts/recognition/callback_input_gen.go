@@ -29,7 +29,7 @@ func hyruleCallbackInputRecognize(harg0 struct {
 							if hyruleImport1.IsInterface(hv4) {
 								{
 									if !(hyruleImport0.CancellationType(hv4)) {
-										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:15).
+										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:16).
 										return struct{ V0 bool }{V0: true}, true
 									}
 								}
@@ -42,7 +42,7 @@ func hyruleCallbackInputRecognize(harg0 struct {
 				if hv2 == nil {
 					{
 						if functionType((callbackValue).Type(hv7)) {
-							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:24).
+							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:23).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}
@@ -60,7 +60,7 @@ func hyruleCallbackInputRecognize(harg0 struct {
 							if hyruleImport1.IsInterface(hv6) {
 								{
 									if !(hyruleImport0.CancellationType(hv6)) {
-										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:15).
+										// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:16).
 										return struct{ V0 bool }{V0: true}, true
 									}
 								}
@@ -73,7 +73,7 @@ func hyruleCallbackInputRecognize(harg0 struct {
 				if hv2 == nil {
 					{
 						if functionType((callbackValue).Type(hv8)) {
-							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:24).
+							// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_input.rules:23).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}

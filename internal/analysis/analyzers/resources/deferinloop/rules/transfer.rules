@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   global! = lifecycle.StoresValueInGlobal
   field! = lifecycle.StoresValueInEscapingField
@@ -9,29 +7,32 @@ host
   lifecycleOwner! = lifecycle.CallTransfersArgumentToLifecycleOwner
   retained! = acquisitionEvidence.ArgumentRetainedByCallee
 
-// Each contract proves a transfer independently. Imported retention is reached
-// only after the structural contracts fail; no allowance is reset or refunded.
-@Transfer
-rewrite (inputs evidence instruction target) =
-  case global instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case field instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case sent instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case returned instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case receiver instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case lifecycleOwner instruction target of
-    true -> outputs true
-    false -> decline
-  <|> case retained evidence instruction target of
-    true -> outputs true
-    false -> decline
-  <|> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Each contract proves a transfer independently. Imported retention is reached
+    // only after the structural contracts fail; no allowance is reset or refunded.
+    @Transfer
+    inputs evidence instruction target ->
+      case global instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case field instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case sent instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case returned instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case receiver instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case lifecycleOwner instruction target of
+        true -> outputs true
+        false -> decline
+      <|> case retained evidence instruction target of
+        true -> outputs true
+        false -> decline
+      <|> outputs false

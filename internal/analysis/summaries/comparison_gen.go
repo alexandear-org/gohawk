@@ -29,7 +29,7 @@ func hyruledecideResultComparisonRecognize(harg0 struct {
 		_ = hv5
 		{
 			if comparisonNil(hv3) {
-				// Rule NilComparison (internal/analysis/summaries/rules/comparison.rules:16).
+				// Rule NilComparison (internal/analysis/summaries/rules/comparison.rules:17).
 				var hv9 *Provider = hv1
 				var hv10 hyruleImport0.Value = hv2
 				var hv11 *hyruleImport0.Const = hv3
@@ -85,7 +85,7 @@ func hyruledecideResultComparisonRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule OtherComparison (internal/analysis/summaries/rules/comparison.rules:28).
+		// Rule OtherComparison (internal/analysis/summaries/rules/comparison.rules:27).
 		var hv18 *Provider = hv1
 		var hv19 hyruleImport0.Value = hv2
 		var hv20 *hyruleImport0.Const = hv3

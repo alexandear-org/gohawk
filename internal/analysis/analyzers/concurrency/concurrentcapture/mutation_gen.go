@@ -38,7 +38,7 @@ func hyruledecideMutationGuardRecognize(harg0 struct {
 			_ = hv9
 			if hv7 == true {
 				if hv8 == true {
-					// Rule Held (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:25).
+					// Rule Held (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:26).
 					var hv15 mutationProof = mutationProof{state: mutationUnknown, reason: hv9}
 					return struct{ V0 mutationProof }{V0: hv15}, true
 				}
@@ -60,7 +60,7 @@ func hyruledecideMutationGuardRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule SyntaxGuards (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:33).
+		// Rule SyntaxGuards (internal/analysis/analyzers/concurrency/concurrentcapture/rules/mutation.rules:32).
 		var hv17 struct{ V0 mutationProof }
 		hv17answered := false
 		if !hv17answered {

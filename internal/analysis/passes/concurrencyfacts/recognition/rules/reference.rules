@@ -1,5 +1,3 @@
-signature total = outputs ^ReferenceUnknown nil false
-
 view Call = *ssa.Call
 
 view Parameter = *ssa.Parameter
@@ -26,31 +24,28 @@ host
   ReferenceAddress
   ReferenceRejected
 
-@Condition
-rewrite (inputs call@(Call()))
-  | let common = common call
-  , condition common
-  =
-  outputs ^ReferenceExact call false
-
-// A rejected call still returns its original value with false availability.
-@OtherCall
-rewrite (inputs call@(Call())) = outputs ^ReferenceRejected call false
-
-@Symbolic
-rewrite (inputs value@(Parameter() | Capture() | Channel())) =
-  outputs ^ReferenceExact value (canceled (typeOf value))
-
-@Local
-rewrite (inputs value@(Allocation()))
-  | synchronization (typeOf value)
-  =
-  outputs ^ReferenceExact value false
-
-// Mutex addresses name cells, not mutable contents. The engine materializes
-// a nonempty embedded path to an existing address before exporting identity.
-@Address
-rewrite (inputs value@(Global() | Field()))
-  | mutex (typeOf value)
-  =
-  outputs ^ReferenceAddress value false
+total fn rewrite
+  fallback outputs ^ReferenceUnknown nil false
+  match inputs
+    @Condition
+    inputs call@(Call())
+      when let common = common call
+      , condition common ->
+      outputs ^ReferenceExact call false
+    // A rejected call still returns its original value with false availability.
+    @OtherCall
+    inputs call@(Call()) ->
+      outputs ^ReferenceRejected call false
+    @Symbolic
+    inputs value@(Parameter() | Capture() | Channel()) ->
+      outputs ^ReferenceExact value (canceled (typeOf value))
+    @Local
+    inputs value@(Allocation())
+      when synchronization (typeOf value) ->
+      outputs ^ReferenceExact value false
+    // Mutex addresses name cells, not mutable contents. The engine materializes
+    // a nonempty embedded path to an existing address before exporting identity.
+    @Address
+    inputs value@(Global() | Field())
+      when mutex (typeOf value) ->
+      outputs ^ReferenceAddress value false

@@ -23,7 +23,7 @@ func hyrulemutationRootStepRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Identifier (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:14).
+				// Rule Identifier (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:15).
 				return struct {
 					V0 *hyruleImport0.Ident
 					V1 hyruleImport0.Expr
@@ -35,7 +35,7 @@ func hyrulemutationRootStepRecognize(harg0 struct {
 				_ = hv4
 				{
 					if mapSource(hv1, hv4) {
-						// Rule MapElement (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:19).
+						// Rule MapElement (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:20).
 						return struct {
 							V0 *hyruleImport0.Ident
 							V1 hyruleImport0.Expr
@@ -47,7 +47,7 @@ func hyrulemutationRootStepRecognize(harg0 struct {
 			if hs1 != nil {
 				hv5 := hs1.X
 				_ = hv5
-				// Rule Parenthesis (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:25).
+				// Rule Parenthesis (internal/analysis/analyzers/concurrency/concurrentcapture/rules/root.rules:24).
 				return struct {
 					V0 *hyruleImport0.Ident
 					V1 hyruleImport0.Expr

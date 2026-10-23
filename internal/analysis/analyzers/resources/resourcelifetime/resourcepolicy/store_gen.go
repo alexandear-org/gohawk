@@ -17,7 +17,7 @@ func hyruleStoreConsumptionRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Stored (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/store.rules:13).
+		// Rule Stored (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/store.rules:14).
 		var hv10 InstructionQueries = hv1
 		var hv11 *hyruleImport0.Store = hv2
 		hv3 := (InstructionQueries).Storage(hv10, hv11)

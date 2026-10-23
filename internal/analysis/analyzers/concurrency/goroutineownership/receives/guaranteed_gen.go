@@ -17,7 +17,7 @@ func hyruledecideGuaranteedRecognize(harg0 struct {
 		if hs1, hok := hv1.(*hyruleImport0.Select); hok && hs1 != nil {
 			hv3 := hs1
 			_ = hv3
-			// Rule Select (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules:11).
+			// Rule Select (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/guaranteed.rules:12).
 			var hv8 hyruleImport0.Instruction = hv3
 			var hv9 func(hyruleImport0.Value) bool = hv2
 			hv4 := SelectedAtEntry(hv8, hv9)

@@ -38,7 +38,7 @@ func hyruleCallbackCallRecognize(harg0 struct{ P0 hyruleImport0.CallInstruction 
 													{
 														var hv7 *hyruleImport1.Func = hv3.Method
 														_ = hv7
-														// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:14).
+														// Rule Method (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:15).
 														return struct {
 															V0 hyruleImport0.Value
 															V1 *hyruleImport1.Func
@@ -72,7 +72,7 @@ func hyruleCallbackCallRecognize(harg0 struct{ P0 hyruleImport0.CallInstruction 
 													{
 														var hv10 hyruleImport0.Value = hv8.Value
 														_ = hv10
-														// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:23).
+														// Rule Function (internal/analysis/passes/concurrencyfacts/recognition/rules/callback_call.rules:22).
 														return struct {
 															V0 hyruleImport0.Value
 															V1 *hyruleImport1.Func

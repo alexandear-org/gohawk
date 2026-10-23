@@ -30,7 +30,7 @@ func hyruleinstructionReceivesRecognize(harg0 struct {
 			hv6, hok := callInstruction(hv1)
 			_ = hv6
 			if hok {
-				// Rule Helper (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:19).
+				// Rule Helper (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:20).
 				var hv11 hyruleImport2.CallInstruction = hv6
 				var hv12 hyruleImport2.Value = hv2
 				var hv13 *hyruleImport2.Go = hv3
@@ -91,7 +91,7 @@ func hyruleinstructionReceivesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv9 := hs1
 				_ = hv9
-				// Rule Select (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:35).
+				// Rule Select (internal/analysis/analyzers/concurrency/producerlifecycle/rules/receive.rules:34).
 				var hv22 *hyruleImport2.Select = hv9
 				var hv23 hyruleImport2.Value = hv2
 				hv10 := selectedReceives(hv22, hv23)

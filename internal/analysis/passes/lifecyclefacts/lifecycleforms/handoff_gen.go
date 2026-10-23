@@ -14,7 +14,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			if hs1 != nil {
 				hv2 := hs1
 				_ = hv2
-				// Rule Return (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:30).
+				// Rule Return (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:31).
 				var hv8 HandoffUse = HandoffUse{Kind: HandoffReturn, Return: hv2}
 				hresult := struct{ V0 HandoffUse }{V0: hv8}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
@@ -27,7 +27,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Box (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:35).
+				// Rule Box (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:36).
 				var hv9 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv3}
 				hresult := struct{ V0 HandoffUse }{V0: hv9}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
@@ -40,7 +40,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Interface (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:38).
+				// Rule Interface (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:39).
 				var hv10 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv4}
 				hresult := struct{ V0 HandoffUse }{V0: hv10}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
@@ -53,7 +53,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			if hs1 != nil {
 				hv5 := hs1
 				_ = hv5
-				// Rule Phi (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:41).
+				// Rule Phi (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:42).
 				var hv11 HandoffUse = HandoffUse{Kind: HandoffFollow, Alias: hv5}
 				hresult := struct{ V0 HandoffUse }{V0: hv11}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
@@ -67,7 +67,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 				hv6 := hs1.Op
 				_ = hv6
 				if hv6 == equalToken {
-					// Rule Comparison (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:44).
+					// Rule Comparison (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:45).
 					hresult := struct{ V0 HandoffUse }{V0: HandoffUse{Kind: HandoffIgnore}}
 					if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
 						var zero struct{ V0 HandoffUse }
@@ -76,7 +76,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 					return hresult, true
 				}
 				if hv6 == notEqualToken {
-					// Rule Comparison (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:44).
+					// Rule Comparison (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:45).
 					hresult := struct{ V0 HandoffUse }{V0: HandoffUse{Kind: HandoffIgnore}}
 					if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
 						var zero struct{ V0 HandoffUse }
@@ -89,7 +89,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			if hs1 != nil {
 				hv7 := hs1
 				_ = hv7
-				// Rule Call (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:49).
+				// Rule Call (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:50).
 				var hv12 HandoffUse = HandoffUse{Kind: HandoffCall, Call: hv7}
 				hresult := struct{ V0 HandoffUse }{V0: hv12}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
@@ -100,7 +100,7 @@ func hyruleHandoffRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (struc
 			}
 		case *hyruleImport0.DebugRef:
 			if hv1 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Debug (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:52).
+				// Rule Debug (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/handoff.rules:53).
 				hresult := struct{ V0 HandoffUse }{V0: HandoffUse{Kind: HandoffIgnore}}
 				if !hyrulehyruleHandoffRecognizeRecord8Valid(hresult) {
 					var zero struct{ V0 HandoffUse }

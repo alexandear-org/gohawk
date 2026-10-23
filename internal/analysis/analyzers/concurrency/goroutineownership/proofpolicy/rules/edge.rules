@@ -1,5 +1,3 @@
-signature total = outputs ^edgeNone
-
 host
   selected! = EdgeQueries.Selected
   drain! = EdgeQueries.Drain
@@ -16,18 +14,21 @@ type DrainEvidence = (ssapath.ObligationAction, bool)
   Drained (action: 0) = true
   Unproven = false
 
-@Edge
-rewrite (inputs queries) =
-  case selected queries of
-    true -> outputs ^edgeExact
-    false -> decline
-  <|> case drain queries of
-    Drained (action: action) -> outputs action
-    Unproven() -> decline
-  <|> case possible queries of
-    true -> outputs ^edgeUnknown
-    false -> decline
-  <|> case ownership queries of
-    true -> outputs ^edgeUnknown
-    false -> decline
-  <|> outputs ^edgeNone
+total fn rewrite
+  fallback outputs ^edgeNone
+  match inputs
+    @Edge
+    inputs queries ->
+      case selected queries of
+        true -> outputs ^edgeExact
+        false -> decline
+      <|> case drain queries of
+        Drained (action: action) -> outputs action
+        Unproven() -> decline
+      <|> case possible queries of
+        true -> outputs ^edgeUnknown
+        false -> decline
+      <|> case ownership queries of
+        true -> outputs ^edgeUnknown
+        false -> decline
+      <|> outputs ^edgeNone

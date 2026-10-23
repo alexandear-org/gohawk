@@ -1,18 +1,20 @@
-signature total = outputs ^Reject
-
 host
   Reject
   Returned
   RunDefers
   Follow
 
-@Return
-rewrite (inputs Return()) = outputs ^Returned
-
-@Deferred
-rewrite (inputs Defers()) = outputs ^RunDefers
-
-// Conditional terminal sends may jump to a shared return block. A jump performs
-// no work; the host must still find a successor and prove its remaining suffix.
-@Successor
-rewrite (inputs Jump()) = outputs ^Follow
+total fn rewrite
+  fallback outputs ^Reject
+  match inputs
+    @Return
+    inputs Return() ->
+      outputs ^Returned
+    @Deferred
+    inputs Defers() ->
+      outputs ^RunDefers
+    // Conditional terminal sends may jump to a shared return block. A jump performs
+    // no work; the host must still find a successor and prove its remaining suffix.
+    @Successor
+    inputs Jump() ->
+      outputs ^Follow

@@ -1,25 +1,26 @@
-signature total = outputs (Opaque ^reasonLabelOwnerUnavailable)
-
 host
   guarded! = cancellationClassifier.resultGuardedReturn
   returned! instruction = returnsCancel instruction classifier.cancel
   owner! = cancellationClassifier.ownerReturnLabel
   possibleOwner! instruction = lifecycle.ReturnedValueOwnsValue instruction classifier.cancel
 
-@Return
-rewrite (inputs instruction classifier) =
-  case guarded classifier instruction of
-    Decided (label: label) -> case returned instruction of
-      false -> outputs label
-      true -> outputs (Transfer ^reasonLabelReturned)
-    Unrecognized() -> case returned instruction of
-      true -> outputs (Transfer ^reasonLabelReturned)
-      false -> do
-        label <- owner classifier instruction
-        case label of
-          Release() -> outputs label
-          Transfer() -> outputs label
-          Opaque() -> outputs label
-          NoAction() -> case possibleOwner instruction of
-            true -> outputs (Opaque ^reasonLabelReturned)
-            false -> outputs (NoAction ^reasonCancellationNone)
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelOwnerUnavailable)
+  match inputs
+    @Return
+    inputs instruction classifier ->
+      case guarded classifier instruction of
+        Decided (label: label) -> case returned instruction of
+          false -> outputs label
+          true -> outputs (Transfer ^reasonLabelReturned)
+        Unrecognized() -> case returned instruction of
+          true -> outputs (Transfer ^reasonLabelReturned)
+          false -> do
+            label <- owner classifier instruction
+            case label of
+              Release() -> outputs label
+              Transfer() -> outputs label
+              Opaque() -> outputs label
+              NoAction() -> case possibleOwner instruction of
+                true -> outputs (Opaque ^reasonLabelReturned)
+                false -> outputs (NoAction ^reasonCancellationNone)

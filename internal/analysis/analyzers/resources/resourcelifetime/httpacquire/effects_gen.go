@@ -21,7 +21,7 @@ func hyruledecideEffectsRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Effects (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/effects.rules:10).
+		// Rule Effects (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/effects.rules:11).
 		var hv8 *Effects = hv1
 		var hv9 *hyruleImport0.Function = hv2
 		var hv10 *hyruleImport1.SearchBudget = hv4

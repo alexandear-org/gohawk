@@ -1,5 +1,3 @@
-signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
-
 host
   returnedCallback! = cancellationClassifier.returnedCallbackCancels
   testingCleanup! common = testingCleanupCall common classifier.cancel
@@ -7,21 +5,24 @@ host
   exactArgument! = cancellationClassifier.exactCallArgument
   captured! common = capturedCancellationArgument common classifier.cancel
 
-@Call
-rewrite (inputs instruction classifier common) =
-  case returnedCallback classifier instruction common of
-    true -> outputs (Release ^reasonLabelReturnedCallback) true
-    false -> decline
-  <|> case testingCleanup common of
-    true -> outputs (Transfer ^reasonLabelTestingCleanup) true
-    false -> decline
-  <|> case registered instruction common of
-    true -> outputs (Opaque ^reasonLabelRegisteredCallback) true
-    false -> decline
-  <|> case exactArgument classifier instruction common of
-    Decided (label: label) -> outputs label true
-    Unrecognized() -> decline
-  <|> case captured common of
-    true -> outputs (Opaque ^reasonLabelCapturedByCallback) true
-    false -> decline
-  <|> outputs (NoAction ^reasonCancellationNone) false
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelHelperUndecided) true
+  match inputs
+    @Call
+    inputs instruction classifier common ->
+      case returnedCallback classifier instruction common of
+        true -> outputs (Release ^reasonLabelReturnedCallback) true
+        false -> decline
+      <|> case testingCleanup common of
+        true -> outputs (Transfer ^reasonLabelTestingCleanup) true
+        false -> decline
+      <|> case registered instruction common of
+        true -> outputs (Opaque ^reasonLabelRegisteredCallback) true
+        false -> decline
+      <|> case exactArgument classifier instruction common of
+        Decided (label: label) -> outputs label true
+        Unrecognized() -> decline
+      <|> case captured common of
+        true -> outputs (Opaque ^reasonLabelCapturedByCallback) true
+        false -> decline
+      <|> outputs (NoAction ^reasonCancellationNone) false

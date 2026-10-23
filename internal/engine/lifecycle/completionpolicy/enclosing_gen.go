@@ -20,7 +20,7 @@ func hyruleRecognizeEnclosingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 					hv4 := hs2
 					_ = hv4
 					if hv3 == bindingLoadToken {
-						// Rule Field (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:10).
+						// Rule Field (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:11).
 						var hv11 EnclosingStep = EnclosingStep{Kind: EnclosingField, Field: hv4}
 						hresult := struct{ V0 EnclosingStep }{V0: hv11}
 						if !hyrulehyruleRecognizeEnclosingRecognizeRecord11Valid(hresult) {
@@ -55,7 +55,7 @@ func hyruleRecognizeEnclosingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 				hv10 := hs1.Op
 				_ = hv10
 				if hv10 == bindingLoadToken {
-					// Rule OtherLoad (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:20).
+					// Rule OtherLoad (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:19).
 					hresult := struct{ V0 EnclosingStep }{V0: EnclosingStep{Kind: EnclosingOpaque}}
 					if !hyrulehyruleRecognizeEnclosingRecognizeRecord11Valid(hresult) {
 						var zero struct{ V0 EnclosingStep }
@@ -66,7 +66,7 @@ func hyruleRecognizeEnclosingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 			}
 		case *hyruleImport0.Parameter, *hyruleImport0.FreeVar, *hyruleImport0.Phi:
 			if hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) && hv1 != (*hyruleImport0.Phi)(nil) {
-				// Rule Ambiguous (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:23).
+				// Rule Ambiguous (internal/engine/lifecycle/completionpolicy/rules/enclosing.rules:22).
 				hresult := struct{ V0 EnclosingStep }{V0: EnclosingStep{Kind: EnclosingOpaque}}
 				if !hyrulehyruleRecognizeEnclosingRecognizeRecord11Valid(hresult) {
 					var zero struct{ V0 EnclosingStep }

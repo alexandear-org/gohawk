@@ -1,31 +1,32 @@
-signature total = outputs (Answer (proof: emptyEvidence(), decided: false))
-
-// A cleanup method is matched by its discharge path. Ordinary masks exclude
-// that method mask and keep identity/containment matching. A possible alias is
-// uncertainty, never completion or evidence of missing cleanup.
-@Mask
-rewrite (inputs evidence request fact) =
-  do
-    mask <- selectedEvidenceMask request fact
-    method <- requestedMethod request
-    observer <- observer evidence.probe
-    false <- directDischargeEvidence fact request method observer
-      else
-        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
-    ordinary <- ordinaryEvidenceMask fact mask method
-    false <- factOwnsArgument request.Instruction request.Target ordinary observer
-      else
-        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
-    false <- factOwnsImmutableCapturedArgument request.Instruction request.Target mask observer
-      else
-        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryCapturedArgument method, decided: true))
-    false <- projectedArgumentEvidence request mask observer
-      else
-        true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryProjectedArgument method, decided: true))
-    false <- conditional evidence request fact
-      else
-        true -> outputs (Answer (proof: importedProof ^reasonArgumentCase method, decided: true))
-    false <- possibleArgumentEvidence request mask
-      else
-        true -> outputs (Answer (proof: unavailableEvidence(), decided: true))
-    outputs (Answer (proof: emptyEvidence(), decided: false))
+total fn rewrite
+  fallback outputs (Answer (proof: emptyEvidence(), decided: false))
+  match inputs
+    // A cleanup method is matched by its discharge path. Ordinary masks exclude
+    // that method mask and keep identity/containment matching. A possible alias is
+    // uncertainty, never completion or evidence of missing cleanup.
+    @Mask
+    inputs evidence request fact ->
+      do
+        mask <- selectedEvidenceMask request fact
+        method <- requestedMethod request
+        observer <- observer evidence.probe
+        false <- directDischargeEvidence fact request method observer
+          else
+            true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
+        ordinary <- ordinaryEvidenceMask fact mask method
+        false <- factOwnsArgument request.Instruction request.Target ordinary observer
+          else
+            true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummary method, decided: true))
+        false <- factOwnsImmutableCapturedArgument request.Instruction request.Target mask observer
+          else
+            true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryCapturedArgument method, decided: true))
+        false <- projectedArgumentEvidence request mask observer
+          else
+            true -> outputs (Answer (proof: importedProof ^reasonLifecycleSummaryProjectedArgument method, decided: true))
+        false <- conditional evidence request fact
+          else
+            true -> outputs (Answer (proof: importedProof ^reasonArgumentCase method, decided: true))
+        false <- possibleArgumentEvidence request mask
+          else
+            true -> outputs (Answer (proof: unavailableEvidence(), decided: true))
+        outputs (Answer (proof: emptyEvidence(), decided: false))

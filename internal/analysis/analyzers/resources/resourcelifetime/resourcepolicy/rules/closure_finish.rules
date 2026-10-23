@@ -1,5 +1,3 @@
-signature total = outputs ^None false
-
 host
   unreadable! = ClosureQueries.Unreadable
   retains! = ClosureQueries.Retains
@@ -7,20 +5,23 @@ host
   CapturedByLiteralCallingUnreadableCallee
   CapturedByRetainingLiteral
 
-// Cleanup in a started literal cannot be ordered against this function's return.
-@Started
-rewrite (inputs _ Go() _) = outputs ^CapturedByStartedLiteral true
-
-// A called or deferred literal runs in this frame. Cleanup was already queried;
-// retention now decides whether the obligation moved. A capture is a cell loaded
-// by the body, so exact-argument summaries can miss its cleanup through an
-// imported helper. Unreadable-body evidence must precede a retention verdict.
-// https://github.com/block/spirit/blob/c554eae/pkg/checksum/single.go#L493-L503
-@Local
-rewrite (inputs queries _ closure) =
-  do
-    false <- unreadable queries closure
-      else
-        true -> outputs ^CapturedByLiteralCallingUnreadableCallee true
-    retains <- retains queries closure
-    outputs ^CapturedByRetainingLiteral retains
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    // Cleanup in a started literal cannot be ordered against this function's return.
+    @Started
+    inputs _ Go() _ ->
+      outputs ^CapturedByStartedLiteral true
+    // A called or deferred literal runs in this frame. Cleanup was already queried;
+    // retention now decides whether the obligation moved. A capture is a cell loaded
+    // by the body, so exact-argument summaries can miss its cleanup through an
+    // imported helper. Unreadable-body evidence must precede a retention verdict.
+    // https://github.com/block/spirit/blob/c554eae/pkg/checksum/single.go#L493-L503
+    @Local
+    inputs queries _ closure ->
+      do
+        false <- unreadable queries closure
+          else
+            true -> outputs ^CapturedByLiteralCallingUnreadableCallee true
+        retains <- retains queries closure
+        outputs ^CapturedByRetainingLiteral retains

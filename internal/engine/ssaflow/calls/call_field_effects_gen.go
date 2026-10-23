@@ -21,7 +21,7 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 		switch hs1 := hv2.(type) {
 		case *hyruleImport0.DebugRef:
 			if hv2 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Debug (internal/engine/ssaflow/calls/rules/call_field_effects.rules:22).
+				// Rule Debug (internal/engine/ssaflow/calls/rules/call_field_effects.rules:23).
 				return struct {
 					V0 CallEffect
 					V1 *hyruleImport0.FieldAddr
@@ -33,14 +33,14 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 				_ = hv3
 				{
 					if selectedEffectField(hv1, hv3) {
-						// Rule SelectedField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:27).
+						// Rule SelectedField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:28).
 						return struct {
 							V0 CallEffect
 							V1 *hyruleImport0.FieldAddr
 						}{V0: 0, V1: hv3}, true
 					}
 				}
-				// Rule OtherField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:33).
+				// Rule OtherField (internal/engine/ssaflow/calls/rules/call_field_effects.rules:32).
 				return struct {
 					V0 CallEffect
 					V1 *hyruleImport0.FieldAddr
@@ -51,7 +51,7 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 				hv4 := hs1.Op
 				_ = hv4
 				if hv4 == useLoadToken {
-					// Rule Read (internal/engine/ssaflow/calls/rules/call_field_effects.rules:36).
+					// Rule Read (internal/engine/ssaflow/calls/rules/call_field_effects.rules:35).
 					return struct {
 						V0 CallEffect
 						V1 *hyruleImport0.FieldAddr
@@ -67,7 +67,7 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 					_ = hv6
 					{
 						if sameEffectValue(hv5, hv6) {
-							// Rule Written (internal/engine/ssaflow/calls/rules/call_field_effects.rules:41).
+							// Rule Written (internal/engine/ssaflow/calls/rules/call_field_effects.rules:40).
 							return struct {
 								V0 CallEffect
 								V1 *hyruleImport0.FieldAddr
@@ -75,7 +75,7 @@ func hyruleclassifyFieldUseRecognize(harg0 struct {
 						}
 					}
 				}
-				// Rule Published (internal/engine/ssaflow/calls/rules/call_field_effects.rules:47).
+				// Rule Published (internal/engine/ssaflow/calls/rules/call_field_effects.rules:44).
 				return struct {
 					V0 CallEffect
 					V1 *hyruleImport0.FieldAddr

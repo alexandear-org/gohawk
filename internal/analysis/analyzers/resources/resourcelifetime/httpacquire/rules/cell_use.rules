@@ -1,31 +1,29 @@
-signature total = outputs false false
-
 host
   sameValue
   stored! = onlyStoredIntoWithin
   direct! = onlyHTTPDoUsesWithin
   closure! = closureLoadsCellForDoWithin
 
-@Debug
-rewrite (inputs Debug() _ stored _) = outputs true stored
-
-// Exactly one store of one unmodified fresh allocation establishes zero state.
-@Store
-rewrite (inputs store@(Store (address: address, value: fresh@(Allocation()))) cell false budget)
-  | sameValue address cell
-  =
-  case stored fresh store budget of
-    true -> outputs true true
-    false -> outputs false false
-
-@Load
-rewrite (inputs load@(Unary (op: ^loadToken)) _ stored budget) =
-  case direct load budget of
-    true -> outputs true stored
-    false -> outputs false false
-
-@Captured
-rewrite (inputs closure@(Closure()) cell stored budget) =
-  case closure closure cell budget of
-    true -> outputs true stored
-    false -> outputs false false
+total fn rewrite
+  fallback outputs false false
+  match inputs
+    @Debug
+    inputs Debug() _ stored _ ->
+      outputs true stored
+    // Exactly one store of one unmodified fresh allocation establishes zero state.
+    @Store
+    inputs store@(Store (address: address, value: fresh@(Allocation()))) cell false budget
+      when sameValue address cell ->
+      case stored fresh store budget of
+        true -> outputs true true
+        false -> outputs false false
+    @Load
+    inputs load@(Unary (op: ^loadToken)) _ stored budget ->
+      case direct load budget of
+        true -> outputs true stored
+        false -> outputs false false
+    @Captured
+    inputs closure@(Closure()) cell stored budget ->
+      case closure closure cell budget of
+        true -> outputs true stored
+        false -> outputs false false

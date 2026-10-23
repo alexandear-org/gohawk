@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   hasReferrers
   serverClientCall
@@ -7,25 +5,23 @@ host
   loads! = urlFieldLoads
   client! = onlyClientGetUsesWithin
 
-// URL is field zero. Config/Listener access cannot retain endpoint identity.
-@URL
-rewrite (inputs field@(FieldAddress (field: 0)) budget)
-  | hasReferrers field
-  =
-  case loads field budget of
-    true -> outputs true
-    false -> outputs false
-
-@Client
-rewrite (inputs client@(Call()) budget)
-  | serverClientCall client
-  =
-  case client client budget of
-    true -> outputs true
-    false -> outputs false
-
-@Close
-rewrite (inputs instruction _)
-  | serverClose instruction
-  =
-  outputs true
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // URL is field zero. Config/Listener access cannot retain endpoint identity.
+    @URL
+    inputs field@(FieldAddress (field: 0)) budget
+      when hasReferrers field ->
+      case loads field budget of
+        true -> outputs true
+        false -> outputs false
+    @Client
+    inputs client@(Call()) budget
+      when serverClientCall client ->
+      case client client budget of
+        true -> outputs true
+        false -> outputs false
+    @Close
+    inputs instruction _
+      when serverClose instruction ->
+      outputs true

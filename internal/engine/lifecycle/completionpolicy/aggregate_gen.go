@@ -15,7 +15,7 @@ func hyruleRecognizeAggregateRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Alloc:
 			if hv1 != (*hyruleImport0.Alloc)(nil) {
-				// Rule Root (internal/engine/lifecycle/completionpolicy/rules/aggregate.rules:9).
+				// Rule Root (internal/engine/lifecycle/completionpolicy/rules/aggregate.rules:10).
 				return struct {
 					V0 AggregateKind
 					V1 hyruleImport0.Value
@@ -34,7 +34,7 @@ func hyruleRecognizeAggregateRecognize(harg0 struct{ P0 hyruleImport0.Value }) (
 				if hv3 == nil {
 					if hv4 == nil {
 						if hv5 == nil {
-							// Rule WholeSlice (internal/engine/lifecycle/completionpolicy/rules/aggregate.rules:14).
+							// Rule WholeSlice (internal/engine/lifecycle/completionpolicy/rules/aggregate.rules:15).
 							return struct {
 								V0 AggregateKind
 								V1 hyruleImport0.Value

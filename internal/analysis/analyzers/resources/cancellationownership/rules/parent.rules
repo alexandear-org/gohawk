@@ -1,5 +1,3 @@
-signature total = outputs nil
-
 view Result = *ssa.Extract
   tuple: Tuple
   index: Index
@@ -20,10 +18,12 @@ type Cancel = (ssa.Value, bool)
   Available (value: 0) = true
   Missing = false
 
-@Parent
-rewrite (inputs (Result (tuple: constructor@(Constructor()), index: 0)) child observer)
-  | sameParentFrame constructor child
-  =
-  case parentCancelResult constructor of
-    Available (value: cancel) -> outputs (newParentClassifier cancel observer)
-    Missing() -> outputs nil
+total fn rewrite
+  fallback outputs nil
+  match inputs
+    @Parent
+    inputs (Result (tuple: constructor@(Constructor()), index: 0)) child observer
+      when sameParentFrame constructor child ->
+      case parentCancelResult constructor of
+        Available (value: cancel) -> outputs (newParentClassifier cancel observer)
+        Missing() -> outputs nil

@@ -25,7 +25,7 @@ func hyruledecideExtractRecognize(harg0 struct {
 				if hs2 != nil {
 					hv5 := hs2
 					_ = hv5
-					// Rule Iterated (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:7).
+					// Rule Iterated (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:8).
 					var hv9 hyruleImport0.Instruction = hv5
 					hv6 := cycle(hv9)
 					_ = hv6
@@ -56,11 +56,11 @@ func hyruledecideExtractRecognize(harg0 struct {
 						}
 						return hv12, true
 					}
-					// Rule Metadata (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:23).
+					// Rule Metadata (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:21).
 					return struct{ V0 bool }{V0: false}, true
 				}
 			}
-			// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:26).
+			// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockvariant/rules/extract.rules:24).
 			var hv13 hyruleImport1.ReachingWalk = hv1
 			var hv14 hyruleImport0.Value = hv3
 			hv8 := Value(hv13, hv14)

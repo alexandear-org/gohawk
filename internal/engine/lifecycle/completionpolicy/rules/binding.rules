@@ -1,5 +1,3 @@
-signature total = outputs Opaque()
-
 type Step = BindingStep
   tag Kind
   Opaque = BindingOpaque
@@ -9,20 +7,22 @@ type Step = BindingStep
   Load (source: Source) = BindingLoad
   Cell (source: Source) = BindingCell
 
-@Exact
-rewrite (inputs (Function() | Closure())) = outputs Exact()
-
-@Field
-rewrite (inputs (Unary (source: field@(FieldAddress()), op: ^bindingLoadToken))) =
-  outputs (Field (field: field))
-
-@Element
-rewrite (inputs (Unary (source: element@(IndexAddress()), op: ^bindingLoadToken))) =
-  outputs (Element (element: element))
-
-@Load
-rewrite (inputs (Unary (source: source, op: ^bindingLoadToken))) = outputs (Load (source: source))
-
-// Stable content is requested at the original observation point by Go.
-@Cell
-rewrite (inputs cell@(Allocation())) = outputs (Cell (source: cell))
+total fn rewrite
+  fallback outputs Opaque()
+  match inputs
+    @Exact
+    inputs (Function() | Closure()) ->
+      outputs Exact()
+    @Field
+    inputs (Unary (source: field@(FieldAddress()), op: ^bindingLoadToken)) ->
+      outputs (Field (field: field))
+    @Element
+    inputs (Unary (source: element@(IndexAddress()), op: ^bindingLoadToken)) ->
+      outputs (Element (element: element))
+    @Load
+    inputs (Unary (source: source, op: ^bindingLoadToken)) ->
+      outputs (Load (source: source))
+    // Stable content is requested at the original observation point by Go.
+    @Cell
+    inputs cell@(Allocation()) ->
+      outputs (Cell (source: cell))

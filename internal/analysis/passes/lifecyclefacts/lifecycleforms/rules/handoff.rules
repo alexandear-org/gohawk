@@ -1,5 +1,3 @@
-signature total = outputs Reject()
-
 type Use = HandoffUse
   tag Kind
   Reject = HandoffReject
@@ -27,27 +25,31 @@ host
   equalToken
   notEqualToken
 
-@Return
-rewrite (inputs returned@(ReturnValue())) = outputs (Return (returned: returned))
-
-// These are the transparent forms shared by fresh and retained results.
-// The host keeps visited state, wrapper depth and result-position agreement.
-@Box
-rewrite (inputs alias@(Box())) = outputs (Follow (alias: alias))
-
-@Interface
-rewrite (inputs alias@(Interface())) = outputs (Follow (alias: alias))
-
-@Phi
-rewrite (inputs alias@(Phi())) = outputs (Follow (alias: alias))
-
-@Comparison
-rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken)))) = outputs Ignore()
-
-// A call is only a request: fresh results require cleanup evidence; retained
-// results require an exact wrapper contract and remain within their depth bound.
-@Call
-rewrite (inputs call@(CallValue())) = outputs (Call (call: call))
-
-@Debug
-rewrite (inputs Debug()) = outputs Ignore()
+total fn rewrite
+  fallback outputs Reject()
+  match inputs
+    @Return
+    inputs returned@(ReturnValue()) ->
+      outputs (Return (returned: returned))
+    // These are the transparent forms shared by fresh and retained results.
+    // The host keeps visited state, wrapper depth and result-position agreement.
+    @Box
+    inputs alias@(Box()) ->
+      outputs (Follow (alias: alias))
+    @Interface
+    inputs alias@(Interface()) ->
+      outputs (Follow (alias: alias))
+    @Phi
+    inputs alias@(Phi()) ->
+      outputs (Follow (alias: alias))
+    @Comparison
+    inputs (Binary (op: (^equalToken | ^notEqualToken))) ->
+      outputs Ignore()
+    // A call is only a request: fresh results require cleanup evidence; retained
+    // results require an exact wrapper contract and remain within their depth bound.
+    @Call
+    inputs call@(CallValue()) ->
+      outputs (Call (call: call))
+    @Debug
+    inputs Debug() ->
+      outputs Ignore()

@@ -1,5 +1,3 @@
-signature total = outputs nil false
-
 host
   typedCleanup! = resourceResultCleanup
   responseBody! = responseBodyAcquired
@@ -19,17 +17,20 @@ type Ownership = (cleanupMethods, int, bool)
   Owned (methods: 0, result: 1) = true
   Unowned = false
 
-@Acquisition
-rewrite (inputs evidence call target) =
-  case typedCleanup call target of
-    Known (methods: methods) -> outputs methods true
-    Unrecognized() -> decline
-  <|> case responseBody call target of
-    true -> outputs ["Close"] true
-    false -> decline
-  <|> case owned evidence call of
-    Owned (methods: methods, result: result) -> case ownedMatches result of
-      true -> outputs methods true
-      false -> outputs nil false
-    Unowned() -> decline
-  <|> outputs nil false
+total fn rewrite
+  fallback outputs nil false
+  match inputs
+    @Acquisition
+    inputs evidence call target ->
+      case typedCleanup call target of
+        Known (methods: methods) -> outputs methods true
+        Unrecognized() -> decline
+      <|> case responseBody call target of
+        true -> outputs ["Close"] true
+        false -> decline
+      <|> case owned evidence call of
+        Owned (methods: methods, result: result) -> case ownedMatches result of
+          true -> outputs methods true
+          false -> outputs nil false
+        Unowned() -> decline
+      <|> outputs nil false

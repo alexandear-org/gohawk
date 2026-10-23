@@ -21,7 +21,7 @@ func hyruledecideProcessRemainderRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Remaining (internal/analysis/analyzers/resources/processownership/rules/action_remainder.rules:10).
+		// Rule Remaining (internal/analysis/analyzers/resources/processownership/rules/action_remainder.rules:11).
 		var hv6 struct{ V0 hyruleImport0.EvidenceState }
 		if storesProcessHandleInExternalField(hv2, hv3) {
 			hv6 = struct{ V0 hyruleImport0.EvidenceState }{V0: decisionProven}

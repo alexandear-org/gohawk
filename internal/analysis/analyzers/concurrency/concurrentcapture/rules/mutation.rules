@@ -1,5 +1,3 @@
-signature total = outputs (Mutation (state: ^mutationUnknown, reason: ^reasonNone))
-
 view Guard = lockGuardProof
   known
   guarded
@@ -20,22 +18,23 @@ host
   reasonChannelGuardUnknown
   reasonUnguardedWrite
 
-// A held lock is possible serialization, not proof that every worker uses the
-// same lock. Unknown effects retain the older syntax fallback.
-@Held
-rewrite (inputs _ _ _ _ _ (Guard (known: true, guarded: true, reason: reason))) =
-  outputs (Mutation (state: ^mutationUnknown, reason: reason))
-
-@LockFallback
-rewrite (inputs _ _ _ _ true (Guard (known: false))) =
-  outputs (Mutation (state: ^mutationUnknown, reason: ^reasonLockFallbackUnknown))
-
-@SyntaxGuards
-rewrite (inputs pass closure mutation varying _ _) =
-  case worker pass closure mutation varying of
-    true -> outputs (Mutation (state: ^mutationUnknown, reason: ^reasonWorkerGuardUnknown))
-    false -> decline
-  <|> case channel pass closure mutation of
-    true -> outputs (Mutation (state: ^mutationUnknown, reason: ^reasonChannelGuardUnknown))
-    false -> decline
-  <|> outputs (Mutation (state: ^mutationProven, reason: ^reasonUnguardedWrite))
+total fn rewrite
+  fallback outputs (Mutation (state: ^mutationUnknown, reason: ^reasonNone))
+  match inputs
+    // A held lock is possible serialization, not proof that every worker uses the
+    // same lock. Unknown effects retain the older syntax fallback.
+    @Held
+    inputs _ _ _ _ _ (Guard (known: true, guarded: true, reason: reason)) ->
+      outputs (Mutation (state: ^mutationUnknown, reason: reason))
+    @LockFallback
+    inputs _ _ _ _ true (Guard (known: false)) ->
+      outputs (Mutation (state: ^mutationUnknown, reason: ^reasonLockFallbackUnknown))
+    @SyntaxGuards
+    inputs pass closure mutation varying _ _ ->
+      case worker pass closure mutation varying of
+        true -> outputs (Mutation (state: ^mutationUnknown, reason: ^reasonWorkerGuardUnknown))
+        false -> decline
+      <|> case channel pass closure mutation of
+        true -> outputs (Mutation (state: ^mutationUnknown, reason: ^reasonChannelGuardUnknown))
+        false -> decline
+      <|> outputs (Mutation (state: ^mutationProven, reason: ^reasonUnguardedWrite))

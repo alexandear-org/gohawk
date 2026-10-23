@@ -1,5 +1,3 @@
-signature total = outputs ^ReportingEmitted
-
 host
   categoryIncluded!
   Suppressed!
@@ -18,22 +16,25 @@ view Diagnostic = analysis.Diagnostic
   category: Category
   position: Pos
 
-@Admission
-rewrite (inputs pass (Diagnostic (category: category, position: position)) analyzer declared withdrawn disabled) =
-  do
-    false <- categoryIncluded withdrawn category
-      else
-        true -> outputs ^ReportingDelisted
-    true <- categoryIncluded declared category
-      else
-        false -> outputs ^ReportingUnknownCheck
-    false <- categoryIncluded disabled category
-      else
-        true -> outputs ^ReportingNotSelected
-    false <- Suppressed pass position analyzer
-      else
-        true -> outputs ^ReportingSuppressed
-    false <- TestFilePosition pass position
-      else
-        true -> outputs ^ReportingTestFileSkipped
-    outputs ^ReportingEmitted
+total fn rewrite
+  fallback outputs ^ReportingEmitted
+  match inputs
+    @Admission
+    inputs pass (Diagnostic (category: category, position: position)) analyzer declared withdrawn disabled ->
+      do
+        false <- categoryIncluded withdrawn category
+          else
+            true -> outputs ^ReportingDelisted
+        true <- categoryIncluded declared category
+          else
+            false -> outputs ^ReportingUnknownCheck
+        false <- categoryIncluded disabled category
+          else
+            true -> outputs ^ReportingNotSelected
+        false <- Suppressed pass position analyzer
+          else
+            true -> outputs ^ReportingSuppressed
+        false <- TestFilePosition pass position
+          else
+            true -> outputs ^ReportingTestFileSkipped
+        outputs ^ReportingEmitted

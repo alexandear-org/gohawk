@@ -1,5 +1,3 @@
-signature total = outputs (unknownIdentity nil)
-
 type Path = AccessPath
   value: Value
   root: Root
@@ -23,41 +21,44 @@ host
   identityNotFound
   identityLocalSSA
 
-// Missing operands cannot establish identity, even when both are missing.
-@MissingLeft
-rewrite (inputs (Path (value: nil)) _ budget) = outputs (unknownIdentity budget)
-
-@MissingRight
-rewrite (inputs _ (Path (value: nil)) budget) = outputs (unknownIdentity budget)
-
-// Roots are already equivalent by the caller's contract. Direct identity wins
-// before requiring a nameable path, so an identical dynamic index still proves
-// identity. Each failed search retains its allowance and stops at cutoff.
-@Identity
-rewrite (inputs left right budget) =
-  case structural left.Value right.Value budget of
-    true -> outputs (identityEvidence ^identityProven ^identitySameValue ^identityLocalSSA)
-    false -> decline
-  <|> do
-    false <- exhausted budget
-      else
-        true -> outputs (unknownIdentity budget)
-    KnownPath (steps: leftPath) <- path left.Value left.Root budget
-      else
-        UnknownPath() -> outputs (unknownIdentity budget)
-    false <- exhausted budget
-      else
-        true -> outputs (unknownIdentity budget)
-    KnownPath (steps: rightPath) <- path right.Value right.Root budget
-      else
-        UnknownPath() -> outputs (unknownIdentity budget)
-    false <- exhausted budget
-      else
-        true -> outputs (unknownIdentity budget)
-    true <- same leftPath rightPath budget
-      else
-        false -> case exhausted budget of
-          true -> outputs (unknownIdentity budget)
-          false -> outputs (identityEvidence ^identityDisproven ^identityNotFound ^identityLocalSSA)
-    outputs (identityEvidence ^identityProven ^identitySamePath ^identityLocalSSA)
-  <|> outputs (unknownIdentity budget)
+total fn rewrite
+  fallback outputs (unknownIdentity nil)
+  match inputs
+    // Missing operands cannot establish identity, even when both are missing.
+    @MissingLeft
+    inputs (Path (value: nil)) _ budget ->
+      outputs (unknownIdentity budget)
+    @MissingRight
+    inputs _ (Path (value: nil)) budget ->
+      outputs (unknownIdentity budget)
+    // Roots are already equivalent by the caller's contract. Direct identity wins
+    // before requiring a nameable path, so an identical dynamic index still proves
+    // identity. Each failed search retains its allowance and stops at cutoff.
+    @Identity
+    inputs left right budget ->
+      case structural left.Value right.Value budget of
+        true -> outputs (identityEvidence ^identityProven ^identitySameValue ^identityLocalSSA)
+        false -> decline
+      <|> do
+        false <- exhausted budget
+          else
+            true -> outputs (unknownIdentity budget)
+        KnownPath (steps: leftPath) <- path left.Value left.Root budget
+          else
+            UnknownPath() -> outputs (unknownIdentity budget)
+        false <- exhausted budget
+          else
+            true -> outputs (unknownIdentity budget)
+        KnownPath (steps: rightPath) <- path right.Value right.Root budget
+          else
+            UnknownPath() -> outputs (unknownIdentity budget)
+        false <- exhausted budget
+          else
+            true -> outputs (unknownIdentity budget)
+        true <- same leftPath rightPath budget
+          else
+            false -> case exhausted budget of
+              true -> outputs (unknownIdentity budget)
+              false -> outputs (identityEvidence ^identityDisproven ^identityNotFound ^identityLocalSSA)
+        outputs (identityEvidence ^identityProven ^identitySamePath ^identityLocalSSA)
+      <|> outputs (unknownIdentity budget)

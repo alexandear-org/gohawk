@@ -24,7 +24,7 @@ func hyruledecideWriterUseRecognize(harg0 struct {
 		switch hs1 := hv2.(type) {
 		case *hyruleImport0.ChangeInterface:
 			if hv2 != (*hyruleImport0.ChangeInterface)(nil) {
-				// Rule InterfaceChange (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:11).
+				// Rule InterfaceChange (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:12).
 				return struct{ V0 bool }{V0: true}, true
 			}
 		case *hyruleImport0.Call:
@@ -35,13 +35,13 @@ func hyruledecideWriterUseRecognize(harg0 struct {
 				_ = hv6
 				{
 					if cookieCall(hv6) {
-						// Rule Cookie (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:14).
+						// Rule Cookie (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:15).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 				{
 					if writerHeaderCall(hv6) {
-						// Rule Header (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:20).
+						// Rule Header (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:19).
 						var hv9 *hyruleImport0.Call = hv6
 						var hv10 *hyruleImport1.SearchBudget = hv4
 						hv7 := benignHTTPHeaders(hv9, hv10)
@@ -58,11 +58,11 @@ func hyruledecideWriterUseRecognize(harg0 struct {
 				}
 				{
 					if writerStatusCall(hv6) {
-						// Rule Status (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:30).
+						// Rule Status (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:27).
 						return struct{ V0 bool }{V0: writerStatus(hv6)}, true
 					}
 				}
-				// Rule Helper (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:36).
+				// Rule Helper (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/writer_use.rules:31).
 				var hv12 *Effects = hv1
 				var hv13 *hyruleImport0.Call = hv6
 				var hv14 hyruleImport0.Value = hv3

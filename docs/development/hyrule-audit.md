@@ -383,7 +383,7 @@ without further migration.
 | Effect collection and call dispatch | `callSummary` dispatches over recognizers that are already generated, and each arm builds effect-applied summaries; cancellation must precede callback holes. A second dispatch layer would retain every hook. `loadEffect` and `appendGo` were considered and are marginal. |
 | Control-flow collectors | Kahn ordering, loop folding, path products, select walks and counted-loop retry are traversal with observable speculative collection and first-cutoff recording. |
 | Binding, identity and facts | Binding matching, stable-content proofs, canonical-load caches, all-or-nothing fact export/import and condition numbering remain native. |
-| Completion lattice and presentation | The reason lattice is interleaved with requirement collection and the operation limit. `snapshots.rules` owns clone/borrow policy; trace vocabulary and rendering stay as declarations. |
+| Completion lattice and presentation | The reason lattice is interleaved with requirement collection and the operation limit. `boiler.yaml` owns snapshot copy/share policy; trace vocabulary and rendering stay as declarations. |
 
 ## Heap model source review
 

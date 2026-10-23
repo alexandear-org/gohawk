@@ -1,24 +1,25 @@
-signature total = outputs ^None false
-
 host
   guarded! = ClosureQueries.Guarded
   owner! = ClosureQueries.Owner
   capture! = ClosureCapture
   unknown! = Evidence.Unknown
 
-// A captured aggregate may be populated after closure creation. Its fields are
-// observed when called; unresolved cleanup cannot establish that it leaks.
-// https://github.com/Autumn-27/ARTEX/blob/bf7f414477832b77d2152539c0723dc691086522/traffic/traffic.go#L1129-L1176
-@Body
-rewrite (inputs queries instruction closure carried) =
-  do
-    guarded <- guarded queries instruction closure
-    false <- unknown guarded
-      else
-        true -> outputs guarded.Reason true
-    Disproven() <- owner queries closure
-      else
-        Proven (reason: reason) -> outputs reason true
-        Unknown (reason: reason) -> outputs reason true
-    answer <- capture queries instruction closure carried
-    answer
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    // A captured aggregate may be populated after closure creation. Its fields are
+    // observed when called; unresolved cleanup cannot establish that it leaks.
+    // https://github.com/Autumn-27/ARTEX/blob/bf7f414477832b77d2152539c0723dc691086522/traffic/traffic.go#L1129-L1176
+    @Body
+    inputs queries instruction closure carried ->
+      do
+        guarded <- guarded queries instruction closure
+        false <- unknown guarded
+          else
+            true -> outputs guarded.Reason true
+        Disproven() <- owner queries closure
+          else
+            Proven (reason: reason) -> outputs reason true
+            Unknown (reason: reason) -> outputs reason true
+        answer <- capture queries instruction closure carried
+        answer

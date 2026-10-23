@@ -16,7 +16,7 @@ func hyruleclassifyCancellationRecognize(harg0 struct {
 		hv2 := harg0.P1
 		_ = hv2
 		if hs1, hok := hv1.(*hyruleImport0.MakeClosure); hok && hs1 != nil {
-			// Rule ClosureCreation (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:23).
+			// Rule ClosureCreation (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:24).
 			hresult := struct{ V0 cancellationLabel }{V0: cancellationLabel{action: cancellationActionNone, reason: reasonCancellationNone}}
 			if !hyrulehyruleclassifyCancellationRecognizeRecord5Valid(hresult) {
 				var zero struct{ V0 cancellationLabel }
@@ -24,7 +24,7 @@ func hyruleclassifyCancellationRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Instruction (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:26).
+		// Rule Instruction (internal/analysis/analyzers/resources/cancellationownership/rules/classify.rules:27).
 		var hv13 struct{ V0 cancellationLabel }
 		hv13answered := false
 		if !hv13answered {

@@ -27,7 +27,7 @@ func hyruleReceivesRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		if hv2 == nil {
-			// Rule Absent (internal/engine/lifecycle/completionmapping/rules/receiver.rules:17).
+			// Rule Absent (internal/engine/lifecycle/completionmapping/rules/receiver.rules:18).
 			return struct{ V0 ReceiverProof }{V0: MatchProof(false)}, true
 		}
 		{
@@ -40,7 +40,7 @@ func hyruleReceivesRecognize(harg0 struct {
 				_ = hv7
 				{
 					if nonempty(hv7) {
-						// Rule ExactPath (internal/engine/lifecycle/completionmapping/rules/receiver.rules:23).
+						// Rule ExactPath (internal/engine/lifecycle/completionmapping/rules/receiver.rules:24).
 						var hv16 hyruleImport2.Value = hv2
 						var hv17 hyruleImport2.Value = hv5
 						var hv18 *hyruleImport3.SearchBudget = hv4
@@ -92,7 +92,7 @@ func hyruleReceivesRecognize(harg0 struct {
 						return hv19, true
 					}
 				}
-				// Rule ExactValue (internal/engine/lifecycle/completionmapping/rules/receiver.rules:37).
+				// Rule ExactValue (internal/engine/lifecycle/completionmapping/rules/receiver.rules:36).
 				var hv28 hyruleImport2.Value = hv2
 				var hv29 hyruleImport2.Value = hv5
 				var hv30 *hyruleImport3.SearchBudget = hv4
@@ -109,7 +109,7 @@ func hyruleReceivesRecognize(harg0 struct {
 				_ = hv9
 				hv10 := hv1.Path
 				_ = hv10
-				// Rule Projection (internal/engine/lifecycle/completionmapping/rules/receiver.rules:43).
+				// Rule Projection (internal/engine/lifecycle/completionmapping/rules/receiver.rules:41).
 				var hv31 hyruleImport2.Value = hv2
 				var hv32 hyruleImport2.Value = hv8
 				var hv33 *hyruleImport3.SearchBudget = hv4
@@ -124,7 +124,7 @@ func hyruleReceivesRecognize(harg0 struct {
 				_ = hv11
 				hv12 := hv1.Supplied
 				_ = hv12
-				// Rule Owner (internal/engine/lifecycle/completionmapping/rules/receiver.rules:50).
+				// Rule Owner (internal/engine/lifecycle/completionmapping/rules/receiver.rules:47).
 				var hv34 Local = hv1
 				var hv35 hyruleImport2.Value = hv2
 				var hv36 hyruleImport2.Value = hv3
@@ -140,7 +140,7 @@ func hyruleReceivesRecognize(harg0 struct {
 				_ = hv13
 				hv14 := hv1.Supplied
 				_ = hv14
-				// Rule Callback (internal/engine/lifecycle/completionmapping/rules/receiver.rules:56).
+				// Rule Callback (internal/engine/lifecycle/completionmapping/rules/receiver.rules:52).
 				return struct{ V0 ReceiverProof }{V0: MatchProof(false)}, true
 			}
 		}

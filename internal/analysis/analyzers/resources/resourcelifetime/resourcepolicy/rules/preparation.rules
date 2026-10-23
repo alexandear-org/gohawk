@@ -1,5 +1,3 @@
-signature total = outputs (Unknown (reason: ^EvidenceUnavailable))
-
 host
   deferred! = PreparationQueries.Deferred
   owners! = PreparationQueries.Owners
@@ -11,26 +9,29 @@ host
   OpaqueConsumption
   EvidenceUnavailable
 
-// Anywhere coverage of a dominating defer may release a later acquisition
-// through captured storage. It supplies uncertainty, not settlement.
-// Only a complete owner census can supply classifier inputs. Collection and
-// guarded-defer initialization then precede prior-cleanup evidence.
-@Preparation
-rewrite (inputs queries) =
-  do
-    Disproven() <- deferred queries
-      else
-        Unknown (reason: reason) -> outputs (Unknown (reason: reason))
-        Proven() -> outputs (Unknown (reason: ^PriorDeferMayRelease))
-    true <- owners queries
-      else
-        false -> outputs (Unknown (reason: ^BudgetExhausted))
-    guarded <- guarded queries
-    false <- unknown guarded
-      else
-        true -> outputs (Unknown (reason: guarded.Reason))
-    Disproven() <- prior queries
-      else
-        Unknown (reason: reason) -> outputs (Unknown (reason: reason))
-        Proven() -> outputs (Unknown (reason: ^OpaqueConsumption))
-    outputs (Proven (reason: ^None))
+total fn rewrite
+  fallback outputs (Unknown (reason: ^EvidenceUnavailable))
+  match inputs
+    // Anywhere coverage of a dominating defer may release a later acquisition
+    // through captured storage. It supplies uncertainty, not settlement.
+    // Only a complete owner census can supply classifier inputs. Collection and
+    // guarded-defer initialization then precede prior-cleanup evidence.
+    @Preparation
+    inputs queries ->
+      do
+        Disproven() <- deferred queries
+          else
+            Unknown (reason: reason) -> outputs (Unknown (reason: reason))
+            Proven() -> outputs (Unknown (reason: ^PriorDeferMayRelease))
+        true <- owners queries
+          else
+            false -> outputs (Unknown (reason: ^BudgetExhausted))
+        guarded <- guarded queries
+        false <- unknown guarded
+          else
+            true -> outputs (Unknown (reason: guarded.Reason))
+        Disproven() <- prior queries
+          else
+            Unknown (reason: reason) -> outputs (Unknown (reason: reason))
+            Proven() -> outputs (Unknown (reason: ^OpaqueConsumption))
+        outputs (Proven (reason: ^None))

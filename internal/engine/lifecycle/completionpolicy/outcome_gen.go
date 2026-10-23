@@ -23,7 +23,7 @@ func hyruledecideUnprovenRecognize(harg0 struct {
 		if hv2 == true {
 			{
 				if exhausted(hv1) {
-					// Rule LocalCutoff (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:17).
+					// Rule LocalCutoff (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:18).
 					return struct{ V0 hyruleImport0.Proof }{V0: evidence(unknown, budgetExhausted, localSSA)}, true
 				}
 			}
@@ -31,21 +31,21 @@ func hyruledecideUnprovenRecognize(harg0 struct {
 		if hv2 == false {
 			{
 				if exhausted(hv1) {
-					// Rule UnavailableCutoff (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:23).
+					// Rule UnavailableCutoff (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:22).
 					return struct{ V0 hyruleImport0.Proof }{V0: evidence(unknown, budgetExhausted, noProvenance)}, true
 				}
 			}
 		}
 		if hv2 == true {
 			if hv4 == true {
-				// Rule LoopOnly (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:34).
+				// Rule LoopOnly (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:31).
 				return struct{ V0 hyruleImport0.Proof }{V0: evidence(unknown, completionInCycle, localSSA)}, true
 			}
 			if hv3 == true {
-				// Rule Incomplete (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:38).
+				// Rule Incomplete (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:35).
 				return struct{ V0 hyruleImport0.Proof }{V0: evidence(unknown, unavailable, localSSA)}, true
 			}
-			// Rule Missing (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:41).
+			// Rule Missing (internal/engine/lifecycle/completionpolicy/rules/outcome.rules:38).
 			return struct{ V0 hyruleImport0.Proof }{V0: evidence(disproven, notFound, localSSA)}, true
 		}
 	}

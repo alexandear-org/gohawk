@@ -21,7 +21,7 @@ func hyrulerecognizeProcessActionRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Entry (internal/analysis/analyzers/resources/processownership/rules/action_entry.rules:9).
+		// Rule Entry (internal/analysis/analyzers/resources/processownership/rules/action_entry.rules:10).
 		var hv6 *commandProof = hv1
 		var hv7 hyruleImport1.Instruction = hv2
 		var hv8 hyruleImport1.Value = hv3

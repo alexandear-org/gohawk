@@ -14,7 +14,7 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 			if hs1 != nil {
 				hv2 := hs1
 				_ = hv2
-				// Rule Deferred (internal/engine/lifecycle/completionpolicy/rules/launch.rules:26).
+				// Rule Deferred (internal/engine/lifecycle/completionpolicy/rules/launch.rules:27).
 				var hv9 *hyruleImport0.CallCommon = commonOf(hv2)
 				var hv10 Callee = Callee{Kind: CalleeCommon, Launch: LaunchDeferred, Common: hv9, AllowOnceFunc: true}
 				hresult := struct{ V0 Callee }{V0: hv10}
@@ -46,7 +46,7 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					hv5, hok := groupCallback(hv4)
 					_ = hv5
 					if hok {
-						// Rule WaitGroupGo (internal/engine/lifecycle/completionpolicy/rules/launch.rules:34).
+						// Rule WaitGroupGo (internal/engine/lifecycle/completionpolicy/rules/launch.rules:33).
 						var hv13 Callee = Callee{Kind: CalleeCallback, Launch: LaunchStarted, Callback: hv5}
 						hresult := struct{ V0 Callee }{V0: hv13}
 						if !hyrulehyruleRecognizeLaunchRecognizeRecord4Valid(hresult) {
@@ -60,7 +60,7 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					hv6, hok := cleanupCallback(hv4)
 					_ = hv6
 					if hok {
-						// Rule Cleanup (internal/engine/lifecycle/completionpolicy/rules/launch.rules:39).
+						// Rule Cleanup (internal/engine/lifecycle/completionpolicy/rules/launch.rules:37).
 						var hv14 Callee = Callee{Kind: CalleeCallback, Launch: LaunchDeferred, Callback: hv6}
 						hresult := struct{ V0 Callee }{V0: hv14}
 						if !hyrulehyruleRecognizeLaunchRecognizeRecord4Valid(hresult) {
@@ -74,7 +74,7 @@ func hyruleRecognizeLaunchRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv7
 				hv8 := hs1
 				_ = hv8
-				// Rule Called (internal/engine/lifecycle/completionpolicy/rules/launch.rules:43).
+				// Rule Called (internal/engine/lifecycle/completionpolicy/rules/launch.rules:40).
 				var hv15 *hyruleImport0.CallCommon = commonOf(hv8)
 				var hv16 Callee = Callee{Kind: CalleeCommon, Launch: LaunchCalled, Common: hv15, AllowOnceFunc: false}
 				hresult := struct{ V0 Callee }{V0: hv16}

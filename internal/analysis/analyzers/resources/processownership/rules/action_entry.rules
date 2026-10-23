@@ -1,16 +1,17 @@
-signature total = outputs ^decisionUnknown true
-
 host
   handoff! = commandProof.possibleWaitHandoff
   deferred! = commandProof.deferredWait
 
-// Possible handoffs and unfinished deferred-wait searches stop the action.
-// Only an absent deferred wait proceeds to ordinary settlement evidence.
-@Entry
-rewrite (inputs proof instruction command) =
-  case handoff proof instruction command of
-    true -> outputs ^decisionUnknown true
-    false -> case deferred proof instruction command of
-      Completed() -> outputs ^decisionProven true
-      Indeterminate() -> outputs ^decisionUnknown true
-      Incomplete() -> outputs ^decisionDisproven false
+total fn rewrite
+  fallback outputs ^decisionUnknown true
+  match inputs
+    // Possible handoffs and unfinished deferred-wait searches stop the action.
+    // Only an absent deferred wait proceeds to ordinary settlement evidence.
+    @Entry
+    inputs proof instruction command ->
+      case handoff proof instruction command of
+        true -> outputs ^decisionUnknown true
+        false -> case deferred proof instruction command of
+          Completed() -> outputs ^decisionProven true
+          Indeterminate() -> outputs ^decisionUnknown true
+          Incomplete() -> outputs ^decisionDisproven false

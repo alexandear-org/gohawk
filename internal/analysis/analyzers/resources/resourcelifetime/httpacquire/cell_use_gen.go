@@ -27,7 +27,7 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.DebugRef:
 			if hv1 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:9).
+				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:10).
 				return struct {
 					V0 bool
 					V1 bool
@@ -47,7 +47,7 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 					if hv3 == false {
 						{
 							if sameValue(hv5, hv2) {
-								// Rule Store (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:13).
+								// Rule Store (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:14).
 								var hv14 *hyruleImport0.Alloc = hv8
 								var hv15 *hyruleImport0.Store = hv7
 								var hv16 *hyruleImport2.SearchBudget = hv4
@@ -84,7 +84,7 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 				hv11 := hs1
 				_ = hv11
 				if hv10 == loadToken {
-					// Rule Load (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:21).
+					// Rule Load (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:20).
 					var hv18 hyruleImport0.Value = hv11
 					var hv19 *hyruleImport2.SearchBudget = hv4
 					hv12 := onlyHTTPDoUsesWithin(hv18, hv19)
@@ -112,7 +112,7 @@ func hyruledecideClientCellUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv12 := hs1
 				_ = hv12
-				// Rule Captured (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:27).
+				// Rule Captured (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/cell_use.rules:25).
 				var hv21 *hyruleImport0.MakeClosure = hv12
 				var hv22 *hyruleImport0.Alloc = hv2
 				var hv23 *hyruleImport2.SearchBudget = hv4

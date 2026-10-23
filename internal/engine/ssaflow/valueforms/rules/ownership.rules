@@ -1,5 +1,3 @@
-signature total = outputs nil false
-
 view FieldAddress = *ssa.FieldAddr
   source: X
 
@@ -38,25 +36,28 @@ host
   loadToken
   receiveToken
 
-@Aggregate
-rewrite (inputs (FieldAddress source | FieldValue source | IndexAddress source | IndexValue source | Lookup source | Slice source)) =
-  outputs source true
-
-// An assertion preserves the interface's object. Extraction refers back to
-// its producer; the ownership walk decides what that producer can establish.
-@AssertedOrExtracted
-rewrite (inputs (Assertion source | Extraction source)) = outputs source true
-
-// Range elements retain their aggregate as a possible owner. policyserv
-// closes channels selected from a receiver's map in a spawned cleanup:
-// https://github.com/matrix-org/policyserv/blob/16995e82a8518f66c5bdc5b6d6d3be04a7640f33/pubsub/psql.go#L62-L72
-@Iterated
-rewrite (inputs (Next source | Range source)) = outputs source true
-
-// Loads and receives select from a holder. Arithmetic and logical operations
-// create a new value and supply no such ownership edge.
-@LoadedOrReceived
-rewrite (inputs (Unary (source: source, op: (^loadToken | ^receiveToken)))) = outputs source true
-
-@OtherUnary
-rewrite (inputs (Unary (source: source))) = outputs source false
+total fn rewrite
+  fallback outputs nil false
+  match inputs
+    @Aggregate
+    inputs (FieldAddress source | FieldValue source | IndexAddress source | IndexValue source | Lookup source | Slice source) ->
+      outputs source true
+    // An assertion preserves the interface's object. Extraction refers back to
+    // its producer; the ownership walk decides what that producer can establish.
+    @AssertedOrExtracted
+    inputs (Assertion source | Extraction source) ->
+      outputs source true
+    // Range elements retain their aggregate as a possible owner. policyserv
+    // closes channels selected from a receiver's map in a spawned cleanup:
+    // https://github.com/matrix-org/policyserv/blob/16995e82a8518f66c5bdc5b6d6d3be04a7640f33/pubsub/psql.go#L62-L72
+    @Iterated
+    inputs (Next source | Range source) ->
+      outputs source true
+    // Loads and receives select from a holder. Arithmetic and logical operations
+    // create a new value and supply no such ownership edge.
+    @LoadedOrReceived
+    inputs (Unary (source: source, op: (^loadToken | ^receiveToken))) ->
+      outputs source true
+    @OtherUnary
+    inputs (Unary (source: source)) ->
+      outputs source false

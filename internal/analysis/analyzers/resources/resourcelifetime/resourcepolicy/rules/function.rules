@@ -1,25 +1,24 @@
-signature total = outputs ^None false
-
 host
   dynamic
   chain! = FunctionQueries.Chain
   tail! = FunctionTail
   DynamicCallee
 
-@Dynamic
-rewrite (inputs _ _ common carried)
-  | dynamic common
-  =
-  outputs ^DynamicCallee carried
-
-// A retained constructor chain may carry the resource directly or through an
-// aggregate. Query it before rejecting a call without directly carried args.
-@Named
-rewrite (inputs queries instruction common carried) =
-  do
-    Disproven() <- chain queries instruction common
-      else
-        Proven (reason: reason) -> outputs reason true
-        Unknown (reason: reason) -> outputs reason true
-    answer <- tail queries instruction common carried
-    answer
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    @Dynamic
+    inputs _ _ common carried
+      when dynamic common ->
+      outputs ^DynamicCallee carried
+    // A retained constructor chain may carry the resource directly or through an
+    // aggregate. Query it before rejecting a call without directly carried args.
+    @Named
+    inputs queries instruction common carried ->
+      do
+        Disproven() <- chain queries instruction common
+          else
+            Proven (reason: reason) -> outputs reason true
+            Unknown (reason: reason) -> outputs reason true
+        answer <- tail queries instruction common carried
+        answer

@@ -249,11 +249,17 @@ site-links-external: site-build
 site-review:
 	$(PNPM) --dir site dev:review
 
-.PHONY: hyrule-generate hyrule-generated-check hyrule-tool-test
-hyrule-generate:
+.PHONY: hyrule-generate hyrule-generated-check hyrule-tool-test boiler-generate boiler-generated-check
+boiler-generate:
+	sh scripts/boiler.sh generate
+
+boiler-generated-check:
+	sh scripts/boiler.sh generate --check
+
+hyrule-generate: boiler-generate
 	sh scripts/hyrule.sh generate
 
-hyrule-generated-check:
+hyrule-generated-check: boiler-generated-check
 	sh scripts/hyrule.sh generate --check
 
 hyrule-tool-test:

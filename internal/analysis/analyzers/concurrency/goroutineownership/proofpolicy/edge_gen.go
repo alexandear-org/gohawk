@@ -11,7 +11,7 @@ func hyruleEdgeRecognize(harg0 struct{ P0 EdgeQueries }) (struct {
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Edge (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/edge.rules:19).
+		// Rule Edge (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/edge.rules:20).
 		var hv7 struct {
 			V0 hyruleImport0.ObligationAction
 		}

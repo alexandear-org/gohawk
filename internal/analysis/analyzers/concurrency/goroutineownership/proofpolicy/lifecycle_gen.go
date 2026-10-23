@@ -12,7 +12,7 @@ func hyruleLifecycleRecognize(harg0 struct{ P0 LifecycleQueries }) (struct {
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Lifecycle (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/lifecycle.rules:5).
+		// Rule Lifecycle (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/lifecycle.rules:6).
 		var hv10 LifecycleQueries = hv1
 		hv2 := (LifecycleQueries).Relay(hv10)
 		_ = hv2

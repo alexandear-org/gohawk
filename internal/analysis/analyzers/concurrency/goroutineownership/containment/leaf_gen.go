@@ -23,7 +23,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Closure (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:10).
+				// Rule Closure (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:11).
 				var hv17 hyruleImport2.ReachingWalk = hv1
 				var hv18 *hyruleImport0.MakeClosure = hv4
 				var hv19 hyruleImport0.Value = hv3
@@ -65,7 +65,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1
 				_ = hv7
-				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
+				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:25).
 				var hv25 hyruleImport2.ReachingWalk = hv1
 				var hv26 hyruleImport0.Value = hv7
 				var hv27 hyruleImport0.Value = hv3
@@ -86,7 +86,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				_ = hv8
 				hv9 := hs1
 				_ = hv9
-				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
+				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:25).
 				var hv29 hyruleImport2.ReachingWalk = hv1
 				var hv30 hyruleImport0.Value = hv9
 				var hv31 hyruleImport0.Value = hv3
@@ -107,7 +107,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 				_ = hv10
 				hv11 := hs1
 				_ = hv11
-				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
+				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:25).
 				var hv33 hyruleImport2.ReachingWalk = hv1
 				var hv34 hyruleImport0.Value = hv11
 				var hv35 hyruleImport0.Value = hv3
@@ -126,7 +126,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv12 := hs1
 				_ = hv12
-				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:26).
+				// Rule Stored (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:25).
 				var hv37 hyruleImport2.ReachingWalk = hv1
 				var hv38 hyruleImport0.Value = hv12
 				var hv39 hyruleImport0.Value = hv3
@@ -145,7 +145,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv13 := hs1.X
 				_ = hv13
-				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:32).
+				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:30).
 				var hv41 hyruleImport2.ReachingWalk = hv1
 				var hv42 hyruleImport0.Value = hv13
 				var hv43 hyruleImport0.Value = hv3
@@ -164,7 +164,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv14 := hs1.Tuple
 				_ = hv14
-				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:32).
+				// Rule Projected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:30).
 				var hv45 hyruleImport2.ReachingWalk = hv1
 				var hv46 hyruleImport0.Value = hv14
 				var hv47 hyruleImport0.Value = hv3
@@ -183,7 +183,7 @@ func hyruledecideContainmentRecognize(harg0 struct {
 			if hs1 != nil {
 				hv15 := hs1
 				_ = hv15
-				// Rule Call (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:38).
+				// Rule Call (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/leaf.rules:35).
 				var hv49 hyruleImport2.ReachingWalk = hv1
 				var hv50 *hyruleImport0.Call = hv15
 				var hv51 hyruleImport0.Value = hv3

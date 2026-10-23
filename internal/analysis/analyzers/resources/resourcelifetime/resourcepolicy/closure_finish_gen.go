@@ -21,7 +21,7 @@ func hyruleClosureFinishRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		if hs1, hok := hv2.(*hyruleImport0.Go); hok && hs1 != nil {
-			// Rule Started (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:11).
+			// Rule Started (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:12).
 			hresult := struct {
 				V0 Reason
 				V1 bool
@@ -35,7 +35,7 @@ func hyruleClosureFinishRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Local (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:19).
+		// Rule Local (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_finish.rules:20).
 		var hv6 ClosureQueries = hv1
 		var hv7 *hyruleImport0.MakeClosure = hv3
 		hv4 := (ClosureQueries).Unreadable(hv6, hv7)

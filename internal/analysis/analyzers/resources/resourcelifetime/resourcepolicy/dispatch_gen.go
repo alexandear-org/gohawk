@@ -25,7 +25,7 @@ func hyruleDispatchRecognize(harg0 struct {
 		_ = hv4
 		{
 			if invokes(hv3) {
-				// Rule Interface (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:13).
+				// Rule Interface (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:14).
 				hresult := struct {
 					V0 Reason
 					V1 bool
@@ -51,7 +51,7 @@ func hyruleDispatchRecognize(harg0 struct {
 					if hv4 == true {
 						{
 							if appendBuiltin(hv6) {
-								// Rule Append (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:19).
+								// Rule Append (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:18).
 								hresult := struct {
 									V0 Reason
 									V1 bool
@@ -67,7 +67,7 @@ func hyruleDispatchRecognize(harg0 struct {
 							}
 						}
 					}
-					// Rule Builtin (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:26).
+					// Rule Builtin (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:23).
 					hresult := struct {
 						V0 Reason
 						V1 bool
@@ -85,7 +85,7 @@ func hyruleDispatchRecognize(harg0 struct {
 				if hs2 != nil {
 					hv7 := hs2
 					_ = hv7
-					// Rule Closure (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:29).
+					// Rule Closure (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:26).
 					var hv14 CallQueries = hv1
 					var hv15 hyruleImport0.Instruction = hv2
 					var hv16 *hyruleImport0.MakeClosure = hv7
@@ -135,7 +135,7 @@ func hyruleDispatchRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule Function (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:35).
+		// Rule Function (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/dispatch.rules:31).
 		var hv19 CallQueries = hv1
 		var hv20 hyruleImport0.Instruction = hv2
 		var hv21 *hyruleImport0.CallCommon = hv3

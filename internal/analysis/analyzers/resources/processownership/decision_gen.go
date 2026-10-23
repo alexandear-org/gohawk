@@ -26,7 +26,7 @@ func hyruledecideProcessReturnRecognize(harg0 struct {
 		_ = hv5
 		if hv3 == nil {
 			if hv4 == true {
-				// Rule AmbiguousSettlement (internal/analysis/analyzers/resources/processownership/rules/decision.rules:26).
+				// Rule AmbiguousSettlement (internal/analysis/analyzers/resources/processownership/rules/decision.rules:27).
 				var hv8 processDecision = processDecision{state: decisionUnknown, reason: reasonAmbiguousWaitOwnership}
 				return struct{ V0 processDecision }{V0: hv8}, true
 			}
@@ -34,7 +34,7 @@ func hyruledecideProcessReturnRecognize(harg0 struct {
 			var hv9 processDecision = processDecision{state: decisionDisproven, reason: reasonWaitOwnershipProven}
 			return struct{ V0 processDecision }{V0: hv9}, true
 		}
-		// Rule UncoveredReturn (internal/analysis/analyzers/resources/processownership/rules/decision.rules:42).
+		// Rule UncoveredReturn (internal/analysis/analyzers/resources/processownership/rules/decision.rules:41).
 		var hv10 *hyruleImport0.Call = hv1
 		var hv11 hyruleImport0.Value = hv2
 		var hv12 *hyruleImport1.SearchBudget = hv5

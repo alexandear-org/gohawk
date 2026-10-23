@@ -21,7 +21,7 @@ func hyruleabandonedProducerSendRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Abandoned (internal/analysis/analyzers/concurrency/producerlifecycle/rules/abandoned.rules:24).
+		// Rule Abandoned (internal/analysis/analyzers/concurrency/producerlifecycle/rules/abandoned.rules:25).
 		var hv13 producerSend = hv2
 		hv5 := callerReturns(hv13)
 		_ = hv5

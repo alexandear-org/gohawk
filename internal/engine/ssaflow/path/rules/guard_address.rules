@@ -1,16 +1,16 @@
-signature total = outputs ^guardAddressAbsent nil
-
 host
   guardAddressAbsent
   guardAddressRoot
   guardAddressProjection
 
-// A pointer returned by a call names one object until that call reruns. Guard
-// invalidation retains that temporal boundary; recognition does not unwrap it.
-@Root
-rewrite (inputs (Allocation() | Parameter() | Free() | Global() | Call() | Extract())) =
-  outputs ^guardAddressRoot nil
-
-@Projection
-rewrite (inputs (FieldAddress (source: source) | Unary (source: source, op: ^guardLoadToken))) =
-  outputs ^guardAddressProjection source
+total fn rewrite
+  fallback outputs ^guardAddressAbsent nil
+  match inputs
+    // A pointer returned by a call names one object until that call reruns. Guard
+    // invalidation retains that temporal boundary; recognition does not unwrap it.
+    @Root
+    inputs (Allocation() | Parameter() | Free() | Global() | Call() | Extract()) ->
+      outputs ^guardAddressRoot nil
+    @Projection
+    inputs (FieldAddress (source: source) | Unary (source: source, op: ^guardLoadToken)) ->
+      outputs ^guardAddressProjection source

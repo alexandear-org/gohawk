@@ -10,7 +10,7 @@ func hyruleCallerLifetimeRecognize(harg0 struct{ P0 CallerLifetimeQueries }) (st
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Caller (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/caller_lifetime.rules:18).
+		// Rule Caller (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/caller_lifetime.rules:19).
 		var hv18 CallerLifetimeQueries = hv1
 		hv2 := (CallerLifetimeQueries).Stop(hv18)
 		_ = hv2

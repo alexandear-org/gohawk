@@ -16,7 +16,7 @@ func hyruleReturnResultRecognize(harg0 struct {
 		hv2 := harg0.P1
 		_ = hv2
 		if hv2 == true {
-			// Rule Completed (internal/engine/lifecycle/completionpolicy/rules/return_result.rules:6).
+			// Rule Completed (internal/engine/lifecycle/completionpolicy/rules/return_result.rules:7).
 			hresult := struct{ V0 ReturnPlan }{V0: ReturnPlan{Kind: ReturnCovered}}
 			if !hyrulehyruleReturnResultRecognizeRecord1Valid(hresult) {
 				var zero struct{ V0 ReturnPlan }
@@ -30,7 +30,7 @@ func hyruleReturnResultRecognize(harg0 struct {
 			_ = hv4
 			if hok {
 				if hv2 == false {
-					// Rule Forward (internal/engine/lifecycle/completionpolicy/rules/return_result.rules:11).
+					// Rule Forward (internal/engine/lifecycle/completionpolicy/rules/return_result.rules:12).
 					var hv5 ReturnPlan = ReturnPlan{Kind: ReturnForward, Call: hv3, Result: hv4}
 					hresult := struct{ V0 ReturnPlan }{V0: hv5}
 					if !hyrulehyruleReturnResultRecognizeRecord1Valid(hresult) {

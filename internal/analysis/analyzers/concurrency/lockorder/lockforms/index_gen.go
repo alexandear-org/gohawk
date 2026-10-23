@@ -18,13 +18,13 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 				hv2 := hs1.Index
 				_ = hv2
 				if hs2, hok := hv2.(*hyruleImport0.Const); hok && hs2 != nil {
-					// Rule ConstantAddress (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:26).
+					// Rule ConstantAddress (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:27).
 					return struct {
 						V0 IndexStep
 						V1 hyruleImport0.Value
 					}{V0: IndexStopped, V1: nil}, true
 				}
-				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:29).
+				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:30).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
@@ -32,7 +32,7 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 			}
 		case *hyruleImport0.Index, *hyruleImport0.Lookup:
 			if hv1 != (*hyruleImport0.Index)(nil) && hv1 != (*hyruleImport0.Lookup)(nil) {
-				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:29).
+				// Rule Dynamic (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:30).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
@@ -42,7 +42,7 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 			if hs1 != nil {
 				hv3 := hs1.Tuple
 				_ = hv3
-				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
+				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:33).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
@@ -52,7 +52,7 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 			if hs1 != nil {
 				hv4 := hs1.X
 				_ = hv4
-				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
+				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:33).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value
@@ -62,7 +62,7 @@ func hyruleDynamicIndexRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct
 			if hs1 != nil {
 				hv5 := hs1.X
 				_ = hv5
-				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:32).
+				// Rule Follow (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/index.rules:33).
 				return struct {
 					V0 IndexStep
 					V1 hyruleImport0.Value

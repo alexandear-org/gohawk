@@ -27,7 +27,7 @@ func hyruleparameterIsViewRecognize(harg0 struct {
 		_ = hv5
 		hv6 := harg0.P5
 		_ = hv6
-		// Rule View (internal/analysis/passes/lifecyclefacts/rules/returned_view.rules:25).
+		// Rule View (internal/analysis/passes/lifecyclefacts/rules/returned_view.rules:26).
 		var hv7 bool = parameterReturnedUnchangedOnEveryReturn(hv1, hv2)
 		if !hv7 {
 			hv7 = parameterMayBeReleased(hv1, hv2)

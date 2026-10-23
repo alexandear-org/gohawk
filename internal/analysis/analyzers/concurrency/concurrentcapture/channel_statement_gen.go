@@ -17,7 +17,7 @@ func hyrulechannelStatementRecognize(harg0 struct{ P0 hyruleImport0.Stmt }) (str
 			if hs1 != nil {
 				hv2 := hs1.Chan
 				_ = hv2
-				// Rule Send (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:19).
+				// Rule Send (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:20).
 				return struct {
 					V0 channelStatementKind
 					V1 hyruleImport0.Expr
@@ -33,7 +33,7 @@ func hyrulechannelStatementRecognize(harg0 struct{ P0 hyruleImport0.Stmt }) (str
 					hv5 := hs2.X
 					_ = hv5
 					if hv4 == channelReceiveToken {
-						// Rule Receive (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:24).
+						// Rule Receive (internal/analysis/analyzers/concurrency/concurrentcapture/rules/channel_statement.rules:25).
 						return struct {
 							V0 channelStatementKind
 							V1 hyruleImport0.Expr

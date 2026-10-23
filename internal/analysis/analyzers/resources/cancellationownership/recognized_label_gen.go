@@ -20,7 +20,7 @@ func hyrulerecognizeCancellationRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Recognized (internal/analysis/analyzers/resources/cancellationownership/rules/recognized_label.rules:7).
+		// Rule Recognized (internal/analysis/analyzers/resources/cancellationownership/rules/recognized_label.rules:8).
 		var hv7 hyruleImport0.Instruction = hv1
 		var hv8 *cancellationClassifier = hv2
 		var hv9 *hyruleImport0.CallCommon = hv3

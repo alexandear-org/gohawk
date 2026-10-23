@@ -1,9 +1,5 @@
 host
   emptyLockState
-
-signature total = outputs emptyLockState() false
-
-host
   lockCopyAvailable!
   copyLockLists!
   copyLockGuards!
@@ -26,19 +22,22 @@ type Origins = (lockOriginMap, bool)
   CopiedOrigins (values: 0) = true
   OriginsCutoff = false
 
-@Copy
-rewrite (inputs state budget) =
-  do
-    true <- lockCopyAvailable budget
-      else
-        false -> outputs emptyLockState() false
-    CopiedLists (held: held, readHeld: readHeld, deferred: deferred) <- copyLockLists state budget
-      else
-        ListsCutoff() -> outputs emptyLockState() false
-    CopiedGuards (values: guards) <- copyLockGuards state budget
-      else
-        GuardsCutoff() -> outputs emptyLockState() false
-    CopiedOrigins (values: origins) <- copyLockOrigins state budget
-      else
-        OriginsCutoff() -> outputs emptyLockState() false
-    outputs (state with (held: held, readHeld: readHeld, deferred: deferred, guards: guards, origins: origins)) true
+total fn rewrite
+  fallback outputs emptyLockState() false
+  match inputs
+    @Copy
+    inputs state budget ->
+      do
+        true <- lockCopyAvailable budget
+          else
+            false -> outputs emptyLockState() false
+        CopiedLists (held: held, readHeld: readHeld, deferred: deferred) <- copyLockLists state budget
+          else
+            ListsCutoff() -> outputs emptyLockState() false
+        CopiedGuards (values: guards) <- copyLockGuards state budget
+          else
+            GuardsCutoff() -> outputs emptyLockState() false
+        CopiedOrigins (values: origins) <- copyLockOrigins state budget
+          else
+            OriginsCutoff() -> outputs emptyLockState() false
+        outputs (state with (held: held, readHeld: readHeld, deferred: deferred, guards: guards, origins: origins)) true

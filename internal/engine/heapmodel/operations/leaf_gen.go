@@ -17,17 +17,17 @@ func hyruleLeafRecognize(harg0 struct {
 		switch hv1.(type) {
 		case *hyruleImport0.Parameter, *hyruleImport0.FreeVar, *hyruleImport0.Global:
 			if hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) && hv1 != (*hyruleImport0.Global)(nil) {
-				// Rule External (internal/engine/heapmodel/operations/rules/leaf.rules:24).
+				// Rule External (internal/engine/heapmodel/operations/rules/leaf.rules:25).
 				return struct{ V0 LeafKind }{V0: LeafExternal}, true
 			}
 		case *hyruleImport0.Const:
 			if hv1 != (*hyruleImport0.Const)(nil) {
-				// Rule Constant (internal/engine/heapmodel/operations/rules/leaf.rules:28).
+				// Rule Constant (internal/engine/heapmodel/operations/rules/leaf.rules:29).
 				return struct{ V0 LeafKind }{V0: LeafNil}, true
 			}
 		case *hyruleImport0.Function, *hyruleImport0.Builtin:
 			if hv1 != (*hyruleImport0.Function)(nil) && hv1 != (*hyruleImport0.Builtin)(nil) {
-				// Rule Callable (internal/engine/heapmodel/operations/rules/leaf.rules:31).
+				// Rule Callable (internal/engine/heapmodel/operations/rules/leaf.rules:32).
 				return struct{ V0 LeafKind }{V0: LeafOpaque}, true
 			}
 		}
@@ -37,7 +37,7 @@ func hyruleLeafRecognize(harg0 struct {
 			if hok {
 				{
 					if localInstruction(hv3, hv2) {
-						// Rule Pending (internal/engine/heapmodel/operations/rules/leaf.rules:36).
+						// Rule Pending (internal/engine/heapmodel/operations/rules/leaf.rules:37).
 						return struct{ V0 LeafKind }{V0: LeafPending}, true
 					}
 				}

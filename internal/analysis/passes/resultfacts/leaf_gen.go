@@ -18,7 +18,7 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 				_ = hv3
 				{
 					if resultNilConstant(hv3) {
-						// Rule NilConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:31).
+						// Rule NilConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:32).
 						return struct{ V0 Guarantee }{V0: AlwaysNil}, true
 					}
 				}
@@ -29,11 +29,11 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 					_ = hv5
 					if hok {
 						if hv5 == true {
-							// Rule TrueConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:37).
+							// Rule TrueConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:36).
 							return struct{ V0 Guarantee }{V0: AlwaysTrue}, true
 						}
 						if hv5 == false {
-							// Rule FalseConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:40).
+							// Rule FalseConstant (internal/analysis/passes/resultfacts/rules/leaf.rules:39).
 							return struct{ V0 Guarantee }{V0: AlwaysFalse}, true
 						}
 					}
@@ -45,14 +45,14 @@ func hyruleclassifyResultLeafRecognize(harg0 struct{ P0 hyruleImport1.Value }) (
 				_ = hv6
 				{
 					if resultConcreteBox(hv6) {
-						// Rule ConcreteBox (internal/analysis/passes/resultfacts/rules/leaf.rules:45).
+						// Rule ConcreteBox (internal/analysis/passes/resultfacts/rules/leaf.rules:44).
 						return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
 					}
 				}
 			}
 		case *hyruleImport1.Alloc, *hyruleImport1.MakeChan, *hyruleImport1.MakeMap, *hyruleImport1.MakeSlice, *hyruleImport1.Function, *hyruleImport1.MakeClosure:
 			if hv1 != (*hyruleImport1.Alloc)(nil) && hv1 != (*hyruleImport1.MakeChan)(nil) && hv1 != (*hyruleImport1.MakeMap)(nil) && hv1 != (*hyruleImport1.MakeSlice)(nil) && hv1 != (*hyruleImport1.Function)(nil) && hv1 != (*hyruleImport1.MakeClosure)(nil) {
-				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:51).
+				// Rule FreshValue (internal/analysis/passes/resultfacts/rules/leaf.rules:48).
 				return struct{ V0 Guarantee }{V0: AlwaysNonNil}, true
 			}
 		}

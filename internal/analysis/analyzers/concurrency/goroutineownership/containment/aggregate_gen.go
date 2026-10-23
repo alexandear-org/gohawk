@@ -20,7 +20,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 				hv3 := hs1.X
 				_ = hv3
 				if hv2 == loadToken {
-					// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+					// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 					return struct {
 						V0 hyruleImport1.Value
 						V1 bool
@@ -31,7 +31,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 			if hs1 != nil {
 				hv4 := hs1.X
 				_ = hv4
-				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
@@ -41,7 +41,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 			if hs1 != nil {
 				hv5 := hs1.X
 				_ = hv5
-				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
@@ -51,7 +51,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 			if hs1 != nil {
 				hv6 := hs1.X
 				_ = hv6
-				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
@@ -61,7 +61,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 			if hs1 != nil {
 				hv7 := hs1.X
 				_ = hv7
-				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool
@@ -71,7 +71,7 @@ func hyruleAggregateSourceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (str
 			if hs1 != nil {
 				hv8 := hs1.X
 				_ = hv8
-				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:6).
+				// Rule Source (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/aggregate.rules:7).
 				return struct {
 					V0 hyruleImport1.Value
 					V1 bool

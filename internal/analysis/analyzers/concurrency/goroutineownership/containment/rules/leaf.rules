@@ -1,42 +1,39 @@
-signature total = outputs false
-
 host
   closure! = closureCarries
   source! = Matches
   stored! = storedCarries
   returned! = callResultCarries
 
-// Captured addressable locals may have held the target at any point.
-@Closure
-rewrite (inputs walk closure@(Closure()) target) =
-  case closure walk closure target of
-    true -> outputs true
-    false -> outputs false
-
-// Loading an aggregate carries the values its fields held. Arithmetic does not.
-@Load
-rewrite (inputs walk (Unary (op: ^loadToken, source: source)) target) =
-  case source walk source target of
-    true -> outputs true
-    false -> outputs false
-
-// An assertion may carry a stored owner, but is not transparently unwrapped and
-// does not itself transfer ownership.
-// https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
-@Stored
-rewrite (inputs walk value@(Allocation() | FieldAddress() | IndexAddress() | Assertion()) target) =
-  case stored walk value target of
-    true -> outputs true
-    false -> outputs false
-
-@Projected
-rewrite (inputs walk (Slice (source: source) | Extract (source: source)) target) =
-  case source walk source target of
-    true -> outputs true
-    false -> outputs false
-
-@Call
-rewrite (inputs walk call@(Call()) target) =
-  case returned walk call target of
-    true -> outputs true
-    false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Captured addressable locals may have held the target at any point.
+    @Closure
+    inputs walk closure@(Closure()) target ->
+      case closure walk closure target of
+        true -> outputs true
+        false -> outputs false
+    // Loading an aggregate carries the values its fields held. Arithmetic does not.
+    @Load
+    inputs walk (Unary (op: ^loadToken, source: source)) target ->
+      case source walk source target of
+        true -> outputs true
+        false -> outputs false
+    // An assertion may carry a stored owner, but is not transparently unwrapped and
+    // does not itself transfer ownership.
+    // https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
+    @Stored
+    inputs walk value@(Allocation() | FieldAddress() | IndexAddress() | Assertion()) target ->
+      case stored walk value target of
+        true -> outputs true
+        false -> outputs false
+    @Projected
+    inputs walk (Slice (source: source) | Extract (source: source)) target ->
+      case source walk source target of
+        true -> outputs true
+        false -> outputs false
+    @Call
+    inputs walk call@(Call()) target ->
+      case returned walk call target of
+        true -> outputs true
+        false -> outputs false

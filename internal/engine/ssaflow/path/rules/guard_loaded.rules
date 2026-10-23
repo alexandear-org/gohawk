@@ -1,24 +1,23 @@
-signature total = outputs "" false false
-
 host
   loaded! = guardLoadedAddress
 
-@Load
-rewrite (inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget formats) =
-  do
-    answer <- loaded condition source nil ^guardEqualToken budget formats
-    answer
-
-// A constant on the left is swapped before recognizing the load. Unsupported
-// address paths still return their rendered payload, with availability false.
-@LiteralLeft
-rewrite (inputs condition@(Comparison (left: literal@(Constant()), right: Unary (source: source, op: ^guardLoadToken), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
-  do
-    answer <- loaded condition source literal op budget formats
-    answer
-
-@LiteralRight
-rewrite (inputs condition@(Comparison (left: Unary (source: source, op: ^guardLoadToken), right: literal@(Constant()), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats) =
-  do
-    answer <- loaded condition source literal op budget formats
-    answer
+total fn rewrite
+  fallback outputs "" false false
+  match inputs
+    @Load
+    inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget formats ->
+      do
+        answer <- loaded condition source nil ^guardEqualToken budget formats
+        answer
+    // A constant on the left is swapped before recognizing the load. Unsupported
+    // address paths still return their rendered payload, with availability false.
+    @LiteralLeft
+    inputs condition@(Comparison (left: literal@(Constant()), right: Unary (source: source, op: ^guardLoadToken), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats ->
+      do
+        answer <- loaded condition source literal op budget formats
+        answer
+    @LiteralRight
+    inputs condition@(Comparison (left: Unary (source: source, op: ^guardLoadToken), right: literal@(Constant()), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats ->
+      do
+        answer <- loaded condition source literal op budget formats
+        answer

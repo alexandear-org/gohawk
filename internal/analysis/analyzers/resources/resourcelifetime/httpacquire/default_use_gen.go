@@ -32,7 +32,7 @@ func hyruledecideDefaultUseRecognize(harg0 struct {
 				if hv3 == true {
 					{
 						if defaultClientValue(hv5) {
-							// Rule RootDo (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:11).
+							// Rule RootDo (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:12).
 							var hv12 hyruleImport0.Value = hv7
 							var hv13 *hyruleImport2.SearchBudget = hv4
 							hv8 := onlyHTTPDoUsesWithin(hv12, hv13)
@@ -61,7 +61,7 @@ func hyruledecideDefaultUseRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:21).
+		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/default_use.rules:20).
 		var hv18 hyruleImport0.Instruction = hv2
 		var hv19 *hyruleImport2.SearchBudget = hv4
 		hv10 := defaultOperands(hv18, hv19)

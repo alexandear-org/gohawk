@@ -14,7 +14,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			_ = hv2
 			hv3 := hs1
 			_ = hv3
-			// Rule ArrayPointer (internal/engine/heapmodel/operations/rules/definition.rules:62).
+			// Rule ArrayPointer (internal/engine/heapmodel/operations/rules/definition.rules:63).
 			var hv31 Definition = Definition{Kind: Alias, Value: hv3, Source: hv2}
 			hresult := struct{ V0 Definition }{V0: hv31}
 			if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -27,7 +27,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			hv4, hok := wrapper(hv1)
 			_ = hv4
 			if hok {
-				// Rule Wrapper (internal/engine/heapmodel/operations/rules/definition.rules:65).
+				// Rule Wrapper (internal/engine/heapmodel/operations/rules/definition.rules:66).
 				var hv32 Definition = Definition{Kind: Alias, Value: hv1, Source: hv4}
 				hresult := struct{ V0 Definition }{V0: hv32}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -46,7 +46,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				_ = hv6
 				hv7 := hs2
 				_ = hv7
-				// Rule FieldAddress (internal/engine/heapmodel/operations/rules/definition.rules:68).
+				// Rule FieldAddress (internal/engine/heapmodel/operations/rules/definition.rules:69).
 				var hv33 Definition = Definition{Kind: FieldAddress, Value: hv7, Source: hv5, Field: hv6}
 				hresult := struct{ V0 Definition }{V0: hv33}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -80,7 +80,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				_ = hv12
 				hv13 := hs2
 				_ = hv13
-				// Rule IndexAddress (internal/engine/heapmodel/operations/rules/definition.rules:76).
+				// Rule IndexAddress (internal/engine/heapmodel/operations/rules/definition.rules:75).
 				var hv35 Definition = Definition{Kind: IndexAddress, Value: hv13, Source: hv11, Index: hv12}
 				hresult := struct{ V0 Definition }{V0: hv35}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -97,7 +97,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				_ = hv15
 				hv16 := hs2
 				_ = hv16
-				// Rule IndexLoad (internal/engine/heapmodel/operations/rules/definition.rules:80).
+				// Rule IndexLoad (internal/engine/heapmodel/operations/rules/definition.rules:78).
 				var hv36 Definition = Definition{Kind: IndexLoad, Value: hv16, Source: hv14, Index: hv15}
 				hresult := struct{ V0 Definition }{V0: hv36}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -110,7 +110,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv17 := hs2
 				_ = hv17
-				// Rule Slice (internal/engine/heapmodel/operations/rules/definition.rules:84).
+				// Rule Slice (internal/engine/heapmodel/operations/rules/definition.rules:81).
 				var hv37 Definition = Definition{Kind: Sliced, Slice: hv17}
 				hresult := struct{ V0 Definition }{V0: hv37}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -128,7 +128,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				hv20 := hs2
 				_ = hv20
 				if hv19 == loadToken {
-					// Rule Load (internal/engine/heapmodel/operations/rules/definition.rules:87).
+					// Rule Load (internal/engine/heapmodel/operations/rules/definition.rules:84).
 					var hv38 Definition = Definition{Kind: Load, Value: hv20, Source: hv18}
 					hresult := struct{ V0 Definition }{V0: hv38}
 					if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -147,7 +147,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 				hv23 := hs2
 				_ = hv23
 				if hv22 == false {
-					// Rule Assertion (internal/engine/heapmodel/operations/rules/definition.rules:92).
+					// Rule Assertion (internal/engine/heapmodel/operations/rules/definition.rules:88).
 					var hv39 Definition = Definition{Kind: Alias, Value: hv23, Source: hv21}
 					hresult := struct{ V0 Definition }{V0: hv39}
 					if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -161,7 +161,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv24 := hs2
 				_ = hv24
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv40 Definition = Definition{Kind: Opaque, Value: hv24}
 				hresult := struct{ V0 Definition }{V0: hv40}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -174,7 +174,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv25 := hs2
 				_ = hv25
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv41 Definition = Definition{Kind: Opaque, Value: hv25}
 				hresult := struct{ V0 Definition }{V0: hv41}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -187,7 +187,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv26 := hs2
 				_ = hv26
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv42 Definition = Definition{Kind: Opaque, Value: hv26}
 				hresult := struct{ V0 Definition }{V0: hv42}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -200,7 +200,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv27 := hs2
 				_ = hv27
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv43 Definition = Definition{Kind: Opaque, Value: hv27}
 				hresult := struct{ V0 Definition }{V0: hv43}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -213,7 +213,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv28 := hs2
 				_ = hv28
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv44 Definition = Definition{Kind: Opaque, Value: hv28}
 				hresult := struct{ V0 Definition }{V0: hv44}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -226,7 +226,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv29 := hs2
 				_ = hv29
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv45 Definition = Definition{Kind: Opaque, Value: hv29}
 				hresult := struct{ V0 Definition }{V0: hv45}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {
@@ -239,7 +239,7 @@ func hyruleDefineRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct{ V0 D
 			if hs2 != nil {
 				hv30 := hs2
 				_ = hv30
-				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:98).
+				// Rule Opaque (internal/engine/heapmodel/operations/rules/definition.rules:93).
 				var hv46 Definition = Definition{Kind: Opaque, Value: hv30}
 				hresult := struct{ V0 Definition }{V0: hv46}
 				if !hyrulehyruleDefineRecognizeRecord16Valid(hresult) {

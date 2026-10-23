@@ -1,5 +1,3 @@
-signature total = outputs (Unknown (reason: ^None))
-
 host
   localURL?
   spend!
@@ -18,23 +16,26 @@ type Handler = (*ssa.Function, bool)
   FoundHandler (function: 0) = true
   NoHandler = false
 
-@Endpoint
-rewrite (inputs call@(localURL url) budget) =
-  do
-    true <- spend budget
-      else
-        false -> outputs (Unknown (reason: ^BudgetExhausted))
-    FoundServer (server: server) <- server url budget
-      else
-        NoServer() -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
-    true <- client call server
-      else
-        false -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
-    FoundHandler (function: handler) <- handler server budget
-      else
-        NoHandler() -> outputs (Disproven (reason: ^HandlerUnavailable))
-    Proven (reason: reason) <- framing call handler budget
-      else
-        Unknown (reason: unknownReason) -> outputs (Unknown (reason: unknownReason))
-        Disproven (reason: disprovenReason) -> outputs (Disproven (reason: disprovenReason))
-    outputs (Proven (reason: reason))
+total fn rewrite
+  fallback outputs (Unknown (reason: ^None))
+  match inputs
+    @Endpoint
+    inputs call@(localURL url) budget ->
+      do
+        true <- spend budget
+          else
+            false -> outputs (Unknown (reason: ^BudgetExhausted))
+        FoundServer (server: server) <- server url budget
+          else
+            NoServer() -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
+        true <- client call server
+          else
+            false -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
+        FoundHandler (function: handler) <- handler server budget
+          else
+            NoHandler() -> outputs (Disproven (reason: ^HandlerUnavailable))
+        Proven (reason: reason) <- framing call handler budget
+          else
+            Unknown (reason: unknownReason) -> outputs (Unknown (reason: unknownReason))
+            Disproven (reason: disprovenReason) -> outputs (Disproven (reason: disprovenReason))
+        outputs (Proven (reason: reason))

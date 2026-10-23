@@ -18,7 +18,7 @@ func hyruleprovePossibleWaitHandoffRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Handoff (internal/analysis/analyzers/resources/processownership/rules/handoff.rules:37).
+		// Rule Handoff (internal/analysis/analyzers/resources/processownership/rules/handoff.rules:38).
 		var hv20 hyruleImport1.Instruction = hv1
 		hv4part0, hv4part1 := handoffCall(hv20)
 		hv4 := struct {

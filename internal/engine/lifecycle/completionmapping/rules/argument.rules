@@ -1,54 +1,54 @@
-signature total = outputs emptyLocal() false
-
-@Exact
-rewrite (inputs context@(Request (exact: true)) local argument target _) =
-  case same context argument target of
-    true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
-    false -> outputs (Exact (local: local, supplied: argument, path: nil)) (identical argument target)
-
-// A possible alias cannot fall through to aggregate containment and become an
-// exact mapping. Mark uncertainty without invalidating unrelated memo entries.
-// Same-storage owner evidence mirrors the captured receiver's exact field:
-// https://github.com/centrifugal/centrifuge-go/blob/080126041ccc71654718bd0601b920ff8b22a8bf/subscription.go#L1156-L1183
-@Argument
-rewrite (inputs context local argument target invocation) =
-  case same context argument target of
-    true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
-    false -> decline
-  <|> case ambiguous argument target of
-    true -> do
-      answer <- uncertain context.Queries
-      answer
-    false -> decline
-  <|> case identity context argument target of
-    true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
-    false -> decline
-  <|> case callback context.Queries argument target of
-    true -> outputs (Callback (local: local, supplied: argument)) true
-    false -> decline
-  <|> do
-    PathFound (path: path) <- projection context argument target
-      else
-        PathMissing() -> decline
-        PathCutoff() -> do
-          answer <- cutoff context.Queries
-          answer
-    outputs (Projection (local: local, supplied: argument, path: path)) true
-  <|> case owner context argument target of
-    KnownValue (value: owner) -> outputs (Owner (local: local, supplied: owner)) true
-    MissingValue() -> decline
-  <|> do
-    true <- contains context.Queries argument target
-      else
+total fn rewrite
+  fallback outputs emptyLocal() false
+  match inputs
+    @Exact
+    inputs context@(Request (exact: true)) local argument target _ ->
+      case same context argument target of
+        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
+        false -> outputs (Exact (local: local, supplied: argument, path: nil)) (identical argument target)
+    // A possible alias cannot fall through to aggregate containment and become an
+    // exact mapping. Mark uncertainty without invalidating unrelated memo entries.
+    // Same-storage owner evidence mirrors the captured receiver's exact field:
+    // https://github.com/centrifugal/centrifuge-go/blob/080126041ccc71654718bd0601b920ff8b22a8bf/subscription.go#L1156-L1183
+    @Argument
+    inputs context local argument target invocation ->
+      case same context argument target of
+        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
         false -> decline
-    PathFound (path: path) <- storedPath context argument target invocation
-      else
-        PathMissing() -> outputs emptyLocal() false
-        PathCutoff() -> do
-          answer <- cutoff context.Queries
+      <|> case ambiguous argument target of
+        true -> do
+          answer <- uncertain context.Queries
           answer
-    outputs (Exact (local: local, supplied: argument, path: path)) true
-  <|> case pathFrom target argument context.Budget of
-    true -> outputs (Owner (local: local, supplied: argument)) true
-    false -> decline
-  <|> outputs emptyLocal() false
+        false -> decline
+      <|> case identity context argument target of
+        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
+        false -> decline
+      <|> case callback context.Queries argument target of
+        true -> outputs (Callback (local: local, supplied: argument)) true
+        false -> decline
+      <|> do
+        PathFound (path: path) <- projection context argument target
+          else
+            PathMissing() -> decline
+            PathCutoff() -> do
+              answer <- cutoff context.Queries
+              answer
+        outputs (Projection (local: local, supplied: argument, path: path)) true
+      <|> case owner context argument target of
+        KnownValue (value: owner) -> outputs (Owner (local: local, supplied: owner)) true
+        MissingValue() -> decline
+      <|> do
+        true <- contains context.Queries argument target
+          else
+            false -> decline
+        PathFound (path: path) <- storedPath context argument target invocation
+          else
+            PathMissing() -> outputs emptyLocal() false
+            PathCutoff() -> do
+              answer <- cutoff context.Queries
+              answer
+        outputs (Exact (local: local, supplied: argument, path: path)) true
+      <|> case pathFrom target argument context.Budget of
+        true -> outputs (Owner (local: local, supplied: argument)) true
+        false -> decline
+      <|> outputs emptyLocal() false

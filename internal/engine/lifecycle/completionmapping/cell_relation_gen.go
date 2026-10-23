@@ -31,7 +31,7 @@ func hyruleRelateCellRecognize(harg0 struct {
 		hv6 := harg0.P5
 		_ = hv6
 		if hv6 == deferredExact {
-			// Rule Exact (internal/engine/lifecycle/completionmapping/rules/cell_relation.rules:8).
+			// Rule Exact (internal/engine/lifecycle/completionmapping/rules/cell_relation.rules:9).
 			var hv8 Local = Local{Kind: Exact, Local: hv2, Supplied: hv4, Path: nil}
 			hresult := struct {
 				V0 Local
@@ -63,7 +63,7 @@ func hyruleRelateCellRecognize(harg0 struct {
 			return hresult, true
 		}
 		if hv6 == deferredUnknown {
-			// Rule Other (internal/engine/lifecycle/completionmapping/rules/cell_relation.rules:18).
+			// Rule Other (internal/engine/lifecycle/completionmapping/rules/cell_relation.rules:17).
 			var hv10 Queries = hv1.Queries
 			var hv11 hyruleImport2.Value = hv3
 			var hv12 hyruleImport2.Value = hv4

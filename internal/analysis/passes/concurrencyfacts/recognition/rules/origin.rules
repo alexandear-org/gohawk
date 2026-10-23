@@ -1,5 +1,3 @@
-signature total = outputs ^OriginUnknown nil nil
-
 view Call = *ssa.Call
 
 view Extraction = *ssa.Extract
@@ -15,19 +13,19 @@ host
   OriginObserved
   OriginFresh
 
-@Observed
-rewrite (inputs call@(Call()))
-  | let common = common call
-  , observes common
-  =
-  outputs ^OriginObserved nil (receiver common)
-
-// Constructor result zero is the context, and result one its cancel function.
-// The caller still proves that the constructor has an admitted parent.
-@Constructed
-rewrite (inputs (Extraction (tuple: call@(Call()), index: index)))
-  | index <= 1
-  , let common = common call
-  , fresh common
-  =
-  outputs ^OriginFresh call nil
+total fn rewrite
+  fallback outputs ^OriginUnknown nil nil
+  match inputs
+    @Observed
+    inputs call@(Call())
+      when let common = common call
+      , observes common ->
+      outputs ^OriginObserved nil (receiver common)
+    // Constructor result zero is the context, and result one its cancel function.
+    // The caller still proves that the constructor has an admitted parent.
+    @Constructed
+    inputs (Extraction (tuple: call@(Call()), index: index))
+      when index <= 1
+      , let common = common call
+      , fresh common ->
+      outputs ^OriginFresh call nil

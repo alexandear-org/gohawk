@@ -1,29 +1,28 @@
-signature total = outputs false
-
 host
   constructorCall
   requestRebinding?
   follow! = headRequestQuery.followOrigin
   preserve! = headRequestQuery.preserve
 
-// Only result zero of an exact HEAD constructor admits a new request origin.
-@Constructor
-rewrite (inputs query _ value@(Extraction (tuple: call@(Call()), index: 0)))
-  | constructorCall call
-  =
-  case preserve query value of
-    true -> outputs true
-    false -> outputs false
-
-// A rebind must first prove its receiver's origin, then independently preserve
-// every use of the new request. Neither fold admits phi requests or aliases.
-@Rebind
-rewrite (inputs query walk value@(Call (common: requestRebinding receiver))) =
-  do
-    true <- follow query walk receiver
-      else
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Only result zero of an exact HEAD constructor admits a new request origin.
+    @Constructor
+    inputs query _ value@(Extraction (tuple: call@(Call()), index: 0))
+      when constructorCall call ->
+      case preserve query value of
+        true -> outputs true
         false -> outputs false
-    true <- preserve query value
-      else
-        false -> outputs false
-    outputs true
+    // A rebind must first prove its receiver's origin, then independently preserve
+    // every use of the new request. Neither fold admits phi requests or aliases.
+    @Rebind
+    inputs query walk value@(Call (common: requestRebinding receiver)) ->
+      do
+        true <- follow query walk receiver
+          else
+            false -> outputs false
+        true <- preserve query value
+          else
+            false -> outputs false
+        outputs true

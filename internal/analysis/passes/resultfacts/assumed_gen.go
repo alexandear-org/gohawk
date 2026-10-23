@@ -25,7 +25,7 @@ func hyruledecideAssumedLeafRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule AssumedLeaf (internal/analysis/passes/resultfacts/rules/assumed.rules:26).
+		// Rule AssumedLeaf (internal/analysis/passes/resultfacts/rules/assumed.rules:27).
 		var hv10 hyruleImport1.FixedValues = hv3
 		var hv11 hyruleImport0.Value = hv2
 		var hv12 *hyruleImport2.SearchBudget = hv4

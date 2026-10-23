@@ -1,0 +1,46 @@
+version: 1
+targets:
+  - name: concurrencySnapshots
+    package: internal/analysis/passes/concurrencyfacts
+    out: internal/analysis/passes/concurrencyfacts/boiler_snapshots_gen.go
+    operations:
+      - snapshot: cloneEffects
+        type: Summary
+        fields:
+          cutoff: keep
+          Paths: keep
+          Conditions: clone
+          Returned: clone
+          Operations: clone
+          deferred: clone
+          Workers: call cloneWorkers
+          Choices: call cloneChoices
+          CancellationInputs: clone
+          AlternativesComplete: keep
+          Reason: keep
+      - snapshot: cloneWorker
+        type: WorkerSummary
+        fields:
+          Operations: clone
+          Alternatives: call cloneOperationAlternatives
+          Spawn: keep
+          Site: keep
+          Prefix: keep
+          Branches: keep
+          AlternativeConditions: clone
+          Replicated: keep
+      - snapshot: cloneChoice
+        type: SelectChoice
+        fields:
+          Arms: call cloneArms
+          Prefix: keep
+          Site: keep
+          Worker: keep
+      - snapshot: cloneArm
+        type: SelectArm
+        fields:
+          Operation: keep
+          Default: keep
+          StateIndex: keep
+          Sequence: clone
+          Complete: keep

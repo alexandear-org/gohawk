@@ -1,5 +1,3 @@
-signature total = outputs unknownBranch()
-
 view Call = *ssa.Call
 
 host
@@ -28,36 +26,38 @@ host
   resourceReasonExactErrorEqualsNonNilFilesystemSentinel
   resourceReasonErrorsAsExactAcquisitionError
 
-// A call cannot be an equality expression. The remaining evidence families
-// retain their order, including terminal predicate cutoffs before legacy APIs.
-@Call
-rewrite (inputs knowledge call@(Call()) error budget) =
-  case assertion call error budget of
-    true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
-    false -> decline
-  <|> case errorsIs call error budget of
-    Witness (reason: reason) -> outputs (result true reason budget)
-    NoWitness() -> decline
-  <|> case errorsAs call error of
-    true -> outputs (result true ^resourceReasonErrorsAsExactAcquisitionError budget)
-    false -> decline
-  <|> case predicate knowledge call error budget of
-    Decided (proof: proof) -> outputs proof
-    Undecided() -> decline
-  <|> case legacy call error budget of
-    Witness (reason: reason) -> outputs (result true reason budget)
-    NoWitness() -> decline
-  <|> outputs (result false ^resourceReasonNone budget)
-
-@Other
-rewrite (inputs _ condition error budget) =
-  case equality condition error budget of
-    true -> outputs (result true ^resourceReasonExactErrorEqualsNonNilFilesystemSentinel budget)
-    false -> decline
-  <|> case assertion condition error budget of
-    true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
-    false -> decline
-  <|> case errorsIs condition error budget of
-    Witness (reason: reason) -> outputs (result true reason budget)
-    NoWitness() -> decline
-  <|> outputs (result false ^resourceReasonNone budget)
+total fn rewrite
+  fallback outputs unknownBranch()
+  match inputs
+    // A call cannot be an equality expression. The remaining evidence families
+    // retain their order, including terminal predicate cutoffs before legacy APIs.
+    @Call
+    inputs knowledge call@(Call()) error budget ->
+      case assertion call error budget of
+        true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
+        false -> decline
+      <|> case errorsIs call error budget of
+        Witness (reason: reason) -> outputs (result true reason budget)
+        NoWitness() -> decline
+      <|> case errorsAs call error of
+        true -> outputs (result true ^resourceReasonErrorsAsExactAcquisitionError budget)
+        false -> decline
+      <|> case predicate knowledge call error budget of
+        Decided (proof: proof) -> outputs proof
+        Undecided() -> decline
+      <|> case legacy call error budget of
+        Witness (reason: reason) -> outputs (result true reason budget)
+        NoWitness() -> decline
+      <|> outputs (result false ^resourceReasonNone budget)
+    @Other
+    inputs _ condition error budget ->
+      case equality condition error budget of
+        true -> outputs (result true ^resourceReasonExactErrorEqualsNonNilFilesystemSentinel budget)
+        false -> decline
+      <|> case assertion condition error budget of
+        true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
+        false -> decline
+      <|> case errorsIs condition error budget of
+        Witness (reason: reason) -> outputs (result true reason budget)
+        NoWitness() -> decline
+      <|> outputs (result false ^resourceReasonNone budget)

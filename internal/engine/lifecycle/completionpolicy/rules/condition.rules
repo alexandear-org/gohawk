@@ -1,5 +1,3 @@
-signature total = outputs Opaque()
-
 type Step = ConditionStep
   tag Kind
   Opaque = ConditionOpaque
@@ -23,27 +21,24 @@ host
   nilOutcome = nilComparisonOutcome
   operandTruth = comparisonOperandTruth
 
-// Prefer the existing right constant. Swapping occurs only if that operand
-// is not constant; this differs from the provider's literal-left convention.
-@NilRight
-rewrite (inputs (Comparison (left: operand, right: literal@(Constant()), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth)
-  | errorNilComparison literal operand
-  =
-  outputs (Outcome (value: operand, outcome: nilOutcome op truth))
-
-@BooleanRight
-rewrite (inputs (Comparison (left: operand, right: Constant (value: Boolean literal), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth) =
-  outputs (Follow (value: operand, truth: operandTruth op truth literal))
-
-@NilLeft
-rewrite (inputs (Comparison (left: literal@(Constant()), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth)
-  | nonconstantOperand operand
-  , errorNilComparison literal operand
-  =
-  outputs (Outcome (value: operand, outcome: nilOutcome op truth))
-
-@BooleanLeft
-rewrite (inputs (Comparison (left: Constant (value: Boolean literal), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth)
-  | nonconstantOperand operand
-  =
-  outputs (Follow (value: operand, truth: operandTruth op truth literal))
+total fn rewrite
+  fallback outputs Opaque()
+  match inputs
+    // Prefer the existing right constant. Swapping occurs only if that operand
+    // is not constant; this differs from the provider's literal-left convention.
+    @NilRight
+    inputs (Comparison (left: operand, right: literal@(Constant()), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+      when errorNilComparison literal operand ->
+      outputs (Outcome (value: operand, outcome: nilOutcome op truth))
+    @BooleanRight
+    inputs (Comparison (left: operand, right: Constant (value: Boolean literal), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth ->
+      outputs (Follow (value: operand, truth: operandTruth op truth literal))
+    @NilLeft
+    inputs (Comparison (left: literal@(Constant()), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+      when nonconstantOperand operand
+      , errorNilComparison literal operand ->
+      outputs (Outcome (value: operand, outcome: nilOutcome op truth))
+    @BooleanLeft
+    inputs (Comparison (left: Constant (value: Boolean literal), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+      when nonconstantOperand operand ->
+      outputs (Follow (value: operand, truth: operandTruth op truth literal))

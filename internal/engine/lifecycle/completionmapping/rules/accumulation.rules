@@ -10,21 +10,20 @@ view Evidence = Paths
 host
   differentPath
 
-signature total = outputs (Paths (Path: "", Seen: false, Exact: false))
-
-@Unnamed
-rewrite (inputs paths _ false) = outputs (paths with (Seen: true, Exact: false))
-
-@First
-rewrite (inputs paths@(Evidence (seen: false)) path true) =
-  outputs (paths with (Path: path, Seen: true, Exact: true))
-
-@Conflict
-rewrite (inputs paths@(Evidence (path: previous)) path true)
-  | differentPath previous path
-  =
-  outputs (paths with (Seen: true, Exact: false))
-
-// Matching a path cannot restore exactness lost at an earlier call.
-@Same
-rewrite (inputs paths _ true) = outputs (paths with (Seen: true))
+total fn rewrite
+  fallback outputs (Paths (Path: "", Seen: false, Exact: false))
+  match inputs
+    @Unnamed
+    inputs paths _ false ->
+      outputs (paths with (Seen: true, Exact: false))
+    @First
+    inputs paths@(Evidence (seen: false)) path true ->
+      outputs (paths with (Path: path, Seen: true, Exact: true))
+    @Conflict
+    inputs paths@(Evidence (path: previous)) path true
+      when differentPath previous path ->
+      outputs (paths with (Seen: true, Exact: false))
+    // Matching a path cannot restore exactness lost at an earlier call.
+    @Same
+    inputs paths _ true ->
+      outputs (paths with (Seen: true))

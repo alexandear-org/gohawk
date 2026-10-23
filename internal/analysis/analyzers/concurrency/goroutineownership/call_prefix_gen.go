@@ -21,7 +21,7 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		if hv3 == nil {
-			// Rule Missing (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:18).
+			// Rule Missing (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:19).
 			hresult := struct {
 				V0 helperCallProof
 				V1 bool
@@ -36,7 +36,7 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 			return hresult, true
 		}
 		if hs1, hok := hv2.(*hyruleImport0.Go); hok && hs1 != nil {
-			// Rule Launched (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:23).
+			// Rule Launched (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:24).
 			var hv11 *spawnAnalysis = hv1
 			var hv12 *hyruleImport0.CallCommon = hv3
 			var hv13 goroutineOwnershipReason = reasonLabelLaunchedHelper
@@ -135,7 +135,7 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 			hv8 := hs4.Value
 			_ = hv8
 			if hs5, hok := hv8.(*hyruleImport0.Builtin); hok && hs5 != nil {
-				// Rule OtherBuiltin (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:44).
+				// Rule OtherBuiltin (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:42).
 				hresult := struct {
 					V0 helperCallProof
 					V1 bool
@@ -150,7 +150,7 @@ func hyrulerecognizeSpawnCallRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule Direct (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:47).
+		// Rule Direct (internal/analysis/analyzers/concurrency/goroutineownership/rules/call_prefix.rules:45).
 		var hv18 struct {
 			V0 helperCallProof
 			V1 bool

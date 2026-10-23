@@ -1,5 +1,3 @@
-signature total = outputs ^actionNone ^reasonNone
-
 view Closure = *ssa.MakeClosure
 
 view Receive = *ssa.UnOp
@@ -31,38 +29,39 @@ host
   reasonLabelSent
   reasonLabelStoredInMap
 
-// Capturing a value has no effect by itself. Classify the closure's defer,
-// return, store, launch or opaque call where that lifecycle action happens.
-@ClosureCreation
-rewrite (inputs _ Closure()) = outputs ^actionNone ^reasonNone
-
-@Reception
-rewrite (inputs analysis instruction@(Receive() | Select() | Range())) =
-  case exact analysis instruction of
-    true -> outputs ^actionJoin ^reasonLabelSignalReceived
-    false -> decline
-  <|> case possible analysis instruction of
-    true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive
-    false -> decline
-  <|> case aggregate analysis instruction of
-    true -> outputs ^actionUnknown ^reasonLabelSignalAggregateReceive
-    false -> decline
-  <|> case selectSends analysis instruction of
-    true -> outputs ^actionUnknown ^reasonLabelSelectSends
-    false -> decline
-  <|> outputs ^actionNone ^reasonNone
-
-@Sent
-rewrite (inputs analysis (Send (value: value))) =
-  case consumes analysis value of
-    true -> outputs ^actionUnknown ^reasonLabelSent
-    false -> outputs ^actionNone ^reasonNone
-
-@Mapped
-rewrite (inputs analysis (MapUpdate (value: value))) =
-  case consumes analysis value of
-    true -> outputs ^actionUnknown ^reasonLabelStoredInMap
-    false -> outputs ^actionNone ^reasonNone
-
-@Other
-rewrite (inputs _ _) = outputs ^actionNone ^reasonNone
+total fn rewrite
+  fallback outputs ^actionNone ^reasonNone
+  match inputs
+    // Capturing a value has no effect by itself. Classify the closure's defer,
+    // return, store, launch or opaque call where that lifecycle action happens.
+    @ClosureCreation
+    inputs _ Closure() ->
+      outputs ^actionNone ^reasonNone
+    @Reception
+    inputs analysis instruction@(Receive() | Select() | Range()) ->
+      case exact analysis instruction of
+        true -> outputs ^actionJoin ^reasonLabelSignalReceived
+        false -> decline
+      <|> case possible analysis instruction of
+        true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive
+        false -> decline
+      <|> case aggregate analysis instruction of
+        true -> outputs ^actionUnknown ^reasonLabelSignalAggregateReceive
+        false -> decline
+      <|> case selectSends analysis instruction of
+        true -> outputs ^actionUnknown ^reasonLabelSelectSends
+        false -> decline
+      <|> outputs ^actionNone ^reasonNone
+    @Sent
+    inputs analysis (Send (value: value)) ->
+      case consumes analysis value of
+        true -> outputs ^actionUnknown ^reasonLabelSent
+        false -> outputs ^actionNone ^reasonNone
+    @Mapped
+    inputs analysis (MapUpdate (value: value)) ->
+      case consumes analysis value of
+        true -> outputs ^actionUnknown ^reasonLabelStoredInMap
+        false -> outputs ^actionNone ^reasonNone
+    @Other
+    inputs _ _ ->
+      outputs ^actionNone ^reasonNone

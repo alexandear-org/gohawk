@@ -24,7 +24,7 @@ func hyruleAfterCallbackRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		if hv4 == true {
-			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/after_callback.rules:9).
+			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/after_callback.rules:10).
 			var hv12 CallQueries = hv1
 			var hv13 hyruleImport0.Instruction = hv2
 			var hv14 *hyruleImport0.CallCommon = hv3

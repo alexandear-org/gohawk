@@ -1,25 +1,25 @@
-signature total = outputs false
-
 host
   entry! = SelectedAtEntry
   selected! = selectGuaranteed
   received! = From
 
-// Arm-entry evidence precedes instruction-local evidence. A mixed or defaulted
-// select is terminal false, even when some offered arm receives from the target.
-// https://github.com/containerd/stargz-snapshotter/blob/624678b4e421947534cbf0618f9609853cccee0f/store/manager.go#L193-L221
-@Select
-rewrite (inputs instruction@(Select()) matches) =
-  case entry instruction matches of
-    true -> outputs true
-    false -> case selected instruction matches of
-      true -> outputs true
-      false -> outputs false
-
-@Other
-rewrite (inputs instruction matches) =
-  case entry instruction matches of
-    true -> outputs true
-    false -> case received instruction matches of
-      true -> outputs true
-      false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Arm-entry evidence precedes instruction-local evidence. A mixed or defaulted
+    // select is terminal false, even when some offered arm receives from the target.
+    // https://github.com/containerd/stargz-snapshotter/blob/624678b4e421947534cbf0618f9609853cccee0f/store/manager.go#L193-L221
+    @Select
+    inputs instruction@(Select()) matches ->
+      case entry instruction matches of
+        true -> outputs true
+        false -> case selected instruction matches of
+          true -> outputs true
+          false -> outputs false
+    @Other
+    inputs instruction matches ->
+      case entry instruction matches of
+        true -> outputs true
+        false -> case received instruction matches of
+          true -> outputs true
+          false -> outputs false

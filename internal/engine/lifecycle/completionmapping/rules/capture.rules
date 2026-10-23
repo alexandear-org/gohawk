@@ -1,46 +1,45 @@
-signature total = outputs emptyLocal() false
-
 host
   classify! value originalMatch exact = CaptureRelation context local binding target value originalMatch exact invocation
   deferredCell! cell = DeferredCell context local cell target invocation
 
-@ExactCell
-rewrite (inputs context@(Request (exact: true)) local cell@(Cell()) target invocation) =
-  do
-    stored <- stable context cell invocation
-    true <- proven stored
-      else
-        false -> outputs emptyLocal() false
-    outputs (Exact (local: local, supplied: stored.Value, path: nil)) (identical stored.Value target)
-
-@ExactValue
-rewrite (inputs (Request (exact: true)) local binding target _) =
-  outputs (Exact (local: local, supplied: binding, path: nil)) (identical binding target)
-
-// Deferred stability may change the alias question. Keep the original binding
-// match separately so containment cannot rescue a directly matched capture.
-@Capture
-rewrite (inputs context local binding target invocation) =
-  do
-    value <- capturedValue binding context.Budget
-    matches <- captureMatches binding target context.Budget
-    false <- exhausted context
-      else
-        true -> outputs emptyLocal() false
-    false <- deferred context
-      else
-        true -> do
-          OtherBinding() <- directCell context binding
-            else
-              DirectCell (cell: cell) -> do
-                answer <- deferredCell cell
-                answer
-          stored <- deferredValue context.Queries binding target invocation
-          true <- proven stored
-            else
-              false -> outputs emptyLocal() false
-          exact <- mayAlias stored.Value target
-          answer <- classify stored.Value matches exact
-          answer
-    answer <- classify value matches matches
-    answer
+total fn rewrite
+  fallback outputs emptyLocal() false
+  match inputs
+    @ExactCell
+    inputs context@(Request (exact: true)) local cell@(Cell()) target invocation ->
+      do
+        stored <- stable context cell invocation
+        true <- proven stored
+          else
+            false -> outputs emptyLocal() false
+        outputs (Exact (local: local, supplied: stored.Value, path: nil)) (identical stored.Value target)
+    @ExactValue
+    inputs (Request (exact: true)) local binding target _ ->
+      outputs (Exact (local: local, supplied: binding, path: nil)) (identical binding target)
+    // Deferred stability may change the alias question. Keep the original binding
+    // match separately so containment cannot rescue a directly matched capture.
+    @Capture
+    inputs context local binding target invocation ->
+      do
+        value <- capturedValue binding context.Budget
+        matches <- captureMatches binding target context.Budget
+        false <- exhausted context
+          else
+            true -> outputs emptyLocal() false
+        false <- deferred context
+          else
+            true -> do
+              OtherBinding() <- directCell context binding
+                else
+                  DirectCell (cell: cell) -> do
+                    answer <- deferredCell cell
+                    answer
+              stored <- deferredValue context.Queries binding target invocation
+              true <- proven stored
+                else
+                  false -> outputs emptyLocal() false
+              exact <- mayAlias stored.Value target
+              answer <- classify stored.Value matches exact
+              answer
+        answer <- classify value matches matches
+        answer

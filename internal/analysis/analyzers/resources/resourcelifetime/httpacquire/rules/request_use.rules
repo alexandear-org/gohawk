@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   requestDo
   requestRebindUse
@@ -7,28 +5,26 @@ host
   follow! = headRequestQuery.followUses
   header! = headerUsesAreEditsWithin
 
-@Debug
-rewrite (inputs _ _ _ Debug()) = outputs true
-
-@Do
-rewrite (inputs _ _ request call@(Call()))
-  | requestDo call request
-  =
-  outputs true
-
-@Rebind
-rewrite (inputs query walk request call@(Call()))
-  | requestRebindUse call request
-  =
-  case follow query walk call of
-    true -> outputs true
-    false -> outputs false
-
-// Header edits preserve Method; opaque map consumers remain unavailable.
-@Header
-rewrite (inputs query _ _ field@(FieldAddress()))
-  | requestHeader field
-  =
-  case header field query.budget of
-    true -> outputs true
-    false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    @Debug
+    inputs _ _ _ Debug() ->
+      outputs true
+    @Do
+    inputs _ _ request call@(Call())
+      when requestDo call request ->
+      outputs true
+    @Rebind
+    inputs query walk request call@(Call())
+      when requestRebindUse call request ->
+      case follow query walk call of
+        true -> outputs true
+        false -> outputs false
+    // Header edits preserve Method; opaque map consumers remain unavailable.
+    @Header
+    inputs query _ _ field@(FieldAddress())
+      when requestHeader field ->
+      case header field query.budget of
+        true -> outputs true
+        false -> outputs false

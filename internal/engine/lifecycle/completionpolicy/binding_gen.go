@@ -12,7 +12,7 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Function, *hyruleImport0.MakeClosure:
 			if hv1 != (*hyruleImport0.Function)(nil) && hv1 != (*hyruleImport0.MakeClosure)(nil) {
-				// Rule Exact (internal/engine/lifecycle/completionpolicy/rules/binding.rules:12).
+				// Rule Exact (internal/engine/lifecycle/completionpolicy/rules/binding.rules:13).
 				hresult := struct{ V0 BindingStep }{V0: BindingStep{Kind: BindingExact}}
 				if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {
 					var zero struct{ V0 BindingStep }
@@ -32,7 +32,7 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 						hv4 := hs2
 						_ = hv4
 						if hv3 == bindingLoadToken {
-							// Rule Field (internal/engine/lifecycle/completionpolicy/rules/binding.rules:15).
+							// Rule Field (internal/engine/lifecycle/completionpolicy/rules/binding.rules:16).
 							var hv7 BindingStep = BindingStep{Kind: BindingField, Field: hv4}
 							hresult := struct{ V0 BindingStep }{V0: hv7}
 							if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {
@@ -59,7 +59,7 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 					}
 				}
 				if hv3 == bindingLoadToken {
-					// Rule Load (internal/engine/lifecycle/completionpolicy/rules/binding.rules:23).
+					// Rule Load (internal/engine/lifecycle/completionpolicy/rules/binding.rules:22).
 					var hv9 BindingStep = BindingStep{Kind: BindingLoad, Source: hv2}
 					hresult := struct{ V0 BindingStep }{V0: hv9}
 					if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {
@@ -73,7 +73,7 @@ func hyruleRecognizeBindingRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 			if hs1 != nil {
 				hv6 := hs1
 				_ = hv6
-				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/binding.rules:27).
+				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/binding.rules:26).
 				var hv10 BindingStep = BindingStep{Kind: BindingCell, Source: hv6}
 				hresult := struct{ V0 BindingStep }{V0: hv10}
 				if !hyrulehyruleRecognizeBindingRecognizeRecord11Valid(hresult) {

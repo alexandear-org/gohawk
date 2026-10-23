@@ -25,7 +25,7 @@ func hyruledecideRequestUseRecognize(harg0 struct {
 		switch hs1 := hv4.(type) {
 		case *hyruleImport0.DebugRef:
 			if hv4 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:10).
+				// Rule Debug (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:11).
 				return struct{ V0 bool }{V0: true}, true
 			}
 		case *hyruleImport0.Call:
@@ -36,13 +36,13 @@ func hyruledecideRequestUseRecognize(harg0 struct {
 				_ = hv6
 				{
 					if requestDo(hv6, hv3) {
-						// Rule Do (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:13).
+						// Rule Do (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:14).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
 				{
 					if requestRebindUse(hv6, hv3) {
-						// Rule Rebind (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:19).
+						// Rule Rebind (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:18).
 						var hv10 headRequestQuery = hv1
 						var hv11 hyruleImport1.ReachingWalk = hv2
 						var hv12 hyruleImport0.Value = hv6
@@ -67,7 +67,7 @@ func hyruledecideRequestUseRecognize(harg0 struct {
 				_ = hv8
 				{
 					if requestHeader(hv8) {
-						// Rule Header (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:28).
+						// Rule Header (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_use.rules:25).
 						var hv14 *hyruleImport0.FieldAddr = hv8
 						var hv15 *hyruleImport2.SearchBudget = hv1.budget
 						hv9 := headerUsesAreEditsWithin(hv14, hv15)

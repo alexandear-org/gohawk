@@ -7,7 +7,7 @@ func hyruleMissingReleaseRecognize(harg0 struct{ P0 MissingQueries }) (struct{ V
 	{
 		hv1 := harg0.P0
 		_ = hv1
-		// Rule Missing (internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/missing.rules:20).
+		// Rule Missing (internal/analysis/analyzers/concurrency/lockorder/lockpolicy/rules/missing.rules:21).
 		var hv15 MissingQueries = hv1
 		hv2 := (MissingQueries).Spend(hv15)
 		_ = hv2

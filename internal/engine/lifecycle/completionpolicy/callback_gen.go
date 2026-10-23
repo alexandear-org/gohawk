@@ -19,7 +19,7 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/callback.rules:23).
+				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/callback.rules:24).
 				var hv8 CallbackSource = CallbackSource{Kind: CallbackExact, Closure: hv3}
 				hresult := struct{ V0 CallbackSource }{V0: hv8}
 				if !hyrulehyruleRecognizeCallbackRecognizeRecord5Valid(hresult) {
@@ -37,7 +37,7 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 					_ = hv5
 					if hok {
 						if hv2 == true {
-							// Rule DeferredOnce (internal/engine/lifecycle/completionpolicy/rules/callback.rules:26).
+							// Rule DeferredOnce (internal/engine/lifecycle/completionpolicy/rules/callback.rules:27).
 							var hv9 CallbackSource = CallbackSource{Kind: CallbackFollow, Source: hv5}
 							hresult := struct{ V0 CallbackSource }{V0: hv9}
 							if !hyrulehyruleRecognizeCallbackRecognizeRecord5Valid(hresult) {
@@ -53,7 +53,7 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 			if hs1 != nil {
 				hv6 := hs1.X
 				_ = hv6
-				// Rule CellRead (internal/engine/lifecycle/completionpolicy/rules/callback.rules:30).
+				// Rule CellRead (internal/engine/lifecycle/completionpolicy/rules/callback.rules:31).
 				var hv10 CallbackSource = CallbackSource{Kind: CallbackStorage, Source: hv6}
 				hresult := struct{ V0 CallbackSource }{V0: hv10}
 				if !hyrulehyruleRecognizeCallbackRecognizeRecord5Valid(hresult) {
@@ -66,7 +66,7 @@ func hyruleRecognizeCallbackRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1
 				_ = hv7
-				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/callback.rules:33).
+				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/callback.rules:34).
 				var hv11 CallbackSource = CallbackSource{Kind: CallbackStorage, Source: hv7}
 				hresult := struct{ V0 CallbackSource }{V0: hv11}
 				if !hyrulehyruleRecognizeCallbackRecognizeRecord5Valid(hresult) {

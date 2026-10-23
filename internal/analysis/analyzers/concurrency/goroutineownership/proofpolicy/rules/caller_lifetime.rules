@@ -1,5 +1,3 @@
-signature total = outputs emptyProof() false
-
 host
   stop! = CallerLifetimeQueries.Stop
   context! = CallerLifetimeQueries.Context
@@ -13,45 +11,48 @@ host
   available! = LifetimeObservation.Available
   matched! = LifetimeObservation.Matched
 
-// Cutoff precedes every witness, including a positive partial search. Each
-// completed false query alone permits the next strategy under the same budget.
-@Caller
-rewrite (inputs queries) =
-  do
-    stop <- stop queries
-    true <- available stop
-      else
-        false -> do
-          proof <- cutoff queries
-          outputs proof true
-    false <- matched stop
-      else
-        true -> outputs (Unknown (reason: ^StopLifecycle)) true
-    context <- context queries
-    true <- available context
-      else
-        false -> do
-          proof <- cutoff queries
-          outputs proof true
-    false <- matched context
-      else
-        true -> outputs (Unknown (reason: ^ContextLifecycle)) true
-    canceled <- canceled queries
-    true <- available canceled
-      else
-        false -> do
-          proof <- cutoff queries
-          outputs proof true
-    false <- matched canceled
-      else
-        true -> outputs (Unknown (reason: ^LocallyCanceledContext)) true
-    receiver <- receiver queries
-    true <- available receiver
-      else
-        false -> do
-          proof <- cutoff queries
-          outputs proof true
-    false <- matched receiver
-      else
-        true -> outputs (Unknown (reason: ^ReceiverContext)) true
-    outputs emptyProof() false
+total fn rewrite
+  fallback outputs emptyProof() false
+  match inputs
+    // Cutoff precedes every witness, including a positive partial search. Each
+    // completed false query alone permits the next strategy under the same budget.
+    @Caller
+    inputs queries ->
+      do
+        stop <- stop queries
+        true <- available stop
+          else
+            false -> do
+              proof <- cutoff queries
+              outputs proof true
+        false <- matched stop
+          else
+            true -> outputs (Unknown (reason: ^StopLifecycle)) true
+        context <- context queries
+        true <- available context
+          else
+            false -> do
+              proof <- cutoff queries
+              outputs proof true
+        false <- matched context
+          else
+            true -> outputs (Unknown (reason: ^ContextLifecycle)) true
+        canceled <- canceled queries
+        true <- available canceled
+          else
+            false -> do
+              proof <- cutoff queries
+              outputs proof true
+        false <- matched canceled
+          else
+            true -> outputs (Unknown (reason: ^LocallyCanceledContext)) true
+        receiver <- receiver queries
+        true <- available receiver
+          else
+            false -> do
+              proof <- cutoff queries
+              outputs proof true
+        false <- matched receiver
+          else
+            true -> outputs (Unknown (reason: ^ReceiverContext)) true
+        outputs emptyProof() false

@@ -36,7 +36,7 @@ func hyruleTranslatePathRecognize(harg0 struct {
 		hv5 := harg0.P4
 		_ = hv5
 		if hv4 == false {
-			// Rule Unknown (internal/engine/lifecycle/completionmapping/rules/path.rules:15).
+			// Rule Unknown (internal/engine/lifecycle/completionmapping/rules/path.rules:16).
 			return struct {
 				V0 string
 				V1 bool
@@ -53,14 +53,14 @@ func hyruleTranslatePathRecognize(harg0 struct {
 				if hv4 == true {
 					{
 						if nonempty(hv8) {
-							// Rule Contained (internal/engine/lifecycle/completionmapping/rules/path.rules:20).
+							// Rule Contained (internal/engine/lifecycle/completionmapping/rules/path.rules:21).
 							return struct {
 								V0 string
 								V1 bool
 							}{V0: "", V1: samePath(hv3, hv8)}, true
 						}
 					}
-					// Rule Exact (internal/engine/lifecycle/completionmapping/rules/path.rules:26).
+					// Rule Exact (internal/engine/lifecycle/completionmapping/rules/path.rules:25).
 					var hv17 hyruleImport2.Value = hv7
 					var hv18 hyruleImport2.Value = hv2
 					var hv19 *hyruleImport3.SearchBudget = hv5
@@ -110,7 +110,7 @@ func hyruleTranslatePathRecognize(harg0 struct {
 				if hv4 == true {
 					{
 						if nonempty(hv3) {
-							// Rule ProjectionChild (internal/engine/lifecycle/completionmapping/rules/path.rules:33).
+							// Rule ProjectionChild (internal/engine/lifecycle/completionmapping/rules/path.rules:31).
 							return struct {
 								V0 string
 								V1 bool
@@ -119,14 +119,14 @@ func hyruleTranslatePathRecognize(harg0 struct {
 					}
 					{
 						if nonempty(hv11) {
-							// Rule ProjectionPath (internal/engine/lifecycle/completionmapping/rules/path.rules:39).
+							// Rule ProjectionPath (internal/engine/lifecycle/completionmapping/rules/path.rules:35).
 							return struct {
 								V0 string
 								V1 bool
 							}{V0: hyruleImport0.JoinAccessPath(hv11), V1: true}, true
 						}
 					}
-					// Rule Projection (internal/engine/lifecycle/completionmapping/rules/path.rules:46).
+					// Rule Projection (internal/engine/lifecycle/completionmapping/rules/path.rules:40).
 					var hv21 hyruleImport2.Value = hv10
 					var hv22 hyruleImport2.Value = hv2
 					var hv23 *hyruleImport3.SearchBudget = hv5
@@ -175,7 +175,7 @@ func hyruleTranslatePathRecognize(harg0 struct {
 				_ = hv13
 				if hv3 == nil {
 					if hv4 == true {
-						// Rule DirectOwner (internal/engine/lifecycle/completionmapping/rules/path.rules:54).
+						// Rule DirectOwner (internal/engine/lifecycle/completionmapping/rules/path.rules:47).
 						return struct {
 							V0 string
 							V1 bool
@@ -183,7 +183,7 @@ func hyruleTranslatePathRecognize(harg0 struct {
 					}
 				}
 				if hv4 == true {
-					// Rule NestedOwner (internal/engine/lifecycle/completionmapping/rules/path.rules:59).
+					// Rule NestedOwner (internal/engine/lifecycle/completionmapping/rules/path.rules:52).
 					var hv25 hyruleImport2.Value = hv13
 					var hv26 hyruleImport2.Value = hv2
 					var hv27 *hyruleImport3.SearchBudget = hv5
@@ -229,7 +229,7 @@ func hyruleTranslatePathRecognize(harg0 struct {
 				hv15 := hv1.Supplied
 				_ = hv15
 				if hv4 == true {
-					// Rule Callback (internal/engine/lifecycle/completionmapping/rules/path.rules:65).
+					// Rule Callback (internal/engine/lifecycle/completionmapping/rules/path.rules:57).
 					return struct {
 						V0 string
 						V1 bool

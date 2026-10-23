@@ -20,7 +20,7 @@ func hyrulerecognizeCancellationCallRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Call (internal/analysis/analyzers/resources/cancellationownership/rules/call_label.rules:10).
+		// Rule Call (internal/analysis/analyzers/resources/cancellationownership/rules/call_label.rules:11).
 		var hv10 struct {
 			V0 cancellationLabel
 			V1 bool

@@ -1,5 +1,3 @@
-signature total = outputs "" false false false
-
 host
   booleanValue
   valueIdentity = guardValueIdentity
@@ -7,31 +5,31 @@ host
   stableOperand! = stableOperandWithin
   computed! = computedGuard
 
-@Parameter
-rewrite (inputs condition@(Parameter()) _)
-  | booleanValue condition
-  =
-  outputs (valueIdentity condition) false true true
-
-// Keep left-before-right short circuiting. A failed operand proof tries the
-// ordinary computed-value policy without refunding any search allowance.
-@Equality
-rewrite (inputs condition@(Comparison (left: left, right: right, op: op@(^guardEqualToken | ^guardNotEqualToken))) budget) =
-  do
-    true <- stableOperand left budget
-      else
-        false -> decline
-    true <- stableOperand right budget
-      else
-        false -> decline
-    outputs (stableEquality left right) (negated op) true true
-  <|> case computed condition budget of
-    KnownGuard (identity: identity) -> outputs identity false true true
-    UnknownGuard() -> decline
-  <|> outputs "" false false false
-
-@Other
-rewrite (inputs condition budget) =
-  case computed condition budget of
-    KnownGuard (identity: identity) -> outputs identity false true true
-    UnknownGuard() -> outputs "" false false false
+total fn rewrite
+  fallback outputs "" false false false
+  match inputs
+    @Parameter
+    inputs condition@(Parameter()) _
+      when booleanValue condition ->
+      outputs (valueIdentity condition) false true true
+    // Keep left-before-right short circuiting. A failed operand proof tries the
+    // ordinary computed-value policy without refunding any search allowance.
+    @Equality
+    inputs condition@(Comparison (left: left, right: right, op: op@(^guardEqualToken | ^guardNotEqualToken))) budget ->
+      do
+        true <- stableOperand left budget
+          else
+            false -> decline
+        true <- stableOperand right budget
+          else
+            false -> decline
+        outputs (stableEquality left right) (negated op) true true
+      <|> case computed condition budget of
+        KnownGuard (identity: identity) -> outputs identity false true true
+        UnknownGuard() -> decline
+      <|> outputs "" false false false
+    @Other
+    inputs condition budget ->
+      case computed condition budget of
+        KnownGuard (identity: identity) -> outputs identity false true true
+        UnknownGuard() -> outputs "" false false false

@@ -1,5 +1,3 @@
-signature total = outputs ^lockEffectIgnore nil
-
 view Operation = concurrencyfacts.Operation
   kind: Kind
   resource: Resource
@@ -21,33 +19,30 @@ host
   readUnlock
   condWait
 
-// An unresolved projection makes even an otherwise ignored effect uncertain.
-@Projected
-rewrite (inputs operation _)
-  | projected operation
-  =
-  outputs ^lockEffectUnknown nil
-
-@Indirect
-rewrite (inputs (Operation (kind: (^lock | ^unlock), resource: Resource (indirect: true))) _) =
-  outputs ^lockEffectUnknown nil
-
-@Absent
-rewrite (inputs (Operation (kind: (^lock | ^unlock), resource: Resource (value: nil))) _) =
-  outputs ^lockEffectUnknown nil
-
-@Acquire
-rewrite (inputs (Operation (kind: ^lock, resource: Resource (value: value))) _) =
-  outputs ^lockEffectAcquire value
-
-@Release
-rewrite (inputs (Operation (kind: ^unlock, resource: Resource (value: value))) region) =
-  case held region value of
-    true -> outputs ^lockEffectRelease value
-    false -> outputs ^lockEffectUnknown nil
-
-// Wait temporarily releases a Locker. Read locking is not an exclusive guard;
-// this query declines both instead of claiming the write has no guard.
-@Unsupported
-rewrite (inputs (Operation (kind: (^condWait | ^readLock | ^readUnlock))) _) =
-  outputs ^lockEffectUnknown nil
+total fn rewrite
+  fallback outputs ^lockEffectIgnore nil
+  match inputs
+    // An unresolved projection makes even an otherwise ignored effect uncertain.
+    @Projected
+    inputs operation _
+      when projected operation ->
+      outputs ^lockEffectUnknown nil
+    @Indirect
+    inputs (Operation (kind: (^lock | ^unlock), resource: Resource (indirect: true))) _ ->
+      outputs ^lockEffectUnknown nil
+    @Absent
+    inputs (Operation (kind: (^lock | ^unlock), resource: Resource (value: nil))) _ ->
+      outputs ^lockEffectUnknown nil
+    @Acquire
+    inputs (Operation (kind: ^lock, resource: Resource (value: value))) _ ->
+      outputs ^lockEffectAcquire value
+    @Release
+    inputs (Operation (kind: ^unlock, resource: Resource (value: value))) region ->
+      case held region value of
+        true -> outputs ^lockEffectRelease value
+        false -> outputs ^lockEffectUnknown nil
+    // Wait temporarily releases a Locker. Read locking is not an exclusive guard;
+    // this query declines both instead of claiming the write has no guard.
+    @Unsupported
+    inputs (Operation (kind: (^condWait | ^readLock | ^readUnlock))) _ ->
+      outputs ^lockEffectUnknown nil

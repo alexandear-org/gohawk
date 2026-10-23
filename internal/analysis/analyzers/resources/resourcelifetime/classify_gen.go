@@ -17,7 +17,7 @@ func hyruleclassifyResourceRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Instruction (internal/analysis/analyzers/resources/resourcelifetime/rules/classify.rules:52).
+		// Rule Instruction (internal/analysis/analyzers/resources/resourcelifetime/rules/classify.rules:53).
 		var hv26 struct {
 			V0 resourceAction
 			V1 resourceLifetimeReason

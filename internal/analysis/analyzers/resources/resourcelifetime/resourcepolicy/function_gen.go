@@ -25,7 +25,7 @@ func hyruleFunctionRecognize(harg0 struct {
 		_ = hv4
 		{
 			if dynamic(hv3) {
-				// Rule Dynamic (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function.rules:9).
+				// Rule Dynamic (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function.rules:10).
 				hresult := struct {
 					V0 Reason
 					V1 bool
@@ -40,7 +40,7 @@ func hyruleFunctionRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule Named (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function.rules:17).
+		// Rule Named (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/function.rules:16).
 		var hv9 FunctionQueries = hv1
 		var hv10 hyruleImport0.Instruction = hv2
 		var hv11 *hyruleImport0.CallCommon = hv3

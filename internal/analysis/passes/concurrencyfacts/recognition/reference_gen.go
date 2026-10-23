@@ -24,7 +24,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 					_ = hv3
 					{
 						if ConditionConstructor(hv3) {
-							// Rule Condition (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:29).
+							// Rule Condition (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:30).
 							return struct {
 								V0 ReferenceKind
 								V1 hyruleImport1.Value
@@ -33,7 +33,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 						}
 					}
 				}
-				// Rule OtherCall (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:37).
+				// Rule OtherCall (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:36).
 				return struct {
 					V0 ReferenceKind
 					V1 hyruleImport1.Value
@@ -44,7 +44,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:39).
 				return struct {
 					V0 ReferenceKind
 					V1 hyruleImport1.Value
@@ -55,7 +55,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 			if hs1 != nil {
 				hv5 := hs1
 				_ = hv5
-				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:39).
 				return struct {
 					V0 ReferenceKind
 					V1 hyruleImport1.Value
@@ -66,7 +66,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 			if hs1 != nil {
 				hv6 := hs1
 				_ = hv6
-				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:40).
+				// Rule Symbolic (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:39).
 				return struct {
 					V0 ReferenceKind
 					V1 hyruleImport1.Value
@@ -79,7 +79,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 				_ = hv7
 				{
 					if hyruleImport0.SynchronizationPointer((referenceValue).Type(hv7)) {
-						// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:44).
+						// Rule Local (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:42).
 						return struct {
 							V0 ReferenceKind
 							V1 hyruleImport1.Value
@@ -94,7 +94,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 				_ = hv8
 				{
 					if hyruleImport0.MutexPointer((referenceValue).Type(hv8)) {
-						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:52).
+						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:48).
 						return struct {
 							V0 ReferenceKind
 							V1 hyruleImport1.Value
@@ -109,7 +109,7 @@ func hyruleResourceReferenceRecognize(harg0 struct{ P0 hyruleImport1.Value }) (s
 				_ = hv9
 				{
 					if hyruleImport0.MutexPointer((referenceValue).Type(hv9)) {
-						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:52).
+						// Rule Address (internal/analysis/passes/concurrencyfacts/recognition/rules/reference.rules:48).
 						return struct {
 							V0 ReferenceKind
 							V1 hyruleImport1.Value

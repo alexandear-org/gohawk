@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   cycle!
   arguments!
@@ -7,75 +5,69 @@ host
   extracted! = decideExtract
   transparent?
 
-// Reexecuted allocations and loop phis may select a different lock each trip.
-@Allocation
-rewrite (inputs _ value@(Allocation())) =
-  case cycle value of
-    true -> outputs true
-    false -> outputs false
-
-@Phi
-rewrite (inputs _ value@(Phi())) =
-  case cycle value of
-    true -> outputs true
-    false -> outputs false
-
-@Extract
-rewrite (inputs walk value@(Extract())) =
-  case extracted walk value of
-    true -> outputs true
-    false -> outputs false
-
-// A queue may supply another owner on each receive. A receive outside a cycle
-// is terminal false; following its channel would invent iteration dependence.
-// https://github.com/encodeous/nylon/blob/c4a96c804f7aa08512721dec7994907eab100bc8/polyamide/device/channels.go#L83-L99
-@Receive
-rewrite (inputs _ value@(Unary (op: ^receiveToken))) =
-  case cycle value of
-    true -> outputs true
-    false -> outputs false
-
-@Unary
-rewrite (inputs walk (Unary (source: source))) =
-  case follow walk source of
-    true -> outputs true
-    false -> outputs false
-
-// Index dependence precedes the aggregate query, sharing the same visited set.
-@Indexed
-rewrite (inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index))) =
-  case follow walk index of
-    true -> outputs true
-    false -> case follow walk owner of
-      true -> outputs true
-      false -> outputs false
-
-@Field
-rewrite (inputs walk (FieldAddress (owner: owner) | Field (owner: owner))) =
-  case follow walk owner of
-    true -> outputs true
-    false -> outputs false
-
-// A range index is its loop phi plus one; operand order remains significant.
-@Binary
-rewrite (inputs walk (Binary (first: first, second: second))) =
-  case follow walk first of
-    true -> outputs true
-    false -> case follow walk second of
-      true -> outputs true
-      false -> outputs false
-
-// A lookup keyed by an iteration can select a different per-session mutex.
-// A call with no variant argument does not acquire uncertainty from its name.
-// https://github.com/fy0/CodeKanban/blob/745699cb67d3d34cec4793168f148eb61e43e766/service/websession/history_cleanup.go#L262-L276
-@Call
-rewrite (inputs walk call@(Call())) =
-  case arguments walk call of
-    true -> outputs true
-    false -> outputs false
-
-@Transparent
-rewrite (inputs walk (transparent source)) =
-  case follow walk source of
-    true -> outputs true
-    false -> outputs false
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Reexecuted allocations and loop phis may select a different lock each trip.
+    @Allocation
+    inputs _ value@(Allocation()) ->
+      case cycle value of
+        true -> outputs true
+        false -> outputs false
+    @Phi
+    inputs _ value@(Phi()) ->
+      case cycle value of
+        true -> outputs true
+        false -> outputs false
+    @Extract
+    inputs walk value@(Extract()) ->
+      case extracted walk value of
+        true -> outputs true
+        false -> outputs false
+    // A queue may supply another owner on each receive. A receive outside a cycle
+    // is terminal false; following its channel would invent iteration dependence.
+    // https://github.com/encodeous/nylon/blob/c4a96c804f7aa08512721dec7994907eab100bc8/polyamide/device/channels.go#L83-L99
+    @Receive
+    inputs _ value@(Unary (op: ^receiveToken)) ->
+      case cycle value of
+        true -> outputs true
+        false -> outputs false
+    @Unary
+    inputs walk (Unary (source: source)) ->
+      case follow walk source of
+        true -> outputs true
+        false -> outputs false
+    // Index dependence precedes the aggregate query, sharing the same visited set.
+    @Indexed
+    inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) ->
+      case follow walk index of
+        true -> outputs true
+        false -> case follow walk owner of
+          true -> outputs true
+          false -> outputs false
+    @Field
+    inputs walk (FieldAddress (owner: owner) | Field (owner: owner)) ->
+      case follow walk owner of
+        true -> outputs true
+        false -> outputs false
+    // A range index is its loop phi plus one; operand order remains significant.
+    @Binary
+    inputs walk (Binary (first: first, second: second)) ->
+      case follow walk first of
+        true -> outputs true
+        false -> case follow walk second of
+          true -> outputs true
+          false -> outputs false
+    // A lookup keyed by an iteration can select a different per-session mutex.
+    // A call with no variant argument does not acquire uncertainty from its name.
+    // https://github.com/fy0/CodeKanban/blob/745699cb67d3d34cec4793168f148eb61e43e766/service/websession/history_cleanup.go#L262-L276
+    @Call
+    inputs walk call@(Call()) ->
+      case arguments walk call of
+        true -> outputs true
+        false -> outputs false
+    @Transparent
+    inputs walk (transparent source) ->
+      case follow walk source of
+        true -> outputs true
+        false -> outputs false

@@ -1,5 +1,3 @@
-signature total = outputs (Producer (state: ^producerUnknown, reason: ^reasonNone))
-
 type Producer = producerProof
   state: State
   reason: Reason
@@ -18,26 +16,29 @@ host
   reasonProducerExceedsReceives
   reasonProducerWithinReceiveCount
 
-// No normal caller return puts a continuing or terminated caller outside
-// this finite consumer-count check (for example log.Fatal(<-results)).
-// https://github.com/saljam/webwormhole/blob/abf852af0458ba79772d9c26ef01434165f217d8/cmd/ww/server.go#L458-L470
-@Abandoned
-rewrite (inputs function send sends engine) =
-  do
-    true <- callerReturns send
-      else
-        false -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverDoesNotReturn))
-    count <- countProducerSends send sends
-    true <- known count.producerProof
-      else
-        false -> outputs count.producerProof
-    Known (count: receives, reason: _) <- channelReceives function send.channel send.spawn engine
-      else
-        Unknown (reason: reason) -> outputs (Producer (state: ^producerUnknown, reason: reason))
-    false <- receives == 0
-      else
-        true -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverObligationUnknown))
-    true <- count.count > receives
-      else
-        false -> outputs (Producer (state: ^producerDisproven, reason: ^reasonProducerWithinReceiveCount))
-    outputs (Producer (state: ^producerProven, reason: ^reasonProducerExceedsReceives))
+total fn rewrite
+  fallback outputs (Producer (state: ^producerUnknown, reason: ^reasonNone))
+  match inputs
+    // No normal caller return puts a continuing or terminated caller outside
+    // this finite consumer-count check (for example log.Fatal(<-results)).
+    // https://github.com/saljam/webwormhole/blob/abf852af0458ba79772d9c26ef01434165f217d8/cmd/ww/server.go#L458-L470
+    @Abandoned
+    inputs function send sends engine ->
+      do
+        true <- callerReturns send
+          else
+            false -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverDoesNotReturn))
+        count <- countProducerSends send sends
+        true <- known count.producerProof
+          else
+            false -> outputs count.producerProof
+        Known (count: receives, reason: _) <- channelReceives function send.channel send.spawn engine
+          else
+            Unknown (reason: reason) -> outputs (Producer (state: ^producerUnknown, reason: reason))
+        false <- receives == 0
+          else
+            true -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverObligationUnknown))
+        true <- count.count > receives
+          else
+            false -> outputs (Producer (state: ^producerDisproven, reason: ^reasonProducerWithinReceiveCount))
+        outputs (Producer (state: ^producerProven, reason: ^reasonProducerExceedsReceives))

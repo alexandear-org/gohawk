@@ -20,7 +20,7 @@ func hyruleclassifyResourceAcquisitionRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Acquisition (internal/analysis/analyzers/resources/deferinloop/rules/acquisition.rules:22).
+		// Rule Acquisition (internal/analysis/analyzers/resources/deferinloop/rules/acquisition.rules:23).
 		var hv11 struct {
 			V0 cleanupMethods
 			V1 bool

@@ -17,7 +17,7 @@ func hyruleNotificationRecognize(harg0 struct {
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Go:
 			if hv1 != (*hyruleImport0.Go)(nil) {
-				// Rule Detached (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:14).
+				// Rule Detached (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:15).
 				return struct{ V0 hyruleImport0.Value }{V0: nil}, true
 			}
 		case *hyruleImport0.Send:
@@ -26,7 +26,7 @@ func hyruleNotificationRecognize(harg0 struct {
 				_ = hv3
 				hv4 := hs1
 				_ = hv4
-				// Rule Sent (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:20).
+				// Rule Sent (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:21).
 				var hv11 func(hyruleImport0.Instruction) bool = hv2
 				var hv12 hyruleImport0.Instruction = hv4
 				hv5 := notificationTerminal(hv11, hv12)
@@ -80,7 +80,7 @@ func hyruleNotificationRecognize(harg0 struct {
 				return hv14, true
 			}
 		}
-		// Rule Close (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:37).
+		// Rule Close (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/notification.rules:36).
 		var hv17 hyruleImport0.Instruction = hv1
 		hv8part0, hv8part1 := notificationChannel(hv17)
 		hv8 := struct {

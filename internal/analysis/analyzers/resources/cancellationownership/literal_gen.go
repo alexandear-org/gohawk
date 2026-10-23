@@ -22,7 +22,7 @@ func hyruleclassifyDeferredLiteralRecognize(harg0 struct {
 			hv3, hok := deferredLiteralClosure(hv2)
 			_ = hv3
 			if hok {
-				// Rule Literal (internal/analysis/analyzers/resources/cancellationownership/rules/literal.rules:18).
+				// Rule Literal (internal/analysis/analyzers/resources/cancellationownership/rules/literal.rules:19).
 				var hv14 *cancellationClassifier = hv1
 				hv4 := (*cancellationClassifier).budget(hv14)
 				_ = hv4

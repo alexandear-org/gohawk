@@ -32,7 +32,7 @@ func hyruleclassifyArgumentUseRecognize(harg0 struct {
 		_ = hv5
 		hv6 := harg0.P5
 		_ = hv6
-		// Rule Argument (internal/analysis/analyzers/resources/deferinloop/rules/argument.rules:23).
+		// Rule Argument (internal/analysis/analyzers/resources/deferinloop/rules/argument.rules:24).
 		var hv11 hyruleImport1.Probe = hv2
 		var hv12 hyruleImport2.Instruction = hv3
 		var hv13 hyruleImport2.Value = hv4

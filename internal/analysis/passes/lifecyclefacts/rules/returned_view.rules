@@ -1,5 +1,3 @@
-signature total = outputs false
-
 host
   unchanged = parameterReturnedUnchangedOnEveryReturn
   mayRelease = parameterMayBeReleased
@@ -7,25 +5,28 @@ host
   parameterCapable = parameterCanRelease
   fields = unreleasedStoredField
 
-// Returning the same value under the same static type preserves the
-// caller-visible owner rather than hiding it behind a view. This is the
-// common status-checking shape: an error response may be closed locally,
-// while a successful response is handed back unchanged. Requiring every
-// normal return and the same type keeps wrappers and interface erasure out
-// of this exception.
-// A constructor that released the argument itself leaves the caller
-// nothing to keep, whatever becomes of the field afterwards.
-// A callee cannot release what it was handed if the parameter's own type
-// offers no way to. compress/gzip takes an io.Reader and documents that
-// its Close does not close it, which is the standard convention: a wrapper
-// closes what it constructed, never what it was given, and taking a plain
-// reader rather than a ReadCloser is the API saying so. Asking the
-// returned type instead gets that case wrong, because *gzip.Reader has a
-// Close that closes its own decompressor.
-@View
-rewrite (inputs function parameter result structure released methodsKnown) =
-  if unchanged function parameter || mayRelease function parameter
-    then outputs false
-    else if not (parameterCapable parameter && capable result)
-    then outputs true
-    else outputs (fields parameter structure released methodsKnown)
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // Returning the same value under the same static type preserves the
+    // caller-visible owner rather than hiding it behind a view. This is the
+    // common status-checking shape: an error response may be closed locally,
+    // while a successful response is handed back unchanged. Requiring every
+    // normal return and the same type keeps wrappers and interface erasure out
+    // of this exception.
+    // A constructor that released the argument itself leaves the caller
+    // nothing to keep, whatever becomes of the field afterwards.
+    // A callee cannot release what it was handed if the parameter's own type
+    // offers no way to. compress/gzip takes an io.Reader and documents that
+    // its Close does not close it, which is the standard convention: a wrapper
+    // closes what it constructed, never what it was given, and taking a plain
+    // reader rather than a ReadCloser is the API saying so. Asking the
+    // returned type instead gets that case wrong, because *gzip.Reader has a
+    // Close that closes its own decompressor.
+    @View
+    inputs function parameter result structure released methodsKnown ->
+      if unchanged function parameter || mayRelease function parameter
+        then outputs false
+        else if not (parameterCapable parameter && capable result)
+        then outputs true
+        else outputs (fields parameter structure released methodsKnown)

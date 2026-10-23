@@ -18,7 +18,7 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 			if hs1 != nil {
 				hv2 := hs1
 				_ = hv2
-				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/retained.rules:19).
+				// Rule Closure (internal/engine/lifecycle/completionpolicy/rules/retained.rules:20).
 				return struct {
 					V0 CapabilityKind
 					V1 hyruleImport0.Value
@@ -29,7 +29,7 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/retained.rules:22).
+				// Rule Cell (internal/engine/lifecycle/completionpolicy/rules/retained.rules:23).
 				return struct {
 					V0 CapabilityKind
 					V1 hyruleImport0.Value
@@ -40,7 +40,7 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 			if hs1 != nil {
 				hv4 := hs1.X
 				_ = hv4
-				// Rule StoredSource (internal/engine/lifecycle/completionpolicy/rules/retained.rules:27).
+				// Rule StoredSource (internal/engine/lifecycle/completionpolicy/rules/retained.rules:28).
 				return struct {
 					V0 CapabilityKind
 					V1 hyruleImport0.Value
@@ -54,7 +54,7 @@ func hyruleRetainedCallbackRecognize(harg0 struct{ P0 hyruleImport0.Value }) (st
 				{
 					var hv6 []hyruleImport0.Value = hv5.Args
 					_ = hv6
-					// Rule Arguments (internal/engine/lifecycle/completionpolicy/rules/retained.rules:32).
+					// Rule Arguments (internal/engine/lifecycle/completionpolicy/rules/retained.rules:33).
 					return struct {
 						V0 CapabilityKind
 						V1 hyruleImport0.Value

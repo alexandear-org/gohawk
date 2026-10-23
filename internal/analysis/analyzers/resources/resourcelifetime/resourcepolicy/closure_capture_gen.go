@@ -24,7 +24,7 @@ func hyruleClosureCaptureRecognize(harg0 struct {
 		hv4 := harg0.P3
 		_ = hv4
 		if hv4 == true {
-			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_capture.rules:9).
+			// Rule Carried (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/closure_capture.rules:10).
 			var hv9 ClosureQueries = hv1
 			var hv10 hyruleImport0.Instruction = hv2
 			var hv11 *hyruleImport0.MakeClosure = hv3

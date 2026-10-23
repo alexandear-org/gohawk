@@ -20,7 +20,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					if !(SynchronizationPointer((node).Type(hv2))) {
 						{
 							if Address(hv3) {
-								// Rule Field (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:48).
+								// Rule Field (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:49).
 								return struct{ V0 bool }{V0: true}, true
 							}
 						}
@@ -37,7 +37,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					if Value((node).Type(hv4)) {
 						{
 							if Address(hv5) {
-								// Rule Write (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:57).
+								// Rule Write (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:56).
 								return struct{ V0 bool }{V0: true}, true
 							}
 						}
@@ -46,7 +46,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 			}
 		case *hyruleImport0.MakeMap, *hyruleImport0.MakeSlice:
 			if hv1 != (*hyruleImport0.MakeMap)(nil) && hv1 != (*hyruleImport0.MakeSlice)(nil) {
-				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:65).
+				// Rule EmptyContainer (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:62).
 				return struct{ V0 bool }{V0: true}, true
 			}
 		case *hyruleImport0.IndexAddr:
@@ -55,7 +55,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv6
 				{
 					if Address(hv6) {
-						// Rule Indexed (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:68).
+						// Rule Indexed (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:65).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
@@ -66,7 +66,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv7
 				{
 					if Elements((node).Type(hv7)) {
-						// Rule Resliced (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:75).
+						// Rule Resliced (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:70).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
@@ -77,7 +77,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv8
 				{
 					if Value(lookupElement(hv8)) {
-						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:82).
+						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:75).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
@@ -88,7 +88,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv9
 				{
 					if Value(lookupElement(hv9)) {
-						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:82).
+						// Rule Element (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:75).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
@@ -98,7 +98,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				hv10 := hs1.Tuple
 				_ = hv10
 				if hs2, hok := hv10.(*hyruleImport0.Select); hok && hs2 != nil {
-					// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:89).
+					// Rule SelectProjection (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:80).
 					return struct{ V0 bool }{V0: false}, true
 				}
 				hv11 := hs1.Tuple
@@ -107,7 +107,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 				_ = hv12
 				{
 					if Value((node).Type(hv12)) {
-						// Rule Projected (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:92).
+						// Rule Projected (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:83).
 						return struct{ V0 bool }{V0: true}, true
 					}
 				}
@@ -122,7 +122,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 					if Value((node).Type(hv13)) {
 						{
 							if Value((node).Type(hv14)) {
-								// Rule MapWrite (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:99).
+								// Rule MapWrite (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:88).
 								return struct{ V0 bool }{V0: true}, true
 							}
 						}
@@ -144,7 +144,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 							hv18 = nilConstant(hv17)
 						}
 						if hv18 {
-							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:107).
+							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:94).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}
@@ -156,7 +156,7 @@ func hyruleDataInstructionRecognize(harg0 struct{ P0 hyruleImport0.Instruction }
 							hv19 = nilConstant(hv17)
 						}
 						if hv19 {
-							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:107).
+							// Rule NilComparison (internal/analysis/passes/concurrencyfacts/admission/rules/data.rules:94).
 							return struct{ V0 bool }{V0: true}, true
 						}
 					}

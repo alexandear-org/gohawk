@@ -25,7 +25,7 @@ func hyruledecideAbsentAcquisitionRecognize(harg0 struct {
 		if hs1, hok := hv2.(*hyruleImport0.Call); hok && hs1 != nil {
 			hv5 := hs1
 			_ = hv5
-			// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules:33).
+			// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_absence.rules:34).
 			var hv18 struct{ V0 resourceProof }
 			hv18answered := false
 			if !hv18answered {

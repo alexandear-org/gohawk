@@ -1,5 +1,3 @@
-signature total = outputs ""
-
 view Call = *ssa.Call
 
 view Global = *ssa.Global
@@ -42,55 +40,53 @@ host
   valueName
   hasLiteral
 
-// Unresolved calls never fall back to a value name: repeated executions may
-// return different owners, and a field declaration alone identifies no instance.
-@Getter
-rewrite (inputs walk call@(Call()) budget) =
-  case getter walk call budget of
-    Named (name: name) -> outputs name
-    Unresolved() -> outputs ""
-
-@Global
-rewrite (inputs _ value@(Global()) _) = outputs (globalName value)
-
-@Address
-rewrite (inputs walk value@(FieldAddress()) budget) =
-  case address walk value budget of
-    Named (name: name) -> outputs name
-    Unresolved() -> outputs ""
-
-@Copied
-rewrite (inputs walk value@(Field()) budget) =
-  case copied walk value budget of
-    Named (name: name) -> outputs name
-    Unresolved() -> outputs ""
-
-// The query retains owner-then-index evaluation even when the owner is unknown.
-@Indexed
-rewrite (inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) budget) =
-  case indexed walk owner index budget of
-    Named (name: name) -> outputs name
-    Unresolved() -> outputs ""
-
-@Parameter
-rewrite (inputs _ value@(Parameter()) _) = outputs (parameterName value)
-
-// Captured owners of the same type remain distinct within the closure.
-// https://github.com/trickstercache/trickster/blob/7818ae3c39e725eb998f04fa31e5d315ede84b79/integration/alb_request_headers_test.go#L93-L99
-@Free
-rewrite (inputs _ value@(Free()) _) = outputs (freeName value)
-
-// Generic allocation comments cannot collapse distinct local lock owners.
-@Allocation
-rewrite (inputs _ value@(Allocation()) _) = outputs (allocationName value)
-
-@Constant
-rewrite (inputs _ value@(Constant()) _)
-  | hasLiteral value
-  =
-  outputs (literalName value)
-
-// Preserve dynamic SSA identity rather than merging owners by their field type.
-// https://github.com/prometheus/prometheus/blob/e06b2dc5a6149e20ca82fe936fb044a6dfe45958/notifier/manager.go#L165-L180
-@Other
-rewrite (inputs _ value _) = outputs (valueName value)
+total fn rewrite
+  fallback outputs ""
+  match inputs
+    // Unresolved calls never fall back to a value name: repeated executions may
+    // return different owners, and a field declaration alone identifies no instance.
+    @Getter
+    inputs walk call@(Call()) budget ->
+      case getter walk call budget of
+        Named (name: name) -> outputs name
+        Unresolved() -> outputs ""
+    @Global
+    inputs _ value@(Global()) _ ->
+      outputs (globalName value)
+    @Address
+    inputs walk value@(FieldAddress()) budget ->
+      case address walk value budget of
+        Named (name: name) -> outputs name
+        Unresolved() -> outputs ""
+    @Copied
+    inputs walk value@(Field()) budget ->
+      case copied walk value budget of
+        Named (name: name) -> outputs name
+        Unresolved() -> outputs ""
+    // The query retains owner-then-index evaluation even when the owner is unknown.
+    @Indexed
+    inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) budget ->
+      case indexed walk owner index budget of
+        Named (name: name) -> outputs name
+        Unresolved() -> outputs ""
+    @Parameter
+    inputs _ value@(Parameter()) _ ->
+      outputs (parameterName value)
+    // Captured owners of the same type remain distinct within the closure.
+    // https://github.com/trickstercache/trickster/blob/7818ae3c39e725eb998f04fa31e5d315ede84b79/integration/alb_request_headers_test.go#L93-L99
+    @Free
+    inputs _ value@(Free()) _ ->
+      outputs (freeName value)
+    // Generic allocation comments cannot collapse distinct local lock owners.
+    @Allocation
+    inputs _ value@(Allocation()) _ ->
+      outputs (allocationName value)
+    @Constant
+    inputs _ value@(Constant()) _
+      when hasLiteral value ->
+      outputs (literalName value)
+    // Preserve dynamic SSA identity rather than merging owners by their field type.
+    // https://github.com/prometheus/prometheus/blob/e06b2dc5a6149e20ca82fe936fb044a6dfe45958/notifier/manager.go#L165-L180
+    @Other
+    inputs _ value _ ->
+      outputs (valueName value)

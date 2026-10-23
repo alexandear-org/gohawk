@@ -24,7 +24,7 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Getter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:47).
+				// Rule Getter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:48).
 				var hv16 hyruleImport1.ReachingWalk = hv1
 				var hv17 *hyruleImport0.Call = hv4
 				var hv18 *hyruleImport2.SearchBudget = hv3
@@ -89,7 +89,7 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1
 				_ = hv7
-				// Rule Copied (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:62).
+				// Rule Copied (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:61).
 				var hv24 hyruleImport1.ReachingWalk = hv1
 				var hv25 *hyruleImport0.Field = hv7
 				var hv26 *hyruleImport2.SearchBudget = hv3
@@ -120,7 +120,7 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				_ = hv8
 				hv9 := hs1.Index
 				_ = hv9
-				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:69).
+				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:67).
 				var hv28 hyruleImport1.ReachingWalk = hv1
 				var hv29 hyruleImport0.Value = hv8
 				var hv30 hyruleImport0.Value = hv9
@@ -152,7 +152,7 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				_ = hv10
 				hv11 := hs1.Index
 				_ = hv11
-				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:69).
+				// Rule Indexed (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:67).
 				var hv33 hyruleImport1.ReachingWalk = hv1
 				var hv34 hyruleImport0.Value = hv10
 				var hv35 hyruleImport0.Value = hv11
@@ -182,21 +182,21 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 			if hs1 != nil {
 				hv12 := hs1
 				_ = hv12
-				// Rule Parameter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:75).
+				// Rule Parameter (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:72).
 				return struct{ V0 string }{V0: parameterName(hv12)}, true
 			}
 		case *hyruleImport0.FreeVar:
 			if hs1 != nil {
 				hv13 := hs1
 				_ = hv13
-				// Rule Free (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:80).
+				// Rule Free (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:77).
 				return struct{ V0 string }{V0: freeName(hv13)}, true
 			}
 		case *hyruleImport0.Alloc:
 			if hs1 != nil {
 				hv14 := hs1
 				_ = hv14
-				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:84).
+				// Rule Allocation (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:81).
 				return struct{ V0 string }{V0: allocationName(hv14)}, true
 			}
 		case *hyruleImport0.Const:
@@ -205,13 +205,13 @@ func hyruledecideIdentityLeafRecognize(harg0 struct {
 				_ = hv15
 				{
 					if hasLiteral(hv15) {
-						// Rule Constant (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:87).
+						// Rule Constant (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:84).
 						return struct{ V0 string }{V0: literalName(hv15)}, true
 					}
 				}
 			}
 		}
-		// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:95).
+		// Rule Other (internal/analysis/analyzers/concurrency/lockorder/lockidentity/rules/leaf.rules:90).
 		return struct{ V0 string }{V0: valueName(hv2)}, true
 	}
 }

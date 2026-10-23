@@ -15,7 +15,7 @@ func hyruleFallbackRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Remaining (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/fallback.rules:17).
+		// Rule Remaining (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/fallback.rules:18).
 		var hv11 FallbackQueries = hv1
 		hv3 := (FallbackQueries).FlagGuarded(hv11)
 		_ = hv3

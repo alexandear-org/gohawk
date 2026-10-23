@@ -14,7 +14,7 @@ func hyruleContextCallRecognize(harg0 struct{ P0 *hyruleImport1.CallCommon }) (s
 		hv1 := harg0.P0
 		_ = hv1
 		if hv1 == nil {
-			// Rule Missing (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:16).
+			// Rule Missing (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:17).
 			return struct {
 				V0 ContextKind
 				V1 hyruleImport1.Value
@@ -22,7 +22,7 @@ func hyruleContextCallRecognize(harg0 struct{ P0 *hyruleImport1.CallCommon }) (s
 		}
 		{
 			if EmptyContext(hv1) {
-				// Rule NonCanceling (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:19).
+				// Rule NonCanceling (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:20).
 				return struct {
 					V0 ContextKind
 					V1 hyruleImport1.Value
@@ -31,7 +31,7 @@ func hyruleContextCallRecognize(harg0 struct{ P0 *hyruleImport1.CallCommon }) (s
 		}
 		{
 			if CancelConstructor(hv1) {
-				// Rule Constructor (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:25).
+				// Rule Constructor (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:24).
 				return struct {
 					V0 ContextKind
 					V1 hyruleImport1.Value
@@ -40,7 +40,7 @@ func hyruleContextCallRecognize(harg0 struct{ P0 *hyruleImport1.CallCommon }) (s
 		}
 		{
 			if DoneCall(hv1) {
-				// Rule Observation (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:31).
+				// Rule Observation (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:28).
 				return struct {
 					V0 ContextKind
 					V1 hyruleImport1.Value
@@ -52,7 +52,7 @@ func hyruleContextCallRecognize(harg0 struct{ P0 *hyruleImport1.CallCommon }) (s
 				{
 					var hv2 hyruleImport1.Value = hv1.Value
 					_ = hv2
-					// Rule Request (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:39).
+					// Rule Request (internal/analysis/passes/concurrencyfacts/recognition/rules/context.rules:34).
 					return struct {
 						V0 ContextKind
 						V1 hyruleImport1.Value

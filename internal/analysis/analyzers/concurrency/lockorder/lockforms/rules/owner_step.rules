@@ -1,5 +1,3 @@
-signature total = outputs nil false
-
 view Field = *ssa.FieldAddr
   source: X
 
@@ -12,14 +10,18 @@ view Constant = *ssa.Const
 host
   indexedSource
 
-@Field
-rewrite (inputs (Field (source: source))) = outputs source true
-
-// Distinct elements are distinct cells. A dynamic index may select a private
-// consumer position, so repeated readers do not prove a shared-cell write.
-// Pyroscope's Tee advances each consumer's cursor while holding a read lock:
-// https://github.com/grafana/pyroscope/blob/d1212251265e7dab4b03ef0d80af565f6d519e1b/pkg/iter/tee.go#L68-L76
-// A constant index names one shared cell. Slice loads retain the backing array;
-// pointer loads stay opaque, as decided by the host's indexedSource contract.
-@ConstantIndex
-rewrite (inputs (Index (source: source, index: Constant()))) = outputs (indexedSource source) true
+total fn rewrite
+  fallback outputs nil false
+  match inputs
+    @Field
+    inputs (Field (source: source)) ->
+      outputs source true
+    // Distinct elements are distinct cells. A dynamic index may select a private
+    // consumer position, so repeated readers do not prove a shared-cell write.
+    // Pyroscope's Tee advances each consumer's cursor while holding a read lock:
+    // https://github.com/grafana/pyroscope/blob/d1212251265e7dab4b03ef0d80af565f6d519e1b/pkg/iter/tee.go#L68-L76
+    // A constant index names one shared cell. Slice loads retain the backing array;
+    // pointer loads stay opaque, as decided by the host's indexedSource contract.
+    @ConstantIndex
+    inputs (Index (source: source, index: Constant())) ->
+      outputs (indexedSource source) true

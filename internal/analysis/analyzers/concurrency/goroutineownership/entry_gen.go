@@ -18,7 +18,7 @@ func hyrulerecognizeSpawnEntryRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule Instruction (internal/analysis/analyzers/concurrency/goroutineownership/rules/entry.rules:17).
+		// Rule Instruction (internal/analysis/analyzers/concurrency/goroutineownership/rules/entry.rules:18).
 		var hv6 struct {
 			V0 ownershipAction
 			V1 goroutineOwnershipReason

@@ -1,5 +1,3 @@
-signature total = outputs (Opaque ^reasonLabelHelperUndecided) true
-
 view Launch = *ssa.Go
 
 host
@@ -17,22 +15,25 @@ type Completion = (proofs.EvidenceState, lifecycle.CompletionRequest)
   Indeterminate (request: 1) = completionUnknown
   Incomplete = completionDisproven
 
-@Launched
-rewrite (inputs Launch() _) = outputs (Opaque ^reasonLabelLaunchedHelper) true
-
-// May-alias invocation evidence can identify an ambiguous handoff beyond exact
-// completion, but it cannot establish release.
-@Argument
-rewrite (inputs instruction classifier) =
-  case completion classifier instruction of
-    Completed() -> outputs (Release ^reasonLabelHelperRelease) true
-    Indeterminate (request: request) -> case summaryInvokes classifier instruction request of
-      true -> outputs (Release ^reasonLabelSummaryRelease) true
-      false -> outputs (Opaque ^reasonLabelHelperUndecided) true
-    Incomplete() -> case mayInvoke instruction of
-      true -> outputs (Opaque ^reasonLabelHelperMayInvoke) true
-      false -> decline
-    <|> case returnsCleanup instruction of
-      true -> outputs (Opaque ^reasonLabelReturnsDeferredCleanup) true
-      false -> decline
-    <|> outputs (NoAction ^reasonCancellationNone) false
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelHelperUndecided) true
+  match inputs
+    @Launched
+    inputs Launch() _ ->
+      outputs (Opaque ^reasonLabelLaunchedHelper) true
+    // May-alias invocation evidence can identify an ambiguous handoff beyond exact
+    // completion, but it cannot establish release.
+    @Argument
+    inputs instruction classifier ->
+      case completion classifier instruction of
+        Completed() -> outputs (Release ^reasonLabelHelperRelease) true
+        Indeterminate (request: request) -> case summaryInvokes classifier instruction request of
+          true -> outputs (Release ^reasonLabelSummaryRelease) true
+          false -> outputs (Opaque ^reasonLabelHelperUndecided) true
+        Incomplete() -> case mayInvoke instruction of
+          true -> outputs (Opaque ^reasonLabelHelperMayInvoke) true
+          false -> decline
+        <|> case returnsCleanup instruction of
+          true -> outputs (Opaque ^reasonLabelReturnsDeferredCleanup) true
+          false -> decline
+        <|> outputs (NoAction ^reasonCancellationNone) false

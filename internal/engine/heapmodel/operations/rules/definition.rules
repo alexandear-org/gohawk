@@ -1,5 +1,3 @@
-signature total = outputs Ignored()
-
 type Definition = Definition
   tag Kind
   Ignored
@@ -59,42 +57,39 @@ host
   wrapper?
   loadToken
 
-@ArrayPointer
-rewrite (inputs value@(ArrayPointer (source: source))) = outputs (Alias (value: value, source: source))
-
-@Wrapper
-rewrite (inputs value@(wrapper source)) = outputs (Alias (value: value, source: source))
-
-@FieldAddress
-rewrite (inputs value@(FieldAddressValue (source: source, field: field))) =
-  outputs (FieldAddress (value: value, source: source, field: field))
-
-@FieldLoad
-rewrite (inputs value@(FieldValue (source: source, field: field))) =
-  outputs (FieldLoad (value: value, source: source, field: field))
-
-@IndexAddress
-rewrite (inputs value@(IndexAddressValue (source: source, index: index))) =
-  outputs (IndexAddress (value: value, source: source, index: index))
-
-@IndexLoad
-rewrite (inputs value@(IndexValue (source: source, index: index))) =
-  outputs (IndexLoad (value: value, source: source, index: index))
-
-@Slice
-rewrite (inputs slice@(SliceValue())) = outputs (Sliced (slice: slice))
-
-@Load
-rewrite (inputs value@(Unary (source: source, op: ^loadToken))) =
-  outputs (Load (value: value, source: source))
-
-// A tuple assertion is interpreted by its extraction, never as the object.
-@Assertion
-rewrite (inputs value@(Assertion (source: source, commaOK: false))) =
-  outputs (Alias (value: value, source: source))
-
-// These definitions produce opaque storage, without claiming an alias to an
-// operand. Other unsupported values remain unrecorded by this pass.
-@Opaque
-rewrite (inputs value@(Map() | Channel() | SliceAllocation() | Range() | Next() | Binary() | MultiConversion())) =
-  outputs (Opaque (value: value))
+total fn rewrite
+  fallback outputs Ignored()
+  match inputs
+    @ArrayPointer
+    inputs value@(ArrayPointer (source: source)) ->
+      outputs (Alias (value: value, source: source))
+    @Wrapper
+    inputs value@(wrapper source) ->
+      outputs (Alias (value: value, source: source))
+    @FieldAddress
+    inputs value@(FieldAddressValue (source: source, field: field)) ->
+      outputs (FieldAddress (value: value, source: source, field: field))
+    @FieldLoad
+    inputs value@(FieldValue (source: source, field: field)) ->
+      outputs (FieldLoad (value: value, source: source, field: field))
+    @IndexAddress
+    inputs value@(IndexAddressValue (source: source, index: index)) ->
+      outputs (IndexAddress (value: value, source: source, index: index))
+    @IndexLoad
+    inputs value@(IndexValue (source: source, index: index)) ->
+      outputs (IndexLoad (value: value, source: source, index: index))
+    @Slice
+    inputs slice@(SliceValue()) ->
+      outputs (Sliced (slice: slice))
+    @Load
+    inputs value@(Unary (source: source, op: ^loadToken)) ->
+      outputs (Load (value: value, source: source))
+    // A tuple assertion is interpreted by its extraction, never as the object.
+    @Assertion
+    inputs value@(Assertion (source: source, commaOK: false)) ->
+      outputs (Alias (value: value, source: source))
+    // These definitions produce opaque storage, without claiming an alias to an
+    // operand. Other unsupported values remain unrecorded by this pass.
+    @Opaque
+    inputs value@(Map() | Channel() | SliceAllocation() | Range() | Next() | Binary() | MultiConversion()) ->
+      outputs (Opaque (value: value))

@@ -26,7 +26,7 @@ func hyruleResolveReturnValueRecognize(harg0 struct {
 			_ = hv5
 			if hv4 == returnLoadToken {
 				if hv2 == returnTrue {
-					// Rule BooleanSpill (internal/engine/lifecycle/completionpolicy/rules/return_value.rules:19).
+					// Rule BooleanSpill (internal/engine/lifecycle/completionpolicy/rules/return_value.rules:20).
 					var hv10 hyruleImport1.Value = hv5
 					var hv11 *hyruleImport3.SearchBudget = hv3
 					hv6part0, hv6part1 := resolveReturn(hv10, hv11)
@@ -51,7 +51,7 @@ func hyruleResolveReturnValueRecognize(harg0 struct {
 					return hv12, true
 				}
 				if hv2 == returnFalse {
-					// Rule BooleanSpill (internal/engine/lifecycle/completionpolicy/rules/return_value.rules:19).
+					// Rule BooleanSpill (internal/engine/lifecycle/completionpolicy/rules/return_value.rules:20).
 					var hv13 hyruleImport1.Value = hv5
 					var hv14 *hyruleImport3.SearchBudget = hv3
 					hv8part0, hv8part1 := resolveReturn(hv13, hv14)

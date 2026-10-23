@@ -20,7 +20,7 @@ func hyrulerecognizeCancellationArgumentRecognize(harg0 struct {
 		hv2 := harg0.P1
 		_ = hv2
 		if hs1, hok := hv1.(*hyruleImport1.Go); hok && hs1 != nil {
-			// Rule Launched (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:20).
+			// Rule Launched (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:21).
 			hresult := struct {
 				V0 cancellationLabel
 				V1 bool
@@ -34,7 +34,7 @@ func hyrulerecognizeCancellationArgumentRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Argument (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:25).
+		// Rule Argument (internal/analysis/analyzers/resources/cancellationownership/rules/argument_label.rules:26).
 		var hv8 *cancellationClassifier = hv2
 		var hv9 hyruleImport1.Instruction = hv1
 		hv3part0, hv3part1 := (*cancellationClassifier).argumentCompletion(hv8, hv9)

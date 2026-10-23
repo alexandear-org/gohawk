@@ -26,7 +26,7 @@ func hyruledecideFromRecognize(harg0 struct {
 				hv5 := hs1.X
 				_ = hv5
 				if hv4 == receiveToken {
-					// Rule Receive (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:8).
+					// Rule Receive (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:9).
 					var hv9 func(hyruleImport1.Value) bool = hv2
 					var hv10 hyruleImport1.Value = hv5
 					hv6 := matchChannel(hv9, hv10)
@@ -66,7 +66,7 @@ func hyruledecideFromRecognize(harg0 struct {
 				_ = hv7
 				{
 					if channelRange(hv7) {
-						// Rule Range (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:22).
+						// Rule Range (internal/analysis/analyzers/concurrency/goroutineownership/receives/rules/from.rules:21).
 						var hv16 func(hyruleImport1.Value) bool = hv2
 						var hv17 hyruleImport1.Value = hv7
 						hv8 := matchChannel(hv16, hv17)

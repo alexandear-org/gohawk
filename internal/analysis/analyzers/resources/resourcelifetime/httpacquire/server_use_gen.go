@@ -25,7 +25,7 @@ func hyruledecideServerUseRecognize(harg0 struct {
 				if hv3 == 0 {
 					{
 						if hasReferrers(hv4) {
-							// Rule URL (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:11).
+							// Rule URL (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:12).
 							var hv8 *hyruleImport0.FieldAddr = hv4
 							var hv9 *hyruleImport1.SearchBudget = hv2
 							hv5 := urlFieldLoads(hv8, hv9)
@@ -50,7 +50,7 @@ func hyruledecideServerUseRecognize(harg0 struct {
 				_ = hv6
 				{
 					if serverClientCall(hv6) {
-						// Rule Client (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:19).
+						// Rule Client (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:18).
 						var hv11 *hyruleImport0.Call = hv6
 						var hv12 *hyruleImport1.SearchBudget = hv2
 						hv7 := onlyClientGetUsesWithin(hv11, hv12)
@@ -69,7 +69,7 @@ func hyruledecideServerUseRecognize(harg0 struct {
 		}
 		{
 			if serverClose(hv1) {
-				// Rule Close (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:27).
+				// Rule Close (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/server_use.rules:24).
 				return struct{ V0 bool }{V0: true}, true
 			}
 		}

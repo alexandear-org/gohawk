@@ -12,7 +12,7 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Go, *hyruleImport0.Send:
 			if hv1 != (*hyruleImport0.Go)(nil) && hv1 != (*hyruleImport0.Send)(nil) {
-				// Rule Concurrent (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:26).
+				// Rule Concurrent (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:27).
 				return struct{ V0 bool }{V0: false}, true
 			}
 		case *hyruleImport0.MakeInterface:
@@ -21,7 +21,7 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 				_ = hv2
 				{
 					if callbackValue(hv2) {
-						// Rule Box (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:29).
+						// Rule Box (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:30).
 						return struct{ V0 bool }{V0: false}, true
 					}
 				}
@@ -32,7 +32,7 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 				_ = hv3
 				{
 					if callbackValue(hv3) {
-						// Rule Map (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:35).
+						// Rule Map (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:34).
 						return struct{ V0 bool }{V0: false}, true
 					}
 				}
@@ -43,7 +43,7 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 				_ = hv4
 				{
 					if returnedCallback(hv4) {
-						// Rule Return (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:41).
+						// Rule Return (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:38).
 						return struct{ V0 bool }{V0: false}, true
 					}
 				}
@@ -58,7 +58,7 @@ func hyruleContextInstructionSafeRecognize(harg0 struct{ P0 hyruleImport0.Instru
 					if callbackValue(hv5) {
 						{
 							if nonlocalCallbackAddress(hv6) {
-								// Rule NonlocalStore (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:47).
+								// Rule NonlocalStore (internal/engine/lifecycle/completionpolicy/rules/context_safe.rules:42).
 								return struct{ V0 bool }{V0: false}, true
 							}
 						}

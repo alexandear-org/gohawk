@@ -1,5 +1,3 @@
-signature total = outputs true
-
 view Go = *ssa.Go
 
 view Send = *ssa.Send
@@ -21,32 +19,28 @@ host
   returnedCallback
   nonlocalCallbackAddress
 
-// Reject every escape before collecting invocation contexts. One safe frame
-// cannot establish safety when another consumer can retain or launch a callback.
-@Concurrent
-rewrite (inputs (Go() | Send())) = outputs false
-
-@Box
-rewrite (inputs (Box (value: value)))
-  | callbackValue value
-  =
-  outputs false
-
-@Map
-rewrite (inputs (MapUpdate (value: value)))
-  | callbackValue value
-  =
-  outputs false
-
-@Return
-rewrite (inputs returned@(Return()))
-  | returnedCallback returned
-  =
-  outputs false
-
-@NonlocalStore
-rewrite (inputs (Store (value: value, address: address)))
-  | callbackValue value
-  , nonlocalCallbackAddress address
-  =
-  outputs false
+total fn rewrite
+  fallback outputs true
+  match inputs
+    // Reject every escape before collecting invocation contexts. One safe frame
+    // cannot establish safety when another consumer can retain or launch a callback.
+    @Concurrent
+    inputs (Go() | Send()) ->
+      outputs false
+    @Box
+    inputs (Box (value: value))
+      when callbackValue value ->
+      outputs false
+    @Map
+    inputs (MapUpdate (value: value))
+      when callbackValue value ->
+      outputs false
+    @Return
+    inputs returned@(Return())
+      when returnedCallback returned ->
+      outputs false
+    @NonlocalStore
+    inputs (Store (value: value, address: address))
+      when callbackValue value
+      , nonlocalCallbackAddress address ->
+      outputs false

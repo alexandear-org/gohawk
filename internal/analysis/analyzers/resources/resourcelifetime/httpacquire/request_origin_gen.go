@@ -35,7 +35,7 @@ func hyruledecideRequestOriginRecognize(harg0 struct {
 					if hv5 == 0 {
 						{
 							if constructorCall(hv8) {
-								// Rule Constructor (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:10).
+								// Rule Constructor (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:11).
 								var hv14 headRequestQuery = hv1
 								var hv15 hyruleImport0.Value = hv6
 								hv9 := (headRequestQuery).preserve(hv14, hv15)
@@ -63,7 +63,7 @@ func hyruledecideRequestOriginRecognize(harg0 struct {
 					hv11, hok := requestRebinding(hv9)
 					_ = hv11
 					if hok {
-						// Rule Rebind (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:20).
+						// Rule Rebind (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/request_origin.rules:19).
 						var hv17 headRequestQuery = hv1
 						var hv18 hyruleImport1.ReachingWalk = hv2
 						var hv19 hyruleImport0.Value = hv11

@@ -1,5 +1,3 @@
-signature total = outputs false false
-
 host
   AlwaysNil
   AlwaysNonNil
@@ -15,33 +13,34 @@ host
   consequent! = Engine.consequentHolds
   forwarded! = Engine.forwardedRelation
 
-@NilError
-rewrite (inputs engine ^AlwaysNil result _ (Case (errorOutcome: ^nilOutcome)) budget) =
-  case resultIs engine result ^AlwaysNonNil budget of
-    true -> outputs true true
-    false -> outputs false true
-
-@VacuousNilError
-rewrite (inputs _ ^AlwaysNil _ _ _ _) = outputs true false
-
-@NonNilError
-rewrite (inputs engine ^AlwaysNonNil result _ (Case (errorOutcome: ^nonNilOutcome)) budget) =
-  case resultIs engine result ^AlwaysNil budget of
-    true -> outputs true true
-    false -> outputs false true
-
-@VacuousNonNilError
-rewrite (inputs _ ^AlwaysNonNil _ _ _ _) = outputs true false
-
-// Unknown error nilness may still satisfy the consequent directly. Otherwise
-// only two unchanged slots of one call can inherit the callee's relation.
-// A vacuous return above never requests either of these queries.
-@OtherError
-rewrite (inputs engine _ result error kind budget) =
-  case consequent engine result kind budget of
-    true -> outputs true true
-    false -> decline
-  <|> case forwarded engine result error kind budget of
-    true -> outputs true true
-    false -> decline
-  <|> outputs false false
+total fn rewrite
+  fallback outputs false false
+  match inputs
+    @NilError
+    inputs engine ^AlwaysNil result _ (Case (errorOutcome: ^nilOutcome)) budget ->
+      case resultIs engine result ^AlwaysNonNil budget of
+        true -> outputs true true
+        false -> outputs false true
+    @VacuousNilError
+    inputs _ ^AlwaysNil _ _ _ _ ->
+      outputs true false
+    @NonNilError
+    inputs engine ^AlwaysNonNil result _ (Case (errorOutcome: ^nonNilOutcome)) budget ->
+      case resultIs engine result ^AlwaysNil budget of
+        true -> outputs true true
+        false -> outputs false true
+    @VacuousNonNilError
+    inputs _ ^AlwaysNonNil _ _ _ _ ->
+      outputs true false
+    // Unknown error nilness may still satisfy the consequent directly. Otherwise
+    // only two unchanged slots of one call can inherit the callee's relation.
+    // A vacuous return above never requests either of these queries.
+    @OtherError
+    inputs engine _ result error kind budget ->
+      case consequent engine result kind budget of
+        true -> outputs true true
+        false -> decline
+      <|> case forwarded engine result error kind budget of
+        true -> outputs true true
+        false -> decline
+      <|> outputs false false

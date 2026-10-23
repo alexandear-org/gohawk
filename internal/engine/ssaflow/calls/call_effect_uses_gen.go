@@ -20,7 +20,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 		switch hs1 := hv2.(type) {
 		case *hyruleImport0.DebugRef:
 			if hv2 != (*hyruleImport0.DebugRef)(nil) {
-				// Rule Debug (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:52).
+				// Rule Debug (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:53).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -30,7 +30,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv3 := hs1
 				_ = hv3
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -40,7 +40,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -50,7 +50,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv5 := hs1
 				_ = hv5
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -60,7 +60,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv6 := hs1
 				_ = hv6
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -70,7 +70,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1
 				_ = hv7
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -80,7 +80,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv8 := hs1
 				_ = hv8
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -90,7 +90,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			if hs1 != nil {
 				hv9 := hs1
 				_ = hv9
-				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:57).
+				// Rule Alias (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:58).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -137,7 +137,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 					if sameEffectValue(hv12, hv1) {
 						{
 							if sameEffectValue(hv13, hv1) {
-								// Rule StoreBoth (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:68).
+								// Rule StoreBoth (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:67).
 								return struct {
 									V0 CallEffect
 									V1 hyruleImport0.Value
@@ -148,7 +148,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 				}
 				{
 					if sameEffectValue(hv12, hv1) {
-						// Rule StoreAddress (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:75).
+						// Rule StoreAddress (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:72).
 						return struct {
 							V0 CallEffect
 							V1 hyruleImport0.Value
@@ -157,14 +157,14 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 				}
 				{
 					if sameEffectValue(hv13, hv1) {
-						// Rule StoreValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:81).
+						// Rule StoreValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:76).
 						return struct {
 							V0 CallEffect
 							V1 hyruleImport0.Value
 						}{V0: useStored, V1: nil}, true
 					}
 				}
-				// Rule OtherStore (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:87).
+				// Rule OtherStore (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:80).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -172,7 +172,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 			}
 		case *hyruleImport0.Return:
 			if hv2 != (*hyruleImport0.Return)(nil) {
-				// Rule Returned (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:90).
+				// Rule Returned (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:83).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -184,14 +184,14 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 				_ = hv14
 				{
 					if sameEffectValue(hv14, hv1) {
-						// Rule SentValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:93).
+						// Rule SentValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:86).
 						return struct {
 							V0 CallEffect
 							V1 hyruleImport0.Value
 						}{V0: useSent, V1: nil}, true
 					}
 				}
-				// Rule SentChannel (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:99).
+				// Rule SentChannel (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:90).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value
@@ -205,7 +205,7 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 				_ = hv16
 				{
 					if sameEffectValue(hv15, hv1) {
-						// Rule MapKey (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:102).
+						// Rule MapKey (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:93).
 						return struct {
 							V0 CallEffect
 							V1 hyruleImport0.Value
@@ -214,14 +214,14 @@ func hyruleclassifyCallUseRecognize(harg0 struct {
 				}
 				{
 					if sameEffectValue(hv16, hv1) {
-						// Rule MapValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:108).
+						// Rule MapValue (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:97).
 						return struct {
 							V0 CallEffect
 							V1 hyruleImport0.Value
 						}{V0: useStored, V1: nil}, true
 					}
 				}
-				// Rule MapMutation (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:114).
+				// Rule MapMutation (internal/engine/ssaflow/calls/rules/call_effect_uses.rules:101).
 				return struct {
 					V0 CallEffect
 					V1 hyruleImport0.Value

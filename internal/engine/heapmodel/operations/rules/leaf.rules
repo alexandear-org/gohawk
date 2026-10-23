@@ -1,5 +1,3 @@
-signature total = outputs ^LeafUnknown
-
 view Parameter = *ssa.Parameter
 
 view Capture = *ssa.FreeVar
@@ -21,20 +19,22 @@ host
   LeafOpaque
   LeafPending
 
-@External
-rewrite (inputs (Parameter() | Capture() | Global()) _) = outputs ^LeafExternal
-
-// A nonnil aggregate constant is a zero value with nil in every memory slot.
-@Constant
-rewrite (inputs Constant() _) = outputs ^LeafNil
-
-@Callable
-rewrite (inputs (Function() | Builtin()) _) = outputs ^LeafOpaque
-
-// Only a local instruction not yet reached by the fixpoint may remain empty.
-// Instructions from another function retain unknown pointees.
-@Pending
-rewrite (inputs (instruction `instruction`) owner)
-  | localInstruction `instruction` owner
-  =
-  outputs ^LeafPending
+total fn rewrite
+  fallback outputs ^LeafUnknown
+  match inputs
+    @External
+    inputs (Parameter() | Capture() | Global()) _ ->
+      outputs ^LeafExternal
+    // A nonnil aggregate constant is a zero value with nil in every memory slot.
+    @Constant
+    inputs Constant() _ ->
+      outputs ^LeafNil
+    @Callable
+    inputs (Function() | Builtin()) _ ->
+      outputs ^LeafOpaque
+    // Only a local instruction not yet reached by the fixpoint may remain empty.
+    // Instructions from another function retain unknown pointees.
+    @Pending
+    inputs (instruction `instruction`) owner
+      when localInstruction `instruction` owner ->
+      outputs ^LeafPending

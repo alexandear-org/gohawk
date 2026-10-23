@@ -16,7 +16,7 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Global:
 			if hv1 != (*hyruleImport0.Global)(nil) {
-				// Rule Global (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:3).
+				// Rule Global (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:4).
 				return struct {
 					V0 AddressKind
 					V1 *hyruleImport0.FreeVar
@@ -34,7 +34,7 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 					if hs2 != nil {
 						hv4 := hs2
 						_ = hv4
-						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:8).
+						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:9).
 						return struct {
 							V0 AddressKind
 							V1 *hyruleImport0.FreeVar
@@ -45,7 +45,7 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 					if hs2 != nil {
 						hv5 := hs2
 						_ = hv5
-						// Rule Field (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:11).
+						// Rule Field (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:12).
 						return struct {
 							V0 AddressKind
 							V1 *hyruleImport0.FreeVar
@@ -53,7 +53,7 @@ func hyruleBindingRootRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct 
 						}{V0: AddressField, V1: nil, V2: hv5}, true
 					}
 				}
-				// Rule UnsupportedUnary (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:14).
+				// Rule UnsupportedUnary (internal/analysis/passes/concurrencyfacts/recognition/rules/binding_root.rules:15).
 				return struct {
 					V0 AddressKind
 					V1 *hyruleImport0.FreeVar

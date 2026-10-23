@@ -33,7 +33,7 @@ func hyruleDiagnosticAdmissionRecognize(harg0 struct {
 			_ = hv7
 			hv8 := hs1.Pos
 			_ = hv8
-			// Rule Admission (internal/reporting/check/rules/report_admission.rules:21).
+			// Rule Admission (internal/reporting/check/rules/report_admission.rules:22).
 			var hv14 map[string]bool = hv5
 			var hv15 string = hv7
 			hv9 := categoryIncluded(hv14, hv15)

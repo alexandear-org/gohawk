@@ -1,5 +1,3 @@
-signature total = outputs ^OutcomeAny false
-
 host
   OutcomeAny
   OutcomeTrue
@@ -29,27 +27,27 @@ host
   Nil = outcomeNil
   Nilable = outcomeNilable
 
-// Caller-fixed evidence has precedence over literal or construction evidence.
-// Preserve its exact value, including OutcomeAny, rather than strengthening it.
-@Bound
-rewrite (inputs _ outcome true) = outputs outcome true
-
-@True
-rewrite (inputs (Constant (literal: Boolean true)) _ false) = outputs ^OutcomeTrue true
-
-@False
-rewrite (inputs (Constant (literal: Boolean false)) _ false) = outputs ^OutcomeFalse true
-
-@Nil
-rewrite (inputs literal@(Constant()) _ false)
-  | Nil literal
-  =
-  outputs ^OutcomeNil true
-
-// A box has a dynamic type even around a typed nil pointer. Retain the
-// original nilable-type gate for all construction forms, including functions.
-@Constructed
-rewrite (inputs value@(Allocation() | Map() | Slice() | Channel() | Closure() | Box() | Function()) _ false)
-  | Nilable value
-  =
-  outputs ^OutcomeNonNil true
+total fn rewrite
+  fallback outputs ^OutcomeAny false
+  match inputs
+    // Caller-fixed evidence has precedence over literal or construction evidence.
+    // Preserve its exact value, including OutcomeAny, rather than strengthening it.
+    @Bound
+    inputs _ outcome true ->
+      outputs outcome true
+    @True
+    inputs (Constant (literal: Boolean true)) _ false ->
+      outputs ^OutcomeTrue true
+    @False
+    inputs (Constant (literal: Boolean false)) _ false ->
+      outputs ^OutcomeFalse true
+    @Nil
+    inputs literal@(Constant()) _ false
+      when Nil literal ->
+      outputs ^OutcomeNil true
+    // A box has a dynamic type even around a typed nil pointer. Retain the
+    // original nilable-type gate for all construction forms, including functions.
+    @Constructed
+    inputs value@(Allocation() | Map() | Slice() | Channel() | Closure() | Box() | Function()) _ false
+      when Nilable value ->
+      outputs ^OutcomeNonNil true

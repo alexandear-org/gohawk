@@ -22,7 +22,7 @@ func hyruleRetainsRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Store (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:31).
+				// Rule Store (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:32).
 				var hv12 RetentionUse = RetentionUse{Kind: RetentionStore, Store: hv4}
 				hresult := struct{ V0 RetentionUse }{V0: hv12}
 				if !hyrulehyruleRetainsRecognizeRecord9Valid(hresult) {
@@ -36,7 +36,7 @@ func hyruleRetainsRecognize(harg0 struct {
 				hv5 := hs1
 				_ = hv5
 				if hv3 == false {
-					// Rule Closure (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:36).
+					// Rule Closure (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:37).
 					var hv13 RetentionUse = RetentionUse{Kind: RetentionClosure, Closure: hv5}
 					hresult := struct{ V0 RetentionUse }{V0: hv13}
 					if !hyrulehyruleRetainsRecognizeRecord9Valid(hresult) {
@@ -51,7 +51,7 @@ func hyruleRetainsRecognize(harg0 struct {
 				hv6 := hs1.X
 				_ = hv6
 				if hv3 == false {
-					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:39).
+					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:40).
 					var hv14 RetentionUse = RetentionUse{Kind: RetentionValue, Value: hv6}
 					hresult := struct{ V0 RetentionUse }{V0: hv14}
 					if !hyrulehyruleRetainsRecognizeRecord9Valid(hresult) {
@@ -66,7 +66,7 @@ func hyruleRetainsRecognize(harg0 struct {
 				hv7 := hs1.Value
 				_ = hv7
 				if hv3 == false {
-					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:39).
+					// Rule Published (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/retention.rules:40).
 					var hv15 RetentionUse = RetentionUse{Kind: RetentionValue, Value: hv7}
 					hresult := struct{ V0 RetentionUse }{V0: hv15}
 					if !hyrulehyruleRetainsRecognizeRecord9Valid(hresult) {

@@ -19,7 +19,7 @@ func hyruletransfersResourceRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Transfer (internal/analysis/analyzers/resources/deferinloop/rules/transfer.rules:14).
+		// Rule Transfer (internal/analysis/analyzers/resources/deferinloop/rules/transfer.rules:15).
 		var hv11 struct{ V0 bool }
 		hv11answered := false
 		if !hv11answered {

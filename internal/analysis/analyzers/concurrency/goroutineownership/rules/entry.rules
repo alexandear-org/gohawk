@@ -1,5 +1,3 @@
-signature total = outputs ^actionNone ^reasonNone false
-
 host
   stored! = storedTerminationInstruction
   selected! = spawnAnalysis.selectedSignalEntry
@@ -12,17 +10,20 @@ host
   reasonLabelSignalReceived
   reasonLabelPossibleSignalReceive
 
-// Arm-entry evidence precedes the instruction's own consumption: a selected
-// receive settles that arm even when its first instruction publishes the handle.
-@Instruction
-rewrite (inputs analysis instruction) =
-  case stored instruction of
-    true -> outputs ^actionUnknown ^reasonLabelStoredTestingReceiver true
-    false -> decline
-  <|> case selected analysis instruction of
-    true -> outputs ^actionJoin ^reasonLabelSignalReceived true
-    false -> decline
-  <|> case possible analysis instruction of
-    true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive true
-    false -> decline
-  <|> outputs ^actionNone ^reasonNone false
+total fn rewrite
+  fallback outputs ^actionNone ^reasonNone false
+  match inputs
+    // Arm-entry evidence precedes the instruction's own consumption: a selected
+    // receive settles that arm even when its first instruction publishes the handle.
+    @Instruction
+    inputs analysis instruction ->
+      case stored instruction of
+        true -> outputs ^actionUnknown ^reasonLabelStoredTestingReceiver true
+        false -> decline
+      <|> case selected analysis instruction of
+        true -> outputs ^actionJoin ^reasonLabelSignalReceived true
+        false -> decline
+      <|> case possible analysis instruction of
+        true -> outputs ^actionUnknown ^reasonLabelPossibleSignalReceive true
+        false -> decline
+      <|> outputs ^actionNone ^reasonNone false

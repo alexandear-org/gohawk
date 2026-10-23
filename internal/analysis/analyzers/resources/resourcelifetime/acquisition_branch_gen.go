@@ -37,7 +37,7 @@ func hyruledecideResourceSuccessBranchRecognize(harg0 struct {
 			hv8 := hs1
 			_ = hv8
 			if hv7 == resourceUnknown {
-				// Rule Unavailable (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:22).
+				// Rule Unavailable (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:23).
 				return struct {
 					V0 resourceBranchProof
 					V1 bool
@@ -53,7 +53,7 @@ func hyruledecideResourceSuccessBranchRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule OtherBranch (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:31).
+		// Rule OtherBranch (internal/analysis/analyzers/resources/resourcelifetime/rules/acquisition_branch.rules:30).
 		var hv14 struct {
 			V0 resourceBranchProof
 			V1 bool

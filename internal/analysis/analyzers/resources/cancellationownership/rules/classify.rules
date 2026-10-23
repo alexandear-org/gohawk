@@ -1,5 +1,3 @@
-signature total = outputs (Opaque ^reasonLabelOwnerUnavailable)
-
 view Closure = *ssa.MakeClosure
 
 host
@@ -18,35 +16,38 @@ host
   localObserves! instruction = localCallOnlyObserves instruction classifier.cancel classifier.observer
   opaqueReference
 
-// Creating a callback does not release or transfer cancellation. Classify the
-// defer, return, store, launch or opaque call that establishes its lifecycle.
-@ClosureCreation
-rewrite (inputs Closure() _) = outputs (NoAction ^reasonCancellationNone)
-
-@Instruction
-rewrite (inputs instruction classifier) =
-  case deferredStore classifier instruction of
-    Decided (label: label) -> outputs label
-    Unrecognized() -> decline
-  <|> case ownerHolds classifier instruction of
-    true -> outputs (NoAction ^reasonCancellationNone)
-    false -> decline
-  <|> case recognized classifier instruction of
-    Decided (label: label) -> outputs label
-    Unrecognized() -> decline
-  <|> case ownerAvailable classifier of
-    false -> outputs (Opaque ^reasonLabelOwnerUnavailable)
-    true -> decline
-  <|> case processReturn classifier instruction of
-    true -> outputs (Opaque ^reasonLabelProcessLifetimeContext)
-    false -> decline
-  <|> case references instruction of
-    false -> outputs (NoAction ^reasonCancellationNone)
-    true -> decline
-  <|> case localStorageOnly instruction of
-    true -> outputs (NoAction ^reasonCancellationNone)
-    false -> decline
-  <|> case localObserves instruction of
-    true -> outputs (NoAction ^reasonCancellationNone)
-    false -> decline
-  <|> outputs (Opaque (opaqueReference instruction))
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelOwnerUnavailable)
+  match inputs
+    // Creating a callback does not release or transfer cancellation. Classify the
+    // defer, return, store, launch or opaque call that establishes its lifecycle.
+    @ClosureCreation
+    inputs Closure() _ ->
+      outputs (NoAction ^reasonCancellationNone)
+    @Instruction
+    inputs instruction classifier ->
+      case deferredStore classifier instruction of
+        Decided (label: label) -> outputs label
+        Unrecognized() -> decline
+      <|> case ownerHolds classifier instruction of
+        true -> outputs (NoAction ^reasonCancellationNone)
+        false -> decline
+      <|> case recognized classifier instruction of
+        Decided (label: label) -> outputs label
+        Unrecognized() -> decline
+      <|> case ownerAvailable classifier of
+        false -> outputs (Opaque ^reasonLabelOwnerUnavailable)
+        true -> decline
+      <|> case processReturn classifier instruction of
+        true -> outputs (Opaque ^reasonLabelProcessLifetimeContext)
+        false -> decline
+      <|> case references instruction of
+        false -> outputs (NoAction ^reasonCancellationNone)
+        true -> decline
+      <|> case localStorageOnly instruction of
+        true -> outputs (NoAction ^reasonCancellationNone)
+        false -> decline
+      <|> case localObserves instruction of
+        true -> outputs (NoAction ^reasonCancellationNone)
+        false -> decline
+      <|> outputs (Opaque (opaqueReference instruction))

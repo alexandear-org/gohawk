@@ -1,5 +1,3 @@
-signature total = outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
-
 type Decision = processDecision
   state
   reason
@@ -22,49 +20,52 @@ host
   reasonSuccessfulStartCannotReturn
   reasonLocalWaitObligation
 
-// A helper returning *exec.Cmd may already have registered cleanup or wait
-// ownership. Reporting without that interprocedural contract loses precision.
-// https://github.com/containerd/containerd/blob/716cbaf51212adb5e80ca1c30b644bfeb9c9d779/cmd/containerd-shim-runc-v2/process/io.go#L288-L330
-// The caller retains its parameter or external command after this helper.
-// Another reader can wait through a different element load that the flow
-// cannot correlate with this one. Shared elements remain unknown.
-// https://github.com/cocoonstack/cocoon/blob/51ff88bcf8f175a2d82b162d9bf9f65604a607b5/cmd/storebench/main.go#L123-L138
-// Cleanup can be registered before Start, including by a returned teardown
-// owner. Keep registration and external-store evidence in their prior order.
-@Start
-rewrite (inputs proof function start command) =
-  do
-    prefix <- prefix proof start command
-    true <- proven prefix.Proof
-      else
-        false -> case cutoff prefix.Proof of
-          true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
-          false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
-    false <- commandReturnedByHelper command
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonHelperOwnershipUnknown))
-    false <- callerCommand function command
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonCallerCommandOwnershipUnknown))
-    false <- aggregate command
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonAggregateCommandOwnershipUnknown))
-    false <- processOwnershipDominatesStart proof prefix.instructions command
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
-    false <- processOwnerDominatesStart proof function start prefix.owners prefix.instructions
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
-    false <- commandStoredExternallyBeforeStart prefix.instructions command
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
-    returns <- returns proof start
-    false <- cutoff returns
-      else
-        true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
-    true <- proven returns
-      else
-        false -> case known returns of
-          true -> outputs (Decision (state: ^decisionProven, reason: ^reasonLocalWaitObligation))
-          false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
-    outputs (Decision (state: ^decisionDisproven, reason: ^reasonSuccessfulStartCannotReturn))
+total fn rewrite
+  fallback outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+  match inputs
+    // A helper returning *exec.Cmd may already have registered cleanup or wait
+    // ownership. Reporting without that interprocedural contract loses precision.
+    // https://github.com/containerd/containerd/blob/716cbaf51212adb5e80ca1c30b644bfeb9c9d779/cmd/containerd-shim-runc-v2/process/io.go#L288-L330
+    // The caller retains its parameter or external command after this helper.
+    // Another reader can wait through a different element load that the flow
+    // cannot correlate with this one. Shared elements remain unknown.
+    // https://github.com/cocoonstack/cocoon/blob/51ff88bcf8f175a2d82b162d9bf9f65604a607b5/cmd/storebench/main.go#L123-L138
+    // Cleanup can be registered before Start, including by a returned teardown
+    // owner. Keep registration and external-store evidence in their prior order.
+    @Start
+    inputs proof function start command ->
+      do
+        prefix <- prefix proof start command
+        true <- proven prefix.Proof
+          else
+            false -> case cutoff prefix.Proof of
+              true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
+              false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+        false <- commandReturnedByHelper command
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonHelperOwnershipUnknown))
+        false <- callerCommand function command
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonCallerCommandOwnershipUnknown))
+        false <- aggregate command
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonAggregateCommandOwnershipUnknown))
+        false <- processOwnershipDominatesStart proof prefix.instructions command
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+        false <- processOwnerDominatesStart proof function start prefix.owners prefix.instructions
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+        false <- commandStoredExternallyBeforeStart prefix.instructions command
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+        returns <- returns proof start
+        false <- cutoff returns
+          else
+            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
+        true <- proven returns
+          else
+            false -> case known returns of
+              true -> outputs (Decision (state: ^decisionProven, reason: ^reasonLocalWaitObligation))
+              false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+        outputs (Decision (state: ^decisionDisproven, reason: ^reasonSuccessfulStartCannotReturn))

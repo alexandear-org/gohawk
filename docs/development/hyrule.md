@@ -22,7 +22,7 @@ The expected checkout layout is a common parent containing `gohawk` and
 `lockdoc`. `make build` and other compilation targets generate from the adjacent checkout
 first. After generation, `GOWORK=off` builds against GoHawk's own dependencies.
 Each CI build job generates with a pinned Lockdoc revision, then tests the
-standalone GoHawk module, including its supported Go floor. The manifest
+standalone GoHawk module, including its supported Go floor. The Hyrule manifest
 records generated-file ownership and hashes. Edit rules or bindings and
 regenerate, never patch generated Go.
 
@@ -31,21 +31,33 @@ holding its bindings. Generated `*_gen.go` output stays in the package directory
 itself, since it calls unexported host functions. It is marked as generated
 for GitHub and does not count toward the directory file limit.
 
-## Equation frontend
+## Function frontend
 
-Rules use compact equations, `host` blocks, whitespace application and named
-argument groups. The handwritten lexer/parser is specified by
+Function headers attach the API to its rules:
+
+```text
+total fn classify(request: Request) -> Decision
+  fallback Unknown()
+  match request
+    Request(ready: true) -> Accepted()
+```
+
+`partial fn` returns native outputs plus a success Boolean. Plain `fn`
+retains the original one-input/optional-host API. Most GoHawk targets declare
+their API in Go: `total fn rewrite` omits duplicate annotations, then
+`match inputs` uses the existing native parameter bundle patterns.
+Equation fragments and schema files remain shareable between targets.
+Arm captures and local values infer their types. `@Label` names remain stable,
+and `when` qualifiers preserve the original guard order.
+
+The handwritten parser is specified by
 [grammar.ebnf](../../tools/hyrule/grammar.ebnf) and
 [LAYOUT.md](../../tools/hyrule/LAYOUT.md). The
 [Hyrule reference](../../tools/hyrule/README.md) covers all language forms.
 `?` marks host matchers, `!` marks ordered queries, and unmarked aliases bind
-pure functions or constants. Optional `@Label` lines preserve diagnostic names.
-
-The legacy parser is migration-only. From the Lockdoc checkout, run
-`scripts/migrate-hyrule.sh /path/to/lockdoc /path/to/gohawk` to convert configured
-sources structurally; the command checks all configurations before replacing
-files. This does not establish behavioral equivalence: generation, compiler
-contracts and affected analyzer tests still need validation.
+pure functions or constants. Concrete interface patterns use Go compatibility;
+there is no `implementers` declaration or claim that interfaces are closed.
+Standalone `signature` declarations are retired.
 
 ## Query sequencing and schema maintenance
 
@@ -62,13 +74,13 @@ retain explicit named arms. Reached queries retain their original order and budg
 public Go entry points still discard evidence if the child or shared allowance
 is exhausted. CI pins the compiler revision supporting this syntax.
 
-Concurrency summary snapshots use schema-derived copying over existing Go
-records. `snapshots.rules` declares complete Summary, WorkerSummary, SelectChoice
-and SelectArm storage, with explicit copying or borrowing for every field.
-Branch-mutable lists are detached; immutable SSA references, path summaries and
-condition evidence retain their existing sharing. Adding a representation field
-requires updating its schema and freeze policy. Budgeted state copying and
-fixpoint equality remain separate domain contracts.
+Concurrency summary snapshots use Boiler's field-complete snapshot operations
+in `boiler.yaml`. They preserve the same four copy functions and nested hooks:
+branch-mutable lists are detached, while immutable SSA references, path summaries
+and condition evidence retain their existing sharing. Each representation field
+has an explicit policy. Budgeted copying and fixpoint equality remain separate.
+`make boiler-generate` runs before Hyrule; `make boiler-generated-check` checks
+the committed snapshot output. The retired `derive ... freeze` rules are removed.
 
 ## Migration scope
 

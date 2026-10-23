@@ -1,17 +1,18 @@
-signature total = outputs ^None false
-
 host
   handoff! = InstructionQueries.Handoff
   unknown! = Evidence.Unknown
   payload! = InstructionQueries.Payload
   SentToChannel
 
-@Sent
-rewrite (inputs queries value instruction) =
-  do
-    proof <- handoff queries value instruction
-    false <- unknown proof
-      else
-        true -> outputs proof.Reason true
-    answer <- payload queries value ^SentToChannel
-    answer
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    @Sent
+    inputs queries value instruction ->
+      do
+        proof <- handoff queries value instruction
+        false <- unknown proof
+          else
+            true -> outputs proof.Reason true
+        answer <- payload queries value ^SentToChannel
+        answer

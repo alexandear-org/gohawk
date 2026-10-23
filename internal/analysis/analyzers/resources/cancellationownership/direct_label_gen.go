@@ -30,7 +30,7 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 				if hv4 == receiveToken {
 					{
 						if (*cancellationClassifier).ownDoneChannel(hv2, hv5) {
-							// Rule Done (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:10).
+							// Rule Done (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:11).
 							hresult := struct {
 								V0 cancellationLabel
 								V1 bool
@@ -51,7 +51,7 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 			if hv1 != (*hyruleImport1.Go)(nil) {
 				{
 					if exactCancelCall(hv3, hv2.cancel) {
-						// Rule StartedCancel (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:16).
+						// Rule StartedCancel (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:15).
 						hresult := struct {
 							V0 cancellationLabel
 							V1 bool
@@ -70,7 +70,7 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 		}
 		{
 			if exactCancelCall(hv3, hv2.cancel) {
-				// Rule DirectCancel (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:22).
+				// Rule DirectCancel (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:19).
 				hresult := struct {
 					V0 cancellationLabel
 					V1 bool
@@ -88,7 +88,7 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 		if hs2, hok := hv1.(*hyruleImport1.Defer); hok && hs2 != nil {
 			hv6 := hs2
 			_ = hv6
-			// Rule DeferredLiteral (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:28).
+			// Rule DeferredLiteral (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:23).
 			var hv11 *cancellationClassifier = hv2
 			var hv12 *hyruleImport1.Defer = hv6
 			hv7part0, hv7part1 := (*cancellationClassifier).deferredLiteralLabel(hv11, hv12)
@@ -154,7 +154,7 @@ func hyrulerecognizeCancellationDirectRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Remaining (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:38).
+		// Rule Remaining (internal/analysis/analyzers/resources/cancellationownership/rules/direct_label.rules:32).
 		var hv17 hyruleImport1.Instruction = hv1
 		var hv18 *cancellationClassifier = hv2
 		hv10part0, hv10part1 := recognizeCancellationDeferredUse(hv17, hv18)

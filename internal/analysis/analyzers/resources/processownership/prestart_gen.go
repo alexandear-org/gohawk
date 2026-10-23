@@ -21,7 +21,7 @@ func hyruleproveProcessStartRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Start (internal/analysis/analyzers/resources/processownership/rules/prestart.rules:34).
+		// Rule Start (internal/analysis/analyzers/resources/processownership/rules/prestart.rules:35).
 		var hv18 *commandProof = hv1
 		var hv19 *hyruleImport1.Call = hv3
 		var hv20 hyruleImport1.Value = hv4

@@ -26,7 +26,7 @@ func hyruleadmitProcessReturnRecognize(harg0 struct {
 		_ = hv4
 		{
 			if startFailureReturn(hv1, hv2) {
-				// Rule Return (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				// Rule Return (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:19).
 				return struct {
 					V0 processReason
 					V1 bool
@@ -35,7 +35,7 @@ func hyruleadmitProcessReturnRecognize(harg0 struct {
 		}
 		{
 			if hyruleImport0.ReturnedValueOwnsValue(hv1, hv3) {
-				// Rule Return_2 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				// Rule Return_2 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:23).
 				return struct {
 					V0 processReason
 					V1 bool
@@ -44,7 +44,7 @@ func hyruleadmitProcessReturnRecognize(harg0 struct {
 		}
 		{
 			if returnsProcessHandle(hv1, hv3) {
-				// Rule Return_3 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+				// Rule Return_3 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:27).
 				return struct {
 					V0 processReason
 					V1 bool
@@ -58,7 +58,7 @@ func hyruleadmitProcessReturnRecognize(harg0 struct {
 					hv5 = returnsProcessHandle(hv1, hv4)
 				}
 				if hv5 {
-					// Rule Return_4 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:18).
+					// Rule Return_4 (internal/analysis/analyzers/resources/processownership/rules/return_admission.rules:31).
 					return struct {
 						V0 processReason
 						V1 bool

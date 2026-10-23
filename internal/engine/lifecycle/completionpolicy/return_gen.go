@@ -22,7 +22,7 @@ func hyruleRecognizeReturnRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Return (internal/engine/lifecycle/completionpolicy/rules/return.rules:16).
+		// Rule Return (internal/engine/lifecycle/completionpolicy/rules/return.rules:17).
 		var hv10 *hyruleImport0.Return = hv1
 		var hv11 int = hv2.Result
 		hv5part0, hv5part1 := returnedValue(hv10, hv11)

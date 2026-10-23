@@ -20,7 +20,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 		_ = hv2
 		{
 			if projected(hv1) {
-				// Rule Projected (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:25).
+				// Rule Projected (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:26).
 				return struct {
 					V0 lockEffect
 					V1 hyruleImport1.Value
@@ -41,7 +41,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					hv6 := hs2.Indirect
 					_ = hv6
 					if hv6 == true {
-						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
+						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:30).
 						return struct {
 							V0 lockEffect
 							V1 hyruleImport1.Value
@@ -57,7 +57,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					hv8 := hs3.Indirect
 					_ = hv8
 					if hv8 == true {
-						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:31).
+						// Rule Indirect (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:30).
 						return struct {
 							V0 lockEffect
 							V1 hyruleImport1.Value
@@ -73,7 +73,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					hv10 := hs4.Indirect
 					_ = hv10
 					if hv9 == nil {
-						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
+						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:33).
 						return struct {
 							V0 lockEffect
 							V1 hyruleImport1.Value
@@ -89,7 +89,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					hv12 := hs5.Indirect
 					_ = hv12
 					if hv11 == nil {
-						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:35).
+						// Rule Absent (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:33).
 						return struct {
 							V0 lockEffect
 							V1 hyruleImport1.Value
@@ -104,7 +104,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					_ = hv13
 					hv14 := hs6.Indirect
 					_ = hv14
-					// Rule Acquire (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:39).
+					// Rule Acquire (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:36).
 					return struct {
 						V0 lockEffect
 						V1 hyruleImport1.Value
@@ -118,7 +118,7 @@ func hyrulelockTransitionRecognize(harg0 struct {
 					_ = hv15
 					hv16 := hs7.Indirect
 					_ = hv16
-					// Rule Release (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:43).
+					// Rule Release (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:39).
 					var hv18 *lockRegion = hv2
 					var hv19 hyruleImport1.Value = hv15
 					hv17 := (*lockRegion).holds(hv18, hv19)
@@ -143,21 +143,21 @@ func hyrulelockTransitionRecognize(harg0 struct {
 				}
 			}
 			if hv3 == condWait {
-				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:46).
 				return struct {
 					V0 lockEffect
 					V1 hyruleImport1.Value
 				}{V0: lockEffectUnknown, V1: nil}, true
 			}
 			if hv3 == readLock {
-				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:46).
 				return struct {
 					V0 lockEffect
 					V1 hyruleImport1.Value
 				}{V0: lockEffectUnknown, V1: nil}, true
 			}
 			if hv3 == readUnlock {
-				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:51).
+				// Rule Unsupported (internal/analysis/analyzers/concurrency/concurrentcapture/rules/lock_transition.rules:46).
 				return struct {
 					V0 lockEffect
 					V1 hyruleImport1.Value

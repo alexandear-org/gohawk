@@ -23,7 +23,7 @@ func hyruleProveRecognize(harg0 struct {
 			hv5 := hs1.EarlyDone
 			_ = hv5
 			if hv3 == true {
-				// Rule DiscoveryCutoff (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:7).
+				// Rule DiscoveryCutoff (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:8).
 				var hv16 Proof = Proof{Outcome: Unknown, Reason: DiscoveryBudgetExhausted}
 				hresult := struct{ V0 Proof }{V0: hv16}
 				if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
@@ -43,7 +43,7 @@ func hyruleProveRecognize(harg0 struct {
 					}
 					return hresult, true
 				}
-				// Rule NoObligation (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:18).
+				// Rule NoObligation (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:17).
 				var hv18 Proof = Proof{Outcome: Unknown, Reason: NoObligation}
 				hresult := struct{ V0 Proof }{V0: hv18}
 				if !hyrulehyruleProveRecognizeRecord2Valid(hresult) {
@@ -53,7 +53,7 @@ func hyruleProveRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule Prove (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:26).
+		// Rule Prove (internal/analysis/analyzers/concurrency/goroutineownership/proofpolicy/rules/proof.rules:25).
 		var hv19 ProofQueries = hv2
 		hv6part0, hv6part1 := (ProofQueries).Lifecycle(hv19)
 		hv6 := struct {

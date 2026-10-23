@@ -15,7 +15,7 @@ func hyrulerecognizeGuardAddressRecognize(harg0 struct{ P0 hyruleImport0.Value }
 		switch hs1 := hv1.(type) {
 		case *hyruleImport0.Alloc, *hyruleImport0.Parameter, *hyruleImport0.FreeVar, *hyruleImport0.Global, *hyruleImport0.Call, *hyruleImport0.Extract:
 			if hv1 != (*hyruleImport0.Alloc)(nil) && hv1 != (*hyruleImport0.Parameter)(nil) && hv1 != (*hyruleImport0.FreeVar)(nil) && hv1 != (*hyruleImport0.Global)(nil) && hv1 != (*hyruleImport0.Call)(nil) && hv1 != (*hyruleImport0.Extract)(nil) {
-				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:10).
+				// Rule Root (internal/engine/ssaflow/path/rules/guard_address.rules:11).
 				return struct {
 					V0 guardAddressKind
 					V1 hyruleImport0.Value

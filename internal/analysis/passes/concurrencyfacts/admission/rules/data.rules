@@ -1,5 +1,3 @@
-signature total = outputs false
-
 view FieldAddress = *ssa.FieldAddr
   owner: X
 
@@ -44,68 +42,56 @@ host
   equalToken
   notEqualToken
 
-// A primitive's fields are its internal state, never ordinary data.
-@Field
-rewrite (inputs field@(FieldAddress (owner: owner)))
-  | not (primitive (typeOf owner))
-  , address field
-  =
-  outputs true
-
-// Flag/counter writes cannot satisfy a modeled wait. Reads only choose among
-// branches the summary already keeps.
-@Write
-rewrite (inputs (Store (value: value, address: location)))
-  | inert (typeOf value)
-  , address location
-  =
-  outputs true
-
-// Empty containers hold no resource. A size panic ends the path before a wait.
-@EmptyContainer
-rewrite (inputs (Map() | SliceAllocation())) = outputs true
-
-@Indexed
-rewrite (inputs index@(IndexAddress()))
-  | address index
-  =
-  outputs true
-
-// Reslicing shares elements and creates no new identity.
-@Resliced
-rewrite (inputs slice@(Slice()))
-  | elements (typeOf slice)
-  =
-  outputs true
-
-// Comma-ok results carry an element plus a Boolean; failed assertions panic.
-@Element
-rewrite (inputs value@(Lookup() | Assertion()))
-  | inert (elementType value)
-  =
-  outputs true
-
-// Select projections belong to the separate dispatch proof.
-@SelectProjection
-rewrite (inputs (Extraction (tuple: Selection()))) = outputs false
-
-@Projected
-rewrite (inputs value@(Extraction()))
-  | inert (typeOf value)
-  =
-  outputs true
-
-// Storing resource keys or values would publish them.
-@MapWrite
-rewrite (inputs (MapUpdate (key: key, value: value)))
-  | inert (typeOf key)
-  , inert (typeOf value)
-  =
-  outputs true
-
-// Comparing against nil cannot panic, including interface comparisons.
-@NilComparison
-rewrite (inputs (Binary (op: (^equalToken | ^notEqualToken), left: left, right: right)))
-  | nilConstant left || nilConstant right
-  =
-  outputs true
+total fn rewrite
+  fallback outputs false
+  match inputs
+    // A primitive's fields are its internal state, never ordinary data.
+    @Field
+    inputs field@(FieldAddress (owner: owner))
+      when not (primitive (typeOf owner))
+      , address field ->
+      outputs true
+    // Flag/counter writes cannot satisfy a modeled wait. Reads only choose among
+    // branches the summary already keeps.
+    @Write
+    inputs (Store (value: value, address: location))
+      when inert (typeOf value)
+      , address location ->
+      outputs true
+    // Empty containers hold no resource. A size panic ends the path before a wait.
+    @EmptyContainer
+    inputs (Map() | SliceAllocation()) ->
+      outputs true
+    @Indexed
+    inputs index@(IndexAddress())
+      when address index ->
+      outputs true
+    // Reslicing shares elements and creates no new identity.
+    @Resliced
+    inputs slice@(Slice())
+      when elements (typeOf slice) ->
+      outputs true
+    // Comma-ok results carry an element plus a Boolean; failed assertions panic.
+    @Element
+    inputs value@(Lookup() | Assertion())
+      when inert (elementType value) ->
+      outputs true
+    // Select projections belong to the separate dispatch proof.
+    @SelectProjection
+    inputs (Extraction (tuple: Selection())) ->
+      outputs false
+    @Projected
+    inputs value@(Extraction())
+      when inert (typeOf value) ->
+      outputs true
+    // Storing resource keys or values would publish them.
+    @MapWrite
+    inputs (MapUpdate (key: key, value: value))
+      when inert (typeOf key)
+      , inert (typeOf value) ->
+      outputs true
+    // Comparing against nil cannot panic, including interface comparisons.
+    @NilComparison
+    inputs (Binary (op: (^equalToken | ^notEqualToken), left: left, right: right))
+      when nilConstant left || nilConstant right ->
+      outputs true

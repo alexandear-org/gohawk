@@ -1,5 +1,3 @@
-signature total = outputs nil nil
-
 view Identifier = *ast.Ident
 
 view Index = *ast.IndexExpr
@@ -11,16 +9,18 @@ view Parenthesis = *ast.ParenExpr
 host
   mapSource
 
-@Identifier
-rewrite (inputs _ identifier@(Identifier())) = outputs identifier nil
-
-// Array and slice element writes are outside this map-root policy. The Go
-// walk repeats these single steps without adding another traversal in a hook.
-@MapElement
-rewrite (inputs pass (Index (source: source)))
-  | mapSource pass source
-  =
-  outputs nil source
-
-@Parenthesis
-rewrite (inputs _ (Parenthesis (source: source))) = outputs nil source
+total fn rewrite
+  fallback outputs nil nil
+  match inputs
+    @Identifier
+    inputs _ identifier@(Identifier()) ->
+      outputs identifier nil
+    // Array and slice element writes are outside this map-root policy. The Go
+    // walk repeats these single steps without adding another traversal in a hook.
+    @MapElement
+    inputs pass (Index (source: source))
+      when mapSource pass source ->
+      outputs nil source
+    @Parenthesis
+    inputs _ (Parenthesis (source: source)) ->
+      outputs nil source

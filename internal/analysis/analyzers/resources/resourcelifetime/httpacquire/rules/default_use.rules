@@ -1,30 +1,29 @@
-signature total = outputs true
-
 host
   defaultClientValue
   direct! = onlyHTTPDoUsesWithin
   operands! = defaultOperands
   helper! = Effects.helperOverrides
 
-// The direct root may read the default only for Do. When that use check fails,
-// retain the original charged operand scan; the load has no callee to expand.
-@RootDo
-rewrite (inputs _ load@(Unary (source: source, op: ^loadToken)) true budget)
-  | defaultClientValue source
-  =
-  case direct load budget of
-    true -> outputs false
-    false -> case operands load budget of
-      true -> outputs true
-      false -> outputs false
-
-@Other
-rewrite (inputs effects instruction _ budget) =
-  do
-    false <- operands instruction budget
-      else
-        true -> outputs true
-    false <- helper effects instruction budget
-      else
-        true -> outputs true
-    outputs false
+total fn rewrite
+  fallback outputs true
+  match inputs
+    // The direct root may read the default only for Do. When that use check fails,
+    // retain the original charged operand scan; the load has no callee to expand.
+    @RootDo
+    inputs _ load@(Unary (source: source, op: ^loadToken)) true budget
+      when defaultClientValue source ->
+      case direct load budget of
+        true -> outputs false
+        false -> case operands load budget of
+          true -> outputs true
+          false -> outputs false
+    @Other
+    inputs effects instruction _ budget ->
+      do
+        false <- operands instruction budget
+          else
+            true -> outputs true
+        false <- helper effects instruction budget
+          else
+            true -> outputs true
+        outputs false

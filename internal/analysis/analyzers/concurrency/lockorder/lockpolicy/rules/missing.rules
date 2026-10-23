@@ -1,5 +1,3 @@
-signature total = outputs (Unknown (reason: ^LockStateBudgetExhausted))
-
 host
   spend! = MissingQueries.Spend
   uncertain! = MissingQueries.Uncertain
@@ -14,45 +12,48 @@ host
   None
   UnreleasedReturn
 
-// A possible acquisition or unwitnessed local release leaves ownership unknown.
-// Complete caller-transfer contracts retain precedence over a missing release;
-// cutoff takes precedence over every positive contract witness.
-@Missing
-rewrite (inputs queries) =
-  do
-    true <- spend queries
-      else
-        false -> exhausted
-    false <- uncertain queries
-      else
-        true -> outputs (Unknown (reason: ^LoadedAcquisitionGuardUnknown))
-    private <- private queries
-    false <- private.Exhausted
-      else
-        true -> exhausted
-    false <- private.Proven
-      else
-        true -> outputs (Accepted (reason: ^PrivateMutexOnly))
-    true <- released queries
-      else
-        false -> outputs (Unknown (reason: ^ReleaseOwnershipUnknown))
-    held <- held queries
-    false <- held.Exhausted
-      else
-        true -> exhausted
-    false <- held.Proven
-      else
-        true -> outputs (Accepted (reason: held.Reason))
-    caller <- caller queries
-    false <- caller.Exhausted
-      else
-        true -> exhausted
-    false <- caller.Proven
-      else
-        true -> outputs (Accepted (reason: caller.Reason))
-    true <- returns queries
-      else
-        false -> outputs (Accepted (reason: ^None))
-    outputs (Reported (reason: ^UnreleasedReturn))
-  where
-    exhausted = outputs (Unknown (reason: ^LockStateBudgetExhausted))
+total fn rewrite
+  fallback outputs (Unknown (reason: ^LockStateBudgetExhausted))
+  match inputs
+    // A possible acquisition or unwitnessed local release leaves ownership unknown.
+    // Complete caller-transfer contracts retain precedence over a missing release;
+    // cutoff takes precedence over every positive contract witness.
+    @Missing
+    inputs queries ->
+      do
+        true <- spend queries
+          else
+            false -> exhausted
+        false <- uncertain queries
+          else
+            true -> outputs (Unknown (reason: ^LoadedAcquisitionGuardUnknown))
+        private <- private queries
+        false <- private.Exhausted
+          else
+            true -> exhausted
+        false <- private.Proven
+          else
+            true -> outputs (Accepted (reason: ^PrivateMutexOnly))
+        true <- released queries
+          else
+            false -> outputs (Unknown (reason: ^ReleaseOwnershipUnknown))
+        held <- held queries
+        false <- held.Exhausted
+          else
+            true -> exhausted
+        false <- held.Proven
+          else
+            true -> outputs (Accepted (reason: held.Reason))
+        caller <- caller queries
+        false <- caller.Exhausted
+          else
+            true -> exhausted
+        false <- caller.Proven
+          else
+            true -> outputs (Accepted (reason: caller.Reason))
+        true <- returns queries
+          else
+            false -> outputs (Accepted (reason: ^None))
+        outputs (Reported (reason: ^UnreleasedReturn))
+      where
+        exhausted = outputs (Unknown (reason: ^LockStateBudgetExhausted))

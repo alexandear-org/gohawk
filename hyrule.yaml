@@ -180,7 +180,7 @@ targets:
     bindings: internal/analysis/passes/concurrencyfacts/effects.go
     signature: passiveSignature
     function: passiveInstruction
-    rules: [internal/analysis/passes/concurrencyfacts/rules/passive.rules, internal/analysis/passes/concurrencyfacts/rules/snapshots.rules]
+    rules: [internal/analysis/passes/concurrencyfacts/rules/passive.rules]
     out: internal/analysis/passes/concurrencyfacts/effect_support_gen.go
   - name: select_comparison
     package: internal/engine/ssaflow/selection

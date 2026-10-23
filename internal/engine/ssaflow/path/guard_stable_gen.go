@@ -27,7 +27,7 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 				_ = hv3
 				{
 					if booleanValue(hv3) {
-						// Rule Parameter (internal/engine/ssaflow/path/rules/guard_stable.rules:10).
+						// Rule Parameter (internal/engine/ssaflow/path/rules/guard_stable.rules:11).
 						return struct {
 							V0 string
 							V1 bool
@@ -48,7 +48,7 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 				hv7 := hs1
 				_ = hv7
 				if hv6 == guardEqualToken {
-					// Rule Equality (internal/engine/ssaflow/path/rules/guard_stable.rules:18).
+					// Rule Equality (internal/engine/ssaflow/path/rules/guard_stable.rules:17).
 					var hv18 struct {
 						V0 string
 						V1 bool
@@ -149,7 +149,7 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 					return hv18, true
 				}
 				if hv6 == guardNotEqualToken {
-					// Rule Equality (internal/engine/ssaflow/path/rules/guard_stable.rules:18).
+					// Rule Equality (internal/engine/ssaflow/path/rules/guard_stable.rules:17).
 					var hv28 struct {
 						V0 string
 						V1 bool
@@ -251,7 +251,7 @@ func hyruledecideStableGuardRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule Other (internal/engine/ssaflow/path/rules/guard_stable.rules:33).
+		// Rule Other (internal/engine/ssaflow/path/rules/guard_stable.rules:31).
 		var hv38 hyruleImport0.Value = hv1
 		var hv39 *hyruleImport2.SearchBudget = hv2
 		hv16part0, hv16part1 := computedGuard(hv38, hv39)

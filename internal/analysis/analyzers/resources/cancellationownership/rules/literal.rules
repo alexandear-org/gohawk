@@ -1,5 +1,3 @@
-signature total = outputs (NoAction ^reasonCancellationNone) false
-
 host
   deferredLiteralClosure?
   allowance! = cancellationClassifier.budget
@@ -12,32 +10,35 @@ host
   reasonLabelResultGuardedDefer
   reasonLabelDeferredLiteralRelease
 
-// A directly deferred closure is exact only after its captured cell is proven
-// stable. A result guard defers judgment to each return; unknown capture, guard
-// census or completion cannot become evidence that cancel is uncalled.
-@Literal
-rewrite (inputs classifier deferred@(deferredLiteralClosure closure)) =
-  do
-    budget <- allowance classifier
-    capture <- capture classifier closure budget
-    true <- known capture
-      else
-        false -> outputs (Opaque ^reasonLabelDeferredClosure) true
-    true <- proven capture
-      else
-        false -> outputs (NoAction ^reasonCancellationNone) false
-    guard <- guarded classifier deferred budget
-    true <- known guard
-      else
-        false -> outputs (Opaque ^reasonLabelDeferredClosure) true
-    false <- proven guard
-      else
-        true -> outputs (NoAction ^reasonLabelResultGuardedDefer) true
-    completion <- completes classifier deferred budget
-    false <- proven completion
-      else
-        true -> outputs (Release ^reasonLabelDeferredLiteralRelease) true
-    true <- deferredLiteralCutoff budget
-      else
-        false -> outputs (NoAction ^reasonCancellationNone) false
-    outputs (Opaque ^reasonLabelDeferredClosure) true
+total fn rewrite
+  fallback outputs (NoAction ^reasonCancellationNone) false
+  match inputs
+    // A directly deferred closure is exact only after its captured cell is proven
+    // stable. A result guard defers judgment to each return; unknown capture, guard
+    // census or completion cannot become evidence that cancel is uncalled.
+    @Literal
+    inputs classifier deferred@(deferredLiteralClosure closure) ->
+      do
+        budget <- allowance classifier
+        capture <- capture classifier closure budget
+        true <- known capture
+          else
+            false -> outputs (Opaque ^reasonLabelDeferredClosure) true
+        true <- proven capture
+          else
+            false -> outputs (NoAction ^reasonCancellationNone) false
+        guard <- guarded classifier deferred budget
+        true <- known guard
+          else
+            false -> outputs (Opaque ^reasonLabelDeferredClosure) true
+        false <- proven guard
+          else
+            true -> outputs (NoAction ^reasonLabelResultGuardedDefer) true
+        completion <- completes classifier deferred budget
+        false <- proven completion
+          else
+            true -> outputs (Release ^reasonLabelDeferredLiteralRelease) true
+        true <- deferredLiteralCutoff budget
+          else
+            false -> outputs (NoAction ^reasonCancellationNone) false
+        outputs (Opaque ^reasonLabelDeferredClosure) true

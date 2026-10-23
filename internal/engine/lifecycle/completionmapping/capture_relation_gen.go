@@ -39,7 +39,7 @@ func hyruleCaptureRelationRecognize(harg0 struct {
 		hv8 := harg0.P7
 		_ = hv8
 		if hv7 == true {
-			// Rule Exact (internal/engine/lifecycle/completionmapping/rules/capture_relation.rules:3).
+			// Rule Exact (internal/engine/lifecycle/completionmapping/rules/capture_relation.rules:4).
 			var hv15 Local = Local{Kind: Exact, Local: hv2, Supplied: hv5, Path: nil}
 			hresult := struct {
 				V0 Local

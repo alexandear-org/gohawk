@@ -35,7 +35,7 @@ func hyrulerecognizeLocalCompletionRecognize(harg0 struct {
 			hv7 := hs1.Local
 			_ = hv7
 			if hv6 == localCallback {
-				// Rule Callback (internal/engine/lifecycle/rules/completion_local.rules:30).
+				// Rule Callback (internal/engine/lifecycle/rules/completion_local.rules:31).
 				var hv17 struct {
 					V0 string
 					V1 bool

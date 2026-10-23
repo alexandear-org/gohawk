@@ -17,7 +17,7 @@ func hyruleDestinationRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (s
 			if hs1 != nil {
 				hv2 := hs1.Addr
 				_ = hv2
-				// Rule Store (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:17).
+				// Rule Store (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:18).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
@@ -27,7 +27,7 @@ func hyruleDestinationRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (s
 			if hs1 != nil {
 				hv3 := hs1.Map
 				_ = hv3
-				// Rule Map (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:20).
+				// Rule Map (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:21).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
@@ -43,21 +43,21 @@ func hyruleDestinationRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (s
 					_ = hv6
 					if hok {
 						if hv5 == "delete" {
-							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:24).
+							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:25).
 							return struct {
 								V0 hyruleImport0.Value
 								V1 bool
 							}{V0: hv6, V1: false}, true
 						}
 						if hv5 == "clear" {
-							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:24).
+							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:25).
 							return struct {
 								V0 hyruleImport0.Value
 								V1 bool
 							}{V0: hv6, V1: false}, true
 						}
 						if hv5 == "copy" {
-							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:24).
+							// Rule Builtin (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/destination.rules:25).
 							return struct {
 								V0 hyruleImport0.Value
 								V1 bool

@@ -30,7 +30,7 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 				_ = hv6
 				{
 					if sameValue(hv5, hv3) {
-						// Rule Store (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:8).
+						// Rule Store (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:9).
 						var hv12 hyruleImport1.ReachingWalk = hv1
 						var hv13 hyruleImport0.Value = hv6
 						var hv14 hyruleImport0.Value = hv4
@@ -53,7 +53,7 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 				_ = hv7
 				hv8 := hs1
 				_ = hv8
-				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:18).
+				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:17).
 				var hv16 hyruleImport1.ReachingWalk = hv1
 				var hv17 hyruleImport0.Value = hv8
 				var hv18 hyruleImport0.Value = hv4
@@ -74,7 +74,7 @@ func hyruledecideStoredUseRecognize(harg0 struct {
 				_ = hv9
 				hv10 := hs1
 				_ = hv10
-				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:18).
+				// Rule Selected (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/stored_use.rules:17).
 				var hv20 hyruleImport1.ReachingWalk = hv1
 				var hv21 hyruleImport0.Value = hv10
 				var hv22 hyruleImport0.Value = hv4

@@ -39,7 +39,7 @@ func hyruleCapturedRecognize(harg0 struct {
 				if hs2, hok := hv3.(*hyruleImport2.Alloc); hok && hs2 != nil {
 					hv8 := hs2
 					_ = hv8
-					// Rule ExactCell (internal/engine/lifecycle/completionmapping/rules/capture.rules:7).
+					// Rule ExactCell (internal/engine/lifecycle/completionmapping/rules/capture.rules:8).
 					var hv23 Context = hv7
 					var hv24 hyruleImport2.Value = hv8
 					var hv25 hyruleImport2.Instruction = hv5
@@ -100,7 +100,7 @@ func hyruleCapturedRecognize(harg0 struct {
 				return hresult, true
 			}
 		}
-		// Rule Capture (internal/engine/lifecycle/completionmapping/rules/capture.rules:22).
+		// Rule Capture (internal/engine/lifecycle/completionmapping/rules/capture.rules:21).
 		var hv32 hyruleImport2.Value = hv3
 		var hv33 *hyruleImport3.SearchBudget = hv1.Budget
 		hv11 := hyruleImport0.CapturedBindingValueWithin(hv32, hv33)

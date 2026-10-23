@@ -1,5 +1,3 @@
-signature total = outputs ^CapabilityAbsent nil nil
-
 host
   CapabilityAbsent
   CapabilityClosure
@@ -16,18 +14,22 @@ view Unary = *ssa.UnOp
 view Call = *ssa.Call
   common: Call
 
-@Closure
-rewrite (inputs closure@(Closure())) = outputs ^CapabilityClosure closure nil
-
-@Cell
-rewrite (inputs cell@(Allocation())) = outputs ^CapabilityStorage cell nil
-
-// Retained capability uses the historical storage-source policy for any
-// unary leaf. This is not the exact callback binding's load-only contract.
-@StoredSource
-rewrite (inputs (Unary (source: source))) = outputs ^CapabilityStorage source nil
-
-// A wrapper receiving a callback may retain it without promising to invoke
-// it. Keep this general argument scan distinct from exact factory relations.
-@Arguments
-rewrite (inputs (Call (common: common))) = outputs ^CapabilityArguments nil common.Args
+total fn rewrite
+  fallback outputs ^CapabilityAbsent nil nil
+  match inputs
+    @Closure
+    inputs closure@(Closure()) ->
+      outputs ^CapabilityClosure closure nil
+    @Cell
+    inputs cell@(Allocation()) ->
+      outputs ^CapabilityStorage cell nil
+    // Retained capability uses the historical storage-source policy for any
+    // unary leaf. This is not the exact callback binding's load-only contract.
+    @StoredSource
+    inputs (Unary (source: source)) ->
+      outputs ^CapabilityStorage source nil
+    // A wrapper receiving a callback may retain it without promising to invoke
+    // it. Keep this general argument scan distinct from exact factory relations.
+    @Arguments
+    inputs (Call (common: common)) ->
+      outputs ^CapabilityArguments nil common.Args

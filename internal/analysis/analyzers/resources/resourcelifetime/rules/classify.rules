@@ -1,5 +1,3 @@
-signature total = outputs ^actionUnknown ^resourceReasonEvidenceUnavailable
-
 host
   collection! instruction = localCollection.label analysis.collection instruction
   guarded! = resourceAnalysis.resultGuardedLabel
@@ -46,46 +44,49 @@ host
   resourceReasonTransactionContextCanceled
   resourceReasonUntouched
 
-// Collection and guarded-result labels are authoritative even when they say
-// untouched. Later evidence queries must not run once one of them recognizes.
-// Parent cleanup and possible releases remain uncertainty, never settlement.
-@Instruction
-rewrite (inputs analysis instruction) =
-  case collection instruction of
-    Recognized (action: action, reason: reason) -> outputs action reason
-    Unrecognized() -> decline
-  <|> case guarded analysis instruction of
-    Recognized (action: action, reason: reason) -> outputs action reason
-    Unrecognized() -> decline
-  <|> case compression analysis instruction of
-    true -> outputs ^actionUnknown ^resourceReasonCompressionOutputMayBeAbandoned
-    false -> decline
-  <|> case parent analysis instruction of
-    Proven (reason: reason) -> outputs ^actionUnknown reason
-    Unknown (reason: reason) -> outputs ^actionUnknown reason
-    Disproven() -> decline
-  <|> case canceled instruction of
-    true -> outputs ^actionUnknown ^resourceReasonTransactionContextCanceled
-    false -> decline
-  <|> do
-    label <- release analysis instruction
-    case label of
-      Settled() -> label
-      Uncertain() -> label
-      Untouched() -> decline
-  <|> case ambiguous analysis instruction of
-    Proven (reason: reason) -> outputs ^actionUnknown reason
-    Unknown (reason: reason) -> outputs ^actionUnknown reason
-    Disproven() -> decline
-  <|> case paired analysis instruction of
-    Proven (reason: reason) -> outputs ^actionUnknown reason
-    Unknown (reason: reason) -> outputs ^actionUnknown reason
-    Disproven() -> decline
-  <|> case loop analysis instruction of
-    Proven (reason: reason) -> outputs ^actionUnknown reason
-    Unknown (reason: reason) -> outputs ^actionUnknown reason
-    Disproven() -> decline
-  <|> case opaque analysis instruction of
-    Opaque (reason: reason) -> outputs ^actionUnknown reason
-    Transparent() -> decline
-  <|> outputs ^actionNone ^resourceReasonUntouched
+total fn rewrite
+  fallback outputs ^actionUnknown ^resourceReasonEvidenceUnavailable
+  match inputs
+    // Collection and guarded-result labels are authoritative even when they say
+    // untouched. Later evidence queries must not run once one of them recognizes.
+    // Parent cleanup and possible releases remain uncertainty, never settlement.
+    @Instruction
+    inputs analysis instruction ->
+      case collection instruction of
+        Recognized (action: action, reason: reason) -> outputs action reason
+        Unrecognized() -> decline
+      <|> case guarded analysis instruction of
+        Recognized (action: action, reason: reason) -> outputs action reason
+        Unrecognized() -> decline
+      <|> case compression analysis instruction of
+        true -> outputs ^actionUnknown ^resourceReasonCompressionOutputMayBeAbandoned
+        false -> decline
+      <|> case parent analysis instruction of
+        Proven (reason: reason) -> outputs ^actionUnknown reason
+        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Disproven() -> decline
+      <|> case canceled instruction of
+        true -> outputs ^actionUnknown ^resourceReasonTransactionContextCanceled
+        false -> decline
+      <|> do
+        label <- release analysis instruction
+        case label of
+          Settled() -> label
+          Uncertain() -> label
+          Untouched() -> decline
+      <|> case ambiguous analysis instruction of
+        Proven (reason: reason) -> outputs ^actionUnknown reason
+        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Disproven() -> decline
+      <|> case paired analysis instruction of
+        Proven (reason: reason) -> outputs ^actionUnknown reason
+        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Disproven() -> decline
+      <|> case loop analysis instruction of
+        Proven (reason: reason) -> outputs ^actionUnknown reason
+        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Disproven() -> decline
+      <|> case opaque analysis instruction of
+        Opaque (reason: reason) -> outputs ^actionUnknown reason
+        Transparent() -> decline
+      <|> outputs ^actionNone ^resourceReasonUntouched

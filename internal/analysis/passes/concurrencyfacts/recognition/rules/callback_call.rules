@@ -1,5 +1,3 @@
-signature total = outputs nil nil false
-
 view Call = *ssa.Call
 
 host
@@ -9,23 +7,23 @@ host
   input = CallbackInput
   arguments = inertArguments
 
-// Only synchronous calls form callback holes. Launches and defers keep their
-// existing completion policy in the engine.
-@Method
-rewrite (inputs call@(Call()))
-  | let common = common call
-  , invokes common
-  , input common.Value common.Method
-  , arguments common
-  =
-  outputs common.Value common.Method true
-
-@Function
-rewrite (inputs call@(Call()))
-  | let common = common call
-  , not (invokes common)
-  , (callee common) == nil
-  , input common.Value nil
-  , arguments common
-  =
-  outputs common.Value nil true
+total fn rewrite
+  fallback outputs nil nil false
+  match inputs
+    // Only synchronous calls form callback holes. Launches and defers keep their
+    // existing completion policy in the engine.
+    @Method
+    inputs call@(Call())
+      when let common = common call
+      , invokes common
+      , input common.Value common.Method
+      , arguments common ->
+      outputs common.Value common.Method true
+    @Function
+    inputs call@(Call())
+      when let common = common call
+      , not (invokes common)
+      , (callee common) == nil
+      , input common.Value nil
+      , arguments common ->
+      outputs common.Value nil true

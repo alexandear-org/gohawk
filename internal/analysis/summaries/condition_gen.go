@@ -29,7 +29,7 @@ func hyruledecideResultConditionRecognize(harg0 struct {
 		hv5 := harg0.P4
 		_ = hv5
 		if hv3 == resultAlwaysTrue {
-			// Rule True (internal/analysis/summaries/rules/condition.rules:25).
+			// Rule True (internal/analysis/summaries/rules/condition.rules:26).
 			hresult := struct {
 				V0 bool
 				V1 bool
@@ -44,7 +44,7 @@ func hyruledecideResultConditionRecognize(harg0 struct {
 			return hresult, true
 		}
 		if hv3 == resultAlwaysFalse {
-			// Rule False (internal/analysis/summaries/rules/condition.rules:28).
+			// Rule False (internal/analysis/summaries/rules/condition.rules:29).
 			hresult := struct {
 				V0 bool
 				V1 bool
@@ -69,7 +69,7 @@ func hyruledecideResultConditionRecognize(harg0 struct {
 				hv9 := hs2
 				_ = hv9
 				if hv8 == comparisonEqual {
-					// Rule LiteralLeft (internal/analysis/summaries/rules/condition.rules:33).
+					// Rule LiteralLeft (internal/analysis/summaries/rules/condition.rules:34).
 					var hv22 *Provider = hv1
 					var hv23 hyruleImport0.Value = hv7
 					var hv24 *hyruleImport0.Const = hv9
@@ -119,7 +119,7 @@ func hyruledecideResultConditionRecognize(harg0 struct {
 					return hresult, true
 				}
 				if hv8 == comparisonNotEqual {
-					// Rule LiteralLeft (internal/analysis/summaries/rules/condition.rules:33).
+					// Rule LiteralLeft (internal/analysis/summaries/rules/condition.rules:34).
 					var hv28 *Provider = hv1
 					var hv29 hyruleImport0.Value = hv7
 					var hv30 *hyruleImport0.Const = hv9

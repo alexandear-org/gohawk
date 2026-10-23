@@ -1,5 +1,3 @@
-signature total = outputs nil
-
 view Load = *ssa.UnOp
   op: Op
 
@@ -16,11 +14,14 @@ type Resolved = (ssa.Value, bool)
   ResolvedValue (value: 0) = true
   Unavailable = false
 
-@BooleanSpill
-rewrite (inputs original@(Load (op: ^returnLoadToken)) (^returnTrue | ^returnFalse) budget) =
-  case resolveReturn original budget of
-    ResolvedValue (value: value) -> outputs value
-    Unavailable() -> outputs original
-
-@Original
-rewrite (inputs value _ _) = outputs value
+total fn rewrite
+  fallback outputs nil
+  match inputs
+    @BooleanSpill
+    inputs original@(Load (op: ^returnLoadToken)) (^returnTrue | ^returnFalse) budget ->
+      case resolveReturn original budget of
+        ResolvedValue (value: value) -> outputs value
+        Unavailable() -> outputs original
+    @Original
+    inputs value _ _ ->
+      outputs value

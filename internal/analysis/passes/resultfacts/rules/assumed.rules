@@ -1,5 +1,3 @@
-signature total = outputs ^Unknown false
-
 host
   Unknown
   AlwaysTrue
@@ -21,17 +19,20 @@ host
   leaf! = Engine.knownLeaf
   booleanGuarantee
 
-// The reaching fold owns wrapper/phi traversal. A decided assumption wins
-// immediately; an undecided cutoff must stop before unconditional inference.
-@AssumedLeaf
-rewrite (inputs engine value assumed budget) =
-  case assumption assumed value budget of
-    Decided (holds: holds) -> outputs (booleanGuarantee holds) true
-    Undecided() -> do
-      false <- exhausted budget
-        else
-          true -> outputs ^Unknown false
-      Resolved (guarantee: guarantee) <- leaf engine value budget
-        else
-          Unavailable() -> outputs ^Unknown false
-      outputs guarantee true
+total fn rewrite
+  fallback outputs ^Unknown false
+  match inputs
+    // The reaching fold owns wrapper/phi traversal. A decided assumption wins
+    // immediately; an undecided cutoff must stop before unconditional inference.
+    @AssumedLeaf
+    inputs engine value assumed budget ->
+      case assumption assumed value budget of
+        Decided (holds: holds) -> outputs (booleanGuarantee holds) true
+        Undecided() -> do
+          false <- exhausted budget
+            else
+              true -> outputs ^Unknown false
+          Resolved (guarantee: guarantee) <- leaf engine value budget
+            else
+              Unavailable() -> outputs ^Unknown false
+          outputs guarantee true

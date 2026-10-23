@@ -20,7 +20,7 @@ func hyruleResponseBodyRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struct
 					_ = hv4
 					{
 						if responseBodyField(hv4) {
-							// Rule Body (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/response.rules:15).
+							// Rule Body (internal/analysis/passes/lifecyclefacts/lifecycleforms/rules/response.rules:16).
 							return struct{ V0 *hyruleImport1.FieldAddr }{V0: hv4}, true
 						}
 					}

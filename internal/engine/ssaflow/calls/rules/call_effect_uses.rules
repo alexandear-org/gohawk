@@ -1,5 +1,3 @@
-signature total = outputs ^effectUnknown nil
-
 view Debug = *ssa.DebugRef
 
 view FieldAddress = *ssa.FieldAddr
@@ -49,67 +47,57 @@ host
   useStoredAndMutated
   useSent
 
-@Debug
-rewrite (inputs (use: Debug())) = outputs 0 nil
-
-// These forms preserve the supplied address. The Go walk checks every use of
-// the resulting alias with the same visited set and counted allowance.
-@Alias
-rewrite (inputs (use: alias@(FieldAddress() | IndexAddress() | Slice() | ChangedType() | Boxed() | ChangedInterface() | Phi()))) =
-  outputs 0 (alias alias)
-
-// Loading reads the slot; subsequent uses of its pointee are a separate query.
-@Read
-rewrite (inputs (use: (Unary (op: ^useLoadToken) | Binary (op: (^useEqualToken | ^useNotEqualToken))))) =
-  outputs ^EffectRead nil
-
-// The new alias may later be loaded and mutated. Retention is observed, but
-// absence of other effects cannot be established, even for a local spill.
-@StoreBoth
-rewrite (inputs (value: value, use: Store (address: address, value: stored)))
-  | same address value
-  , same stored value
-  =
-  outputs ^useStoredAndMutated nil
-
-@StoreAddress
-rewrite (inputs (value: value, use: Store (address: address)))
-  | same address value
-  =
-  outputs ^EffectMutate nil
-
-@StoreValue
-rewrite (inputs (value: value, use: Store (value: stored)))
-  | same stored value
-  =
-  outputs ^useStored nil
-
-@OtherStore
-rewrite (inputs (use: Store())) = outputs 0 nil
-
-@Returned
-rewrite (inputs (use: Return())) = outputs ^EffectRetain nil
-
-@SentValue
-rewrite (inputs (value: value, use: Send (value: sent)))
-  | same sent value
-  =
-  outputs ^useSent nil
-
-@SentChannel
-rewrite (inputs (use: Send())) = outputs ^EffectMutate nil
-
-@MapKey
-rewrite (inputs (value: value, use: MapUpdate (key: key)))
-  | same key value
-  =
-  outputs ^useStored nil
-
-@MapValue
-rewrite (inputs (value: value, use: MapUpdate (value: stored)))
-  | same stored value
-  =
-  outputs ^useStored nil
-
-@MapMutation
-rewrite (inputs (use: MapUpdate())) = outputs ^EffectMutate nil
+total fn rewrite
+  fallback outputs ^effectUnknown nil
+  match inputs
+    @Debug
+    inputs (use: Debug()) ->
+      outputs 0 nil
+    // These forms preserve the supplied address. The Go walk checks every use of
+    // the resulting alias with the same visited set and counted allowance.
+    @Alias
+    inputs (use: alias@(FieldAddress() | IndexAddress() | Slice() | ChangedType() | Boxed() | ChangedInterface() | Phi())) ->
+      outputs 0 (alias alias)
+    // Loading reads the slot; subsequent uses of its pointee are a separate query.
+    @Read
+    inputs (use: (Unary (op: ^useLoadToken) | Binary (op: (^useEqualToken | ^useNotEqualToken)))) ->
+      outputs ^EffectRead nil
+    // The new alias may later be loaded and mutated. Retention is observed, but
+    // absence of other effects cannot be established, even for a local spill.
+    @StoreBoth
+    inputs (value: value, use: Store (address: address, value: stored))
+      when same address value
+      , same stored value ->
+      outputs ^useStoredAndMutated nil
+    @StoreAddress
+    inputs (value: value, use: Store (address: address))
+      when same address value ->
+      outputs ^EffectMutate nil
+    @StoreValue
+    inputs (value: value, use: Store (value: stored))
+      when same stored value ->
+      outputs ^useStored nil
+    @OtherStore
+    inputs (use: Store()) ->
+      outputs 0 nil
+    @Returned
+    inputs (use: Return()) ->
+      outputs ^EffectRetain nil
+    @SentValue
+    inputs (value: value, use: Send (value: sent))
+      when same sent value ->
+      outputs ^useSent nil
+    @SentChannel
+    inputs (use: Send()) ->
+      outputs ^EffectMutate nil
+    @MapKey
+    inputs (value: value, use: MapUpdate (key: key))
+      when same key value ->
+      outputs ^useStored nil
+    @MapValue
+    inputs (value: value, use: MapUpdate (value: stored))
+      when same stored value ->
+      outputs ^useStored nil
+    @MapMutation
+    inputs (use: MapUpdate()) ->
+      outputs ^EffectMutate nil

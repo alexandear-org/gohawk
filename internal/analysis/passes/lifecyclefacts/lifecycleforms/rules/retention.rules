@@ -1,5 +1,3 @@
-signature total = outputs Ignore()
-
 type Use = RetentionUse
   tag Kind
   Ignore = RetentionIgnore
@@ -28,23 +26,25 @@ view Defer = *ssa.Defer
 
 view Go = *ssa.Go
 
-@Store
-rewrite (inputs store@(StoreValue()) _ _) = outputs (Store (store: store))
-
-// Capture is not completed ownership transfer. Every-return claims require a
-// separate cleanup registration proof; conditional cleanup cannot settle it.
-@Closure
-rewrite (inputs closure@(ClosureValue()) _ false) = outputs (Closure (closure: closure))
-
-@Published
-rewrite (inputs (Send (value: value) | MapUpdate (value: value)) _ false) =
-  outputs (Value (value: value))
-
-// Returning the value is described by returned-owner/view summaries. Strict
-// retention leaves it to those summaries instead of claiming a stored owner.
-@Returned
-rewrite (inputs (Return (values: values)) false _) = outputs (Returned (values: values))
-
-@Called
-rewrite (inputs instruction@(Call() | Defer() | Go()) _ _) =
-  outputs (Called (instruction: instruction))
+total fn rewrite
+  fallback outputs Ignore()
+  match inputs
+    @Store
+    inputs store@(StoreValue()) _ _ ->
+      outputs (Store (store: store))
+    // Capture is not completed ownership transfer. Every-return claims require a
+    // separate cleanup registration proof; conditional cleanup cannot settle it.
+    @Closure
+    inputs closure@(ClosureValue()) _ false ->
+      outputs (Closure (closure: closure))
+    @Published
+    inputs (Send (value: value) | MapUpdate (value: value)) _ false ->
+      outputs (Value (value: value))
+    // Returning the value is described by returned-owner/view summaries. Strict
+    // retention leaves it to those summaries instead of claiming a stored owner.
+    @Returned
+    inputs (Return (values: values)) false _ ->
+      outputs (Returned (values: values))
+    @Called
+    inputs instruction@(Call() | Defer() | Go()) _ _ ->
+      outputs (Called (instruction: instruction))

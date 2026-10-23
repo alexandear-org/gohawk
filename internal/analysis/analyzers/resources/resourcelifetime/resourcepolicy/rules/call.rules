@@ -1,5 +1,3 @@
-signature total = outputs ^None false
-
 host
   unknown! = Evidence.Unknown
   proven! = Evidence.Proven
@@ -7,22 +5,25 @@ host
   callback! = CallQueries.Callback
   after! = AfterCallback
 
-@Absent
-rewrite (inputs _ _ nil) = outputs ^None false
-
-// Retained callbacks are queried even when ordinary arguments do not carry the
-// resource. Unknown carried evidence stops before any callback query.
-@Call
-rewrite (inputs queries instruction common) =
-  do
-    proof <- carried queries common
-    false <- unknown proof
-      else
-        true -> outputs proof.Reason true
-    carried <- proven proof
-    Disproven() <- callback queries instruction common
-      else
-        Proven (reason: reason) -> outputs reason true
-        Unknown (reason: reason) -> outputs reason true
-    answer <- after queries instruction common carried
-    answer
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    @Absent
+    inputs _ _ nil ->
+      outputs ^None false
+    // Retained callbacks are queried even when ordinary arguments do not carry the
+    // resource. Unknown carried evidence stops before any callback query.
+    @Call
+    inputs queries instruction common ->
+      do
+        proof <- carried queries common
+        false <- unknown proof
+          else
+            true -> outputs proof.Reason true
+        carried <- proven proof
+        Disproven() <- callback queries instruction common
+          else
+            Proven (reason: reason) -> outputs reason true
+            Unknown (reason: reason) -> outputs reason true
+        answer <- after queries instruction common carried
+        answer

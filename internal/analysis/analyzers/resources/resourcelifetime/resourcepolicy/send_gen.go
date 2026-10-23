@@ -20,7 +20,7 @@ func hyruleSendRecognize(harg0 struct {
 		_ = hv2
 		hv3 := harg0.P2
 		_ = hv3
-		// Rule Sent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/send.rules:9).
+		// Rule Sent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/send.rules:10).
 		var hv7 InstructionQueries = hv1
 		var hv8 hyruleImport0.Value = hv2
 		var hv9 hyruleImport0.Instruction = hv3

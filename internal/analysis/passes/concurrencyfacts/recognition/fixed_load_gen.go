@@ -24,7 +24,7 @@ func hyruleFixedLoadRecognize(harg0 struct{ P0 *hyruleImport1.UnOp }) (struct {
 					if hs2 != nil {
 						hv4 := hs2
 						_ = hv4
-						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:3).
+						// Rule Capture (internal/analysis/passes/concurrencyfacts/recognition/rules/fixed_load.rules:4).
 						return struct {
 							V0 AddressKind
 							V1 *hyruleImport1.FreeVar

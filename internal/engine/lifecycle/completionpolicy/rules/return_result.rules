@@ -1,12 +1,14 @@
-signature total = outputs Uncovered()
-
 host
   source? = ssacall.CallResultSource
 
-@Completed
-rewrite (inputs _ true) = outputs Covered()
-
-// Forward the same result predicate to the nested callee. Its coverage and
-// exact-local iteration remain with the consuming completion search.
-@Forward
-rewrite (inputs (source call result) false) = outputs (Forward (call: call, result: result))
+total fn rewrite
+  fallback outputs Uncovered()
+  match inputs
+    @Completed
+    inputs _ true ->
+      outputs Covered()
+    // Forward the same result predicate to the nested callee. Its coverage and
+    // exact-local iteration remain with the consuming completion search.
+    @Forward
+    inputs (source call result) false ->
+      outputs (Forward (call: call, result: result))

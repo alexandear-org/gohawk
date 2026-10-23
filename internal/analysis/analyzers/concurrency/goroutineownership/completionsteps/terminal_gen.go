@@ -12,17 +12,17 @@ func hyruleTerminalRecognize(harg0 struct{ P0 hyruleImport0.Instruction }) (stru
 		switch hv1.(type) {
 		case *hyruleImport0.Return:
 			if hv1 != (*hyruleImport0.Return)(nil) {
-				// Rule Return (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:9).
+				// Rule Return (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:10).
 				return struct{ V0 TerminalStep }{V0: Returned}, true
 			}
 		case *hyruleImport0.RunDefers:
 			if hv1 != (*hyruleImport0.RunDefers)(nil) {
-				// Rule Deferred (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:12).
+				// Rule Deferred (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:13).
 				return struct{ V0 TerminalStep }{V0: RunDefers}, true
 			}
 		case *hyruleImport0.Jump:
 			if hv1 != (*hyruleImport0.Jump)(nil) {
-				// Rule Successor (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:17).
+				// Rule Successor (internal/analysis/analyzers/concurrency/goroutineownership/completionsteps/rules/terminal.rules:18).
 				return struct{ V0 TerminalStep }{V0: Follow}, true
 			}
 		}

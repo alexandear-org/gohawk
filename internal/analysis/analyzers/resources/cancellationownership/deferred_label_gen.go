@@ -19,7 +19,7 @@ func hyrulerecognizeCancellationDeferredUseRecognize(harg0 struct {
 		_ = hv1
 		hv2 := harg0.P1
 		_ = hv2
-		// Rule DeferredUse (internal/analysis/analyzers/resources/cancellationownership/rules/deferred_label.rules:12).
+		// Rule DeferredUse (internal/analysis/analyzers/resources/cancellationownership/rules/deferred_label.rules:13).
 		var hv7 struct {
 			V0 cancellationLabel
 			V1 bool

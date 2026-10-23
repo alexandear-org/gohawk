@@ -1,5 +1,3 @@
-signature total = outputs false false
-
 host
   resultAlwaysTrue
   resultAlwaysFalse
@@ -22,24 +20,26 @@ type Equality = (bool, bool)
   Known (equal: 0) = true
   Unknown (equal: 0) = false
 
-@True
-rewrite (inputs _ _ ^resultAlwaysTrue _ _) = outputs true true
-
-@False
-rewrite (inputs _ _ ^resultAlwaysFalse _ _) = outputs false true
-
-// A literal on the left is swapped first, including when both sides are
-// constants. Do not request a summary for unsupported operators or operands.
-@LiteralLeft
-rewrite (inputs provider (Comparison (left: literal@(Constant()), right: left, op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget) =
-  case equality provider left literal block budget of
-    Known (equal: equal) -> outputs (truth equal op) true
-    Unknown (equal: equal) -> outputs (truth equal op) false
-
-// Preserve the equality payload even when unknown: the caller still requires
-// known before pruning a successor, and this keeps the native result contract.
-@LiteralRight
-rewrite (inputs provider (Comparison (left: left, right: literal@(Constant()), op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget) =
-  case equality provider left literal block budget of
-    Known (equal: equal) -> outputs (truth equal op) true
-    Unknown (equal: equal) -> outputs (truth equal op) false
+total fn rewrite
+  fallback outputs false false
+  match inputs
+    @True
+    inputs _ _ ^resultAlwaysTrue _ _ ->
+      outputs true true
+    @False
+    inputs _ _ ^resultAlwaysFalse _ _ ->
+      outputs false true
+    // A literal on the left is swapped first, including when both sides are
+    // constants. Do not request a summary for unsupported operators or operands.
+    @LiteralLeft
+    inputs provider (Comparison (left: literal@(Constant()), right: left, op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget ->
+      case equality provider left literal block budget of
+        Known (equal: equal) -> outputs (truth equal op) true
+        Unknown (equal: equal) -> outputs (truth equal op) false
+    // Preserve the equality payload even when unknown: the caller still requires
+    // known before pruning a successor, and this keeps the native result contract.
+    @LiteralRight
+    inputs provider (Comparison (left: left, right: literal@(Constant()), op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget ->
+      case equality provider left literal block budget of
+        Known (equal: equal) -> outputs (truth equal op) true
+        Unknown (equal: equal) -> outputs (truth equal op) false

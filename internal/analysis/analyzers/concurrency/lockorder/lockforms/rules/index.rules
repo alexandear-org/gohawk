@@ -1,5 +1,3 @@
-signature total = outputs ^IndexStopped nil
-
 view IndexAddress = *ssa.IndexAddr
   index: Index
 
@@ -23,12 +21,15 @@ host
   IndexDynamic
   IndexFollow
 
-@ConstantAddress
-rewrite (inputs (IndexAddress (index: Constant()))) = outputs ^IndexStopped nil
-
-@Dynamic
-rewrite (inputs (IndexAddress() | Index() | Lookup())) = outputs ^IndexDynamic nil
-
-@Follow
-rewrite (inputs (Extract (source: source) | Field (source: source) | Unary (source: source))) =
-  outputs ^IndexFollow source
+total fn rewrite
+  fallback outputs ^IndexStopped nil
+  match inputs
+    @ConstantAddress
+    inputs (IndexAddress (index: Constant())) ->
+      outputs ^IndexStopped nil
+    @Dynamic
+    inputs (IndexAddress() | Index() | Lookup()) ->
+      outputs ^IndexDynamic nil
+    @Follow
+    inputs (Extract (source: source) | Field (source: source) | Unary (source: source)) ->
+      outputs ^IndexFollow source

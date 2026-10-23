@@ -1,5 +1,3 @@
-signature partial
-
 view ChangeType = *ssa.ChangeType
 
 view Convert = *ssa.Convert
@@ -17,8 +15,10 @@ view Slice = *ssa.Slice
 host
   valueInstruction?
 
-// The original converted/projected value, rather than its operand, supplies
-// the next use list. This is not a universal unwrap or an ownership proof.
-@Alias
-rewrite (inputs (valueInstruction source@(ChangeType() | Convert() | Box() | Interface() | Field() | Index() | Slice()))) =
-  outputs source
+partial fn rewrite
+  match inputs
+    // The original converted/projected value, rather than its operand, supplies
+    // the next use list. This is not a universal unwrap or an ownership proof.
+    @Alias
+    inputs (valueInstruction source@(ChangeType() | Convert() | Box() | Interface() | Field() | Index() | Slice())) ->
+      outputs source

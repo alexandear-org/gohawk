@@ -27,7 +27,7 @@ func hyruleEscapesRecognize(harg0 struct {
 				_ = hv5
 				hv6 := hs1.Val
 				_ = hv6
-				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
+				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:11).
 				var hv16 func(hyruleImport0.Value) bool = hv3
 				var hv17 hyruleImport0.Value = hv6
 				hv7 := derived(hv16, hv17)
@@ -45,7 +45,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv7 := hs1.X
 				_ = hv7
-				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
+				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:11).
 				var hv19 func(hyruleImport0.Value) bool = hv3
 				var hv20 hyruleImport0.Value = hv7
 				hv8 := derived(hv19, hv20)
@@ -63,7 +63,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv8 := hs1.Value
 				_ = hv8
-				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:10).
+				// Rule Consumed (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:11).
 				var hv22 func(hyruleImport0.Value) bool = hv3
 				var hv23 hyruleImport0.Value = hv8
 				hv9 := derived(hv22, hv23)
@@ -99,7 +99,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv10 := hs1
 				_ = hv10
-				// Rule Captured (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:24).
+				// Rule Captured (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:23).
 				var hv28 *hyruleImport0.MakeClosure = hv10
 				var hv29 func(hyruleImport0.Value) bool = hv3
 				hv11 := captured(hv28, hv29)
@@ -117,7 +117,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv11 := hs1
 				_ = hv11
-				// Rule Returned (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:33).
+				// Rule Returned (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:31).
 				var hv31 *hyruleImport0.Return = hv11
 				var hv32 hyruleImport0.Value = hv2
 				var hv33 func(hyruleImport0.Value) bool = hv3
@@ -136,7 +136,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv12 := hs1
 				_ = hv12
-				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
+				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:36).
 				var hv35 func(hyruleImport0.Instruction) bool = hv4
 				var hv36 hyruleImport0.Instruction = hv12
 				hv13 := called(hv35, hv36)
@@ -154,7 +154,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv13 := hs1
 				_ = hv13
-				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
+				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:36).
 				var hv38 func(hyruleImport0.Instruction) bool = hv4
 				var hv39 hyruleImport0.Instruction = hv13
 				hv14 := called(hv38, hv39)
@@ -172,7 +172,7 @@ func hyruleEscapesRecognize(harg0 struct {
 			if hs1 != nil {
 				hv14 := hs1
 				_ = hv14
-				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:39).
+				// Rule Called (internal/analysis/analyzers/concurrency/goroutineownership/containment/rules/escape.rules:36).
 				var hv41 func(hyruleImport0.Instruction) bool = hv4
 				var hv42 hyruleImport0.Instruction = hv14
 				hv15 := called(hv41, hv42)

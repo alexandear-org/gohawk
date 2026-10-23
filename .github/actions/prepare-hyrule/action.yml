@@ -7,10 +7,11 @@ runs:
       shell: bash
       run: |
         git init ../lockdoc
-        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git 34c6e9b9b5c222bb5d363c6ac6e399f30567040a
+        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git f0d9b07a9fdcc42a406ba293c2576f1341cb193d
         git -C ../lockdoc checkout --detach FETCH_HEAD
         GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         # Check committed output before any target regenerates it.
+        GOTOOLCHAIN=go1.27.0 sh scripts/boiler.sh generate --check
         GOTOOLCHAIN=go1.27.0 sh scripts/hyrule.sh generate --check
         GOTOOLCHAIN=go1.27.0 make generated-markdown
         echo 'GOWORK=off' >> "$GITHUB_ENV"

@@ -24,7 +24,7 @@ func hyruleContextOriginRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struc
 					_ = hv3
 					{
 						if DoneCall(hv3) {
-							// Rule Observed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:18).
+							// Rule Observed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:19).
 							return struct {
 								V0 OriginKind
 								V1 *hyruleImport1.Call
@@ -49,7 +49,7 @@ func hyruleContextOriginRecognize(harg0 struct{ P0 hyruleImport1.Value }) (struc
 							_ = hv7
 							{
 								if CancelConstructor(hv7) {
-									// Rule Constructed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:27).
+									// Rule Constructed (internal/analysis/passes/concurrencyfacts/recognition/rules/origin.rules:26).
 									return struct {
 										V0 OriginKind
 										V1 *hyruleImport1.Call

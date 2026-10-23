@@ -1,5 +1,3 @@
-signature total = outputs ^None false
-
 host
   possible
   returned! = InstructionQueries.Returned
@@ -12,40 +10,37 @@ host
   StoredOnCollectionOwner
   StoredInMap
 
-@Returned
-rewrite (inputs queries return@(Return())) =
-  do
-    proof <- returned queries return
-    outputs proof.Reason (possible proof)
-
-@Stored
-rewrite (inputs queries store@(Store())) =
-  do
-    answer <- stored queries store
-    answer
-
-@Sent
-rewrite (inputs queries instruction@(Send (value: value))) =
-  do
-    answer <- send queries value instruction
-    answer
-
-@Mapped
-rewrite (inputs queries (Map (value: value))) =
-  do
-    answer <- payload queries value ^StoredInMap
-    answer
-
-@Selected
-rewrite (inputs queries select@(Select())) =
-  do
-    answer <- select queries select
-    answer
-
-@Called
-rewrite (inputs queries instruction@(Call() | Defer() | Go()))
-  | let common = common instruction
-  =
-  do
-    answer <- call queries instruction common
-    answer
+total fn rewrite
+  fallback outputs ^None false
+  match inputs
+    @Returned
+    inputs queries return@(Return()) ->
+      do
+        proof <- returned queries return
+        outputs proof.Reason (possible proof)
+    @Stored
+    inputs queries store@(Store()) ->
+      do
+        answer <- stored queries store
+        answer
+    @Sent
+    inputs queries instruction@(Send (value: value)) ->
+      do
+        answer <- send queries value instruction
+        answer
+    @Mapped
+    inputs queries (Map (value: value)) ->
+      do
+        answer <- payload queries value ^StoredInMap
+        answer
+    @Selected
+    inputs queries select@(Select()) ->
+      do
+        answer <- select queries select
+        answer
+    @Called
+    inputs queries instruction@(Call() | Defer() | Go())
+      when let common = common instruction ->
+      do
+        answer <- call queries instruction common
+        answer

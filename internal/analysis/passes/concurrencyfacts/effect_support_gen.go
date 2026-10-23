@@ -23,7 +23,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 		_ = hv3
 		{
 			if effectFree(hv1, hv2) {
-				// Rule EffectFree (internal/analysis/passes/concurrencyfacts/rules/passive.rules:42).
+				// Rule EffectFree (internal/analysis/passes/concurrencyfacts/rules/passive.rules:44).
 				return struct{ V0 Reason }{V0: ReasonNone}, true
 			}
 		}
@@ -42,7 +42,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 					_ = hv5
 					{
 						if hyruleImport0.Value(hv5) {
-							// Rule InertMerge (internal/analysis/passes/concurrencyfacts/rules/passive.rules:56).
+							// Rule InertMerge (internal/analysis/passes/concurrencyfacts/rules/passive.rules:55).
 							return struct{ V0 Reason }{V0: ReasonNone}, true
 						}
 					}
@@ -52,7 +52,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 			if hs1 != nil {
 				hv6 := hs1
 				_ = hv6
-				// Rule Field (internal/analysis/passes/concurrencyfacts/rules/passive.rules:63).
+				// Rule Field (internal/analysis/passes/concurrencyfacts/rules/passive.rules:60).
 				var hv13 *hyruleImport2.FieldAddr = hv6
 				var hv14 *hyruleImport3.SearchBudget = hv3
 				hv7 := passiveFieldWithin(hv13, hv14)
@@ -76,7 +76,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				_ = hv9
 				{
 					if localSynchronizationPointerStore(hv9) {
-						// Rule PointerSpill (internal/analysis/passes/concurrencyfacts/rules/passive.rules:70).
+						// Rule PointerSpill (internal/analysis/passes/concurrencyfacts/rules/passive.rules:66).
 						return struct{ V0 Reason }{V0: ReasonNone}, true
 					}
 				}
@@ -90,7 +90,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 							if !(hyruleImport0.ContainsSynchronization((passiveValue).Type(hv10))) {
 								{
 									if !(hyruleImport0.SynchronizationPointer((passiveValue).Type(hv11))) {
-										// Rule OrdinaryStore (internal/analysis/passes/concurrencyfacts/rules/passive.rules:77).
+										// Rule OrdinaryStore (internal/analysis/passes/concurrencyfacts/rules/passive.rules:71).
 										return struct{ V0 Reason }{V0: ReasonNone}, true
 									}
 								}
@@ -105,7 +105,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 				_ = hv12
 				{
 					if hyruleImport1.ChannelType(hv12) {
-						// Rule ChannelRepresentation (internal/analysis/passes/concurrencyfacts/rules/passive.rules:85).
+						// Rule ChannelRepresentation (internal/analysis/passes/concurrencyfacts/rules/passive.rules:77).
 						return struct{ V0 Reason }{V0: ReasonNone}, true
 					}
 				}
@@ -113,7 +113,7 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 		case *hyruleImport2.MakeChan:
 			if hv1 != (*hyruleImport2.MakeChan)(nil) {
 				if hv2 == true {
-					// Rule RootChannel (internal/analysis/passes/concurrencyfacts/rules/passive.rules:92).
+					// Rule RootChannel (internal/analysis/passes/concurrencyfacts/rules/passive.rules:82).
 					return struct{ V0 Reason }{V0: ReasonNone}, true
 				}
 			}
@@ -121,66 +121,6 @@ func hyrulepassiveInstructionRecognize(harg0 struct {
 	}
 	var zero struct{ V0 Reason }
 	return zero, false
-}
-
-// cloneEffects is schema-derived freeze; host leaf hooks retain their declared contracts.
-func cloneEffects(h0 Summary) Summary {
-	result := h0
-	if h0.Conditions != nil {
-		result.Conditions = make([]Condition, len(h0.Conditions))
-		copy(result.Conditions, h0.Conditions)
-	}
-	if h0.Returned != nil {
-		result.Returned = make([]Returned, len(h0.Returned))
-		copy(result.Returned, h0.Returned)
-	}
-	if h0.Operations != nil {
-		result.Operations = make([]Operation, len(h0.Operations))
-		copy(result.Operations, h0.Operations)
-	}
-	if h0.deferred != nil {
-		result.deferred = make([]Operation, len(h0.deferred))
-		copy(result.deferred, h0.deferred)
-	}
-	result.Workers = cloneWorkers(h0.Workers)
-	result.Choices = cloneChoices(h0.Choices)
-	if h0.CancellationInputs != nil {
-		result.CancellationInputs = make([]Reference, len(h0.CancellationInputs))
-		copy(result.CancellationInputs, h0.CancellationInputs)
-	}
-	return result
-}
-
-// cloneWorker is schema-derived freeze; host leaf hooks retain their declared contracts.
-func cloneWorker(h0 WorkerSummary) WorkerSummary {
-	result := h0
-	if h0.Operations != nil {
-		result.Operations = make([]Operation, len(h0.Operations))
-		copy(result.Operations, h0.Operations)
-	}
-	result.Alternatives = cloneOperationAlternatives(h0.Alternatives)
-	if h0.AlternativeConditions != nil {
-		result.AlternativeConditions = make([][]Condition, len(h0.AlternativeConditions))
-		copy(result.AlternativeConditions, h0.AlternativeConditions)
-	}
-	return result
-}
-
-// cloneChoice is schema-derived freeze; host leaf hooks retain their declared contracts.
-func cloneChoice(h0 SelectChoice) SelectChoice {
-	result := h0
-	result.Arms = cloneArms(h0.Arms)
-	return result
-}
-
-// cloneArm is schema-derived freeze; host leaf hooks retain their declared contracts.
-func cloneArm(h0 SelectArm) SelectArm {
-	result := h0
-	if h0.Sequence != nil {
-		result.Sequence = make([]Operation, len(h0.Sequence))
-		copy(result.Sequence, h0.Sequence)
-	}
-	return result
 }
 func passiveInstruction(hparam0 hyruleImport2.Instruction, hparam1 bool, hparam2 *hyruleImport3.SearchBudget) Reason {
 	hvalue, hok := hyrulepassiveInstructionRecognize(struct {

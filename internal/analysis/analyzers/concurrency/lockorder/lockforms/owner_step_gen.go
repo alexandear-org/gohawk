@@ -17,7 +17,7 @@ func hyruleOwnerStepRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct {
 			if hs1 != nil {
 				hv2 := hs1.X
 				_ = hv2
-				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:15).
+				// Rule Field (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:16).
 				return struct {
 					V0 hyruleImport0.Value
 					V1 bool
@@ -30,7 +30,7 @@ func hyruleOwnerStepRecognize(harg0 struct{ P0 hyruleImport0.Value }) (struct {
 				hv4 := hs1.Index
 				_ = hv4
 				if hs2, hok := hv4.(*hyruleImport0.Const); hok && hs2 != nil {
-					// Rule ConstantIndex (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:24).
+					// Rule ConstantIndex (internal/analysis/analyzers/concurrency/lockorder/lockforms/rules/owner_step.rules:25).
 					return struct {
 						V0 hyruleImport0.Value
 						V1 bool

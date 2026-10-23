@@ -23,7 +23,7 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 			if hs1 != nil {
 				hv4 := hs1
 				_ = hv4
-				// Rule Allocation (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:10).
+				// Rule Allocation (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:11).
 				var hv12 hyruleImport0.Value = hv4
 				var hv13 *hyruleImport2.SearchBudget = hv3
 				hv5 := onlyHTTPDoUsesWithin(hv12, hv13)
@@ -99,7 +99,7 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 					hv10 := hs2
 					_ = hv10
 					if hv9 == loadToken {
-						// Rule LocalCell (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:30).
+						// Rule LocalCell (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:28).
 						var hv21 *hyruleImport0.Alloc = hv10
 						var hv22 *hyruleImport2.SearchBudget = hv3
 						hv11 := zeroClientCellWithin(hv21, hv22)
@@ -121,7 +121,7 @@ func hyruledecideHeadClientRecognize(harg0 struct {
 				}
 			}
 		}
-		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:36).
+		// Rule Other (internal/analysis/analyzers/resources/resourcelifetime/httpacquire/rules/client.rules:33).
 		hresult := struct{ V0 Proof }{V0: carriedProof(false, hv3)}
 		if !hyrulehyruledecideHeadClientRecognizeRecord10Valid(hresult) {
 			var zero struct{ V0 Proof }

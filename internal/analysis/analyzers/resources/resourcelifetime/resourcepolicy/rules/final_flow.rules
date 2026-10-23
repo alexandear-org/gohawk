@@ -1,5 +1,3 @@
-signature total = outputs (Unavailable (reason: ^EvidenceUnavailable))
-
 host
   flow! = FlowQueries.Flow
   reportable = Decision.Reportable
@@ -10,31 +8,34 @@ host
   BudgetExhausted
   ProcessExitReclaims
 
-// DB-prepared driver statements belong to pooled connections, whose finalClose
-// closes their open statements. This does not settle Rows, Tx, or Conn, nor
-// claim that DB.Close is identical to Stmt.Close.
-// https://go.dev/src/database/sql/sql.go (driverConn.finalClose, DB.prepareDC)
-// https://github.com/mariadb-operator/mariadb-operator/blob/e8ece7a8076954674e10e0381571bd80278ac35f/licenses/go-licenses/github.com/go-sql-driver/mysql/driver_test.go#L2809
-// Preserve a non-reportable answer intact. Only a reportable flow reaches the
-// exclusions, and an available witness survives when none of them applies.
-@Final
-rewrite (inputs queries error) =
-  do
-    flow <- flow queries error
-    true <- reportable flow
-      else
-        false -> outputs flow
-    false <- database queries
-      else
-        true -> outputs (Accepted (reason: ^ParentCleanup))
-    false <- poolExhausted queries
-      else
-        true -> outputs (Unavailable (reason: ^BudgetExhausted))
-    exit <- exit queries
-    false <- exit.Reclaimed
-      else
-        true -> outputs (Accepted (reason: ^ProcessExitReclaims))
-    false <- exit.Exhausted
-      else
-        true -> outputs (Unavailable (reason: ^BudgetExhausted))
-    outputs flow
+total fn rewrite
+  fallback outputs (Unavailable (reason: ^EvidenceUnavailable))
+  match inputs
+    // DB-prepared driver statements belong to pooled connections, whose finalClose
+    // closes their open statements. This does not settle Rows, Tx, or Conn, nor
+    // claim that DB.Close is identical to Stmt.Close.
+    // https://go.dev/src/database/sql/sql.go (driverConn.finalClose, DB.prepareDC)
+    // https://github.com/mariadb-operator/mariadb-operator/blob/e8ece7a8076954674e10e0381571bd80278ac35f/licenses/go-licenses/github.com/go-sql-driver/mysql/driver_test.go#L2809
+    // Preserve a non-reportable answer intact. Only a reportable flow reaches the
+    // exclusions, and an available witness survives when none of them applies.
+    @Final
+    inputs queries error ->
+      do
+        flow <- flow queries error
+        true <- reportable flow
+          else
+            false -> outputs flow
+        false <- database queries
+          else
+            true -> outputs (Accepted (reason: ^ParentCleanup))
+        false <- poolExhausted queries
+          else
+            true -> outputs (Unavailable (reason: ^BudgetExhausted))
+        exit <- exit queries
+        false <- exit.Reclaimed
+          else
+            true -> outputs (Accepted (reason: ^ProcessExitReclaims))
+        false <- exit.Exhausted
+          else
+            true -> outputs (Unavailable (reason: ^BudgetExhausted))
+        outputs flow

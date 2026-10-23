@@ -1,5 +1,3 @@
-signature total = outputs false false
-
 host
   literal! = Provider.literalEquality
   paired! = Provider.pairedNilness
@@ -13,20 +11,21 @@ type Equality = (bool, bool)
   Known (equal: 0) = true
   Unknown (equal: 0) = false
 
-@NilComparison
-rewrite (inputs provider value literal block budget)
-  | Nil literal
-  =
-  do
-    answer <- literal provider value literal budget
-    case answer of
-      Known() -> answer
-      Unknown() -> do
-        paired <- paired provider value block budget
-        paired
-
-@OtherComparison
-rewrite (inputs provider value literal _ budget) =
-  do
-    answer <- literal provider value literal budget
-    answer
+total fn rewrite
+  fallback outputs false false
+  match inputs
+    @NilComparison
+    inputs provider value literal block budget
+      when Nil literal ->
+      do
+        answer <- literal provider value literal budget
+        case answer of
+          Known() -> answer
+          Unknown() -> do
+            paired <- paired provider value block budget
+            paired
+    @OtherComparison
+    inputs provider value literal _ budget ->
+      do
+        answer <- literal provider value literal budget
+        answer

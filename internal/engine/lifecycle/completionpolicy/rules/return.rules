@@ -1,5 +1,3 @@
-signature total = outputs Uncovered()
-
 host
   returnedValue!
   ResolveReturnValue!
@@ -13,15 +11,18 @@ type Selected = (ssa.Value, bool)
   SelectedValue (value: 0) = true
   MissingValue = false
 
-@Return
-rewrite (inputs returned condition completed budget) =
-  do
-    SelectedValue (value: value) <- returnedValue returned condition.Result
-      else
-        MissingValue() -> outputs Uncovered()
-    observed <- ResolveReturnValue value condition.Outcome budget
-    false <- excludesReturn condition.Outcome observed
-      else
-        true -> outputs Irrelevant()
-    plan <- ReturnResult observed completed
-    outputs plan
+total fn rewrite
+  fallback outputs Uncovered()
+  match inputs
+    @Return
+    inputs returned condition completed budget ->
+      do
+        SelectedValue (value: value) <- returnedValue returned condition.Result
+          else
+            MissingValue() -> outputs Uncovered()
+        observed <- ResolveReturnValue value condition.Outcome budget
+        false <- excludesReturn condition.Outcome observed
+          else
+            true -> outputs Irrelevant()
+        plan <- ReturnResult observed completed
+        outputs plan

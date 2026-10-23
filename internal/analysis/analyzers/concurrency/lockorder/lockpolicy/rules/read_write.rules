@@ -1,5 +1,3 @@
-signature total = outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
-
 host
   guard! = ReadWriteQueries.Guard
   unknown! = Proof.Unknown
@@ -11,28 +9,31 @@ host
   ImportedWriterGuardUnknown
   ReadLockWrite
 
-// A field-only method exposes caller synchronization or separate ownership;
-// same-owner matching cannot decide which. Keep the candidate unknown.
-// https://github.com/apache/skywalking-rover/blob/e83d5925500a7e63dd55c080a9b1542d6cedaefb/pkg/tools/buffer/buffer.go#L629-L649
-// Exclusivity must belong to the actual destination: a fresh wrapper may carry
-// a borrowed map or slice. Another held writer also leaves the field's guard
-// unknown; this does not establish that it is protected by that mutex.
-// https://github.com/rfjakob/gocryptfs/blob/842af4463989ee6808d397433e9aba8517e49c89/internal/fusefrontend/file.go#L409-L430
-@Write
-rewrite (inputs queries) =
-  do
-    guard <- guard queries
-    false <- unknown guard
-      else
-        true -> outputs (Continue (proof: guard))
-    false <- private queries
-      else
-        true -> outputs (Continue (proof: Accepted (reason: ^PrivateWriteStorage)))
-    false <- held queries
-      else
-        true -> outputs (Continue (proof: Unknown (reason: ^ExclusiveWriterUnknown)))
-    WriterAbsent() <- writer queries
-      else
-        WriterUnavailable() -> outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
-        WriterFound() -> outputs (Continue (proof: Unknown (reason: ^ImportedWriterGuardUnknown)))
-    outputs (Stop (proof: Reported (reason: ^ReadLockWrite)))
+total fn rewrite
+  fallback outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
+  match inputs
+    // A field-only method exposes caller synchronization or separate ownership;
+    // same-owner matching cannot decide which. Keep the candidate unknown.
+    // https://github.com/apache/skywalking-rover/blob/e83d5925500a7e63dd55c080a9b1542d6cedaefb/pkg/tools/buffer/buffer.go#L629-L649
+    // Exclusivity must belong to the actual destination: a fresh wrapper may carry
+    // a borrowed map or slice. Another held writer also leaves the field's guard
+    // unknown; this does not establish that it is protected by that mutex.
+    // https://github.com/rfjakob/gocryptfs/blob/842af4463989ee6808d397433e9aba8517e49c89/internal/fusefrontend/file.go#L409-L430
+    @Write
+    inputs queries ->
+      do
+        guard <- guard queries
+        false <- unknown guard
+          else
+            true -> outputs (Continue (proof: guard))
+        false <- private queries
+          else
+            true -> outputs (Continue (proof: Accepted (reason: ^PrivateWriteStorage)))
+        false <- held queries
+          else
+            true -> outputs (Continue (proof: Unknown (reason: ^ExclusiveWriterUnknown)))
+        WriterAbsent() <- writer queries
+          else
+            WriterUnavailable() -> outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
+            WriterFound() -> outputs (Continue (proof: Unknown (reason: ^ImportedWriterGuardUnknown)))
+        outputs (Stop (proof: Reported (reason: ^ReadLockWrite)))

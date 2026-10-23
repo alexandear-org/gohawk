@@ -1,5 +1,3 @@
-signature total = outputs Absent()
-
 type Origin = CallbackSource
   tag Kind
   Absent = CallbackAbsent
@@ -20,15 +18,19 @@ view Allocation = *ssa.Alloc
 host
   onceSource?
 
-@Closure
-rewrite (inputs closure@(Closure()) _) = outputs (Exact (closure: closure))
-
-@DeferredOnce
-rewrite (inputs (Call (common: onceSource source)) true) = outputs (Follow (source: source))
-
-// The storage proof retains its observation point and the same child cap.
-@CellRead
-rewrite (inputs (Unary (source: source)) _) = outputs (Storage (source: source))
-
-@Cell
-rewrite (inputs source@(Allocation()) _) = outputs (Storage (source: source))
+total fn rewrite
+  fallback outputs Absent()
+  match inputs
+    @Closure
+    inputs closure@(Closure()) _ ->
+      outputs (Exact (closure: closure))
+    @DeferredOnce
+    inputs (Call (common: onceSource source)) true ->
+      outputs (Follow (source: source))
+    // The storage proof retains its observation point and the same child cap.
+    @CellRead
+    inputs (Unary (source: source)) _ ->
+      outputs (Storage (source: source))
+    @Cell
+    inputs source@(Allocation()) _ ->
+      outputs (Storage (source: source))

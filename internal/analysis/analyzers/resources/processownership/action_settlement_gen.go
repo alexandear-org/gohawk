@@ -24,7 +24,7 @@ func hyrulerecognizeProcessSettlementRecognize(harg0 struct {
 		_ = hv3
 		hv4 := harg0.P3
 		_ = hv4
-		// Rule Settlement (internal/analysis/analyzers/resources/processownership/rules/action_settlement.rules:10).
+		// Rule Settlement (internal/analysis/analyzers/resources/processownership/rules/action_settlement.rules:11).
 		var hv6 bool = waitsForCommand(hv2, hv3)
 		if !hv6 {
 			hv6 = releasedProcess(hv2, hv3)

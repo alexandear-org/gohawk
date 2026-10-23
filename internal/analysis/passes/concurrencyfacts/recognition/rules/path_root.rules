@@ -1,16 +1,18 @@
-signature total = outputs false nil
-
 view Allocation = *ssa.Alloc
 
 view Parameter = *ssa.Parameter
 
-@Local
-rewrite (inputs (Allocation() | Parameter() | Capture()) _) = outputs true nil
-
-// A global is an exact address only for mutex identity. Channel slots still
-// need content stability and cannot inherit their global owner's identity.
-@GlobalMutex
-rewrite (inputs Global() true) = outputs true nil
-
-@Unary
-rewrite (inputs load@(Unary()) _) = outputs false load
+total fn rewrite
+  fallback outputs false nil
+  match inputs
+    @Local
+    inputs (Allocation() | Parameter() | Capture()) _ ->
+      outputs true nil
+    // A global is an exact address only for mutex identity. Channel slots still
+    // need content stability and cannot inherit their global owner's identity.
+    @GlobalMutex
+    inputs Global() true ->
+      outputs true nil
+    @Unary
+    inputs load@(Unary()) _ ->
+      outputs false load

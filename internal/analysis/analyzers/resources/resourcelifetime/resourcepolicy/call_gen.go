@@ -21,7 +21,7 @@ func hyruleCallRecognize(harg0 struct {
 		hv3 := harg0.P2
 		_ = hv3
 		if hv3 == nil {
-			// Rule Absent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/call.rules:10).
+			// Rule Absent (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/call.rules:11).
 			hresult := struct {
 				V0 Reason
 				V1 bool
@@ -35,7 +35,7 @@ func hyruleCallRecognize(harg0 struct {
 			}
 			return hresult, true
 		}
-		// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/call.rules:15).
+		// Rule Call (internal/analysis/analyzers/resources/resourcelifetime/resourcepolicy/rules/call.rules:16).
 		var hv11 CallQueries = hv1
 		var hv12 *hyruleImport0.CallCommon = hv3
 		hv4 := (CallQueries).Carried(hv11, hv12)

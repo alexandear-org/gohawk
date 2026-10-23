@@ -1,44 +1,38 @@
-signature total = outputs (Opaque ^reasonLabelDeferredClosure) true
-
 host
   ownDone = cancellationClassifier.ownDoneChannel
   exactCancel common = exactCancelCall common classifier.cancel
   literal! = cancellationClassifier.deferredLiteralLabel
   remaining! = recognizeCancellationDeferredUse
 
-// A selected Done observation is cancellation evidence, not synchronous unlinking.
-@Done
-rewrite (inputs (Receive (op: ^receiveToken, value: channel)) classifier _)
-  | ownDone classifier channel
-  =
-  outputs (Opaque ^reasonLabelOwnDoneReceive) true
-
-@StartedCancel
-rewrite (inputs Started() classifier common)
-  | exactCancel common
-  =
-  outputs (Transfer ^reasonLabelLaunchedCancel) true
-
-@DirectCancel
-rewrite (inputs _ classifier common)
-  | exactCancel common
-  =
-  outputs (Release ^reasonLabelRelease) true
-
-@DeferredLiteral
-rewrite (inputs instruction@(Deferred()) classifier _) =
-  case literal classifier instruction of
-    Decided (label: label) -> outputs label true
-    Unrecognized() -> do
-      result <- remaining instruction classifier
-      case result of
-        Decided() -> result
-        Unrecognized() -> result
-
-@Remaining
-rewrite (inputs instruction classifier _) =
-  do
-    result <- remaining instruction classifier
-    case result of
-      Decided() -> result
-      Unrecognized() -> result
+total fn rewrite
+  fallback outputs (Opaque ^reasonLabelDeferredClosure) true
+  match inputs
+    // A selected Done observation is cancellation evidence, not synchronous unlinking.
+    @Done
+    inputs (Receive (op: ^receiveToken, value: channel)) classifier _
+      when ownDone classifier channel ->
+      outputs (Opaque ^reasonLabelOwnDoneReceive) true
+    @StartedCancel
+    inputs Started() classifier common
+      when exactCancel common ->
+      outputs (Transfer ^reasonLabelLaunchedCancel) true
+    @DirectCancel
+    inputs _ classifier common
+      when exactCancel common ->
+      outputs (Release ^reasonLabelRelease) true
+    @DeferredLiteral
+    inputs instruction@(Deferred()) classifier _ ->
+      case literal classifier instruction of
+        Decided (label: label) -> outputs label true
+        Unrecognized() -> do
+          result <- remaining instruction classifier
+          case result of
+            Decided() -> result
+            Unrecognized() -> result
+    @Remaining
+    inputs instruction classifier _ ->
+      do
+        result <- remaining instruction classifier
+        case result of
+          Decided() -> result
+          Unrecognized() -> result
