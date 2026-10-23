@@ -1,0 +1,26 @@
+package "internal/analysis/passes/concurrencyfacts" {
+    output "boiler_snapshots_gen.go" {
+        snapshot cloneEffects(Summary) {
+            cutoff, Paths, AlternativesComplete, Reason = keep
+            Conditions, Returned, Operations, deferred, CancellationInputs = clone
+            Workers = call cloneWorkers
+            Choices = call cloneChoices
+        }
+
+        snapshot cloneWorker(WorkerSummary) {
+            Operations, AlternativeConditions = clone
+            Alternatives = call cloneOperationAlternatives
+            Spawn, Site, Prefix, Branches, Replicated = keep
+        }
+
+        snapshot cloneChoice(SelectChoice) {
+            Arms = call cloneArms
+            Prefix, Site, Worker = keep
+        }
+
+        snapshot cloneArm(SelectArm) {
+            Operation, Default, StateIndex, Complete = keep
+            Sequence = clone
+        }
+    }
+}

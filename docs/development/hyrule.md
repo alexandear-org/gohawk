@@ -11,9 +11,10 @@ regenerated output together with the rule change that produced it.
 
 `tools/hyrule` links to `../../hyrule`, the standalone
 [Hyrule repository](https://github.com/kojah/hyrule). Keep `gohawk`, `hyrule`
-and `lockdoc` beside one another and create the ignored workspace with
-`go work init . ../hyrule ../lockdoc`. Lockdoc remains a workspace member for
-Boiler. The workspace uses Go 1.27; GoHawk's own module keeps its Go 1.26 floor.
+and `boiler` beside one another. `tools/boiler` links to `../../boiler`, the
+standalone [Boiler repository](https://github.com/kojah/boiler). An optional
+ignored workspace can be created with `go work init . ../hyrule ../boiler`.
+The workspace uses Go 1.27; GoHawk's own module keeps its Go 1.26 floor.
 
 `make hyrule-generate` builds the local compiler and updates the root
 `hyrule.yaml` targets. `make hyrule-generated-check` checks output freshness.
@@ -22,8 +23,9 @@ Compiler tests and standalone examples run in Hyrule's repository.
 On clean clones, `scripts/hyrule.sh` uses the compiler pinned in
 `tools/hyruletool/go.mod`; this separate tool module isolates its Go requirement.
 Set `HYRULE_PINNED=1` to exercise that version even with the local symlink present.
-CI checks committed output with the pinned Hyrule compiler, retains its pinned
-Lockdoc checkout for Boiler, and then tests with `GOWORK=off`, including GoHawk's
+`scripts/boiler.sh` follows the same convention with `tools/boilertool/go.mod`
+and `BOILER_PINNED=1`. CI checks committed output with both pinned compilers
+and then tests with `GOWORK=off`, including GoHawk's
 supported Go floor. Edit rules or bindings and regenerate; never patch generated Go.
 
 Each package keeps its rule sources in a `rules/` folder beside the Go file
@@ -81,11 +83,13 @@ retain explicit named arms. Reached queries retain their original order and budg
 public Go entry points still discard evidence if the child or shared allowance
 is exhausted. CI pins the compiler revision supporting this syntax.
 
-Concurrency summary snapshots use Boiler's field-complete snapshot operations
-in `boiler.yaml`. They preserve the same four copy functions and nested hooks:
+Concurrency summary snapshots use Boiler's field-complete snapshot recipe.
+`boiler.yaml` discovers `boiler/*.boiler` and selects the bundled `boiler:snapshot`
+recipe; `boiler/concurrencyfacts.boiler` defines the four targets and their field
+rules. They preserve the same four copy functions and nested hooks:
 branch-mutable lists are detached, while immutable SSA references, path summaries
 and condition evidence retain their existing sharing. Each representation field
-has an explicit policy. Budgeted copying and fixpoint equality remain separate.
+has an explicit rule. Budgeted copying and fixpoint equality remain separate.
 `make boiler-generate` runs before Hyrule; `make boiler-generated-check` checks
 the committed snapshot output. The retired `derive ... freeze` rules are removed.
 

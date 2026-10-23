@@ -1,17 +1,13 @@
 name: Generate Hyrule sources
-description: Verify committed Hyrule Go is fresh, generate ignored Markdown with the pinned compiler, then use standalone module dependencies. Hyrule is pinned independently.
+description: Verify committed Hyrule Go is fresh, generate ignored Markdown with the pinned compiler, then use standalone module dependencies. Hyrule and Boiler are pinned independently.
 runs:
   using: composite
   steps:
-    - name: Prepare generator workspace
+    - name: Verify pinned generators
       shell: bash
       run: |
-        git init ../lockdoc
-        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git 0d00860a5053c0daed9ac50aec0d42cb3d1e8d60
-        git -C ../lockdoc checkout --detach FETCH_HEAD
-        GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         # Check committed output before any target regenerates it.
-        GOTOOLCHAIN=go1.27.0 sh scripts/boiler.sh generate --check
+        BOILER_PINNED=1 GOTOOLCHAIN=go1.27.0 sh scripts/boiler.sh generate --check
         HYRULE_PINNED=1 GOTOOLCHAIN=go1.27.0 sh scripts/hyrule.sh generate --check
         GOTOOLCHAIN=go1.27.0 make generated-markdown
         echo 'GOWORK=off' >> "$GITHUB_ENV"

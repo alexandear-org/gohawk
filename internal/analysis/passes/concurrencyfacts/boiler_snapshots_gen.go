@@ -6,7 +6,7 @@ import (
 	"slices"
 )
 
-// cloneEffects returns a snapshot of Summary. Every field has an explicit boiler policy.
+// cloneEffects returns a snapshot of Summary. Every field has an explicit boiler rule.
 func cloneEffects(in Summary) Summary {
 	out := in
 	out.Conditions = slices.Clone(out.Conditions)
@@ -19,7 +19,7 @@ func cloneEffects(in Summary) Summary {
 	return out
 }
 
-// cloneWorker returns a snapshot of WorkerSummary. Every field has an explicit boiler policy.
+// cloneWorker returns a snapshot of WorkerSummary. Every field has an explicit boiler rule.
 func cloneWorker(in WorkerSummary) WorkerSummary {
 	out := in
 	out.Operations = slices.Clone(out.Operations)
@@ -28,14 +28,14 @@ func cloneWorker(in WorkerSummary) WorkerSummary {
 	return out
 }
 
-// cloneChoice returns a snapshot of SelectChoice. Every field has an explicit boiler policy.
+// cloneChoice returns a snapshot of SelectChoice. Every field has an explicit boiler rule.
 func cloneChoice(in SelectChoice) SelectChoice {
 	out := in
 	out.Arms = cloneArms(out.Arms)
 	return out
 }
 
-// cloneArm returns a snapshot of SelectArm. Every field has an explicit boiler policy.
+// cloneArm returns a snapshot of SelectArm. Every field has an explicit boiler rule.
 func cloneArm(in SelectArm) SelectArm {
 	out := in
 	out.Sequence = slices.Clone(out.Sequence)
