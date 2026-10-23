@@ -17,25 +17,25 @@ type Handler = (*ssa.Function, bool)
   NoHandler = false
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^None))
+  fallback outputs (Unknown { reason: ^None })
   match inputs
     @Endpoint
-    inputs call@(localURL url) budget ->
+    inputs ((localURL url) as call) budget ->
       do
         true <- spend budget
           else
-            false -> outputs (Unknown (reason: ^BudgetExhausted))
-        FoundServer (server: server) <- server url budget
+            false -> outputs (Unknown { reason: ^BudgetExhausted })
+        FoundServer { server } <- server url budget
           else
-            NoServer() -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
+            NoServer() -> outputs (Disproven { reason: ^ServerIdentityUnavailable })
         true <- client call server
           else
-            false -> outputs (Disproven (reason: ^ServerIdentityUnavailable))
-        FoundHandler (function: handler) <- handler server budget
+            false -> outputs (Disproven { reason: ^ServerIdentityUnavailable })
+        FoundHandler { function: handler } <- handler server budget
           else
-            NoHandler() -> outputs (Disproven (reason: ^HandlerUnavailable))
-        Proven (reason: reason) <- framing call handler budget
+            NoHandler() -> outputs (Disproven { reason: ^HandlerUnavailable })
+        Proven { reason } <- framing call handler budget
           else
-            Unknown (reason: unknownReason) -> outputs (Unknown (reason: unknownReason))
-            Disproven (reason: disprovenReason) -> outputs (Disproven (reason: disprovenReason))
-        outputs (Proven (reason: reason))
+            Unknown { reason: unknownReason } -> outputs (Unknown { reason: unknownReason })
+            Disproven { reason: disprovenReason } -> outputs (Disproven { reason: disprovenReason })
+        outputs (Proven { reason })

@@ -14,32 +14,32 @@ total fn rewrite
   fallback outputs ^None false
   match inputs
     @Returned
-    inputs queries return@(Return()) ->
+    inputs queries (Return() as return) ->
       do
         proof <- returned queries return
         outputs proof.Reason (possible proof)
     @Stored
-    inputs queries store@(Store()) ->
+    inputs queries (Store() as store) ->
       do
         answer <- stored queries store
         answer
     @Sent
-    inputs queries instruction@(Send (value: value)) ->
+    inputs queries (Send { value } as instruction) ->
       do
         answer <- send queries value instruction
         answer
     @Mapped
-    inputs queries (Map (value: value)) ->
+    inputs queries (Map { value }) ->
       do
         answer <- payload queries value ^StoredInMap
         answer
     @Selected
-    inputs queries select@(Select()) ->
+    inputs queries (Select() as select) ->
       do
         answer <- select queries select
         answer
     @Called
-    inputs queries instruction@(Call() | Defer() | Go())
+    inputs queries ((Call() | Defer() | Go()) as instruction)
       when let common = common instruction ->
       do
         answer <- call queries instruction common

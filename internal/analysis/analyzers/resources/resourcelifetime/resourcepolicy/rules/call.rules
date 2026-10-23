@@ -23,7 +23,7 @@ total fn rewrite
         carried <- proven proof
         Disproven() <- callback queries instruction common
           else
-            Proven (reason: reason) -> outputs reason true
-            Unknown (reason: reason) -> outputs reason true
+            Proven { reason } -> outputs reason true
+            Unknown { reason } -> outputs reason true
         answer <- after queries instruction common carried
         answer

@@ -36,12 +36,12 @@ total fn rewrite
     // A literal only called or deferred in place does not escape. Passing it to a
     // different callee still asks that callee's retention proof.
     @InPlace
-    inputs value (Call (common: Common (value: called)) | Defer (common: Common (value: called))) _
+    inputs value (Call { common: Common { value: called } } | Defer { common: Common { value: called } }) _
       when sameValue value called ->
       outputs Ignore()
     @Called
-    inputs _ instruction@(Call() | Defer()) _ ->
-      outputs (Called (instruction: instruction))
+    inputs _ ((Call() | Defer()) as instruction) _ ->
+      outputs (Called { instruction })
     @ReturnedStrict
     inputs _ Return() true ->
       outputs Ignore()
@@ -51,20 +51,20 @@ total fn rewrite
     // Converted and projected aggregates escape only when the derived value does.
     @Alias
     inputs _ (EscapeAlias source) _ ->
-      outputs (Follow (source: source))
+      outputs (Follow { source })
     // Storing into a value is not publication of the value itself.
     @StoreIntoSelf
-    inputs value (StoreValue (address: address)) _
+    inputs value (StoreValue { address }) _
       when sameValue value address ->
       outputs Ignore()
     // Local storage must itself escape; a nonlocal destination is an escape.
     // The caller retains this storage search and the shared visited set.
     @Stored
-    inputs _ store@(StoreValue()) _ ->
-      outputs (Store (store: store))
+    inputs _ (StoreValue() as store) _ ->
+      outputs (Store { store })
     @Captured
-    inputs _ source@(Closure()) _ ->
-      outputs (Follow (source: source))
+    inputs _ (Closure() as source) _ ->
+      outputs (Follow { source })
     @Ignored
     inputs _ (Unary() | Debug()) _ ->
       outputs Ignore()

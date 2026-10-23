@@ -39,7 +39,9 @@ Function headers attach the API to its rules:
 total fn classify(request: Request) -> Decision
   fallback Unknown()
   match request
-    Request(ready: true) -> Accepted()
+    @classify_L4_F4ac38f99
+    Request { ready: true } ->
+      Accepted()
 ```
 
 `partial fn` returns native outputs plus a success Boolean. Plain `fn`
@@ -57,7 +59,12 @@ The handwritten parser is specified by
 `?` marks host matchers, `!` marks ordered queries, and unmarked aliases bind
 pure functions or constants. Concrete interface patterns use Go compatibility;
 there is no `implementers` declaration or claim that interfaces are closed.
-Standalone `signature` declarations are retired.
+Standalone `signature` declarations are retired. Named fields use braces:
+`Request { header, count } as request` destructures by field name and captures
+the whole record. `{ count }` means `{ count: count }` in patterns, construction
+and updates. Updates use `request with { count: next }`; nested records can
+use their own `as` captures. Prefix `name@pattern` captures and parenthesized
+named fields/updates are no longer accepted.
 
 ## Query sequencing and schema maintenance
 

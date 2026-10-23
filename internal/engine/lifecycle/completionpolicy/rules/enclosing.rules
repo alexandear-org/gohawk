@@ -9,15 +9,15 @@ total fn rewrite
   fallback outputs Exact()
   match inputs
     @Field
-    inputs (Unary (source: field@(FieldAddress()), op: ^bindingLoadToken)) ->
-      outputs (Field (field: field))
+    inputs (Unary { source: FieldAddress() as field, op: ^bindingLoadToken }) ->
+      outputs (Field { field })
     // Enclosing reference resolution observes the cell at this load, not at
     // registration time. Unlike callback binding, it does not follow index loads.
     @Cell
-    inputs load@(Unary (source: cell@(Allocation()), op: ^bindingLoadToken)) ->
-      outputs (Cell (cell: cell, load: load))
+    inputs (Unary { source: Allocation() as cell, op: ^bindingLoadToken } as load) ->
+      outputs (Cell { cell, load })
     @OtherLoad
-    inputs (Unary (op: ^bindingLoadToken)) ->
+    inputs (Unary { op: ^bindingLoadToken }) ->
       outputs Opaque()
     @Ambiguous
     inputs (Parameter() | Free() | Phi()) ->

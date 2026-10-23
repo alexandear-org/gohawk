@@ -23,13 +23,13 @@ total fn rewrite
     @Acquisition
     inputs evidence call target ->
       case typedCleanup call target of
-        Known (methods: methods) -> outputs methods true
+        Known { methods } -> outputs methods true
         Unrecognized() -> decline
       <|> case responseBody call target of
         true -> outputs ["Close"] true
         false -> decline
       <|> case owned evidence call of
-        Owned (methods: methods, result: result) -> case ownedMatches result of
+        Owned { methods, result } -> case ownedMatches result of
           true -> outputs methods true
           false -> outputs nil false
         Unowned() -> decline

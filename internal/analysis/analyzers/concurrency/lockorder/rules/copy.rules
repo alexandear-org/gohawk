@@ -31,13 +31,13 @@ total fn rewrite
         true <- lockCopyAvailable budget
           else
             false -> outputs emptyLockState() false
-        CopiedLists (held: held, readHeld: readHeld, deferred: deferred) <- copyLockLists state budget
+        CopiedLists { held, readHeld, deferred } <- copyLockLists state budget
           else
             ListsCutoff() -> outputs emptyLockState() false
-        CopiedGuards (values: guards) <- copyLockGuards state budget
+        CopiedGuards { values: guards } <- copyLockGuards state budget
           else
             GuardsCutoff() -> outputs emptyLockState() false
-        CopiedOrigins (values: origins) <- copyLockOrigins state budget
+        CopiedOrigins { values: origins } <- copyLockOrigins state budget
           else
             OriginsCutoff() -> outputs emptyLockState() false
-        outputs (state with (held: held, readHeld: readHeld, deferred: deferred, guards: guards, origins: origins)) true
+        outputs (state with { held, readHeld, deferred, guards, origins }) true

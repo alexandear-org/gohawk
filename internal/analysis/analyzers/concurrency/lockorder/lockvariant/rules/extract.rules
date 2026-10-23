@@ -6,23 +6,23 @@ total fn rewrite
   fallback outputs false
   match inputs
     @Iterated
-    inputs _ (Extract (tuple: next@(Next()))) ->
+    inputs _ (Extract { tuple: Next() as next }) ->
       case cycle next of
         true -> outputs true
         false -> outputs false
     // Selected-case index and receive-ok are metadata. Only received payloads may
     // inherit the choice's cycle dependence; no extra tuple walk is charged here.
     @Payload
-    inputs _ (Extract (tuple: choice@(Select()), index: index))
+    inputs _ (Extract { tuple: Select() as choice, index })
       when index >= 2 ->
       case cycle choice of
         true -> outputs true
         false -> outputs false
     @Metadata
-    inputs _ (Extract (tuple: Select())) ->
+    inputs _ (Extract { tuple: Select() }) ->
       outputs false
     @Other
-    inputs walk (Extract (tuple: tuple)) ->
+    inputs walk (Extract { tuple }) ->
       case follow walk tuple of
         true -> outputs true
         false -> outputs false

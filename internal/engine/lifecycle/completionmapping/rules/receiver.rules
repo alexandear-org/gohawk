@@ -22,30 +22,30 @@ total fn rewrite
     // When an exact path is unavailable, derivation supplies possible cleanup only;
     // a loop's dynamic element cannot become a must-complete action.
     @ExactPath
-    inputs (Exact (local: local, path: path)) receiver _ budget
+    inputs (Exact { local, path }) receiver _ budget
       when nonempty path ->
       case relativePath receiver local budget of
         MissingPath() -> case derives receiver local budget of
           true -> outputs possible()
           false -> outputs (matching false)
-        KnownPath (path: actual) -> case nonempty actual of
+        KnownPath { path: actual } -> case nonempty actual of
           true -> outputs (matching (samePath actual path))
           false -> do
             match <- derives receiver local budget
             outputs (matching match)
     @ExactValue
-    inputs (Exact (local: local)) receiver _ budget ->
+    inputs (Exact { local }) receiver _ budget ->
       do
         match <- derives receiver local budget
         outputs (matching match)
     @Projection
-    inputs (Projection (local: local)) receiver _ budget ->
+    inputs (Projection { local }) receiver _ budget ->
       do
         match <- exactReceiver receiver local budget
         outputs (matching match)
     // Mirror the caller target's path beneath its supplied owner in the callee.
     @Owner
-    inputs mapping@(Owner()) receiver target budget ->
+    inputs (Owner() as mapping) receiver target budget ->
       do
         answer <- mirrored mapping receiver target budget
         outputs answer

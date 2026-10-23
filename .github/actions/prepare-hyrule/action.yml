@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         git init ../lockdoc
-        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git f0d9b07a9fdcc42a406ba293c2576f1341cb193d
+        git -C ../lockdoc fetch --depth=1 https://github.com/kojah/lockdoc.git 0d00860a5053c0daed9ac50aec0d42cb3d1e8d60
         git -C ../lockdoc checkout --detach FETCH_HEAD
         GOTOOLCHAIN=go1.27.0 go work init . ../lockdoc
         # Check committed output before any target regenerates it.

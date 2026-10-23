@@ -27,13 +27,13 @@ total fn rewrite
     @Instruction
     inputs instruction classifier ->
       case deferredStore classifier instruction of
-        Decided (label: label) -> outputs label
+        Decided { label } -> outputs label
         Unrecognized() -> decline
       <|> case ownerHolds classifier instruction of
         true -> outputs (NoAction ^reasonCancellationNone)
         false -> decline
       <|> case recognized classifier instruction of
-        Decided (label: label) -> outputs label
+        Decided { label } -> outputs label
         Unrecognized() -> decline
       <|> case ownerAvailable classifier of
         false -> outputs (Opaque ^reasonLabelOwnerUnavailable)

@@ -61,35 +61,35 @@ total fn rewrite
   fallback outputs Ignored()
   match inputs
     @ArrayPointer
-    inputs value@(ArrayPointer (source: source)) ->
-      outputs (Alias (value: value, source: source))
+    inputs (ArrayPointer { source } as value) ->
+      outputs (Alias { value, source })
     @Wrapper
-    inputs value@(wrapper source) ->
-      outputs (Alias (value: value, source: source))
+    inputs ((wrapper source) as value) ->
+      outputs (Alias { value, source })
     @FieldAddress
-    inputs value@(FieldAddressValue (source: source, field: field)) ->
-      outputs (FieldAddress (value: value, source: source, field: field))
+    inputs (FieldAddressValue { source, field } as value) ->
+      outputs (FieldAddress { value, source, field })
     @FieldLoad
-    inputs value@(FieldValue (source: source, field: field)) ->
-      outputs (FieldLoad (value: value, source: source, field: field))
+    inputs (FieldValue { source, field } as value) ->
+      outputs (FieldLoad { value, source, field })
     @IndexAddress
-    inputs value@(IndexAddressValue (source: source, index: index)) ->
-      outputs (IndexAddress (value: value, source: source, index: index))
+    inputs (IndexAddressValue { source, index } as value) ->
+      outputs (IndexAddress { value, source, index })
     @IndexLoad
-    inputs value@(IndexValue (source: source, index: index)) ->
-      outputs (IndexLoad (value: value, source: source, index: index))
+    inputs (IndexValue { source, index } as value) ->
+      outputs (IndexLoad { value, source, index })
     @Slice
-    inputs slice@(SliceValue()) ->
-      outputs (Sliced (slice: slice))
+    inputs (SliceValue() as slice) ->
+      outputs (Sliced { slice })
     @Load
-    inputs value@(Unary (source: source, op: ^loadToken)) ->
-      outputs (Load (value: value, source: source))
+    inputs (Unary { source, op: ^loadToken } as value) ->
+      outputs (Load { value, source })
     // A tuple assertion is interpreted by its extraction, never as the object.
     @Assertion
-    inputs value@(Assertion (source: source, commaOK: false)) ->
-      outputs (Alias (value: value, source: source))
+    inputs (Assertion { source, commaOK: false } as value) ->
+      outputs (Alias { value, source })
     // These definitions produce opaque storage, without claiming an alias to an
     // operand. Other unsupported values remain unrecorded by this pass.
     @Opaque
-    inputs value@(Map() | Channel() | SliceAllocation() | Range() | Next() | Binary() | MultiConversion()) ->
-      outputs (Opaque (value: value))
+    inputs ((Map() | Channel() | SliceAllocation() | Range() | Next() | Binary() | MultiConversion()) as value) ->
+      outputs (Opaque { value })

@@ -25,11 +25,11 @@ total fn rewrite
   fallback outputs ^IndexStopped nil
   match inputs
     @ConstantAddress
-    inputs (IndexAddress (index: Constant())) ->
+    inputs (IndexAddress { index: Constant() }) ->
       outputs ^IndexStopped nil
     @Dynamic
     inputs (IndexAddress() | Index() | Lookup()) ->
       outputs ^IndexDynamic nil
     @Follow
-    inputs (Extract (source: source) | Field (source: source) | Unary (source: source)) ->
+    inputs (Extract { source } | Field { source } | Unary { source }) ->
       outputs ^IndexFollow source

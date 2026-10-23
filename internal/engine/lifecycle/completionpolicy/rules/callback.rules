@@ -22,15 +22,15 @@ total fn rewrite
   fallback outputs Absent()
   match inputs
     @Closure
-    inputs closure@(Closure()) _ ->
-      outputs (Exact (closure: closure))
+    inputs (Closure() as closure) _ ->
+      outputs (Exact { closure })
     @DeferredOnce
-    inputs (Call (common: onceSource source)) true ->
-      outputs (Follow (source: source))
+    inputs (Call { common: onceSource source }) true ->
+      outputs (Follow { source })
     // The storage proof retains its observation point and the same child cap.
     @CellRead
-    inputs (Unary (source: source)) _ ->
-      outputs (Storage (source: source))
+    inputs (Unary { source }) _ ->
+      outputs (Storage { source })
     @Cell
-    inputs source@(Allocation()) _ ->
-      outputs (Storage (source: source))
+    inputs (Allocation() as source) _ ->
+      outputs (Storage { source })

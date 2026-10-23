@@ -27,12 +27,12 @@ total fn rewrite
     @AssumedLeaf
     inputs engine value assumed budget ->
       case assumption assumed value budget of
-        Decided (holds: holds) -> outputs (booleanGuarantee holds) true
+        Decided { holds } -> outputs (booleanGuarantee holds) true
         Undecided() -> do
           false <- exhausted budget
             else
               true -> outputs ^Unknown false
-          Resolved (guarantee: guarantee) <- leaf engine value budget
+          Resolved { guarantee } <- leaf engine value budget
             else
               Unavailable() -> outputs ^Unknown false
           outputs guarantee true

@@ -14,15 +14,15 @@ total fn rewrite
     inputs (Function() | Closure()) ->
       outputs Exact()
     @Field
-    inputs (Unary (source: field@(FieldAddress()), op: ^bindingLoadToken)) ->
-      outputs (Field (field: field))
+    inputs (Unary { source: FieldAddress() as field, op: ^bindingLoadToken }) ->
+      outputs (Field { field })
     @Element
-    inputs (Unary (source: element@(IndexAddress()), op: ^bindingLoadToken)) ->
-      outputs (Element (element: element))
+    inputs (Unary { source: IndexAddress() as element, op: ^bindingLoadToken }) ->
+      outputs (Element { element })
     @Load
-    inputs (Unary (source: source, op: ^bindingLoadToken)) ->
-      outputs (Load (source: source))
+    inputs (Unary { source, op: ^bindingLoadToken }) ->
+      outputs (Load { source })
     // Stable content is requested at the original observation point by Go.
     @Cell
-    inputs cell@(Allocation()) ->
-      outputs (Cell (source: cell))
+    inputs (Allocation() as cell) ->
+      outputs (Cell { source: cell })

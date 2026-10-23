@@ -6,16 +6,16 @@ host
   result = carriedProof
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^None))
+  fallback outputs (Unknown { reason: ^None })
   match inputs
     @Allocation
-    inputs client@(Allocation()) _ budget ->
+    inputs (Allocation() as client) _ budget ->
       case direct client budget of
         true -> outputs (result true budget)
         false -> outputs (result false budget)
     // The default root's Do-only allowance must not enter strict helper memos.
     @Default
-    inputs client@(Unary (source: source, op: ^loadToken)) function budget
+    inputs (Unary { source, op: ^loadToken } as client) function budget
       when defaultClientValue source ->
       case direct client budget of
         false -> outputs (result false budget)
@@ -26,7 +26,7 @@ total fn rewrite
             Disproven() -> outputs proof
             Proven() -> outputs proof
     @LocalCell
-    inputs (Unary (source: cell@(Allocation()), op: ^loadToken)) _ budget ->
+    inputs (Unary { source: Allocation() as cell, op: ^loadToken }) _ budget ->
       case cell cell budget of
         true -> outputs (result true budget)
         false -> outputs (result false budget)

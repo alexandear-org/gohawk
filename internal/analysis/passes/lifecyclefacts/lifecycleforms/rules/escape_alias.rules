@@ -20,5 +20,5 @@ partial fn rewrite
     // The original converted/projected value, rather than its operand, supplies
     // the next use list. This is not a universal unwrap or an ownership proof.
     @Alias
-    inputs (valueInstruction source@(ChangeType() | Convert() | Box() | Interface() | Field() | Index() | Slice())) ->
+    inputs (valueInstruction ((ChangeType() | Convert() | Box() | Interface() | Field() | Index() | Slice()) as source)) ->
       outputs source

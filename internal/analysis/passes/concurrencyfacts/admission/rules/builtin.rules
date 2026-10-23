@@ -12,10 +12,10 @@ total fn rewrite
     inputs (builtin ("len" | "cap" | "min" | "max")) ->
       outputs true
     @Copy
-    inputs common@(builtin ("append" | "copy"))
+    inputs ((builtin ("append" | "copy")) as common)
       when copiedElements common ->
       outputs true
     @Delete
-    inputs common@(builtin "delete")
+    inputs ((builtin "delete") as common)
       when deletedElement common ->
       outputs true

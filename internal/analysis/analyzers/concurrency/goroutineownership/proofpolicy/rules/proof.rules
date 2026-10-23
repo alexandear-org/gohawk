@@ -2,21 +2,21 @@ host
   None
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^None))
+  fallback outputs (Unknown { reason: ^None })
   match inputs
     // Partial discovery cannot rule out an alternative completion handle.
     @DiscoveryCutoff
-    inputs (Discovery (exhausted: true)) _ ->
-      outputs (Unknown (reason: ^DiscoveryBudgetExhausted))
+    inputs (Discovery { exhausted: true }) _ ->
+      outputs (Unknown { reason: ^DiscoveryBudgetExhausted })
     // Early Done may announce readiness. Without a separate completion promise,
     // later work cannot establish a defect, including when join mode is selected.
     // https://github.com/nadoo/glider/blob/38b34030bc0664b958f9226a51d9400258e5d852/dns/server.go#L39-L62
     @EarlyDone
-    inputs (Discovery (obligation: false, early: true)) _ ->
-      outputs (Unknown (reason: ^DoneBeforeCompletion))
+    inputs (Discovery { obligation: false, early: true }) _ ->
+      outputs (Unknown { reason: ^DoneBeforeCompletion })
     @NoObligation
-    inputs (Discovery (obligation: false)) _ ->
-      outputs (Unknown (reason: ^NoObligation))
+    inputs (Discovery { obligation: false }) _ ->
+      outputs (Unknown { reason: ^NoObligation })
     // Other workers may own the producer's completion even when the parent has no
     // receive obligation. Worker pools need not dominate their producer launch.
     // https://github.com/grafana/alerting/blob/46847d9b586c46b06f8c666a93250ed062e4efb9/testing/alerting-gen/pkg/execute/run.go#L95-L160
@@ -27,22 +27,22 @@ total fn rewrite
       do
         Undecided() <- lifecycle queries
           else
-            Decided (proof: proof) -> outputs proof
+            Decided { proof } -> outputs proof
         Undecided() <- dominating queries
           else
-            Decided (proof: proof) -> outputs proof
+            Decided { proof } -> outputs proof
         false <- workers queries
           else
-            true -> outputs (Unknown (reason: ^WorkerConsumesSignal))
+            true -> outputs (Unknown { reason: ^WorkerConsumesSignal })
         flow <- flow queries
         false <- honored queries flow
           else
-            true -> outputs (Honored (reason: ^JoinProven))
+            true -> outputs (Honored { reason: ^JoinProven })
         false <- guarded queries
           else
-            true -> outputs (Honored (reason: ^GuardedLocalJoin))
+            true -> outputs (Honored { reason: ^GuardedLocalJoin })
         false <- uncertain queries flow
           else
-            true -> outputs (Unknown (reason: ^OpaqueTransfer))
+            true -> outputs (Unknown { reason: ^OpaqueTransfer })
         proof <- fallback queries flow.Witness
         outputs proof

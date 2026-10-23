@@ -27,6 +27,6 @@ total fn rewrite
         Aliased() -> case argumentReleased evidence instruction index of
           true -> outputs ^resourceSettled ^reasonCalleeReleasesArgument true
           false -> outputs ^resourceLive ^reasonNone true
-        Other (contains: contains) -> case wrappedArgument contains argument target of
+        Other { contains } -> case wrappedArgument contains argument target of
           true -> outputs ^resourceUnknown ^reasonWrapperPassedToCallee false
           false -> outputs ^resourceLive ^reasonNone false

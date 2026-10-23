@@ -32,14 +32,14 @@ total fn rewrite
     // A literal on the left is swapped first, including when both sides are
     // constants. Do not request a summary for unsupported operators or operands.
     @LiteralLeft
-    inputs provider (Comparison (left: literal@(Constant()), right: left, op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget ->
+    inputs provider (Comparison { left: Constant() as literal, right: left, op: (^comparisonEqual | ^comparisonNotEqual) as op }) _ block budget ->
       case equality provider left literal block budget of
-        Known (equal: equal) -> outputs (truth equal op) true
-        Unknown (equal: equal) -> outputs (truth equal op) false
+        Known { equal } -> outputs (truth equal op) true
+        Unknown { equal } -> outputs (truth equal op) false
     // Preserve the equality payload even when unknown: the caller still requires
     // known before pruning a successor, and this keeps the native result contract.
     @LiteralRight
-    inputs provider (Comparison (left: left, right: literal@(Constant()), op: op@(^comparisonEqual | ^comparisonNotEqual))) _ block budget ->
+    inputs provider (Comparison { left, right: Constant() as literal, op: (^comparisonEqual | ^comparisonNotEqual) as op }) _ block budget ->
       case equality provider left literal block budget of
-        Known (equal: equal) -> outputs (truth equal op) true
-        Unknown (equal: equal) -> outputs (truth equal op) false
+        Known { equal } -> outputs (truth equal op) true
+        Unknown { equal } -> outputs (truth equal op) false

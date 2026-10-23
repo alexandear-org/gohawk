@@ -17,7 +17,7 @@ total fn rewrite
     @Return
     inputs returned condition completed budget ->
       do
-        SelectedValue (value: value) <- returnedValue returned condition.Result
+        SelectedValue { value } <- returnedValue returned condition.Result
           else
             MissingValue() -> outputs Uncovered()
         observed <- ResolveReturnValue value condition.Outcome budget

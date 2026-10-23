@@ -53,17 +53,17 @@ total fn rewrite
     @Instruction
     inputs analysis instruction ->
       case collection instruction of
-        Recognized (action: action, reason: reason) -> outputs action reason
+        Recognized { action, reason } -> outputs action reason
         Unrecognized() -> decline
       <|> case guarded analysis instruction of
-        Recognized (action: action, reason: reason) -> outputs action reason
+        Recognized { action, reason } -> outputs action reason
         Unrecognized() -> decline
       <|> case compression analysis instruction of
         true -> outputs ^actionUnknown ^resourceReasonCompressionOutputMayBeAbandoned
         false -> decline
       <|> case parent analysis instruction of
-        Proven (reason: reason) -> outputs ^actionUnknown reason
-        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Proven { reason } -> outputs ^actionUnknown reason
+        Unknown { reason } -> outputs ^actionUnknown reason
         Disproven() -> decline
       <|> case canceled instruction of
         true -> outputs ^actionUnknown ^resourceReasonTransactionContextCanceled
@@ -75,18 +75,18 @@ total fn rewrite
           Uncertain() -> label
           Untouched() -> decline
       <|> case ambiguous analysis instruction of
-        Proven (reason: reason) -> outputs ^actionUnknown reason
-        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Proven { reason } -> outputs ^actionUnknown reason
+        Unknown { reason } -> outputs ^actionUnknown reason
         Disproven() -> decline
       <|> case paired analysis instruction of
-        Proven (reason: reason) -> outputs ^actionUnknown reason
-        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Proven { reason } -> outputs ^actionUnknown reason
+        Unknown { reason } -> outputs ^actionUnknown reason
         Disproven() -> decline
       <|> case loop analysis instruction of
-        Proven (reason: reason) -> outputs ^actionUnknown reason
-        Unknown (reason: reason) -> outputs ^actionUnknown reason
+        Proven { reason } -> outputs ^actionUnknown reason
+        Unknown { reason } -> outputs ^actionUnknown reason
         Disproven() -> decline
       <|> case opaque analysis instruction of
-        Opaque (reason: reason) -> outputs ^actionUnknown reason
+        Opaque { reason } -> outputs ^actionUnknown reason
         Transparent() -> decline
       <|> outputs ^actionNone ^resourceReasonUntouched

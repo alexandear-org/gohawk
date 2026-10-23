@@ -12,5 +12,5 @@ total fn rewrite
     inputs (Allocation() | Parameter() | Free() | Global() | Call() | Extract()) ->
       outputs ^guardAddressRoot nil
     @Projection
-    inputs (FieldAddress (source: source) | Unary (source: source, op: ^guardLoadToken)) ->
+    inputs (FieldAddress { source } | Unary { source, op: ^guardLoadToken }) ->
       outputs ^guardAddressProjection source

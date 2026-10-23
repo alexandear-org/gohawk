@@ -16,12 +16,12 @@ total fn rewrite
     // Stores select the address directly. Containers require the caller's separate
     // loaded-owner evidence before a write can be attributed to that owner.
     @Store
-    inputs (Store (destination: destination)) ->
+    inputs (Store { destination }) ->
       outputs destination true
     @Map
-    inputs (MapUpdate (destination: destination)) ->
+    inputs (MapUpdate { destination }) ->
       outputs destination false
     // copy mutates its first argument; its source remains a permitted read.
     @Builtin
-    inputs (Call (common: builtinArguments ("delete" | "clear" | "copy") destination)) ->
+    inputs (Call { common: builtinArguments ("delete" | "clear" | "copy") destination }) ->
       outputs destination false

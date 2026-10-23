@@ -7,19 +7,19 @@ total fn rewrite
   fallback outputs false
   match inputs
     @Receive
-    inputs (Unary (op: ^receiveToken, channel: channel)) matches _ ->
+    inputs (Unary { op: ^receiveToken, channel }) matches _ ->
       case channel matches channel of
         true -> outputs true
         false -> outputs false
     // Select enumeration spends each existing arm visit before invoking a channel
     // predicate. Other arms do not borrow a matching receive's identity.
     @Select
-    inputs choice@(Select()) matches budget ->
+    inputs (Select() as choice) matches budget ->
       case selected choice matches budget of
         true -> outputs true
         false -> outputs false
     @Range
-    inputs (Range (channel: channel)) matches _
+    inputs (Range { channel }) matches _
       when channelRange channel ->
       case channel matches channel of
         true -> outputs true

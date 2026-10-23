@@ -10,7 +10,7 @@ total fn rewrite
     @Return
     inputs instruction classifier ->
       case guarded classifier instruction of
-        Decided (label: label) -> case returned instruction of
+        Decided { label } -> case returned instruction of
           false -> outputs label
           true -> outputs (Transfer ^reasonLabelReturned)
         Unrecognized() -> case returned instruction of

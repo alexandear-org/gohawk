@@ -18,9 +18,9 @@ total fn rewrite
   fallback outputs nil
   match inputs
     @BooleanSpill
-    inputs original@(Load (op: ^returnLoadToken)) (^returnTrue | ^returnFalse) budget ->
+    inputs (Load { op: ^returnLoadToken } as original) (^returnTrue | ^returnFalse) budget ->
       case resolveReturn original budget of
-        ResolvedValue (value: value) -> outputs value
+        ResolvedValue { value } -> outputs value
         Unavailable() -> outputs original
     @Original
     inputs value _ _ ->

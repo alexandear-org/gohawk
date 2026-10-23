@@ -5,21 +5,21 @@ host
   client! = headClient
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^None))
+  fallback outputs (Unknown { reason: ^None })
   match inputs
     // Non-HEAD origins stay silent. Mutation is explained only after the exact
     // constructor chain has been recognized, preserving the old query order.
     @Head
-    inputs call@(headDo client request) budget ->
+    inputs ((headDo client request) as call) budget ->
       do
         true <- constructed request budget
           else
-            false -> outputs (Unknown (reason: ^None))
+            false -> outputs (Unknown { reason: ^None })
         true <- unchanged request budget
           else
-            false -> outputs (Disproven (reason: ^HeadRequestModified))
+            false -> outputs (Disproven { reason: ^HeadRequestModified })
         Proven() <- client client call budget
           else
-            Unknown (reason: reason) -> outputs (Unknown (reason: reason))
-            Disproven() -> outputs (Disproven (reason: ^HeadClientNotUnconfigured))
-        outputs (Unknown (reason: ^HeadAcquisition))
+            Unknown { reason } -> outputs (Unknown { reason })
+            Disproven() -> outputs (Disproven { reason: ^HeadClientNotUnconfigured })
+        outputs (Unknown { reason: ^HeadAcquisition })

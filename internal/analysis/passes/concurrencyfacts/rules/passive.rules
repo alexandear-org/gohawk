@@ -42,43 +42,43 @@ total fn rewrite
   fallback outputs ^ReasonEffectUnknown
   match inputs
     @EffectFree
-    inputs (instruction: instruction, root: root)
+    inputs { instruction, root }
       when free instruction root ->
       outputs ^ReasonNone
     // The acyclic collector checks all successors and identical ordered effects.
     // Allocation/debug/closure creation and interface boxing publish no value by
     // themselves; every subsequent use still needs a complete modeled callee.
     @Structural
-    inputs (instruction: (Branch() | Jump() | Debug() | Allocation() | Closure() | Boxed() | ChangedInterface())) ->
+    inputs { instruction: (Branch() | Jump() | Debug() | Allocation() | Closure() | Boxed() | ChangedInterface()) } ->
       outputs ^ReasonNone
     // Every incoming computation remains checked by the instruction whitelist.
     @InertMerge
-    inputs (instruction: phi@(Phi()))
+    inputs { instruction: Phi() as phi }
       when let type = typeOf phi
       , inert type ->
       outputs ^ReasonNone
     @Field
-    inputs (instruction: field@(FieldAddress()), budget: budget) ->
+    inputs { instruction: FieldAddress() as field, budget } ->
       case fieldPath field budget of
         true -> outputs ^ReasonNone
         false -> outputs ^ReasonEffectUnknown
     // Spilling a primitive pointer into a local closure cell does not copy it.
     @PointerSpill
-    inputs (instruction: store@(Store()))
+    inputs { instruction: Store() as store }
       when localPointer store ->
       outputs ^ReasonNone
     // Resetting or copying primitive state invalidates its counter/lock proof.
     @OrdinaryStore
-    inputs (instruction: Store (value: value, address: address))
+    inputs { instruction: Store { value, address } }
       when local address
       , not (contains (typeOf value))
       , not (primitive (typeOf address)) ->
       outputs ^ReasonNone
     @ChannelRepresentation
-    inputs (instruction: value@(ChangedType()))
+    inputs { instruction: ChangedType() as value }
       when channel value ->
       outputs ^ReasonNone
     // Callee allocation sites cannot name runtime instances across separate calls.
     @RootChannel
-    inputs (instruction: Channel(), root: true) ->
+    inputs { instruction: Channel(), root: true } ->
       outputs ^ReasonNone

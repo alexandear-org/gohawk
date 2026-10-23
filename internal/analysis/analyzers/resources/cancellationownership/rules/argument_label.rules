@@ -27,7 +27,7 @@ total fn rewrite
     inputs instruction classifier ->
       case completion classifier instruction of
         Completed() -> outputs (Release ^reasonLabelHelperRelease) true
-        Indeterminate (request: request) -> case summaryInvokes classifier instruction request of
+        Indeterminate { request } -> case summaryInvokes classifier instruction request of
           true -> outputs (Release ^reasonLabelSummaryRelease) true
           false -> outputs (Opaque ^reasonLabelHelperUndecided) true
         Incomplete() -> case mayInvoke instruction of

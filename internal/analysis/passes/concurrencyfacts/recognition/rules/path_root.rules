@@ -14,5 +14,5 @@ total fn rewrite
     inputs Global() true ->
       outputs true nil
     @Unary
-    inputs load@(Unary()) _ ->
+    inputs (Unary() as load) _ ->
       outputs false load

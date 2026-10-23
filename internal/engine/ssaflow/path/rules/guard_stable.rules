@@ -9,13 +9,13 @@ total fn rewrite
   fallback outputs "" false false false
   match inputs
     @Parameter
-    inputs condition@(Parameter()) _
+    inputs (Parameter() as condition) _
       when booleanValue condition ->
       outputs (valueIdentity condition) false true true
     // Keep left-before-right short circuiting. A failed operand proof tries the
     // ordinary computed-value policy without refunding any search allowance.
     @Equality
-    inputs condition@(Comparison (left: left, right: right, op: op@(^guardEqualToken | ^guardNotEqualToken))) budget ->
+    inputs (Comparison { left, right, op: (^guardEqualToken | ^guardNotEqualToken) as op } as condition) budget ->
       do
         true <- stableOperand left budget
           else
@@ -25,11 +25,11 @@ total fn rewrite
             false -> decline
         outputs (stableEquality left right) (negated op) true true
       <|> case computed condition budget of
-        KnownGuard (identity: identity) -> outputs identity false true true
+        KnownGuard { identity } -> outputs identity false true true
         UnknownGuard() -> decline
       <|> outputs "" false false false
     @Other
     inputs condition budget ->
       case computed condition budget of
-        KnownGuard (identity: identity) -> outputs identity false true true
+        KnownGuard { identity } -> outputs identity false true true
         UnknownGuard() -> outputs "" false false false

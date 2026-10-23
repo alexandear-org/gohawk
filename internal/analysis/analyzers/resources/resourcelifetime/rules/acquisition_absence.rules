@@ -32,21 +32,21 @@ total fn rewrite
     // A call cannot be an equality expression. The remaining evidence families
     // retain their order, including terminal predicate cutoffs before legacy APIs.
     @Call
-    inputs knowledge call@(Call()) error budget ->
+    inputs knowledge (Call() as call) error budget ->
       case assertion call error budget of
         true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
         false -> decline
       <|> case errorsIs call error budget of
-        Witness (reason: reason) -> outputs (result true reason budget)
+        Witness { reason } -> outputs (result true reason budget)
         NoWitness() -> decline
       <|> case errorsAs call error of
         true -> outputs (result true ^resourceReasonErrorsAsExactAcquisitionError budget)
         false -> decline
       <|> case predicate knowledge call error budget of
-        Decided (proof: proof) -> outputs proof
+        Decided { proof } -> outputs proof
         Undecided() -> decline
       <|> case legacy call error budget of
-        Witness (reason: reason) -> outputs (result true reason budget)
+        Witness { reason } -> outputs (result true reason budget)
         NoWitness() -> decline
       <|> outputs (result false ^resourceReasonNone budget)
     @Other
@@ -58,6 +58,6 @@ total fn rewrite
         true -> outputs (result true ^resourceReasonErrorTypeAssertionSucceeded budget)
         false -> decline
       <|> case errorsIs condition error budget of
-        Witness (reason: reason) -> outputs (result true reason budget)
+        Witness { reason } -> outputs (result true reason budget)
         NoWitness() -> decline
       <|> outputs (result false ^resourceReasonNone budget)

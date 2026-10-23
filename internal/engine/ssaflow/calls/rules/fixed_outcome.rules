@@ -36,18 +36,18 @@ total fn rewrite
     inputs _ outcome true ->
       outputs outcome true
     @True
-    inputs (Constant (literal: Boolean true)) _ false ->
+    inputs (Constant { literal: Boolean true }) _ false ->
       outputs ^OutcomeTrue true
     @False
-    inputs (Constant (literal: Boolean false)) _ false ->
+    inputs (Constant { literal: Boolean false }) _ false ->
       outputs ^OutcomeFalse true
     @Nil
-    inputs literal@(Constant()) _ false
+    inputs (Constant() as literal) _ false
       when Nil literal ->
       outputs ^OutcomeNil true
     // A box has a dynamic type even around a typed nil pointer. Retain the
     // original nilable-type gate for all construction forms, including functions.
     @Constructed
-    inputs value@(Allocation() | Map() | Slice() | Channel() | Closure() | Box() | Function()) _ false
+    inputs ((Allocation() | Map() | Slice() | Channel() | Closure() | Box() | Function()) as value) _ false
       when Nilable value ->
       outputs ^OutcomeNonNil true

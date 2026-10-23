@@ -7,10 +7,10 @@ total fn rewrite
     // Callee root binding retains the existing unary-source contract. It does
     // not repeat the dereference restriction of canonical fixed-load queries.
     @Capture
-    inputs (Unary (source: capture@(Capture()))) ->
+    inputs (Unary { source: Capture() as capture }) ->
       outputs ^AddressCapture capture nil
     @Field
-    inputs (Unary (source: field@(Field()))) ->
+    inputs (Unary { source: Field() as field }) ->
       outputs ^AddressField nil field
     @UnsupportedUnary
     inputs Unary() ->

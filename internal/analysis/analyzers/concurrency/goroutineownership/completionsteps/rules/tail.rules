@@ -12,10 +12,10 @@ total fn rewrite
     // call's nonblocking tail may load a captured cell or close a completion signal.
     // Other unary operations, named calls, sends, receives and launches remain work.
     @Passive
-    inputs (Return() | Jump() | Debug() | Unary (op: ^loadToken)) ->
+    inputs (Return() | Jump() | Debug() | Unary { op: ^loadToken }) ->
       outputs ^Passive
     @Close
-    inputs call@(Call())
+    inputs (Call() as call)
       when closes call ->
       outputs ^Passive
     @Deferred

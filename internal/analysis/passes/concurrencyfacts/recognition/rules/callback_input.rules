@@ -14,13 +14,13 @@ total fn rewrite
     // Only exact parameters or captures can be supplied by the caller. Loads,
     // conversions and phi choices remain opaque; contexts belong to cancellation.
     @Method
-    inputs (value: value@(Parameter() | Capture()), method: method)
+    inputs { value: (Parameter() | Capture()) as value, method }
       when method != nil
       , let type = typeOf value
       , interface type
       , not (canceled type) ->
       outputs true
     @Function
-    inputs (value: value@(Parameter() | Capture()), method: nil)
+    inputs { value: (Parameter() | Capture()) as value, method: nil }
       when function (typeOf value) ->
       outputs true

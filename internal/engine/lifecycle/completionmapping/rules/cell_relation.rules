@@ -8,10 +8,10 @@ total fn rewrite
   match inputs
     @Exact
     inputs _ local _ target _ ^deferredExact ->
-      outputs (Exact (local: local, supplied: target, path: nil)) true
+      outputs (Exact { local, supplied: target, path: nil }) true
     @Contains
     inputs _ local cell _ _ ^deferredContains ->
-      outputs (Exact (local: local, supplied: cell, path: nil)) true
+      outputs (Exact { local, supplied: cell, path: nil }) true
     // A merged cell may hold another value only on paths which never stored this
     // target. Require the target to survive on every path through its own store.
     @Other
@@ -20,4 +20,4 @@ total fn rewrite
         true <- storedOnPath context.Queries cell target invocation
           else
             false -> outputs emptyLocal() false
-        outputs (Exact (local: local, supplied: target, path: nil)) true
+        outputs (Exact { local, supplied: target, path: nil }) true

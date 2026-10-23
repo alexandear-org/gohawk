@@ -2,10 +2,10 @@ total fn rewrite
   fallback outputs emptyLocal() false
   match inputs
     @Exact
-    inputs context@(Request (exact: true)) local argument target _ ->
+    inputs (Request { exact: true } as context) local argument target _ ->
       case same context argument target of
-        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
-        false -> outputs (Exact (local: local, supplied: argument, path: nil)) (identical argument target)
+        true -> outputs (Exact { local, supplied: argument, path: nil }) true
+        false -> outputs (Exact { local, supplied: argument, path: nil }) (identical argument target)
     // A possible alias cannot fall through to aggregate containment and become an
     // exact mapping. Mark uncertainty without invalidating unrelated memo entries.
     // Same-storage owner evidence mirrors the captured receiver's exact field:
@@ -13,7 +13,7 @@ total fn rewrite
     @Argument
     inputs context local argument target invocation ->
       case same context argument target of
-        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
+        true -> outputs (Exact { local, supplied: argument, path: nil }) true
         false -> decline
       <|> case ambiguous argument target of
         true -> do
@@ -21,34 +21,34 @@ total fn rewrite
           answer
         false -> decline
       <|> case identity context argument target of
-        true -> outputs (Exact (local: local, supplied: argument, path: nil)) true
+        true -> outputs (Exact { local, supplied: argument, path: nil }) true
         false -> decline
       <|> case callback context.Queries argument target of
-        true -> outputs (Callback (local: local, supplied: argument)) true
+        true -> outputs (Callback { local, supplied: argument }) true
         false -> decline
       <|> do
-        PathFound (path: path) <- projection context argument target
+        PathFound { path } <- projection context argument target
           else
             PathMissing() -> decline
             PathCutoff() -> do
               answer <- cutoff context.Queries
               answer
-        outputs (Projection (local: local, supplied: argument, path: path)) true
+        outputs (Projection { local, supplied: argument, path }) true
       <|> case owner context argument target of
-        KnownValue (value: owner) -> outputs (Owner (local: local, supplied: owner)) true
+        KnownValue { value: owner } -> outputs (Owner { local, supplied: owner }) true
         MissingValue() -> decline
       <|> do
         true <- contains context.Queries argument target
           else
             false -> decline
-        PathFound (path: path) <- storedPath context argument target invocation
+        PathFound { path } <- storedPath context argument target invocation
           else
             PathMissing() -> outputs emptyLocal() false
             PathCutoff() -> do
               answer <- cutoff context.Queries
               answer
-        outputs (Exact (local: local, supplied: argument, path: path)) true
+        outputs (Exact { local, supplied: argument, path }) true
       <|> case pathFrom target argument context.Budget of
-        true -> outputs (Owner (local: local, supplied: argument)) true
+        true -> outputs (Owner { local, supplied: argument }) true
         false -> decline
       <|> outputs emptyLocal() false

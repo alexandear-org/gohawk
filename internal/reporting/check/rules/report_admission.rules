@@ -20,7 +20,7 @@ total fn rewrite
   fallback outputs ^ReportingEmitted
   match inputs
     @Admission
-    inputs pass (Diagnostic (category: category, position: position)) analyzer declared withdrawn disabled ->
+    inputs pass (Diagnostic { category, position }) analyzer declared withdrawn disabled ->
       do
         false <- categoryIncluded withdrawn category
           else

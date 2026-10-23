@@ -10,7 +10,7 @@ host
   EvidenceUnavailable
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^EvidenceUnavailable))
+  fallback outputs (Unknown { reason: ^EvidenceUnavailable })
   match inputs
     // Anywhere coverage of a dominating defer may release a later acquisition
     // through captured storage. It supplies uncertainty, not settlement.
@@ -21,17 +21,17 @@ total fn rewrite
       do
         Disproven() <- deferred queries
           else
-            Unknown (reason: reason) -> outputs (Unknown (reason: reason))
-            Proven() -> outputs (Unknown (reason: ^PriorDeferMayRelease))
+            Unknown { reason } -> outputs (Unknown { reason })
+            Proven() -> outputs (Unknown { reason: ^PriorDeferMayRelease })
         true <- owners queries
           else
-            false -> outputs (Unknown (reason: ^BudgetExhausted))
+            false -> outputs (Unknown { reason: ^BudgetExhausted })
         guarded <- guarded queries
         false <- unknown guarded
           else
-            true -> outputs (Unknown (reason: guarded.Reason))
+            true -> outputs (Unknown { reason: guarded.Reason })
         Disproven() <- prior queries
           else
-            Unknown (reason: reason) -> outputs (Unknown (reason: reason))
-            Proven() -> outputs (Unknown (reason: ^OpaqueConsumption))
-        outputs (Proven (reason: ^None))
+            Unknown { reason } -> outputs (Unknown { reason })
+            Proven() -> outputs (Unknown { reason: ^OpaqueConsumption })
+        outputs (Proven { reason: ^None })

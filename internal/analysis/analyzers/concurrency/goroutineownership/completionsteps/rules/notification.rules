@@ -19,7 +19,7 @@ total fn rewrite
     // than completion. Blocking-producer checks use the full send lifecycle.
     // https://github.com/kubernetes-sigs/cluster-proportional-autoscaler/blob/39dd2288da294e98d683c5619fc3556016df1e76/pkg/autoscaler/autoscaler_server.go#L109-L124
     @Sent
-    inputs send@(Send (channel: channel)) coverage ->
+    inputs (Send { channel } as send) coverage ->
       case terminal coverage send of
         true -> outputs channel
         false -> outputs nil
@@ -27,16 +27,16 @@ total fn rewrite
     // must still require registration on every normal return.
     // https://github.com/BurntSushi/wingo/blob/33b154361587e65ec35d4499f1cc487835d0ab48/event/ipc.go#L124-L157
     @DeferredClose
-    inputs instruction@(DeferCall()) _ ->
+    inputs (DeferCall() as instruction) _ ->
       case channel instruction of
-        Available (value: channel) -> outputs channel
+        Available { value: channel } -> outputs channel
         Missing() -> decline
       <|> outputs nil
     // Other closes inside a cycle are per-item cleanup, not worker completion.
     @Close
     inputs instruction _ ->
       do
-        Available (value: channel) <- channel instruction
+        Available { value: channel } <- channel instruction
           else
             Missing() -> outputs nil
         false <- cyclic instruction

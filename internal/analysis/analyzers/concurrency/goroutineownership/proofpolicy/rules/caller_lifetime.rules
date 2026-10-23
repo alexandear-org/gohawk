@@ -27,7 +27,7 @@ total fn rewrite
               outputs proof true
         false <- matched stop
           else
-            true -> outputs (Unknown (reason: ^StopLifecycle)) true
+            true -> outputs (Unknown { reason: ^StopLifecycle }) true
         context <- context queries
         true <- available context
           else
@@ -36,7 +36,7 @@ total fn rewrite
               outputs proof true
         false <- matched context
           else
-            true -> outputs (Unknown (reason: ^ContextLifecycle)) true
+            true -> outputs (Unknown { reason: ^ContextLifecycle }) true
         canceled <- canceled queries
         true <- available canceled
           else
@@ -45,7 +45,7 @@ total fn rewrite
               outputs proof true
         false <- matched canceled
           else
-            true -> outputs (Unknown (reason: ^LocallyCanceledContext)) true
+            true -> outputs (Unknown { reason: ^LocallyCanceledContext }) true
         receiver <- receiver queries
         true <- available receiver
           else
@@ -54,5 +54,5 @@ total fn rewrite
               outputs proof true
         false <- matched receiver
           else
-            true -> outputs (Unknown (reason: ^ReceiverContext)) true
+            true -> outputs (Unknown { reason: ^ReceiverContext }) true
         outputs emptyProof() false

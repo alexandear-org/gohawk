@@ -22,8 +22,8 @@ total fn rewrite
   fallback outputs nil
   match inputs
     @Parent
-    inputs (Result (tuple: constructor@(Constructor()), index: 0)) child observer
+    inputs (Result { tuple: Constructor() as constructor, index: 0 }) child observer
       when sameParentFrame constructor child ->
       case parentCancelResult constructor of
-        Available (value: cancel) -> outputs (newParentClassifier cancel observer)
+        Available { value: cancel } -> outputs (newParentClassifier cancel observer)
         Missing() -> outputs nil

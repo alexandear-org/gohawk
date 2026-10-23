@@ -8,7 +8,7 @@ total fn rewrite
     @Recognized
     inputs instruction classifier common ->
       case direct instruction classifier common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> do
           result <- call instruction classifier common
           result

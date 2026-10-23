@@ -10,17 +10,17 @@ total fn rewrite
   match inputs
     // Reexecuted allocations and loop phis may select a different lock each trip.
     @Allocation
-    inputs _ value@(Allocation()) ->
+    inputs _ (Allocation() as value) ->
       case cycle value of
         true -> outputs true
         false -> outputs false
     @Phi
-    inputs _ value@(Phi()) ->
+    inputs _ (Phi() as value) ->
       case cycle value of
         true -> outputs true
         false -> outputs false
     @Extract
-    inputs walk value@(Extract()) ->
+    inputs walk (Extract() as value) ->
       case extracted walk value of
         true -> outputs true
         false -> outputs false
@@ -28,31 +28,31 @@ total fn rewrite
     // is terminal false; following its channel would invent iteration dependence.
     // https://github.com/encodeous/nylon/blob/c4a96c804f7aa08512721dec7994907eab100bc8/polyamide/device/channels.go#L83-L99
     @Receive
-    inputs _ value@(Unary (op: ^receiveToken)) ->
+    inputs _ (Unary { op: ^receiveToken } as value) ->
       case cycle value of
         true -> outputs true
         false -> outputs false
     @Unary
-    inputs walk (Unary (source: source)) ->
+    inputs walk (Unary { source }) ->
       case follow walk source of
         true -> outputs true
         false -> outputs false
     // Index dependence precedes the aggregate query, sharing the same visited set.
     @Indexed
-    inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) ->
+    inputs walk (IndexAddress { owner, index } | Index { owner, index }) ->
       case follow walk index of
         true -> outputs true
         false -> case follow walk owner of
           true -> outputs true
           false -> outputs false
     @Field
-    inputs walk (FieldAddress (owner: owner) | Field (owner: owner)) ->
+    inputs walk (FieldAddress { owner } | Field { owner }) ->
       case follow walk owner of
         true -> outputs true
         false -> outputs false
     // A range index is its loop phi plus one; operand order remains significant.
     @Binary
-    inputs walk (Binary (first: first, second: second)) ->
+    inputs walk (Binary { first, second }) ->
       case follow walk first of
         true -> outputs true
         false -> case follow walk second of
@@ -62,7 +62,7 @@ total fn rewrite
     // A call with no variant argument does not acquire uncertainty from its name.
     // https://github.com/fy0/CodeKanban/blob/745699cb67d3d34cec4793168f148eb61e43e766/service/websession/history_cleanup.go#L262-L276
     @Call
-    inputs walk call@(Call()) ->
+    inputs walk (Call() as call) ->
       case arguments walk call of
         true -> outputs true
         false -> outputs false

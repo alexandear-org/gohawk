@@ -13,7 +13,7 @@ host
   ReleaseProven
 
 total fn rewrite
-  fallback outputs (Unavailable (reason: ^EvidenceUnavailable))
+  fallback outputs (Unavailable { reason: ^EvidenceUnavailable })
   match inputs
     // A paired error restricts the edges on which acquisition creates an obligation.
     // A shortened lookup stops before missing evidence can activate a failed edge.
@@ -25,26 +25,26 @@ total fn rewrite
         error <- error queries
         false <- errorUnknown error
           else
-            true -> outputs (Unavailable (reason: error.Reason))
+            true -> outputs (Unavailable { reason: error.Reason })
         boundary <- boundary queries
         true <- boundary == ^None
           else
-            false -> outputs (Unavailable (reason: boundary))
+            false -> outputs (Unavailable { reason: boundary })
         Disproven() <- canceled queries
           else
-            Unknown (reason: reason) -> outputs (Unavailable (reason: reason))
-            Proven() -> outputs (Accepted (reason: ^CanceledAcquisition))
+            Unknown { reason } -> outputs (Unavailable { reason })
+            Proven() -> outputs (Accepted { reason: ^CanceledAcquisition })
         Disproven() <- asserted queries error.Value
           else
-            Unknown (reason: reason) -> outputs (Unavailable (reason: reason))
-            Proven() -> outputs (Accepted (reason: ^ReleaseProven))
+            Unknown { reason } -> outputs (Unavailable { reason })
+            Proven() -> outputs (Accepted { reason: ^ReleaseProven })
         optional <- optional queries error.Value
         false <- optionalUnknown optional
           else
-            true -> outputs (Unavailable (reason: optional.Reason))
+            true -> outputs (Unavailable { reason: optional.Reason })
         prepared <- prepare optional.Initialize
         false <- prepareUnknown prepared
           else
-            true -> outputs (Unavailable (reason: prepared.Reason))
+            true -> outputs (Unavailable { reason: prepared.Reason })
         decision <- finalize prepared.Queries error.Value
         outputs decision

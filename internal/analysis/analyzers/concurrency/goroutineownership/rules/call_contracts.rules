@@ -16,26 +16,26 @@ total fn rewrite
   fallback outputs (Opaque ^reasonLabelCallUnavailable) true
   match inputs
     @Missing
-    inputs (common: nil) ->
+    inputs { common: nil } ->
       outputs (NoAction ^reasonNone) true
     // Each answer commits, including a recognized none label. Partial evidence
     // retains its original precedence before summary, bookkeeping and callbacks.
     @Contract
     inputs analysis instruction common ->
       case retained analysis instruction common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> case pipe analysis instruction common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> case summary analysis instruction of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> case bookkeeping analysis common of
         true -> outputs (NoAction ^reasonNone) true
         false -> decline
       <|> case cleanup analysis common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> case mockContract common ^goMockReturn of
         true -> case arguments analysis common of

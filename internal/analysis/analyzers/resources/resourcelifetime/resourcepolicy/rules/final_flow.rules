@@ -9,7 +9,7 @@ host
   ProcessExitReclaims
 
 total fn rewrite
-  fallback outputs (Unavailable (reason: ^EvidenceUnavailable))
+  fallback outputs (Unavailable { reason: ^EvidenceUnavailable })
   match inputs
     // DB-prepared driver statements belong to pooled connections, whose finalClose
     // closes their open statements. This does not settle Rows, Tx, or Conn, nor
@@ -27,15 +27,15 @@ total fn rewrite
             false -> outputs flow
         false <- database queries
           else
-            true -> outputs (Accepted (reason: ^ParentCleanup))
+            true -> outputs (Accepted { reason: ^ParentCleanup })
         false <- poolExhausted queries
           else
-            true -> outputs (Unavailable (reason: ^BudgetExhausted))
+            true -> outputs (Unavailable { reason: ^BudgetExhausted })
         exit <- exit queries
         false <- exit.Reclaimed
           else
-            true -> outputs (Accepted (reason: ^ProcessExitReclaims))
+            true -> outputs (Accepted { reason: ^ProcessExitReclaims })
         false <- exit.Exhausted
           else
-            true -> outputs (Unavailable (reason: ^BudgetExhausted))
+            true -> outputs (Unavailable { reason: ^BudgetExhausted })
         outputs flow

@@ -46,43 +46,43 @@ total fn rewrite
     // Unresolved calls never fall back to a value name: repeated executions may
     // return different owners, and a field declaration alone identifies no instance.
     @Getter
-    inputs walk call@(Call()) budget ->
+    inputs walk (Call() as call) budget ->
       case getter walk call budget of
-        Named (name: name) -> outputs name
+        Named { name } -> outputs name
         Unresolved() -> outputs ""
     @Global
-    inputs _ value@(Global()) _ ->
+    inputs _ (Global() as value) _ ->
       outputs (globalName value)
     @Address
-    inputs walk value@(FieldAddress()) budget ->
+    inputs walk (FieldAddress() as value) budget ->
       case address walk value budget of
-        Named (name: name) -> outputs name
+        Named { name } -> outputs name
         Unresolved() -> outputs ""
     @Copied
-    inputs walk value@(Field()) budget ->
+    inputs walk (Field() as value) budget ->
       case copied walk value budget of
-        Named (name: name) -> outputs name
+        Named { name } -> outputs name
         Unresolved() -> outputs ""
     // The query retains owner-then-index evaluation even when the owner is unknown.
     @Indexed
-    inputs walk (IndexAddress (owner: owner, index: index) | Index (owner: owner, index: index)) budget ->
+    inputs walk (IndexAddress { owner, index } | Index { owner, index }) budget ->
       case indexed walk owner index budget of
-        Named (name: name) -> outputs name
+        Named { name } -> outputs name
         Unresolved() -> outputs ""
     @Parameter
-    inputs _ value@(Parameter()) _ ->
+    inputs _ (Parameter() as value) _ ->
       outputs (parameterName value)
     // Captured owners of the same type remain distinct within the closure.
     // https://github.com/trickstercache/trickster/blob/7818ae3c39e725eb998f04fa31e5d315ede84b79/integration/alb_request_headers_test.go#L93-L99
     @Free
-    inputs _ value@(Free()) _ ->
+    inputs _ (Free() as value) _ ->
       outputs (freeName value)
     // Generic allocation comments cannot collapse distinct local lock owners.
     @Allocation
-    inputs _ value@(Allocation()) _ ->
+    inputs _ (Allocation() as value) _ ->
       outputs (allocationName value)
     @Constant
-    inputs _ value@(Constant()) _
+    inputs _ (Constant() as value) _
       when hasLiteral value ->
       outputs (literalName value)
     // Preserve dynamic SSA identity rather than merging owners by their field type.

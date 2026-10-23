@@ -13,14 +13,14 @@ total fn rewrite
     // Only synchronous calls form callback holes. Launches and defers keep their
     // existing completion policy in the engine.
     @Method
-    inputs call@(Call())
+    inputs (Call() as call)
       when let common = common call
       , invokes common
       , input common.Value common.Method
       , arguments common ->
       outputs common.Value common.Method true
     @Function
-    inputs call@(Call())
+    inputs (Call() as call)
       when let common = common call
       , not (invokes common)
       , (callee common) == nil

@@ -27,12 +27,12 @@ total fn rewrite
         true <- proven stored
           else
             false -> decline
-        KnownValue (value: owner) <- owner context stored.Value target
+        KnownValue { value: owner } <- owner context stored.Value target
           else
             MissingValue() -> decline
-        outputs (Owner (local: local, supplied: owner)) true
+        outputs (Owner { local, supplied: owner }) true
       <|> do
-        KnownRelation (relation: relation) <- relation cell target invocation context.Budget
+        KnownRelation { relation } <- relation cell target invocation context.Budget
           else
             UnknownRelation() -> outputs emptyLocal() false
         answer <- classifyRelation context local cell target invocation relation

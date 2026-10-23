@@ -8,17 +8,17 @@ total fn rewrite
       do
         RelayMissing() <- relay queries
           else
-            RelayFound() -> outputs (Unknown (reason: ^RelayDependency)) true
-            RelayCutoff (budget: budget) -> do
+            RelayFound() -> outputs (Unknown { reason: ^RelayDependency }) true
+            RelayCutoff { budget } -> do
               proof <- relayCutoff queries budget
               outputs proof true
         Undecided() <- handle queries
           else
-            Decided (proof: proof) -> outputs proof true
+            Decided { proof } -> outputs proof true
         Undecided() <- caller queries
           else
-            Decided (proof: proof) -> outputs proof true
+            Decided { proof } -> outputs proof true
         true <- synctest queries
           else
             false -> outputs emptyProof() false
-        outputs (Honored (reason: ^SynctestBubbleOwner)) true
+        outputs (Honored { reason: ^SynctestBubbleOwner }) true

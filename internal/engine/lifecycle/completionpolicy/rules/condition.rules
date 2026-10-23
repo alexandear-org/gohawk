@@ -27,18 +27,18 @@ total fn rewrite
     // Prefer the existing right constant. Swapping occurs only if that operand
     // is not constant; this differs from the provider's literal-left convention.
     @NilRight
-    inputs (Comparison (left: operand, right: literal@(Constant()), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+    inputs (Comparison { left: operand, right: Constant() as literal, op: (^conditionEqualToken | ^conditionNotEqualToken) as op }) truth
       when errorNilComparison literal operand ->
-      outputs (Outcome (value: operand, outcome: nilOutcome op truth))
+      outputs (Outcome { value: operand, outcome: nilOutcome op truth })
     @BooleanRight
-    inputs (Comparison (left: operand, right: Constant (value: Boolean literal), op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth ->
-      outputs (Follow (value: operand, truth: operandTruth op truth literal))
+    inputs (Comparison { left: operand, right: Constant { value: Boolean literal }, op: (^conditionEqualToken | ^conditionNotEqualToken) as op }) truth ->
+      outputs (Follow { value: operand, truth: operandTruth op truth literal })
     @NilLeft
-    inputs (Comparison (left: literal@(Constant()), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+    inputs (Comparison { left: Constant() as literal, right: operand, op: (^conditionEqualToken | ^conditionNotEqualToken) as op }) truth
       when nonconstantOperand operand
       , errorNilComparison literal operand ->
-      outputs (Outcome (value: operand, outcome: nilOutcome op truth))
+      outputs (Outcome { value: operand, outcome: nilOutcome op truth })
     @BooleanLeft
-    inputs (Comparison (left: Constant (value: Boolean literal), right: operand, op: op@(^conditionEqualToken | ^conditionNotEqualToken))) truth
+    inputs (Comparison { left: Constant { value: Boolean literal }, right: operand, op: (^conditionEqualToken | ^conditionNotEqualToken) as op }) truth
       when nonconstantOperand operand ->
-      outputs (Follow (value: operand, truth: operandTruth op truth literal))
+      outputs (Follow { value: operand, truth: operandTruth op truth literal })

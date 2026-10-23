@@ -20,7 +20,7 @@ total fn rewrite
         true -> outputs (Opaque ^reasonLabelRegisteredCallback) true
         false -> decline
       <|> case exactArgument classifier instruction common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> case captured common of
         true -> outputs (Opaque ^reasonLabelCapturedByCallback) true

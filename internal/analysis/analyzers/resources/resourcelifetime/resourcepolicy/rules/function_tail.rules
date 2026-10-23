@@ -23,15 +23,15 @@ total fn rewrite
       do
         Disproven() <- escape queries instruction common
           else
-            Proven (reason: reason) -> outputs reason true
-            Unknown (reason: reason) -> outputs reason true
+            Proven { reason } -> outputs reason true
+            Unknown { reason } -> outputs reason true
         Disproven() <- aggregate queries common
           else
-            Unknown (reason: reason) -> outputs reason true
+            Unknown { reason } -> outputs reason true
             Proven() -> do
               Disproven() <- publication queries instruction
                 else
-                  Unknown (reason: reason) -> outputs reason true
+                  Unknown { reason } -> outputs reason true
                   Proven() -> outputs ^NestedInTransferredArgument true
               unmodeled <- unmodeled queries instruction common
               outputs ^UnsummarizedCallee unmodeled

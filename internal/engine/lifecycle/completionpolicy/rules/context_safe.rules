@@ -28,19 +28,19 @@ total fn rewrite
     inputs (Go() | Send()) ->
       outputs false
     @Box
-    inputs (Box (value: value))
+    inputs (Box { value })
       when callbackValue value ->
       outputs false
     @Map
-    inputs (MapUpdate (value: value))
+    inputs (MapUpdate { value })
       when callbackValue value ->
       outputs false
     @Return
-    inputs returned@(Return())
+    inputs (Return() as returned)
       when returnedCallback returned ->
       outputs false
     @NonlocalStore
-    inputs (Store (value: value, address: address))
+    inputs (Store { value, address })
       when callbackValue value
       , nonlocalCallbackAddress address ->
       outputs false

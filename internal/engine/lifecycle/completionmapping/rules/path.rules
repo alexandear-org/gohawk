@@ -19,13 +19,13 @@ total fn rewrite
     // A contained target is settled only at its selected path, not the aggregate
     // or a sibling field. This comparison does not need a new storage query.
     @Contained
-    inputs (Exact (path: path)) _ actual true _
+    inputs (Exact { path }) _ actual true _
       when nonempty path ->
       outputs "" (samePath actual path)
     @Exact
-    inputs (Exact (supplied: supplied)) target actual true budget ->
+    inputs (Exact { supplied }) target actual true budget ->
       case steps supplied target budget of
-        KnownSteps (path: path) -> outputs (appendPath path actual) true
+        KnownSteps { path } -> outputs (appendPath path actual) true
         MissingSteps() -> outputs "" false
     // A strict projection can settle only itself, never a further projection.
     @ProjectionChild
@@ -33,15 +33,15 @@ total fn rewrite
       when nonempty actual ->
       outputs "" false
     @ProjectionPath
-    inputs (Projection (path: path)) _ _ true _
+    inputs (Projection { path }) _ _ true _
       when nonempty path ->
       outputs (join path) true
     // Retain the query's path payload even when its availability is false.
     @Projection
-    inputs (Projection (supplied: supplied)) target _ true budget ->
+    inputs (Projection { supplied }) target _ true budget ->
       case steps supplied target budget of
-        KnownSteps (path: path) -> outputs (join path) true
-        MissingSteps (path: path) -> outputs (join path) false
+        KnownSteps { path } -> outputs (join path) true
+        MissingSteps { path } -> outputs (join path) false
     // Nil denotes the already-matched direct receiver. A nonnil empty path is a
     // nested answer and still needs the mirrored-owner query below.
     @DirectOwner
@@ -50,9 +50,9 @@ total fn rewrite
     // A nested completion must name the mirrored path: settling c.rpc cannot
     // settle the caller's c.monitors beneath the same supplied owner.
     @NestedOwner
-    inputs (Owner (supplied: supplied)) target actual true budget ->
+    inputs (Owner { supplied }) target actual true budget ->
       case steps supplied target budget of
-        KnownSteps (path: path) -> outputs "" (samePath actual path)
+        KnownSteps { path } -> outputs "" (samePath actual path)
         MissingSteps() -> outputs "" false
     @Callback
     inputs Callback() _ _ true _ ->

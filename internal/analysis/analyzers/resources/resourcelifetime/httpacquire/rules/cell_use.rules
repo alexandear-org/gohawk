@@ -12,18 +12,18 @@ total fn rewrite
       outputs true stored
     // Exactly one store of one unmodified fresh allocation establishes zero state.
     @Store
-    inputs store@(Store (address: address, value: fresh@(Allocation()))) cell false budget
+    inputs (Store { address, value: Allocation() as fresh } as store) cell false budget
       when sameValue address cell ->
       case stored fresh store budget of
         true -> outputs true true
         false -> outputs false false
     @Load
-    inputs load@(Unary (op: ^loadToken)) _ stored budget ->
+    inputs (Unary { op: ^loadToken } as load) _ stored budget ->
       case direct load budget of
         true -> outputs true stored
         false -> outputs false false
     @Captured
-    inputs closure@(Closure()) cell stored budget ->
+    inputs (Closure() as closure) cell stored budget ->
       case closure closure cell budget of
         true -> outputs true stored
         false -> outputs false false

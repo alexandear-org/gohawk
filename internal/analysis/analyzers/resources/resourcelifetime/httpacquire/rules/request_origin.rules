@@ -9,7 +9,7 @@ total fn rewrite
   match inputs
     // Only result zero of an exact HEAD constructor admits a new request origin.
     @Constructor
-    inputs query _ value@(Extraction (tuple: call@(Call()), index: 0))
+    inputs query _ (Extraction { tuple: Call() as call, index: 0 } as value)
       when constructorCall call ->
       case preserve query value of
         true -> outputs true
@@ -17,7 +17,7 @@ total fn rewrite
     // A rebind must first prove its receiver's origin, then independently preserve
     // every use of the new request. Neither fold admits phi requests or aliases.
     @Rebind
-    inputs query walk value@(Call (common: requestRebinding receiver)) ->
+    inputs query walk (Call { common: requestRebinding receiver } as value) ->
       do
         true <- follow query walk receiver
           else

@@ -23,7 +23,7 @@ total fn rewrite
         true -> outputs ^edgeExact
         false -> decline
       <|> case drain queries of
-        Drained (action: action) -> outputs action
+        Drained { action } -> outputs action
         Unproven() -> decline
       <|> case possible queries of
         true -> outputs ^edgeUnknown

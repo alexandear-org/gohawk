@@ -13,7 +13,7 @@ total fn rewrite
     // Explicit bounds, including a constant zero, remain opaque. Only a whole
     // slice may preserve this aggregate's callback slots and element numbering.
     @WholeSlice
-    inputs (Slice (source: source, low: nil, high: nil, max: nil)) ->
+    inputs (Slice { source, low: nil, high: nil, max: nil }) ->
       outputs ^AggregateFollow source
     @BoundedSlice
     inputs Slice() ->

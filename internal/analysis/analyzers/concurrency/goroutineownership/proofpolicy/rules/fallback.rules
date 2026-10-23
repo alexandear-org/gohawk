@@ -2,7 +2,7 @@ host
   None
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^None))
+  fallback outputs (Unknown { reason: ^None })
   match inputs
     // A Boolean guard around spawn/join can express correlation this flow does
     // not prove. Keep uncertainty rather than claiming either joined or violated.
@@ -20,24 +20,24 @@ total fn rewrite
       do
         false <- flagGuarded queries
           else
-            true -> outputs (Unknown (reason: ^FlagGuardedJoin))
+            true -> outputs (Unknown { reason: ^FlagGuardedJoin })
         false <- counted queries
           else
-            true -> outputs (Unknown (reason: ^LoopJoinUnproven))
+            true -> outputs (Unknown { reason: ^LoopJoinUnproven })
         false <- shared queries
           else
-            true -> outputs (Unknown (reason: ^SharedStorageSignal))
+            true -> outputs (Unknown { reason: ^SharedStorageSignal })
         false <- buffered queries
           else
-            true -> outputs (Unknown (reason: ^BufferedSignal))
+            true -> outputs (Unknown { reason: ^BufferedSignal })
         Observed() <- census queries
           else
-            Unobserved() -> outputs (Unknown (reason: ^UnobservedSignal))
-            Unavailable() -> outputs (Unknown (reason: ^SignalCensusUnavailable))
-            CensusCutoff (budget: budget) -> do
+            Unobserved() -> outputs (Unknown { reason: ^UnobservedSignal })
+            Unavailable() -> outputs (Unknown { reason: ^SignalCensusUnavailable })
+            CensusCutoff { budget } -> do
               proof <- censusCutoff queries budget
               outputs proof
         false <- entry queries
           else
-            true -> outputs (Unknown (reason: ^ProcessExitStopsWorker))
-        outputs (Violated (reason: ^UnownedReturn, witness: witness))
+            true -> outputs (Unknown { reason: ^ProcessExitStopsWorker })
+        outputs (Violated { reason: ^UnownedReturn, witness })

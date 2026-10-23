@@ -26,10 +26,10 @@ total fn rewrite
   match inputs
     // Missing operands cannot establish identity, even when both are missing.
     @MissingLeft
-    inputs (Path (value: nil)) _ budget ->
+    inputs (Path { value: nil }) _ budget ->
       outputs (unknownIdentity budget)
     @MissingRight
-    inputs _ (Path (value: nil)) budget ->
+    inputs _ (Path { value: nil }) budget ->
       outputs (unknownIdentity budget)
     // Roots are already equivalent by the caller's contract. Direct identity wins
     // before requiring a nameable path, so an identical dynamic index still proves
@@ -43,13 +43,13 @@ total fn rewrite
         false <- exhausted budget
           else
             true -> outputs (unknownIdentity budget)
-        KnownPath (steps: leftPath) <- path left.Value left.Root budget
+        KnownPath { steps: leftPath } <- path left.Value left.Root budget
           else
             UnknownPath() -> outputs (unknownIdentity budget)
         false <- exhausted budget
           else
             true -> outputs (unknownIdentity budget)
-        KnownPath (steps: rightPath) <- path right.Value right.Root budget
+        KnownPath { steps: rightPath } <- path right.Value right.Root budget
           else
             UnknownPath() -> outputs (unknownIdentity budget)
         false <- exhausted budget

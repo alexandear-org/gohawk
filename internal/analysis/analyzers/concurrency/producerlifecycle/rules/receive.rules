@@ -13,7 +13,7 @@ host
   reasonNone
 
 total fn rewrite
-  fallback outputs (Known (count: 0, reason: ^reasonNone))
+  fallback outputs (Known { count: 0, reason: ^reasonNone })
   match inputs
     // Helper calls keep their count, uncertainty and reason intact. In particular,
     // an asynchronous or exhausted helper cannot become a missing receive.
@@ -25,14 +25,14 @@ total fn rewrite
           Known() -> outputs proof
           Unknown() -> outputs proof
     @Receive
-    inputs (Unary (op: ^receiveToken, channel: received)) channel _ _ _ ->
+    inputs (Unary { op: ^receiveToken, channel: received }) channel _ _ _ ->
       case alias received channel of
-        true -> outputs (Known (count: 1, reason: ^reasonNone))
-        false -> outputs (Known (count: 0, reason: ^reasonNone))
+        true -> outputs (Known { count: 1, reason: ^reasonNone })
+        false -> outputs (Known { count: 0, reason: ^reasonNone })
     // Select states retain the original may-count policy. The query only scans
     // this instruction's states; it does not infer an exact protocol or loop count.
     @Select
-    inputs select@(Select()) channel _ _ _ ->
+    inputs (Select() as select) channel _ _ _ ->
       do
         proof <- selected select channel
         case proof of

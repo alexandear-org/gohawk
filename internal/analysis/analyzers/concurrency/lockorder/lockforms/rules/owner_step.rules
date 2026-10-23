@@ -14,7 +14,7 @@ total fn rewrite
   fallback outputs nil false
   match inputs
     @Field
-    inputs (Field (source: source)) ->
+    inputs (Field { source }) ->
       outputs source true
     // Distinct elements are distinct cells. A dynamic index may select a private
     // consumer position, so repeated readers do not prove a shared-cell write.
@@ -23,5 +23,5 @@ total fn rewrite
     // A constant index names one shared cell. Slice loads retain the backing array;
     // pointer loads stay opaque, as decided by the host's indexedSource contract.
     @ConstantIndex
-    inputs (Index (source: source, index: Constant())) ->
+    inputs (Index { source, index: Constant() }) ->
       outputs (indexedSource source) true

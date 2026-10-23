@@ -5,19 +5,19 @@ total fn rewrite
   fallback outputs "" false false
   match inputs
     @Load
-    inputs condition@(Unary (source: source, op: ^guardLoadToken)) budget formats ->
+    inputs (Unary { source, op: ^guardLoadToken } as condition) budget formats ->
       do
         answer <- loaded condition source nil ^guardEqualToken budget formats
         answer
     // A constant on the left is swapped before recognizing the load. Unsupported
     // address paths still return their rendered payload, with availability false.
     @LiteralLeft
-    inputs condition@(Comparison (left: literal@(Constant()), right: Unary (source: source, op: ^guardLoadToken), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats ->
+    inputs (Comparison { left: Constant() as literal, right: Unary { source, op: ^guardLoadToken }, op: (^guardEqualToken | ^guardNotEqualToken) as op } as condition) budget formats ->
       do
         answer <- loaded condition source literal op budget formats
         answer
     @LiteralRight
-    inputs condition@(Comparison (left: Unary (source: source, op: ^guardLoadToken), right: literal@(Constant()), op: op@(^guardEqualToken | ^guardNotEqualToken))) budget formats ->
+    inputs (Comparison { left: Unary { source, op: ^guardLoadToken }, right: Constant() as literal, op: (^guardEqualToken | ^guardNotEqualToken) as op } as condition) budget formats ->
       do
         answer <- loaded condition source literal op budget formats
         answer

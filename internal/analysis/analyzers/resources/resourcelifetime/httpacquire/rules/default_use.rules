@@ -10,7 +10,7 @@ total fn rewrite
     // The direct root may read the default only for Do. When that use check fails,
     // retain the original charged operand scan; the load has no callee to expand.
     @RootDo
-    inputs _ load@(Unary (source: source, op: ^loadToken)) true budget
+    inputs _ (Unary { source, op: ^loadToken } as load) true budget
       when defaultClientValue source ->
       case direct load budget of
         true -> outputs false

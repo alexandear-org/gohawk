@@ -17,7 +17,7 @@ total fn rewrite
     // stable. A result guard defers judgment to each return; unknown capture, guard
     // census or completion cannot become evidence that cancel is uncalled.
     @Literal
-    inputs classifier deferred@(deferredLiteralClosure closure) ->
+    inputs classifier ((deferredLiteralClosure closure) as deferred) ->
       do
         budget <- allowance classifier
         capture <- capture classifier closure budget

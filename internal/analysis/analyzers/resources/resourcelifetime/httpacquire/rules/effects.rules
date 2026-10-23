@@ -4,7 +4,7 @@ host
   result = localHTTPEffectProof
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^BudgetExhausted))
+  fallback outputs (Unknown { reason: ^BudgetExhausted })
   match inputs
     // Root and handler checks share the same strict effect memo and child quota.
     // Framing evidence is reached only when neither default-override check wins.

@@ -10,13 +10,13 @@ total fn rewrite
   match inputs
     // URL is field zero. Config/Listener access cannot retain endpoint identity.
     @URL
-    inputs field@(FieldAddress (field: 0)) budget
+    inputs (FieldAddress { field: 0 } as field) budget
       when hasReferrers field ->
       case loads field budget of
         true -> outputs true
         false -> outputs false
     @Client
-    inputs client@(Call()) budget
+    inputs (Call() as client) budget
       when serverClientCall client ->
       case client client budget of
         true -> outputs true

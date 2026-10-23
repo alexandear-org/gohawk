@@ -21,26 +21,26 @@ total fn rewrite
   fallback outputs ^effectUnknown nil
   match inputs
     @Debug
-    inputs (use: Debug()) ->
+    inputs { use: Debug() } ->
       outputs 0 nil
     // Other fields cannot overwrite this slot. A matching projection is rebased
     // and visited by Go; no field access follows a loaded pointer implicitly.
     @SelectedField
-    inputs (path: path, use: field@(FieldAddress()))
+    inputs { path, use: FieldAddress() as field }
       when selected path field ->
       outputs 0 field
     @OtherField
-    inputs (use: FieldAddress()) ->
+    inputs { use: FieldAddress() } ->
       outputs 0 nil
     @Read
-    inputs (use: Unary (op: ^useLoadToken)) ->
+    inputs { use: Unary { op: ^useLoadToken } } ->
       outputs ^EffectRead nil
     // A whole-owner write includes this child field. Publication is retention,
     // rather than a claim that the stored value establishes ownership transfer.
     @Written
-    inputs (path: path, use: Store (address: address))
+    inputs { path, use: Store { address } }
       when same address path.Root ->
       outputs ^EffectMutate nil
     @Published
-    inputs (use: Store()) ->
+    inputs { use: Store() } ->
       outputs ^EffectRetain nil

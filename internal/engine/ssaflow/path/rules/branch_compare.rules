@@ -26,7 +26,7 @@ total fn rewrite
       when bothNil left right ->
       outputs (isEqual op) (equalityToken op)
     @Literals
-    inputs op@(^guardEqualToken | ^guardNotEqualToken | ^guardLessToken | ^guardLessEqualToken | ^guardGreaterToken | ^guardGreaterEqualToken) (Constant (value: left)) (Constant (value: right))
+    inputs ((^guardEqualToken | ^guardNotEqualToken | ^guardLessToken | ^guardLessEqualToken | ^guardGreaterToken | ^guardGreaterEqualToken) as op) (Constant { value: left }) (Constant { value: right })
       when present left
       , present right ->
       outputs (compare left op right) true

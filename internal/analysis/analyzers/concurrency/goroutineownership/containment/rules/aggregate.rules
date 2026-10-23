@@ -5,5 +5,5 @@ total fn rewrite
     // slices and non-load unary operations retain their original boundary. The
     // caller owns transparent-wrapper peeling and charges every traversal step.
     @Source
-    inputs (Unary (op: ^loadToken, source: source) | FieldAddress (source: source) | IndexAddress (source: source) | Field (source: source) | Index (source: source) | Lookup (source: source)) ->
+    inputs (Unary { op: ^loadToken, source } | FieldAddress { source } | IndexAddress { source } | Field { source } | Index { source } | Lookup { source }) ->
       outputs source true

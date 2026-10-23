@@ -21,7 +21,7 @@ host
   reasonLocalWaitObligation
 
 total fn rewrite
-  fallback outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+  fallback outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable })
   match inputs
     // A helper returning *exec.Cmd may already have registered cleanup or wait
     // ownership. Reporting without that interprocedural contract loses precision.
@@ -39,33 +39,33 @@ total fn rewrite
         true <- proven prefix.Proof
           else
             false -> case cutoff prefix.Proof of
-              true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
-              false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
+              true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartCutoff })
+              false -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable })
         false <- commandReturnedByHelper command
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonHelperOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonHelperOwnershipUnknown })
         false <- callerCommand function command
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonCallerCommandOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonCallerCommandOwnershipUnknown })
         false <- aggregate command
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonAggregateCommandOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonAggregateCommandOwnershipUnknown })
         false <- processOwnershipDominatesStart proof prefix.instructions command
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown })
         false <- processOwnerDominatesStart proof function start prefix.owners prefix.instructions
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown })
         false <- commandStoredExternallyBeforeStart prefix.instructions command
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartOwnershipUnknown })
         returns <- returns proof start
         false <- cutoff returns
           else
-            true -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartCutoff))
+            true -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartCutoff })
         true <- proven returns
           else
             false -> case known returns of
-              true -> outputs (Decision (state: ^decisionProven, reason: ^reasonLocalWaitObligation))
-              false -> outputs (Decision (state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable))
-        outputs (Decision (state: ^decisionDisproven, reason: ^reasonSuccessfulStartCannotReturn))
+              true -> outputs (Decision { state: ^decisionProven, reason: ^reasonLocalWaitObligation })
+              false -> outputs (Decision { state: ^decisionUnknown, reason: ^reasonPreStartEvidenceUnavailable })
+        outputs (Decision { state: ^decisionDisproven, reason: ^reasonSuccessfulStartCannotReturn })

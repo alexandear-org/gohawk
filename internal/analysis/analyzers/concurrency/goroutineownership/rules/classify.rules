@@ -38,7 +38,7 @@ total fn rewrite
     inputs _ Closure() ->
       outputs ^actionNone ^reasonNone
     @Reception
-    inputs analysis instruction@(Receive() | Select() | Range()) ->
+    inputs analysis ((Receive() | Select() | Range()) as instruction) ->
       case exact analysis instruction of
         true -> outputs ^actionJoin ^reasonLabelSignalReceived
         false -> decline
@@ -53,12 +53,12 @@ total fn rewrite
         false -> decline
       <|> outputs ^actionNone ^reasonNone
     @Sent
-    inputs analysis (Send (value: value)) ->
+    inputs analysis (Send { value }) ->
       case consumes analysis value of
         true -> outputs ^actionUnknown ^reasonLabelSent
         false -> outputs ^actionNone ^reasonNone
     @Mapped
-    inputs analysis (MapUpdate (value: value)) ->
+    inputs analysis (MapUpdate { value }) ->
       case consumes analysis value of
         true -> outputs ^actionUnknown ^reasonLabelStoredInMap
         false -> outputs ^actionNone ^reasonNone

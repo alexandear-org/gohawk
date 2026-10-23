@@ -30,21 +30,21 @@ total fn rewrite
   fallback outputs Ignore()
   match inputs
     @Store
-    inputs store@(StoreValue()) _ _ ->
-      outputs (Store (store: store))
+    inputs (StoreValue() as store) _ _ ->
+      outputs (Store { store })
     // Capture is not completed ownership transfer. Every-return claims require a
     // separate cleanup registration proof; conditional cleanup cannot settle it.
     @Closure
-    inputs closure@(ClosureValue()) _ false ->
-      outputs (Closure (closure: closure))
+    inputs (ClosureValue() as closure) _ false ->
+      outputs (Closure { closure })
     @Published
-    inputs (Send (value: value) | MapUpdate (value: value)) _ false ->
-      outputs (Value (value: value))
+    inputs (Send { value } | MapUpdate { value }) _ false ->
+      outputs (Value { value })
     // Returning the value is described by returned-owner/view summaries. Strict
     // retention leaves it to those summaries instead of claiming a stored owner.
     @Returned
-    inputs (Return (values: values)) false _ ->
-      outputs (Returned (values: values))
+    inputs (Return { values }) false _ ->
+      outputs (Returned { values })
     @Called
-    inputs instruction@(Call() | Defer() | Go()) _ _ ->
-      outputs (Called (instruction: instruction))
+    inputs ((Call() | Defer() | Go()) as instruction) _ _ ->
+      outputs (Called { instruction })

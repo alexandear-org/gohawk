@@ -23,12 +23,12 @@ total fn rewrite
     // A deferred unlock remains effective on later control-flow loop trips.
     // Unique identities let the dataflow reach a fixed point without growing.
     @DeferredRelease
-    inputs flow Deferred() effect@(Effect (operation: ^mutexRelease)) state ->
+    inputs flow Deferred() (Effect { operation: ^mutexRelease } as effect) state ->
       do
         released <- deferRelease flow effect state
         outputs released
     @Release
-    inputs flow instruction effect@(Effect (operation: ^mutexRelease)) state ->
+    inputs flow instruction (Effect { operation: ^mutexRelease } as effect) state ->
       do
         released <- release flow instruction effect state
         outputs released

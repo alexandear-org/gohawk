@@ -12,18 +12,18 @@ total fn rewrite
     inputs _ _ _ Debug() ->
       outputs true
     @Do
-    inputs _ _ request call@(Call())
+    inputs _ _ request (Call() as call)
       when requestDo call request ->
       outputs true
     @Rebind
-    inputs query walk request call@(Call())
+    inputs query walk request (Call() as call)
       when requestRebindUse call request ->
       case follow query walk call of
         true -> outputs true
         false -> outputs false
     // Header edits preserve Method; opaque map consumers remain unavailable.
     @Header
-    inputs query _ _ field@(FieldAddress())
+    inputs query _ _ (FieldAddress() as field)
       when requestHeader field ->
       case header field query.budget of
         true -> outputs true

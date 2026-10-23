@@ -9,7 +9,7 @@ total fn rewrite
   match inputs
     // A selected Done observation is cancellation evidence, not synchronous unlinking.
     @Done
-    inputs (Receive (op: ^receiveToken, value: channel)) classifier _
+    inputs (Receive { op: ^receiveToken, value: channel }) classifier _
       when ownDone classifier channel ->
       outputs (Opaque ^reasonLabelOwnDoneReceive) true
     @StartedCancel
@@ -21,9 +21,9 @@ total fn rewrite
       when exactCancel common ->
       outputs (Release ^reasonLabelRelease) true
     @DeferredLiteral
-    inputs instruction@(Deferred()) classifier _ ->
+    inputs (Deferred() as instruction) classifier _ ->
       case literal classifier instruction of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> do
           result <- remaining instruction classifier
           case result of

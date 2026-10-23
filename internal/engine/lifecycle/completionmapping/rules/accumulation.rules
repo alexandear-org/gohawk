@@ -11,19 +11,19 @@ host
   differentPath
 
 total fn rewrite
-  fallback outputs (Paths (Path: "", Seen: false, Exact: false))
+  fallback outputs (Paths { Path: "", Seen: false, Exact: false })
   match inputs
     @Unnamed
     inputs paths _ false ->
-      outputs (paths with (Seen: true, Exact: false))
+      outputs (paths with { Seen: true, Exact: false })
     @First
-    inputs paths@(Evidence (seen: false)) path true ->
-      outputs (paths with (Path: path, Seen: true, Exact: true))
+    inputs (Evidence { seen: false } as paths) path true ->
+      outputs (paths with { Path: path, Seen: true, Exact: true })
     @Conflict
-    inputs paths@(Evidence (path: previous)) path true
+    inputs (Evidence { path: previous } as paths) path true
       when differentPath previous path ->
-      outputs (paths with (Seen: true, Exact: false))
+      outputs (paths with { Seen: true, Exact: false })
     // Matching a path cannot restore exactness lost at an earlier call.
     @Same
     inputs paths _ true ->
-      outputs (paths with (Seen: true))
+      outputs (paths with { Seen: true })

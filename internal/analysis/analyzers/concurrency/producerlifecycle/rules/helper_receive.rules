@@ -17,23 +17,23 @@ host
   reasonReceiverHelperUnknown
 
 total fn rewrite
-  fallback outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
+  fallback outputs (Unknown { count: 0, reason: ^reasonReceiverHelperUnknown })
   match inputs
     @Origin
     inputs call _ origin _ _
       when producerOrigin call origin ->
-      outputs (Known (count: 0, reason: ^reasonProducerLaunch))
+      outputs (Known { count: 0, reason: ^reasonProducerLaunch })
     @Builtin
     inputs call _ _ _ _
       when producerBuiltin call ->
-      outputs (Known (count: 0, reason: ^reasonBuiltinNotReceive))
+      outputs (Known { count: 0, reason: ^reasonBuiltinNotReceive })
     @Helper
     inputs call channel _ engine budget ->
       do
         summary <- receiverSummary engine call budget
         false <- receiverExhausted budget
           else
-            true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+            true -> outputs (Unknown { count: 0, reason: ^reasonReceiverBudgetExhausted })
         true <- receiverComplete summary
           else
             false -> do
@@ -44,17 +44,17 @@ total fn rewrite
               true <- proven uses
                 else
                   false -> decline
-              outputs (Known (count: 0, reason: ^reasonWorkerChannelUsesComplete))
+              outputs (Known { count: 0, reason: ^reasonWorkerChannelUsesComplete })
             <|> do
               false <- receiverExhausted budget
                 else
-                  true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+                  true -> outputs (Unknown { count: 0, reason: ^reasonReceiverBudgetExhausted })
               uncertain <- opaqueReceives call channel budget
               false <- receiverExhausted budget
                 else
-                  true -> outputs (Unknown (count: 0, reason: ^reasonReceiverBudgetExhausted))
+                  true -> outputs (Unknown { count: 0, reason: ^reasonReceiverBudgetExhausted })
               outputs (opaqueReceiver uncertain)
-            <|> outputs (Unknown (count: 0, reason: ^reasonReceiverHelperUnknown))
+            <|> outputs (Unknown { count: 0, reason: ^reasonReceiverHelperUnknown })
         launched <- receiverLaunched call
         answer <- summaryReceives summary channel launched budget
         outputs answer

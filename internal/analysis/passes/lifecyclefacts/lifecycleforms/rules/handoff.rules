@@ -29,27 +29,27 @@ total fn rewrite
   fallback outputs Reject()
   match inputs
     @Return
-    inputs returned@(ReturnValue()) ->
-      outputs (Return (returned: returned))
+    inputs (ReturnValue() as returned) ->
+      outputs (Return { returned })
     // These are the transparent forms shared by fresh and retained results.
     // The host keeps visited state, wrapper depth and result-position agreement.
     @Box
-    inputs alias@(Box()) ->
-      outputs (Follow (alias: alias))
+    inputs (Box() as alias) ->
+      outputs (Follow { alias })
     @Interface
-    inputs alias@(Interface()) ->
-      outputs (Follow (alias: alias))
+    inputs (Interface() as alias) ->
+      outputs (Follow { alias })
     @Phi
-    inputs alias@(Phi()) ->
-      outputs (Follow (alias: alias))
+    inputs (Phi() as alias) ->
+      outputs (Follow { alias })
     @Comparison
-    inputs (Binary (op: (^equalToken | ^notEqualToken))) ->
+    inputs (Binary { op: (^equalToken | ^notEqualToken) }) ->
       outputs Ignore()
     // A call is only a request: fresh results require cleanup evidence; retained
     // results require an exact wrapper contract and remain within their depth bound.
     @Call
-    inputs call@(CallValue()) ->
-      outputs (Call (call: call))
+    inputs (CallValue() as call) ->
+      outputs (Call { call })
     @Debug
     inputs Debug() ->
       outputs Ignore()

@@ -33,7 +33,7 @@ total fn rewrite
           NotCalled() -> case opaqueUse instruction of
             true -> Unknown ^reasonResourceCapturedOrStored
             false -> Live ^reasonNone
-          Called (common: common) -> case cleanupReceiver obligation common of
+          Called { common } -> case cleanupReceiver obligation common of
             true -> case cleanupMethod obligation common of
               true -> Settled ^reasonExplicitCleanup
               false -> Live ^reasonNone

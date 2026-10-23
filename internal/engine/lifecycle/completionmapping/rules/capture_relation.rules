@@ -3,7 +3,7 @@ total fn rewrite
   match inputs
     @Exact
     inputs _ local _ _ value _ true _ ->
-      outputs (Exact (local: local, supplied: value, path: nil)) true
+      outputs (Exact { local, supplied: value, path: nil }) true
     // A captured projection of the target retains exact completion semantics.
     // A path rooted at the captured cell must keep that cell on both sides;
     // unavailable storage there commits to failure rather than trying containment.
@@ -11,13 +11,13 @@ total fn rewrite
     @Related
     inputs context local binding target value matches false invocation ->
       case callback context.Queries value target of
-        true -> outputs (Callback (local: local, supplied: value)) true
+        true -> outputs (Callback { local, supplied: value }) true
         false -> decline
       <|> case derives value target context.Budget of
-        true -> outputs (Exact (local: local, supplied: value, path: nil)) true
+        true -> outputs (Exact { local, supplied: value, path: nil }) true
         false -> decline
       <|> case pathFrom target value context.Budget of
-        true -> outputs (Owner (local: local, supplied: value)) true
+        true -> outputs (Owner { local, supplied: value }) true
         false -> decline
       <|> do
         true <- pathFrom target binding context.Budget
@@ -26,6 +26,6 @@ total fn rewrite
         answer <- capturedOwner context local binding invocation
         answer
       <|> case unmatchedContainment context binding target matches of
-        true -> outputs (Exact (local: local, supplied: binding, path: nil)) true
+        true -> outputs (Exact { local, supplied: binding, path: nil }) true
         false -> decline
       <|> outputs emptyLocal() false

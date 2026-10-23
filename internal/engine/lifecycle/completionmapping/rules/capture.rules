@@ -6,16 +6,16 @@ total fn rewrite
   fallback outputs emptyLocal() false
   match inputs
     @ExactCell
-    inputs context@(Request (exact: true)) local cell@(Cell()) target invocation ->
+    inputs (Request { exact: true } as context) local (Cell() as cell) target invocation ->
       do
         stored <- stable context cell invocation
         true <- proven stored
           else
             false -> outputs emptyLocal() false
-        outputs (Exact (local: local, supplied: stored.Value, path: nil)) (identical stored.Value target)
+        outputs (Exact { local, supplied: stored.Value, path: nil }) (identical stored.Value target)
     @ExactValue
-    inputs (Request (exact: true)) local binding target _ ->
-      outputs (Exact (local: local, supplied: binding, path: nil)) (identical binding target)
+    inputs (Request { exact: true }) local binding target _ ->
+      outputs (Exact { local, supplied: binding, path: nil }) (identical binding target)
     // Deferred stability may change the alias question. Keep the original binding
     // match separately so containment cannot rescue a directly matched capture.
     @Capture
@@ -31,7 +31,7 @@ total fn rewrite
             true -> do
               OtherBinding() <- directCell context binding
                 else
-                  DirectCell (cell: cell) -> do
+                  DirectCell { cell } -> do
                     answer <- deferredCell cell
                     answer
               stored <- deferredValue context.Queries binding target invocation

@@ -10,7 +10,7 @@ host
   ReadLockWrite
 
 total fn rewrite
-  fallback outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
+  fallback outputs (Stop { proof: Unknown { reason: ^LockStateBudgetExhausted } })
   match inputs
     // A field-only method exposes caller synchronization or separate ownership;
     // same-owner matching cannot decide which. Keep the candidate unknown.
@@ -25,15 +25,15 @@ total fn rewrite
         guard <- guard queries
         false <- unknown guard
           else
-            true -> outputs (Continue (proof: guard))
+            true -> outputs (Continue { proof: guard })
         false <- private queries
           else
-            true -> outputs (Continue (proof: Accepted (reason: ^PrivateWriteStorage)))
+            true -> outputs (Continue { proof: Accepted { reason: ^PrivateWriteStorage } })
         false <- held queries
           else
-            true -> outputs (Continue (proof: Unknown (reason: ^ExclusiveWriterUnknown)))
+            true -> outputs (Continue { proof: Unknown { reason: ^ExclusiveWriterUnknown } })
         WriterAbsent() <- writer queries
           else
-            WriterUnavailable() -> outputs (Stop (proof: Unknown (reason: ^LockStateBudgetExhausted)))
-            WriterFound() -> outputs (Continue (proof: Unknown (reason: ^ImportedWriterGuardUnknown)))
-        outputs (Stop (proof: Reported (reason: ^ReadLockWrite)))
+            WriterUnavailable() -> outputs (Stop { proof: Unknown { reason: ^LockStateBudgetExhausted } })
+            WriterFound() -> outputs (Continue { proof: Unknown { reason: ^ImportedWriterGuardUnknown } })
+        outputs (Stop { proof: Reported { reason: ^ReadLockWrite } })

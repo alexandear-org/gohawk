@@ -13,11 +13,11 @@ total fn rewrite
     inputs _ InterfaceChange() _ _ ->
       outputs true
     @Cookie
-    inputs _ call@(Call()) _ _
+    inputs _ (Call() as call) _ _
       when cookieCall call ->
       outputs true
     @Header
-    inputs _ call@(Call()) _ budget
+    inputs _ (Call() as call) _ budget
       when writerHeaderCall call ->
       case header call budget of
         true -> outputs true
@@ -25,11 +25,11 @@ total fn rewrite
     // Nonredirect final statuses preserve empty framing; a failed status check is
     // terminal, so it never falls through to visible-helper inference.
     @Status
-    inputs _ call@(Call()) _ _
+    inputs _ (Call() as call) _ _
       when writerStatusCall call ->
       outputs (status call)
     @Helper
-    inputs effects call@(Call()) writer budget ->
+    inputs effects (Call() as call) writer budget ->
       case helper effects call writer budget of
         true -> outputs true
         false -> outputs false

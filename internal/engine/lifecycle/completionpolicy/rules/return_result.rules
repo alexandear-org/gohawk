@@ -11,4 +11,4 @@ total fn rewrite
     // exact-local iteration remain with the consuming completion search.
     @Forward
     inputs (source call result) false ->
-      outputs (Forward (call: call, result: result))
+      outputs (Forward { call, result })

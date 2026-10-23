@@ -2,8 +2,8 @@ total fn rewrite
   fallback outputs ^AddressBlocked nil nil
   match inputs
     @Capture
-    inputs (Unary (op: ^dereferenceToken, source: capture@(Capture()))) ->
+    inputs (Unary { op: ^dereferenceToken, source: Capture() as capture }) ->
       outputs ^AddressCapture capture nil
     @Field
-    inputs (Unary (op: ^dereferenceToken, source: field@(Field()))) ->
+    inputs (Unary { op: ^dereferenceToken, source: Field() as field }) ->
       outputs ^AddressField nil field

@@ -19,7 +19,7 @@ total fn rewrite
             true -> outputs guarded.Reason true
         Disproven() <- owner queries closure
           else
-            Proven (reason: reason) -> outputs reason true
-            Unknown (reason: reason) -> outputs reason true
+            Proven { reason } -> outputs reason true
+            Unknown { reason } -> outputs reason true
         answer <- capture queries instruction closure carried
         answer

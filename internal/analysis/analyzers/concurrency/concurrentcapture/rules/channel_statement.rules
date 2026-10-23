@@ -18,10 +18,10 @@ total fn rewrite
   fallback outputs ^channelStatementNone nil
   match inputs
     @Send
-    inputs (Send (channel: channel)) ->
+    inputs (Send { channel }) ->
       outputs ^channelStatementSend channel
     // Keep the direct expression-statement boundary: assignments and parenthesized
     // receive expressions are not part of this conservative semaphore recognizer.
     @Receive
-    inputs (Expression (expression: Unary (op: ^channelReceiveToken, operand: channel))) ->
+    inputs (Expression { expression: Unary { op: ^channelReceiveToken, operand: channel } }) ->
       outputs ^channelStatementReceive channel

@@ -17,7 +17,7 @@ host
   reasonProducerWithinReceiveCount
 
 total fn rewrite
-  fallback outputs (Producer (state: ^producerUnknown, reason: ^reasonNone))
+  fallback outputs (Producer { state: ^producerUnknown, reason: ^reasonNone })
   match inputs
     // No normal caller return puts a continuing or terminated caller outside
     // this finite consumer-count check (for example log.Fatal(<-results)).
@@ -27,18 +27,18 @@ total fn rewrite
       do
         true <- callerReturns send
           else
-            false -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverDoesNotReturn))
+            false -> outputs (Producer { state: ^producerUnknown, reason: ^reasonReceiverDoesNotReturn })
         count <- countProducerSends send sends
         true <- known count.producerProof
           else
             false -> outputs count.producerProof
-        Known (count: receives, reason: _) <- channelReceives function send.channel send.spawn engine
+        Known { count: receives, reason: _ } <- channelReceives function send.channel send.spawn engine
           else
-            Unknown (reason: reason) -> outputs (Producer (state: ^producerUnknown, reason: reason))
+            Unknown { reason } -> outputs (Producer { state: ^producerUnknown, reason })
         false <- receives == 0
           else
-            true -> outputs (Producer (state: ^producerUnknown, reason: ^reasonReceiverObligationUnknown))
+            true -> outputs (Producer { state: ^producerUnknown, reason: ^reasonReceiverObligationUnknown })
         true <- count.count > receives
           else
-            false -> outputs (Producer (state: ^producerDisproven, reason: ^reasonProducerWithinReceiveCount))
-        outputs (Producer (state: ^producerProven, reason: ^reasonProducerExceedsReceives))
+            false -> outputs (Producer { state: ^producerDisproven, reason: ^reasonProducerWithinReceiveCount })
+        outputs (Producer { state: ^producerProven, reason: ^reasonProducerExceedsReceives })

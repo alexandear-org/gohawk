@@ -13,7 +13,7 @@ host
   UnreleasedReturn
 
 total fn rewrite
-  fallback outputs (Unknown (reason: ^LockStateBudgetExhausted))
+  fallback outputs (Unknown { reason: ^LockStateBudgetExhausted })
   match inputs
     // A possible acquisition or unwitnessed local release leaves ownership unknown.
     // Complete caller-transfer contracts retain precedence over a missing release;
@@ -26,34 +26,34 @@ total fn rewrite
             false -> exhausted
         false <- uncertain queries
           else
-            true -> outputs (Unknown (reason: ^LoadedAcquisitionGuardUnknown))
+            true -> outputs (Unknown { reason: ^LoadedAcquisitionGuardUnknown })
         private <- private queries
         false <- private.Exhausted
           else
             true -> exhausted
         false <- private.Proven
           else
-            true -> outputs (Accepted (reason: ^PrivateMutexOnly))
+            true -> outputs (Accepted { reason: ^PrivateMutexOnly })
         true <- released queries
           else
-            false -> outputs (Unknown (reason: ^ReleaseOwnershipUnknown))
+            false -> outputs (Unknown { reason: ^ReleaseOwnershipUnknown })
         held <- held queries
         false <- held.Exhausted
           else
             true -> exhausted
         false <- held.Proven
           else
-            true -> outputs (Accepted (reason: held.Reason))
+            true -> outputs (Accepted { reason: held.Reason })
         caller <- caller queries
         false <- caller.Exhausted
           else
             true -> exhausted
         false <- caller.Proven
           else
-            true -> outputs (Accepted (reason: caller.Reason))
+            true -> outputs (Accepted { reason: caller.Reason })
         true <- returns queries
           else
-            false -> outputs (Accepted (reason: ^None))
-        outputs (Reported (reason: ^UnreleasedReturn))
+            false -> outputs (Accepted { reason: ^None })
+        outputs (Reported { reason: ^UnreleasedReturn })
       where
-        exhausted = outputs (Unknown (reason: ^LockStateBudgetExhausted))
+        exhausted = outputs (Unknown { reason: ^LockStateBudgetExhausted })

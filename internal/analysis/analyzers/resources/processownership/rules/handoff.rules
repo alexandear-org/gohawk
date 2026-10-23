@@ -38,7 +38,7 @@ total fn rewrite
     @Handoff
     inputs instruction command budget ->
       do
-        Called (common: common) <- handoffCall instruction
+        Called { common } <- handoffCall instruction
           else
             NotCalled() -> outputs missingHandoff()
         false <- handoffWait common
@@ -46,7 +46,7 @@ total fn rewrite
             true -> case mergedWaitReceiver common command of
               true -> outputs mergedHandoff()
               false -> outputs missingHandoff()
-        Visible (function: function) <- handoffBody common
+        Visible { function } <- handoffBody common
           else
             Opaque() -> do
               capture <- provePossibleCallbackCapture common.Value command budget

@@ -16,20 +16,20 @@ total fn rewrite
       when invokes common ->
       outputs ^InterfaceMethod carried
     @Append
-    inputs _ _ (Common (value: builtin@(Builtin()))) true
+    inputs _ _ (Common { value: Builtin() as builtin }) true
       when appendBuiltin builtin ->
       outputs ^Appended true
     // Preserve the inspected reason even when this builtin consumes nothing.
     @Builtin
-    inputs _ _ (Common (value: Builtin())) _ ->
+    inputs _ _ (Common { value: Builtin() }) _ ->
       outputs ^Appended false
     @Closure
-    inputs queries instruction (Common (value: closure@(Closure()))) carried ->
+    inputs queries instruction (Common { value: Closure() as closure }) carried ->
       case closure queries instruction closure carried of
-        Opaque (reason: reason) -> outputs reason true
-        Transparent (reason: reason) -> outputs reason false
+        Opaque { reason } -> outputs reason true
+        Transparent { reason } -> outputs reason false
     @Function
     inputs queries instruction common carried ->
       case function queries instruction common carried of
-        Opaque (reason: reason) -> outputs reason true
-        Transparent (reason: reason) -> outputs reason false
+        Opaque { reason } -> outputs reason true
+        Transparent { reason } -> outputs reason false

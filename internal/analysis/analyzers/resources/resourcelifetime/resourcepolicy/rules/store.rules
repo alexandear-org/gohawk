@@ -21,8 +21,8 @@ total fn rewrite
         false <- collectionOwner store storage
           else
             true -> outputs ^StoredOnCollectionOwner true
-        Disproven (reason: reason) <- wrapper queries store
+        Disproven { reason } <- wrapper queries store
           else
-            Proven (reason: reason) -> outputs reason true
-            Unknown (reason: reason) -> outputs reason true
+            Proven { reason } -> outputs reason true
+            Unknown { reason } -> outputs reason true
         outputs reason false

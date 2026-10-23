@@ -47,14 +47,14 @@ total fn rewrite
   match inputs
     // A primitive's fields are its internal state, never ordinary data.
     @Field
-    inputs field@(FieldAddress (owner: owner))
+    inputs (FieldAddress { owner } as field)
       when not (primitive (typeOf owner))
       , address field ->
       outputs true
     // Flag/counter writes cannot satisfy a modeled wait. Reads only choose among
     // branches the summary already keeps.
     @Write
-    inputs (Store (value: value, address: location))
+    inputs (Store { value, address: location })
       when inert (typeOf value)
       , address location ->
       outputs true
@@ -63,35 +63,35 @@ total fn rewrite
     inputs (Map() | SliceAllocation()) ->
       outputs true
     @Indexed
-    inputs index@(IndexAddress())
+    inputs (IndexAddress() as index)
       when address index ->
       outputs true
     // Reslicing shares elements and creates no new identity.
     @Resliced
-    inputs slice@(Slice())
+    inputs (Slice() as slice)
       when elements (typeOf slice) ->
       outputs true
     // Comma-ok results carry an element plus a Boolean; failed assertions panic.
     @Element
-    inputs value@(Lookup() | Assertion())
+    inputs ((Lookup() | Assertion()) as value)
       when inert (elementType value) ->
       outputs true
     // Select projections belong to the separate dispatch proof.
     @SelectProjection
-    inputs (Extraction (tuple: Selection())) ->
+    inputs (Extraction { tuple: Selection() }) ->
       outputs false
     @Projected
-    inputs value@(Extraction())
+    inputs (Extraction() as value)
       when inert (typeOf value) ->
       outputs true
     // Storing resource keys or values would publish them.
     @MapWrite
-    inputs (MapUpdate (key: key, value: value))
+    inputs (MapUpdate { key, value })
       when inert (typeOf key)
       , inert (typeOf value) ->
       outputs true
     // Comparing against nil cannot panic, including interface comparisons.
     @NilComparison
-    inputs (Binary (op: (^equalToken | ^notEqualToken), left: left, right: right))
+    inputs (Binary { op: (^equalToken | ^notEqualToken), left, right })
       when nilConstant left || nilConstant right ->
       outputs true

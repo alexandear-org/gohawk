@@ -5,7 +5,7 @@ host
   MemoryWriter
 
 total fn rewrite
-  fallback outputs (Unavailable (reason: ^EvidenceUnavailable))
+  fallback outputs (Unavailable { reason: ^EvidenceUnavailable })
   match inputs
     // This is a policy exclusion, not proof that a compressor was finalized.
     // Keep it before candidate evidence, tracing, allowances and all flow queries.
@@ -14,7 +14,7 @@ total fn rewrite
       do
         false <- memory queries
           else
-            true -> outputs (Accepted (reason: ^MemoryWriter))
+            true -> outputs (Accepted { reason: ^MemoryWriter })
         candidate <- begin queries
         decision <- acquire candidate
         outputs decision

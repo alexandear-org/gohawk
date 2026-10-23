@@ -13,14 +13,14 @@ total fn rewrite
   fallback outputs nil nil
   match inputs
     @Identifier
-    inputs _ identifier@(Identifier()) ->
+    inputs _ (Identifier() as identifier) ->
       outputs identifier nil
     // Array and slice element writes are outside this map-root policy. The Go
     // walk repeats these single steps without adding another traversal in a hook.
     @MapElement
-    inputs pass (Index (source: source))
+    inputs pass (Index { source })
       when mapSource pass source ->
       outputs nil source
     @Parenthesis
-    inputs _ (Parenthesis (source: source)) ->
+    inputs _ (Parenthesis { source }) ->
       outputs nil source

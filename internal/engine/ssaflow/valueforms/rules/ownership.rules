@@ -56,8 +56,8 @@ total fn rewrite
     // Loads and receives select from a holder. Arithmetic and logical operations
     // create a new value and supply no such ownership edge.
     @LoadedOrReceived
-    inputs (Unary (source: source, op: (^loadToken | ^receiveToken))) ->
+    inputs (Unary { source, op: (^loadToken | ^receiveToken) }) ->
       outputs source true
     @OtherUnary
-    inputs (Unary (source: source)) ->
+    inputs (Unary { source }) ->
       outputs source false

@@ -17,7 +17,7 @@ total fn rewrite
   fallback outputs false false
   match inputs
     @NilError
-    inputs engine ^AlwaysNil result _ (Case (errorOutcome: ^nilOutcome)) budget ->
+    inputs engine ^AlwaysNil result _ (Case { errorOutcome: ^nilOutcome }) budget ->
       case resultIs engine result ^AlwaysNonNil budget of
         true -> outputs true true
         false -> outputs false true
@@ -25,7 +25,7 @@ total fn rewrite
     inputs _ ^AlwaysNil _ _ _ _ ->
       outputs true false
     @NonNilError
-    inputs engine ^AlwaysNonNil result _ (Case (errorOutcome: ^nonNilOutcome)) budget ->
+    inputs engine ^AlwaysNonNil result _ (Case { errorOutcome: ^nonNilOutcome }) budget ->
       case resultIs engine result ^AlwaysNil budget of
         true -> outputs true true
         false -> outputs false true

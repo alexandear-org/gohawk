@@ -17,12 +17,12 @@ total fn rewrite
   fallback outputs (Opaque ^reasonLabelCallUnavailable) true
   match inputs
     @Missing
-    inputs (common: nil) ->
+    inputs { common: nil } ->
       outputs (NoAction ^reasonNone) true
     // A launched observer runs independently of the caller. Handle it before
     // receiver, summary and library contracts that describe synchronous calls.
     @Launched
-    inputs (analysis: analysis, instruction: Launch(), common: common) ->
+    inputs { analysis, instruction: Launch(), common } ->
       do
         label <- opaque analysis common ^reasonLabelLaunchedHelper
         case label of
@@ -33,18 +33,18 @@ total fn rewrite
     // append retains its arguments in a slice the caller keeps; the other
     // builtins only observe a channel or its capacity.
     @Appended
-    inputs (analysis: analysis, common: common@(Common (value: builtin@(Builtin()))))
+    inputs { analysis, common: Common { value: Builtin() as builtin } as common }
       when let name = name builtin
       , name == "append" ->
       case arguments analysis common of
         true -> outputs (Opaque ^reasonLabelAppended) true
         false -> outputs (NoAction ^reasonNone) true
     @OtherBuiltin
-    inputs (common: Common (value: Builtin())) ->
+    inputs { common: Common { value: Builtin() } } ->
       outputs (NoAction ^reasonNone) true
     @Direct
-    inputs (analysis: analysis, common: common) ->
+    inputs { analysis, common } ->
       case direct analysis common of
-        Decided (label: label) -> outputs label true
+        Decided { label } -> outputs label true
         Unrecognized() -> decline
       <|> outputs (NoAction ^reasonNone) false

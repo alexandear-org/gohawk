@@ -28,24 +28,24 @@ total fn rewrite
   fallback outputs ^ReferenceUnknown nil false
   match inputs
     @Condition
-    inputs call@(Call())
+    inputs (Call() as call)
       when let common = common call
       , condition common ->
       outputs ^ReferenceExact call false
     // A rejected call still returns its original value with false availability.
     @OtherCall
-    inputs call@(Call()) ->
+    inputs (Call() as call) ->
       outputs ^ReferenceRejected call false
     @Symbolic
-    inputs value@(Parameter() | Capture() | Channel()) ->
+    inputs ((Parameter() | Capture() | Channel()) as value) ->
       outputs ^ReferenceExact value (canceled (typeOf value))
     @Local
-    inputs value@(Allocation())
+    inputs (Allocation() as value)
       when synchronization (typeOf value) ->
       outputs ^ReferenceExact value false
     // Mutex addresses name cells, not mutable contents. The engine materializes
     // a nonempty embedded path to an existing address before exporting identity.
     @Address
-    inputs value@(Global() | Field())
+    inputs ((Global() | Field()) as value)
       when mutex (typeOf value) ->
       outputs ^ReferenceAddress value false

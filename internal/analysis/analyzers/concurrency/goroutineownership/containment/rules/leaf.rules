@@ -9,13 +9,13 @@ total fn rewrite
   match inputs
     // Captured addressable locals may have held the target at any point.
     @Closure
-    inputs walk closure@(Closure()) target ->
+    inputs walk (Closure() as closure) target ->
       case closure walk closure target of
         true -> outputs true
         false -> outputs false
     // Loading an aggregate carries the values its fields held. Arithmetic does not.
     @Load
-    inputs walk (Unary (op: ^loadToken, source: source)) target ->
+    inputs walk (Unary { op: ^loadToken, source }) target ->
       case source walk source target of
         true -> outputs true
         false -> outputs false
@@ -23,17 +23,17 @@ total fn rewrite
     // does not itself transfer ownership.
     // https://github.com/trustmaster/goflow/blob/bcaec740da3562ed5bf209d88b120c8e7c32a8e2/dsl/parse/strip_trivia_test.go#L29-L48
     @Stored
-    inputs walk value@(Allocation() | FieldAddress() | IndexAddress() | Assertion()) target ->
+    inputs walk ((Allocation() | FieldAddress() | IndexAddress() | Assertion()) as value) target ->
       case stored walk value target of
         true -> outputs true
         false -> outputs false
     @Projected
-    inputs walk (Slice (source: source) | Extract (source: source)) target ->
+    inputs walk (Slice { source } | Extract { source }) target ->
       case source walk source target of
         true -> outputs true
         false -> outputs false
     @Call
-    inputs walk call@(Call()) target ->
+    inputs walk (Call() as call) target ->
       case returned walk call target of
         true -> outputs true
         false -> outputs false
