@@ -27,9 +27,10 @@ class CIPolicyTest(unittest.TestCase):
         fake_go.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> go-invoked\n')
         fake_go.chmod(0o700)
         (self.root / "scripts").mkdir()
-        (self.root / "scripts/hyrule.sh").write_text(
-            '#!/bin/sh\nprintf "%s\\n" "$*" >> generation-invoked\n'
-        )
+        for generator in ("boiler", "hyrule"):
+            (self.root / f"scripts/{generator}.sh").write_text(
+                f'#!/bin/sh\nprintf "{generator} %s\\n" "$*" >> generation-invoked\n'
+            )
         self.environment = os.environ.copy()
         for name in ("CI", "GITHUB_ACTIONS", "MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES", "GOFLAGS", "HYRULE_READY"):
             self.environment.pop(name, None)
@@ -75,7 +76,7 @@ class CIPolicyTest(unittest.TestCase):
         result = self.run_make("test")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.marker.read_text(), "run ./tools/gendocs -generated-markdown\ntest ./...\n")
-        self.assertEqual((self.root / "generation-invoked").read_text(), "generate\n")
+        self.assertEqual((self.root / "generation-invoked").read_text(), "boiler generate\nhyrule generate\n")
 
 
 class GeneratedSourceBuildTest(unittest.TestCase):
