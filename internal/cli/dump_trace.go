@@ -253,7 +253,7 @@ func detailValue(value string) string {
 // directory when the file is under it.
 func relativePosition(directory, position string) string {
 	if relative, err := filepath.Rel(directory, position); err == nil && !strings.HasPrefix(relative, "..") {
-		return relative
+		return filepath.ToSlash(relative)
 	}
 	return position
 }
@@ -274,7 +274,7 @@ func newDeclarationIndex(graph *checker.Graph) declarationIndex {
 	for _, action := range graph.Roots {
 		pkg := action.Package
 		for _, file := range pkg.Syntax {
-			filename := pkg.Fset.Position(file.Pos()).Filename
+			filename := filepath.ToSlash(pkg.Fset.Position(file.Pos()).Filename)
 			if _, seen := index[filename]; seen {
 				continue
 			}
@@ -312,7 +312,7 @@ func (index declarationIndex) enclosing(position string) (string, declaration) {
 	if !ok {
 		return "", declaration{}
 	}
-	for _, declared := range index[filename] {
+	for _, declared := range index[filepath.ToSlash(filename)] {
 		if declared.start <= line && line <= declared.stop {
 			return declared.name, declared
 		}

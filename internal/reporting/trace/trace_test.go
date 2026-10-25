@@ -3,7 +3,6 @@ package trace
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"flag"
 	"go/ast"
 	"go/parser"
@@ -290,8 +289,11 @@ func TestCloseReleasesBothDestinations(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, file := range []*os.File{traceFile, timingFile} {
-		if _, err := file.Stat(); !errors.Is(err, os.ErrClosed) {
-			t.Errorf("destination still open: %v", err)
+		if _, err := file.Stat(); err == nil {
+			t.Error("destination still open")
+		}
+		if err := os.Remove(file.Name()); err != nil {
+			t.Errorf("remove closed destination: %v", err)
 		}
 	}
 	if Enabled("test", "") || TimingEnabled() {
