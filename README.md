@@ -60,20 +60,15 @@ gohawk -enable-all ./...
 
 ## How gohawk compares to other analyzers
 
-gohawk aims to complement other Go analyzers, not replace them. Each tool
-looks for a different kind of problem, so running several together catches
-more than any one alone.
-
-Deep, flow-based analysis of Go already covers several domains well.
+gohawk aims to complement other Go analyzers, not replace them. Deep, flow-based analysis of Go already covers several domains well.
 [NilAway](https://github.com/uber-go/nilaway) covers nil safety,
 [gosec](https://github.com/securego/gosec) covers security and taint
 analysis, and [Staticcheck](https://staticcheck.dev/) covers a broad range of
-general bugs. Resource management and concurrency are among the last big
-gaps, and that is the domain gohawk focuses on.
+general bugs. gohawk primarily focuses on resource management and concurrency, which is uncovered ground.
 
 ## golangci-lint integration
 
-gohawk can run as a module plugin inside a custom golangci-lint binary. See the
+There is no native GolangCI lint integration (yet!), but gohawk can run as a module plugin inside a custom golangci-lint binary. See the
 [golangci-lint integration guide](https://gohawk.dev/golangci-lint/)
 for build and configuration instructions.
 
@@ -88,13 +83,6 @@ gohawk was developed with assistance from LLMs, and AI-assisted contributions
 are permitted. Contributors must disclose AI usage, and every contribution must
 meet the project's strict standards for quality, testing, analyzer precision,
 and human readability. See the full [AI policy](https://gohawk.dev/ai-policy/).
-
-## Sponsorship
-
-If gohawk is useful to you or your organization, consider sponsoring its
-continued development. Sponsorship helps fund maintenance, new analyzers, and
-improvements to the documentation and developer experience. To discuss
-sponsorship, get in touch with [@kojah](https://github.com/kojah).
 
 ## License
 
