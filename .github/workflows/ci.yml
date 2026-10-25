@@ -281,6 +281,8 @@ jobs:
           if ($findings.Count -ne 1 -or $findings[0].category -ne 'resourcelifetime/missing-release') {
               throw "Expected exactly one resource leak and no finding for safe: $output"
           }
+          # The runner otherwise propagates the expected native exit code 3.
+          exit 0
 
   exhaustive-cli:
     runs-on: ubuntu-latest
