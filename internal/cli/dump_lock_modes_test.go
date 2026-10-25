@@ -52,3 +52,11 @@ func exclusive(){writer.Lock();next.Lock();next.Unlock();writer.Unlock()}
 		}
 	}
 }
+
+func TestLockGraphShortFile(t *testing.T) {
+	for _, filename := range []string{"lib.go", "/tmp/module/lib.go", `C:\Users\runner\module\lib.go`} {
+		if got := shortFile(filename); got != "lib.go" {
+			t.Errorf("shortFile(%q) = %q, want lib.go", filename, got)
+		}
+	}
+}

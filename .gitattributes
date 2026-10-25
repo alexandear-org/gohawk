@@ -1,3 +1,6 @@
+# Keep source and generated-text checks identical on every checkout platform.
+* text=auto eol=lf
+
 # Hyrule output: collapsed in GitHub diffs and excluded from language stats.
 *_gen.go linguist-generated=true
 .hyrule-manifest.json linguist-generated=true

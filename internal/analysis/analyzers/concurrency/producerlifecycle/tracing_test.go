@@ -92,7 +92,7 @@ func producerTrace(t *testing.T, pkg string) []producerTraceEvent {
 		}
 	}
 	t.Cleanup(func() {
-		if err := flags.Set("gohawk-trace", "none"); err != nil {
+		if err := trace.Close(); err != nil {
 			t.Error(err)
 		}
 	})

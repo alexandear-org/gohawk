@@ -829,11 +829,18 @@ exactly as they owe `Close` to `os.Open`. A wrapper that stores a caller's
 resource, or a type whose methods never release the field, produces no
 contract.
 
-Two process and type boundaries are modelled rather than guessed. Files
-listed in `os.ProcAttr.Files` and handed to `os.StartProcess` reach a call
-with no visible body inside an aggregate, so the child's inheritance of the
-descriptors is an opaque boundary and nothing is reported. A comma-ok
-assertion of the resource to its own type, or to an interface it satisfies,
+Process handoff evidence depends on the target platform's standard library.
+On Unix, `os.StartProcess` has a non-retaining summary for the process attributes,
+so handing over inherited descriptors does not discharge the parent's file
+cleanup; `process_handoff_unix.go` retains that diagnostic regression. On Windows,
+the same SSA call receives `unknown/aggregate-owner-may-escape`, and the final
+resource decision is `unknown/opaque-consumption`. This is a deliberate detection
+gap, not proof that the child owns or closes the parent's file. The portable
+`process_handoff.go` still diagnoses a file dropped after constructing a local
+stream slice, without the process handoff. No platform-name exemption is used in
+the analyzer; each target uses its actual summary evidence.
+
+A comma-ok assertion of the resource to its own type, or to an interface it satisfies,
 cannot fail for that value, so a release under the assertion is a release,
 in the caller and inside a helper alike; an assertion the resource does not
 satisfy leaves the release conditional.

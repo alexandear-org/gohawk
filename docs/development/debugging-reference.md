@@ -158,6 +158,12 @@ do not edit them by hand.
 The flags carry a `gohawk-` prefix because `x/tools` owns the generic `-trace`
 flag. Enabling tracing must never change which diagnostics are reported.
 
+Source positions use forward slashes on every platform. Candidate filters accept
+the host's native path separators as well as forward slashes. Code that embeds
+the tracer in a long-lived process or a test must call `trace.Close` when it owns
+and finishes recording; it releases both trace and timing files and disables
+recording. Restore any temporary `trace.Capture` before closing the configuration.
+
 ### Timing
 
 `-gohawk-timing-file=PATH` records cost rather than evidence: one JSON line

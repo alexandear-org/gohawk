@@ -11,6 +11,7 @@ import (
 
 	gohawk "github.com/kojah/gohawk/analyzers"
 	"github.com/kojah/gohawk/internal/cli/vetprofile"
+	analysisTrace "github.com/kojah/gohawk/internal/reporting/trace"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/unitchecker"
 )
@@ -63,6 +64,12 @@ type cliResult struct {
 // go vet invokes this same binary as its tool, the invocation carries a .cfg
 // file and is answered by unitchecker instead.
 func Main() int {
+	defer func() {
+		// Evidence output is best-effort and must not change the analysis status.
+		if err := analysisTrace.Close(); err != nil {
+			writeLine(os.Stderr, "gohawk: close evidence output:", err)
+		}
+	}()
 	runtime := cliRuntime{
 		output:        os.Stdout,
 		errorsOutput:  os.Stderr,

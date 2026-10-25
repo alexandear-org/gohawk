@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"go/ast"
 	"go/token"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -114,14 +115,8 @@ func write(pass *analysis.Pass, entry event) {
 	if !global.active.Load() || pass == nil {
 		return
 	}
-	position := ""
-	if entry.Pos.IsValid() {
-		position = pass.Fset.Position(entry.Pos).String()
-	}
-	candidate := ""
-	if entry.Candidate.IsValid() {
-		candidate = pass.Fset.Position(entry.Candidate).String()
-	}
+	position := sourcePosition(pass, entry.Pos)
+	candidate := sourcePosition(pass, entry.Candidate)
 	global.Lock()
 	defer global.Unlock()
 	if !selected(global.config, entry, candidate) {
@@ -150,6 +145,16 @@ func write(pass *analysis.Pass, entry event) {
 	_, _ = global.config.writer.Write(encoded)
 }
 
+// Keep candidate filters and emitted positions in the same portable spelling.
+func sourcePosition(pass *analysis.Pass, at token.Pos) string {
+	if !at.IsValid() {
+		return ""
+	}
+	position := pass.Fset.Position(at)
+	position.Filename = filepath.ToSlash(position.Filename)
+	return position.String()
+}
+
 func selected(config settings, entry event, candidate string) bool {
 	if !config.selectors["all"] && !config.selectors[entry.Analyzer] && (entry.Check == "" || !config.selectors[entry.Check]) {
 		return false
@@ -176,7 +181,7 @@ func enabledFor(pass *analysis.Pass, analyzer, check string, candidate token.Pos
 	if pass == nil || !candidate.IsValid() {
 		return false
 	}
-	return strings.Contains(pass.Fset.Position(candidate).String(), global.config.candidate)
+	return strings.Contains(sourcePosition(pass, candidate), global.config.candidate)
 }
 
 // Step is the part of a trace event that varies between emissions. The

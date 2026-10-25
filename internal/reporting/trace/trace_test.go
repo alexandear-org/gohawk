@@ -3,6 +3,7 @@ package trace
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"go/ast"
 	"go/parser"
@@ -140,17 +141,19 @@ func TestEmitDiagnosticResolvesEnclosingFunction(t *testing.T) {
 func resetTrace(t *testing.T) {
 	t.Helper()
 	global.Lock()
-	previous := global.config
+	previous, previousTiming := global.config, timingActive.Load()
 	global.config = settings{writer: osStderrForTest{}}
 	global.active.Store(false)
+	timingActive.Store(false)
 	global.Unlock()
 	t.Cleanup(func() {
-		global.Lock()
-		if global.config.file != nil {
-			_ = global.config.file.Close()
+		if err := Close(); err != nil {
+			t.Error(err)
 		}
+		global.Lock()
 		global.config = previous
 		global.active.Store(len(previous.selectors) > 0)
+		timingActive.Store(previousTiming)
 		global.Unlock()
 	})
 }
@@ -161,6 +164,7 @@ func (osStderrForTest) Write(value []byte) (int, error) { return len(value), nil
 
 func TestTimingFileRecordsOneLinePerRun(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "timing.jsonl")
+	resetTrace(t)
 	flags := flag.NewFlagSet("timing", flag.ContinueOnError)
 	RegisterFlags(flags)
 	if err := flags.Parse([]string{"-gohawk-timing-file=" + path}); err != nil {
@@ -244,5 +248,56 @@ func TestCaptureHandsRecordsToTheSinkAndRestores(t *testing.T) {
 	}
 	if output.Len() != 0 || global.active.Load() {
 		t.Fatalf("restore left tracing active or wrote %q", output.String())
+	}
+}
+
+func TestNativeSourcePathsMatchPortableCandidateFilters(t *testing.T) {
+	resetTrace(t)
+	files := token.NewFileSet()
+	file := files.AddFile(filepath.Join("source", "resource.go"), -1, 100)
+	file.SetLines([]int{0, 10, 20})
+	pass := &analysis.Pass{Fset: files}
+	for _, candidate := range []string{"source/resource.go:2", filepath.Join("source", "resource.go") + ":2"} {
+		var records []Record
+		restore := Capture([]string{"test"}, candidate, func(record Record) { records = append(records, record) })
+		probe := For(pass, "test", "", file.Pos(10))
+		if !probe.Enabled() {
+			t.Errorf("candidate %q did not select native source path", candidate)
+		}
+		probe.Decision(Step{Reason: "portable-position", Pos: file.Pos(20)})
+		restore()
+		if len(records) != 1 || records[0].Candidate != "source/resource.go:2:1" || records[0].Position != "source/resource.go:3:1" {
+			t.Errorf("candidate %q: records = %+v", candidate, records)
+		}
+	}
+}
+
+func TestCloseReleasesBothDestinations(t *testing.T) {
+	directory := t.TempDir()
+	resetTrace(t)
+	flags := flag.NewFlagSet("destinations", flag.ContinueOnError)
+	RegisterFlags(flags)
+	for name, value := range map[string]string{
+		"gohawk-trace": "all", "gohawk-trace-file": filepath.Join(directory, "trace.jsonl"),
+		"gohawk-timing-file": filepath.Join(directory, "timing.jsonl"),
+	} {
+		if err := flags.Set(name, value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	traceFile, timingFile := global.config.file, global.config.timing
+	if err := Close(); err != nil {
+		t.Fatal(err)
+	}
+	for _, file := range []*os.File{traceFile, timingFile} {
+		if _, err := file.Stat(); !errors.Is(err, os.ErrClosed) {
+			t.Errorf("destination still open: %v", err)
+		}
+	}
+	if Enabled("test", "") || TimingEnabled() {
+		t.Error("closing destinations left recording enabled")
+	}
+	if err := Close(); err != nil {
+		t.Errorf("closing twice: %v", err)
 	}
 }

@@ -129,6 +129,6 @@ func writeLockDot(buffer *bytes.Buffer, action *checker.Action, orders *lockorde
 }
 
 func shortFile(filename string) string {
-	// A missing slash gives -1, so the slice starts at zero and keeps the whole value.
-	return filename[strings.LastIndexByte(filename, '/')+1:]
+	// Dumps can contain positions from either host, including imported traces.
+	return filename[strings.LastIndexAny(filename, `/\`)+1:]
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -76,7 +77,7 @@ func (value optionValue) Set(raw string) error {
 		global.config.selectors = selectors
 		global.active.Store(len(selectors) > 0)
 	case optionCandidate:
-		global.config.candidate = raw
+		global.config.candidate = filepath.ToSlash(raw)
 	case optionFile:
 		if raw == "" {
 			return errors.New("trace file must not be empty")
@@ -126,7 +127,7 @@ func Capture(selectors []string, candidate string, sink func(Record)) (restore f
 	for _, selector := range selectors {
 		chosen[selector] = true
 	}
-	global.config.selectors, global.config.candidate, global.config.sink = chosen, candidate, sink
+	global.config.selectors, global.config.candidate, global.config.sink = chosen, filepath.ToSlash(candidate), sink
 	global.active.Store(len(chosen) > 0)
 	return func() {
 		global.Lock()
@@ -134,4 +135,21 @@ func Capture(selectors []string, candidate string, sink func(Record)) (restore f
 		global.config = previous
 		global.active.Store(wasActive)
 	}
+}
+
+// Close releases the configured trace and timing files and disables recording.
+// Restore any temporary Capture before closing its underlying configuration.
+func Close() error {
+	global.Lock()
+	defer global.Unlock()
+	var failures []error
+	for _, file := range []*os.File{global.config.file, global.config.timing} {
+		if file != nil {
+			failures = append(failures, file.Close())
+		}
+	}
+	global.config = settings{writer: os.Stderr}
+	global.active.Store(false)
+	timingActive.Store(false)
+	return errors.Join(failures...)
 }
