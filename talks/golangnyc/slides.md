@@ -33,11 +33,10 @@ mermaid:
 <div>
 <div class="eyebrow">GolangNYC · James Ko</div>
 <h1>Who<br>cleans up?</h1>
-<p class="subtitle">Finding resource and concurrency bugs in Go with <strong>gohawk</strong>.</p>
+<p class="subtitle"><strong>gohawk</strong></p>
 </div>
 <img src="/gohawk-logo.png" alt="A hawk sheltering a Go gopher" />
 </div>
-<div class="foot">gohawk.dev · github.com/kojah/gohawk</div>
 
 <!--
 SECTION 1 — 8 minutes total, slides 1–5. Elapsed target: 08:00.
@@ -49,9 +48,7 @@ No live network or running external worker is needed for any example.
 
 ---
 
-<div class="eyebrow">01 / Spot the bug</div>
-
-# Would you approve this?
+# Spot the bug.
 
 <<< @/examples/resources.go#leaky
 
@@ -66,7 +63,7 @@ Do not claim Close errors never matter: the happy path deliberately returns its 
 
 ---
 
-# The leak is on the error path
+# The missed return.
 
 <<< @/examples/resources.go#leaky {6-8}
 
@@ -81,16 +78,16 @@ Distinguish a reachable return from an imaginary combination of incompatible bra
 
 ---
 
-# The happy path is only one path
+# Two paths.
 
 ```mermaid
 flowchart LR
-  A[Open file] --> E{Open error?}
-  E -->|yes| R[Return error]
-  E -->|no| C[Copy header]
-  C --> Q{Copy error?}
-  Q -->|yes| L[Return with file still open]
-  Q -->|no| F[Close file]
+  A[Open] --> E{Error?}
+  E -->|yes| R[Return]
+  E -->|no| C[Copy]
+  C --> Q{Error?}
+  Q -->|yes| L[Leak]
+  Q -->|no| F[Close]
   style L fill:#593b2b,stroke:#ffbc79,color:#fff
 ```
 
@@ -105,7 +102,7 @@ Static analysis considers code paths without waiting for production to take them
 
 ---
 
-# Put cleanup next to acquisition
+# Defer it.
 
 <<< @/examples/resources.go#fixed {6}
 
@@ -123,11 +120,7 @@ That question is the bridge to gohawk.
 class: section
 ---
 
-<div class="eyebrow">02 / What gohawk catches · 10 min</div>
-
-# Make the missed path visible.
-
-<p class="subtitle">A static analyzer for resource management and concurrency in Go.</p>
+# Meet gohawk.
 
 <!--
 SECTION 2 — 10 minutes total, slides 6–12. Elapsed target: 18:00.
@@ -138,16 +131,10 @@ Source: repository README and docs/analyzers/.
 
 ---
 
-# A diagnostic you can act on
+# There it is.
 
 <div class="terminal">
 <p>owned resource from os.Open is not<br>released on every return path</p>
-</div>
-
-<div class="steps">
-<div class="step"><b>WHERE</b><span>The acquisition</span></div>
-<div class="step"><b>WHY</b><span>A return misses cleanup</span></div>
-<div class="step"><b>FIX</b><span>Defer or transfer ownership</span></div>
 </div>
 
 <!--
@@ -161,14 +148,14 @@ Source: internal/analysis/analyzers/resources/resourcelifetime/analyzer.go.
 
 ---
 
-# Same question, different resources
+# Who finishes?
 
-| You start…                        | Someone must…            |
-| --------------------------------- | ------------------------ |
-| A file or response body           | Close it                 |
-| A SQL transaction                 | Commit or roll it back   |
-| A worker with a completion signal | Wait for that completion |
-| A child process                   | Wait for its exit        |
+<div class="steps">
+<div class="step"><b>FILE</b><span>Close</span></div>
+<div class="step"><b>TRANSACTION</b><span>Commit / rollback</span></div>
+<div class="step"><b>WORKER</b><span>Join</span></div>
+<div class="step"><b>PROCESS</b><span>Wait</span></div>
+</div>
 
 <!--
 Context for the speaker: Each check has its own contracts and limits. Process ownership is experimental.
@@ -182,7 +169,7 @@ Sources: public resourcelifetime, goroutineownership and processownership pages.
 
 ---
 
-# A goroutine can have an unpaid duty too
+# Who waits?
 
 <<< @/examples/workers.go#unjoined
 
@@ -198,7 +185,7 @@ obligation is the positive evidence this check starts from.
 
 ---
 
-# The launching function owns the join
+# Join it.
 
 <<< @/examples/workers.go#joined {9}
 
@@ -213,9 +200,9 @@ The accepted example is checked against the same analyzer as the bad example.
 
 ---
 
-<div class="eyebrow">Experimental · processownership/missing-wait</div>
+<div class="eyebrow">Experimental</div>
 
-# Child processes, same shape
+# And processes?
 
 <<< @/examples/processes.go#process {6-9}
 
@@ -232,7 +219,7 @@ executed during validation: examples are compiled and analyzed only.
 
 ---
 
-# Choose the checks you want
+# Choose your checks.
 
 ```sh
 gohawk ./...
@@ -256,11 +243,7 @@ use list and doc from the installed version. Source: docs/configuration.md.
 class: section
 ---
 
-<div class="eyebrow">03 / How it follows the code · 15 min</div>
-
-# Cleanup rarely stays<br>in one function.
-
-<p class="subtitle">Follow the opening example across a helper boundary.</p>
+# Across helpers.
 
 <!--
 SECTION 3 — 15 minutes total, slides 13–21. Elapsed target: 33:00.
@@ -271,7 +254,7 @@ all resources in every program are accounted for.
 
 ---
 
-# Would a helper confuse the analysis?
+# Still closed.
 
 <<< @/examples/resources.go#helpers
 
@@ -286,20 +269,18 @@ The example is imported directly from the validated Go source.
 
 ---
 
-# Summarize the promise
+# Remember the promise.
 
 <div class="two">
 <div class="panel">
-<h2>Inside the helper</h2>
-<p><code>closeFile(file)</code><br>closes its parameter.</p>
+<h2>Helper</h2>
+<p>Closes parameter 0.</p>
 </div>
 <div class="panel">
-<h2>At the call site</h2>
-<p>That parameter is bound to<br><em>this caller’s file</em>.</p>
+<h2>Caller</h2>
+<p>Parameter 0 = this file.</p>
 </div>
 </div>
-
-<p class="statement">Reuse the guarantee.<br>Keep the value identity.</p>
 
 <!--
 Spend about 2 minutes. A function summary records selected behavior rather than
@@ -312,15 +293,14 @@ Source: docs/development/fact-model.md and docs/architecture.md.
 
 ---
 
-# Bind the helper’s argument to the caller’s file
+# The same file.
 
 ```mermaid
 flowchart LR
-  O[os.Open result] --> V[Caller file value]
-  V --> B[Helper parameter]
-  B --> C[Close that parameter]
-  C --> S[Cleanup guarantee]
-  S -. applied at the call .-> V
+  O[Open] --> V[File]
+  V --> B[Parameter 0]
+  B --> C[Close]
+  C -. summary .-> V
 ```
 
 <!--
@@ -335,11 +315,7 @@ full heap or alias model.
 
 ---
 
-# A little SSA, only where it helps
-
-<div class="panel">
-<p><strong>Static single assignment</strong> gives each computed value its own identity.</p>
-</div>
+# Follow the value.
 
 ```text
 file₁, err₁ = Open(path)
@@ -361,12 +337,12 @@ we will not derive the whole intermediate representation on stage.
 
 ---
 
-# Classify actions, then ask the flow
+# Find → classify → follow
 
 <div class="steps">
-<div class="step"><b>1 · FIND</b><span>What exact obligation began?</span></div>
-<div class="step"><b>2 · CLASSIFY</b><span>Cleanup, transfer, unknown, or neither?</span></div>
-<div class="step"><b>3 · FOLLOW</b><span>What reaches each feasible return?</span></div>
+<div class="step"><span>Obligation</span></div>
+<div class="step"><span>Actions</span></div>
+<div class="step"><span>Returns</span></div>
 </div>
 
 <!--
@@ -382,14 +358,12 @@ Source: docs/architecture.md, lifecycle analyzer section.
 
 ---
 
-# “Unknown” is a useful answer
+# Unknown is an answer.
 
-| Evidence on a path            | Meaning for the report          |
-| ----------------------------- | ------------------------------- |
-| Exact cleanup                 | The duty is discharged          |
-| Recognized ownership transfer | A local leak is not established |
-| Opaque handoff                | The analysis cannot decide      |
-| Proven uncovered return       | A report may be justified       |
+<div class="two">
+<div class="panel"><h2>Cleanup / transfer</h2><p>No report.</p></div>
+<div class="panel"><h2>Unknown</h2><p>No report.</p></div>
+</div>
 
 <!--
 Context for the speaker: Unknown suppresses a diagnostic. It does not certify the program safe.
@@ -403,14 +377,12 @@ The last row says may because final reporting can include other policy exclusion
 
 ---
 
-# Summaries cross packages
+# Across packages.
 
 ```mermaid
 flowchart LR
-  D[Analyze dependency package] --> F[Publish selected function facts]
-  F --> I[Import facts in caller package]
-  I --> B[Bind arguments and results]
-  B --> P[Evaluate caller paths]
+  D[Dependency] --> F[Summary]
+  F --> I[Caller]
 ```
 
 <!--
@@ -425,7 +397,7 @@ Source: docs/development/fact-model.md, selecting knowledge before analysis.
 
 ---
 
-# Let the Go toolchain drive the run
+# Built on go vet.
 
 <div class="terminal">
 <p>gohawk ./...<br>  → go vet -vettool=… -json<br>  → package analysis + cached facts<br>  → diagnostics</p>
@@ -445,11 +417,7 @@ Source: docs/architecture.md, how a run is driven.
 class: section
 ---
 
-<div class="eyebrow">04 / When should it stay silent? · 10 min</div>
-
-# A warning spends<br>the reader’s attention.
-
-<p class="subtitle">The hard part is deciding when the evidence is strong enough.</p>
+# Warnings cost attention.
 
 <!--
 SECTION 4 — 10 minutes total, slides 22–28. Elapsed target: 43:00.
@@ -460,7 +428,7 @@ measurement. A trustworthy diagnostic should point toward an actionable change.
 
 ---
 
-# No local Close. Still a leak?
+# A leak?
 
 <<< @/examples/resources.go#transfer
 
@@ -475,16 +443,16 @@ prove its eventual caller will close it; it changes the local ownership question
 
 ---
 
-# Similar syntax, different evidence
+# Dropped or handed on?
 
 <div class="two">
 <div class="panel">
-<h2>Reportable local leak</h2>
-<p>Acquisition succeeds.<br>A feasible return drops it.<br>No cleanup or handoff covers that path.</p>
+<h2>Dropped</h2>
+<p>Open → return</p>
 </div>
 <div class="panel">
-<h2>Ownership transfer</h2>
-<p>Acquisition succeeds.<br>The exact resource is returned.<br>The local duty moves to the caller.</p>
+<h2>Transferred</h2>
+<p>Open → new owner</p>
 </div>
 </div>
 
@@ -499,15 +467,13 @@ require deeper ownership evidence; it is outside this simple example.
 
 ---
 
-# Silence has more than one meaning
+# Silence ≠ safety.
 
 <div class="steps">
-<div class="step"><b>COVERED</b><span>Recognized cleanup or handoff</span></div>
-<div class="step"><b>UNKNOWN</b><span>Opaque ownership or a proof limit</span></div>
-<div class="step"><b>OUTSIDE SCOPE</b><span>No supported obligation to check</span></div>
+<div class="step"><span>Covered</span></div>
+<div class="step"><span>Unknown</span></div>
+<div class="step"><span>Outside scope</span></div>
 </div>
-
-<p class="statement">No warning ≠ no bug.</p>
 
 <!--
 Spend about 90 seconds. Work without a recognizable completion signal is a good
@@ -519,16 +485,16 @@ contract, not a claim of whole-program correctness.
 
 ---
 
-# Safe examples earn their place first
+# Test the lookalikes.
 
 <div class="two">
 <div class="panel">
-<h2>Should report</h2>
-<p>A return drops the file.<br>A worker’s join is abandoned.<br>Only one branch waits for a process.</p>
+<h2>Report</h2>
+<p>Leak · abandoned join</p>
 </div>
 <div class="panel">
-<h2>Should accept</h2>
-<p>Cleanup through a helper.<br>A returned owner.<br>A join before every return.</p>
+<h2>Accept</h2>
+<p>Helper · transfer · join</p>
 </div>
 </div>
 
@@ -544,13 +510,13 @@ set and do not replace the analyzer's larger local testdata suite.
 
 ---
 
-# Then take it into real repositories
+# Into the wild.
 
 <div class="steps">
-<div class="step"><b>RUN</b><span>Collect findings on pinned revisions</span></div>
-<div class="step"><b>REVIEW</b><span>Read the code and its lifecycle</span></div>
-<div class="step"><b>MINIMIZE</b><span>Turn mistakes into focused regressions</span></div>
-<div class="step"><b>REPLAY</b><span>Keep reviewed labels honest</span></div>
+<div class="step"><span>Run</span></div>
+<div class="step"><span>Review</span></div>
+<div class="step"><span>Minimize</span></div>
+<div class="step"><span>Replay</span></div>
 </div>
 
 <!--
@@ -565,9 +531,9 @@ Source: AGENTS.md precision policy and development audit guidance.
 
 ---
 
-# A deliberate tradeoff
+# Precision first.
 
-<p class="statement">Accept some missed bugs<br>to avoid asking users to fix<br><strong>correct code.</strong></p>
+<p class="statement">Don’t flag<br><strong>correct code.</strong></p>
 
 <!--
 Context for the speaker: Keep uncertain ownership uncertain.
@@ -583,11 +549,7 @@ Bridge: here is what a reviewed report can turn into in a real project.
 class: section
 ---
 
-<div class="eyebrow">05 / Real impact → try it yourself · 7 min</div>
-
-# From a missing Wait<br>to a Docker fix.
-
-<p class="subtitle">A finding starts the investigation. The review establishes the bug.</p>
+# Docker. A missing Wait.
 
 <!--
 Context for the speaker: moby/moby #53517 · Reap nft process on errors
@@ -601,16 +563,16 @@ Status/merge claims are intentionally omitted: this slide explains the patch.
 
 ---
 
-# Two problems in one subprocess wrapper
+# One report. Two bugs.
 
 <div class="two">
 <div class="panel">
-<h2>The lifecycle finding</h2>
-<p>Start succeeds.<br>A later I/O error returns.<br><code>Wait</code> is skipped.</p>
+<h2>gohawk found</h2>
+<p>A skipped Wait.</p>
 </div>
 <div class="panel">
-<h2>The review also found</h2>
-<p>Parent drains stdout first.<br>Child fills stderr’s pipe.<br>Both can block.</p>
+<h2>Review found</h2>
+<p>A pipe deadlock.</p>
 </div>
 </div>
 
@@ -626,7 +588,7 @@ came from review and a reproduction; do not attribute general deadlock detection
 
 ---
 
-# Let os/exec manage the lifecycle
+# Let Run handle it.
 
 ```go
 // Simplified from the proposed Docker patch.
@@ -652,17 +614,12 @@ Source: https://pkg.go.dev/os/exec#Cmd.Run and the linked PR diff.
 
 ---
 
-# Try it on one package you know
+# Try it.
 
 ```sh
-# Install from source, or use a release binary.
 go install github.com/kojah/gohawk@latest
 
 gohawk ./...
-gohawk doc resourcelifetime/missing-release
-
-# Standard Go tooling integration.
-go vet -vettool="$(command -v gohawk)" ./...
 ```
 
 <!--
@@ -677,16 +634,16 @@ on an unfamiliar large repository as the first demo.
 
 ---
 
-# Put it into the workflow
+# Make it routine.
 
 <div class="two">
 <div class="panel">
-<h2>For your project</h2>
-<p>Pin the tool version in CI.<br>Choose checks deliberately.<br>Review ownership before suppressing.</p>
+<h2>Use it</h2>
+<p>Pin. Run. Review.</p>
 </div>
 <div class="panel">
-<h2>For gohawk</h2>
-<p>Bring a minimized example.<br>Include the safe lookalike.<br>Explain who owns cleanup.</p>
+<h2>Improve it</h2>
+<p>Small reproductions.</p>
 </div>
 </div>
 
@@ -701,15 +658,9 @@ lifecycle. Tests and source review remain part of the workflow.
 
 ---
 
-# Back to that twelve-line function
+# Who cleans up?
 
-<div class="steps">
-<div class="step"><b>ACQUIRE</b><span>A file opens successfully</span></div>
-<div class="step"><b>FOLLOW</b><span>A copy fails before cleanup</span></div>
-<div class="step"><b>REPAIR</b><span>Defer cleanup or transfer the duty</span></div>
-</div>
-
-<p class="statement">For every start:<br><strong>who owns finishing it?</strong></p>
+<p class="statement">Open → ? → Close</p>
 
 <!--
 Spend about 1 minute 45 seconds. Close the narrative with the same opening example.
@@ -722,11 +673,9 @@ Next slide begins the reserved ten-minute Q&A.
 class: section
 ---
 
-<div class="eyebrow">06 / Questions · 10 min</div>
+# Your questions.
 
-# What would you<br>point it at?
-
-<p class="subtitle"><strong>gohawk.dev</strong><br>github.com/kojah/gohawk</p>
+<p class="subtitle"><strong>gohawk.dev</strong></p>
 
 <!--
 Context for the speaker: Questions about ownership, safe lookalikes, summaries, or adoption?
@@ -741,12 +690,11 @@ need a pinned version, a corpus and reviewed measurements. Do not improvise numb
 
 <div class="eyebrow">Backup / scope</div>
 
-# What this talk does not establish
+# The limits.
 
-- That a silent program is bug-free.
-- That arbitrary framework ownership can be inferred.
-- That a stop request means a goroutine has completed.
-- That a subprocess report proves a pipe deadlock.
+- Silence ≠ safety
+- Cancellation ≠ completion
+- Unknown stays unknown
 
 <!--
 Context for the speaker: Each diagnostic is bounded by its check’s documented evidence model.
@@ -760,7 +708,7 @@ unreported case, inspect the actual version and trace before promising coverage.
 
 <div class="eyebrow">Backup / process lifecycle</div>
 
-# When immediate completion fits: Run
+# Run.
 
 <<< @/examples/processes.go#processfixed
 
@@ -776,7 +724,7 @@ causes the child to exit. This accepted example is compiled and analyzed, not ru
 
 <div class="eyebrow">Backup / sources</div>
 
-# Follow the evidence
+# Sources.
 
 - [Resource lifetime](https://gohawk.dev/analyzers/resources-and-lifecycle/resourcelifetime/)
 - [Goroutine ownership](https://gohawk.dev/analyzers/concurrency-and-synchronization/goroutineownership/)
